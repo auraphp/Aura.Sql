@@ -10,6 +10,6 @@ $di->params['Aura\Sql\ConnectionManager']['default'] = array(
     'dsn'      => array(
         'host' => 'localhost',
     ),
-    'username' => 'your_username',
-    'password' => 'your_password',
+    'username' => 'lithium_blog',
+    'password' => 'lithium_blog',
 );
