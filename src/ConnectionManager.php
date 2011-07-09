@@ -37,9 +37,9 @@ class ConnectionManager
     // pick a random slave, or a random master if no slaves, or default if no masters
     public function getRead()
     {
-        if ($slaves) {
+        if (!empty($this->slaves)) {
             return $this->getRandomSlave();
-        } elseif ($masters) {
+        } elseif (!empty($this->masters)) {
             return $this->getRandomMaster();
         } else {
             return $this->getDefault();
@@ -49,7 +49,7 @@ class ConnectionManager
     // pick a random master or the default
     public function getWrite()
     {
-        if ($masters) {
+        if (!empty($this->masters)) {
             return $this->getRandomMaster();
         } else {
             return $this->getDefault();
