@@ -83,7 +83,7 @@ class ConnectionManager
     }
     
     // converts a random $this->masters entry to a Connection object
-    public function getRandomSlave()
+    public function getRandomSlave($key = null)
     {
         if (! $key) {
             $key = array_rand($this->slaves);
