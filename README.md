@@ -1,9 +1,9 @@
 The Aura.Sql package will provide adapters for connecting to these relational database systems:
 
-- Microsoft SQL Server (Windows only)
 - MySQL
 - Oracle
 - Postgres
+- SQL Server (Windows only)
 - Sqlite 2
 - Sqlite 3
 
