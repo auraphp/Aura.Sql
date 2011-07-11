@@ -29,7 +29,7 @@ class ConnectionManager
         array $slaves = array()
     ) {
         $this->factory = $factory;
-        $this->default = array_merge_recursive($this->default, $default);
+        $this->default = $this->merge($default);
         $this->masters = $masters;
         $this->slaves = $slaves;
     }
@@ -60,10 +60,10 @@ class ConnectionManager
     public function getDefault()
     {
         if (! $this->conn['default'] instanceof Connection) {
-            list($adapter, $params) = $this->merge();
+            list($adapter, $params) = $this->mergeAdapterParams();
             $this->conn['default'] = $this->factory->newInstance($adapter, $params);
         }
-        return $this->default;
+        return $this->conn['default'];
     }
     
     // converts a $this->masters entry to a Connection object and returns is
@@ -76,7 +76,7 @@ class ConnectionManager
         }
         
         if (! $this->conn['masters'][$key] instanceof Connection) {
-            list($adapter, $params) = $this->merge($this->masters[$key]);
+            list($adapter, $params) = $this->mergeAdapterParams($this->masters[$key]);
             $this->conn['masters'][$key] = $this->factory->newInstance($adapter, $params);
         }
         return $this->conn['masters'][$key];
@@ -92,16 +92,16 @@ class ConnectionManager
         }
         
         if (! $this->conn['slaves'][$key] instanceof Connection) {
-            list($adapter, $params) = $this->merge($this->slaves[$key]);
+            list($adapter, $params) = $this->mergeAdapterParams($this->slaves[$key]);
             $this->conn['slaves'][$key] = $this->factory->newInstance($adapter, $params);
         }
         return $this->conn['slaves'][$key];
     }
     
     // merges $this->default with master or slave override values
-    public function merge(array $override = array())
+    public function mergeAdapterParams(array $override = array())
     {
-        $merged  = array_merge_recursive($this->default, $override);
+        $merged  = $this->merge($override);
         $adapter = $merged['adapter'];
         $params  = array(
             'dsn'      => $merged['dsn'],
@@ -110,5 +110,27 @@ class ConnectionManager
             'options'  => $merged['options'],
         );
         return array($adapter, $params);
+    }
+    
+    public function merge(array $override = array())
+    {
+        // pre-empt merging if possible
+        if (! $override) {
+            return $this->default;
+        }
+        
+        // recursively merge, which turns scalars into arrays
+        $merged = array_merge_recursive($this->default, $override);
+        
+        // convert the keys that are supposed to be scalars
+        $list = array('adapter', 'username', 'password');
+        foreach ($list as $key) {
+            if (is_array($merged[$key])) {
+                $merged[$key] = end($merged[$key]);
+            }
+        }
+        
+        // done!
+        return $merged;
     }
 }
