@@ -7,21 +7,11 @@ namespace Aura\Sql\Connection;
  */
 class MysqlTest extends AbstractConnectionTest
 {
+    protected $extension = 'pdo_mysql';
+    
     protected $connect_type = 'mysql';
     
-    protected $connect_params = array(
-        'dsn' => array(
-            'host' => 'localhost',
-            'dbname' => 'test',
-        ),
-        'username' => 'root',
-        'password' => 'admin',
-        'options' => array(),
-    );
-    
     protected $expect_class = 'Aura\Sql\Connection\Mysql';    
-    
-    protected $expect_dsn_string = 'mysql:host=localhost;dbname=test';
     
     protected $create_table = "CREATE TABLE aura (
         id int NOT NULL AUTO_INCREMENT,

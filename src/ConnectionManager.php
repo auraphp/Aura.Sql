@@ -1,5 +1,8 @@
 <?php
 namespace Aura\Sql;
+use Aura\Sql\Exception\NoSuchMaster as NoSuchMasterException;
+use Aura\Sql\Exception\NoSuchSlave as NoSuchSlaveException;
+
 class ConnectionManager
 {
     protected $default = array(
@@ -29,7 +32,7 @@ class ConnectionManager
         array $slaves = array()
     ) {
         $this->factory = $factory;
-        $this->default = $this->merge($default);
+        $this->default = $default;
         $this->masters = $masters;
         $this->slaves = $slaves;
     }
@@ -37,10 +40,10 @@ class ConnectionManager
     // pick a random slave, or a random master if no slaves, or default if no masters
     public function getRead()
     {
-        if (!empty($this->slaves)) {
-            return $this->getRandomSlave();
-        } elseif (!empty($this->masters)) {
-            return $this->getRandomMaster();
+        if ($this->slaves) {
+            return $this->getSlave();
+        } elseif ($this->masters) {
+            return $this->getMaster();
         } else {
             return $this->getDefault();
         }
@@ -49,8 +52,8 @@ class ConnectionManager
     // pick a random master or the default
     public function getWrite()
     {
-        if (!empty($this->masters)) {
-            return $this->getRandomMaster();
+        if ($this->masters) {
+            return $this->getMaster();
         } else {
             return $this->getDefault();
         }
@@ -72,26 +75,33 @@ class ConnectionManager
         if (! $key) {
             $key = array_rand($this->masters);
         } elseif (! isset($this->masters[$key])) {
-            throw new Exception\NoSuchConnection;
+            throw new NoSuchMasterException($key);
         }
         
-        if (! $this->conn['masters'][$key] instanceof Connection) {
+        $is_conn = ! empty($this->conn['masters'][$key])
+                && $this->conn['masters'][$key] instanceof Connection;
+                
+        if (! $is_conn) {
             list($adapter, $params) = $this->mergeAdapterParams($this->masters[$key]);
             $this->conn['masters'][$key] = $this->factory->newInstance($adapter, $params);
         }
+        
         return $this->conn['masters'][$key];
     }
     
     // converts a random $this->masters entry to a Connection object
-    public function getRandomSlave($key = null)
+    public function getSlave($key = null)
     {
         if (! $key) {
             $key = array_rand($this->slaves);
         } elseif (! isset($this->slaves[$key])) {
-            throw new Exception\NoSuchConnection;
+            throw new NoSuchSlaveException($key);
         }
         
-        if (! $this->conn['slaves'][$key] instanceof Connection) {
+        $is_conn = ! empty($this->conn['slaves'][$key])
+                && $this->conn['slaves'][$key] instanceof Connection;
+        
+        if (! $is_conn) {
             list($adapter, $params) = $this->mergeAdapterParams($this->slaves[$key]);
             $this->conn['slaves'][$key] = $this->factory->newInstance($adapter, $params);
         }
@@ -99,9 +109,9 @@ class ConnectionManager
     }
     
     // merges $this->default with master or slave override values
-    public function mergeAdapterParams(array $override = array())
+    protected function mergeAdapterParams(array $override = array())
     {
-        $merged  = $this->merge($override);
+        $merged  = $this->merge($this->default, $override);
         $adapter = $merged['adapter'];
         $params  = array(
             'dsn'      => $merged['dsn'],
@@ -112,25 +122,16 @@ class ConnectionManager
         return array($adapter, $params);
     }
     
-    public function merge(array $override = array())
+    protected function merge($baseline, $override)
     {
-        // pre-empt merging if possible
-        if (! $override) {
-            return $this->default;
-        }
-        
-        // recursively merge, which turns scalars into arrays
-        $merged = array_merge_recursive($this->default, $override);
-        
-        // convert the keys that are supposed to be scalars
-        $list = array('adapter', 'username', 'password');
-        foreach ($list as $key) {
-            if (is_array($merged[$key])) {
-                $merged[$key] = end($merged[$key]);
+        foreach ($override as $key => $val) {
+            if (array_key_exists($key, $baseline) && is_array($val)) {
+                $baseline[$key] = $this->merge($baseline[$key], $override[$key]);
+            } else {
+                $baseline[$key] = $val;
             }
         }
-        
-        // done!
-        return $merged;
+
+        return $baseline;
     }
 }

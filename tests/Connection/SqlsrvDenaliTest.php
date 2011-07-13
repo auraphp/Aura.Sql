@@ -11,19 +11,7 @@ class SqlsrvDenaliTest extends SqlsrvTest
 {
     protected $connect_type = 'sqlsrv_denali';
     
-    protected $connect_params = array(
-        'dsn' => array(
-            'Server' => 'jic-31.jic',
-            'Database' => 'ZF',
-        ),
-        'username' => 'sa',
-        'password' => 'JIC2011@MS',
-        'options' =>  array(),
-    );
-    
     protected $expect_class = 'Aura\Sql\Connection\SqlsrvDenali';
-    
-    protected $expect_dsn_string = 'sqlsrv:Server=jic-31.jic;Database=ZF';
     
     public function testFetchTableList()
     {

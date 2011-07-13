@@ -20,6 +20,8 @@ use PDO;
  */
 abstract class AbstractConnectionTest extends \PHPUnit_Framework_TestCase
 {
+    protected $extension;
+    
     protected $dsn = array();
     
     protected $connect_type;
@@ -63,6 +65,17 @@ abstract class AbstractConnectionTest extends \PHPUnit_Framework_TestCase
     {
         parent::setUp();
         
+        // skip if we don't have the extension
+        if (! extension_loaded($this->extension)) {
+            $this->markTestSkipped("Extension '{$this->extension}' not loaded.");
+        }
+        
+        // load test config values
+        $class = get_class($this);
+        $this->connect_params = $GLOBALS[$class]['connect_params'];
+        $this->expect_dsn_string = $GLOBALS[$class]['expect_dsn_string'];
+        
+        // build the connection object
         $forge = new Forge(new Config);
         
         $signal_manager = new SignalManager(new HandlerFactory, new ResultFactory, new ResultCollection);
@@ -82,16 +95,6 @@ abstract class AbstractConnectionTest extends \PHPUnit_Framework_TestCase
         $this->dropTable();
         $this->createTable();
         $this->fillTable();
-    }
-    
-    /**
-     * Tears down the fixture, for example, closes a network connection.
-     * This method is called after a test is executed.
-     */
-    protected function tearDown()
-    {
-        parent::tearDown();
-        $this->dropTable();
     }
     
     protected function createTable()

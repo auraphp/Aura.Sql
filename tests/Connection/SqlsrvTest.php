@@ -7,21 +7,11 @@ namespace Aura\Sql\Connection;
  */
 class SqlsrvTest extends AbstractConnectionTest
 {
+    protected $extension = 'sqlsrv';
+    
     protected $connect_type = 'sqlsrv';
     
-    protected $connect_params = array(
-        'dsn' => array(
-            'Server' => 'localhost\\SQLEXPRESS',
-            'Database' => 'test',
-        ),
-        'username' => 'sa',
-        'password' => 'JIC2011@MS',
-        'options' =>  array(),
-    );
-    
     protected $expect_class = 'Aura\Sql\Connection\Sqlsrv';
-    
-    protected $expect_dsn_string = 'sqlsrv:Server=localhost\\SQLEXPRESS;Database=test';
     
     protected $create_table = "CREATE TABLE aura (
         id int IDENTITY NOT NULL,
