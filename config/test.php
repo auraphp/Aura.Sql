@@ -1,5 +1,10 @@
 <?php
 /**
+ * Package prefix for autoloader.
+ */
+$loader->addPrefix('Aura\Sql\\', dirname(__DIR__) . DIRECTORY_SEPARATOR . 'tests');
+
+/**
  * MysqlTest
  */
 $GLOBALS['Aura\Sql\Connection\MysqlTest']['connect_params'] = array(
