@@ -160,7 +160,7 @@ abstract class AbstractConnection
     public function fetchValue($spec, array $data = array())
     {
         if ($spec instanceof Select) {
-            $select->limit = 1;
+            $spec->limit = 1;
         }
         $stmt = $this->query($spec, $data);
         return $stmt->fetchColumn(0);
@@ -206,7 +206,7 @@ abstract class AbstractConnection
     public function fetchOne($spec, array $data = array())
     {
         if ($spec instanceof Select) {
-            $select->limit = 1;
+            $spec->limit = 1;
         }
         $stmt = $this->query($spec, $data);
         return $stmt->fetch(PDO::FETCH_ASSOC);

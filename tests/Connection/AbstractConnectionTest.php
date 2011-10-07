@@ -202,6 +202,15 @@ abstract class AbstractConnectionTest extends \PHPUnit_Framework_TestCase
         $actual = $this->conn->fetchValue($text);
         $expect = '1';
         $this->assertSame($expect, $actual);
+        
+        // use a Select
+        $select = new Select;
+        $select->cols[] = 'id';
+        $select->from[] = $this->table;
+        $select->where['id = ?'] = 1;
+        $actual = $this->conn->fetchValue($select);
+        $expect = '1';
+        $this->assertSame($expect, $actual);
     }
     
     public function testFetchPairs()
@@ -227,6 +236,19 @@ abstract class AbstractConnectionTest extends \PHPUnit_Framework_TestCase
     {
         $text = "SELECT id, name FROM {$this->table} WHERE id = 1";
         $actual = $this->conn->fetchOne($text);
+        $expect = array (
+            'id'   => '1',
+            'name' => 'Anna',
+        );
+        $this->assertSame($expect, $actual);
+
+        // use a Select
+        $select = new Select;
+        $select->cols[] = 'id';
+        $select->cols[] = 'name';
+        $select->from[] = $this->table;
+        $select->where['id = ?'] = 1;
+        $actual = $this->conn->fetchOne($select);
         $expect = array (
             'id'   => '1',
             'name' => 'Anna',

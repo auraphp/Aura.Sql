@@ -34,6 +34,16 @@ class Select
         $this->order    = new \ArrayObject;
     }
     
+    public function distinct($flag = true)
+    {
+        $this->distinct = (bool) $flag;
+    }
+    
+    public function cols($spec)
+    {
+        
+    }
+    
     public function __toString()
     {
         // is this a SELECT or SELECT DISTINCT?
