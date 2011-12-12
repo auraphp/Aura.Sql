@@ -134,14 +134,14 @@ abstract class AbstractConnectionTest extends \PHPUnit_Framework_TestCase
     public function testConnect()
     {
         $actual = $this->conn->connect();
-        $this->assertType('\PDO', $actual);
+        $this->assertInstanceOf('\PDO', $actual);
     }
     
     public function testQuery()
     {
         $text = "SELECT * FROM {$this->table}";
         $stmt = $this->conn->query($text);
-        $this->assertType('PDOStatement', $stmt);
+        $this->assertInstanceOf('PDOStatement', $stmt);
         $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
         $expect = 10;
         $actual = count($result);
@@ -153,7 +153,7 @@ abstract class AbstractConnectionTest extends \PHPUnit_Framework_TestCase
         $text = "SELECT * FROM {$this->table} WHERE id <= :val";
         $data['val'] = '5';
         $stmt = $this->conn->query($text, $data);
-        $this->assertType('PDOStatement', $stmt);
+        $this->assertInstanceOf('PDOStatement', $stmt);
         $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
         $expect = 5;
         $actual = count($result);

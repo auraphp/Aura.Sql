@@ -203,7 +203,7 @@ class ConnectionManagerTest extends \PHPUnit_Framework_TestCase
     {
         $manager = $this->newManager($this->default);
         $conn = $manager->getDefault();
-        $this->assertType('Aura\Sql\Connection\MockConnection', $conn);
+        $this->assertInstanceOf('Aura\Sql\Connection\MockConnection', $conn);
         
         $expect = $this->default;
         unset($expect['adapter']);

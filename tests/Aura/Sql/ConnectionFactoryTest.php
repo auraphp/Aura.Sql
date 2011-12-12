@@ -53,7 +53,7 @@ class ConnectionFactoryTest extends \PHPUnit_Framework_TestCase
             'options' => array(),
         );
         $conn = $this->factory->newInstance('mock', $params);
-        $this->assertType('Aura\Sql\Connection\MockConnection', $conn);
+        $this->assertInstanceOf('Aura\Sql\Connection\MockConnection', $conn);
     }
     
     /**
