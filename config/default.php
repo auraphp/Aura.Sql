@@ -2,7 +2,7 @@
 /**
  * Package prefix for autoloader.
  */
-$loader->addPrefix('Aura\Sql\\', dirname(__DIR__) . DIRECTORY_SEPARATOR . 'src');
+$loader->add('Aura\Sql\\', dirname(__DIR__) . DIRECTORY_SEPARATOR . 'src');
 
 $di->params['Aura\Sql\ConnectionFactory'] = array(
     'forge' => $di->getForge(),
