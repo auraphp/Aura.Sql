@@ -19,23 +19,23 @@ $signal_manager = new SignalManager(new HandlerFactory, new ResultFactory, new R
 $type = 'mysql';
 
 //Parameters like host name , username , password , additional things for utf-8 characterset
-$params = array(
-    'dsn' => array(
+$params = [
+    'dsn' => [
         'host' => 'localhost',
         'dbname' => 'test',
-    ),
+    ],
     'username' => 'root',
     'password' => 'admin',
-    'options' => array(),
-);
+    'options' => [],
+];
 
 $params['signal'] = $signal_manager;
 
-$factory = new ConnectionFactory($forge, array(
+$factory = new ConnectionFactory($forge, [
     'mysql'         => 'Aura\Sql\Connection\Mysql',
     'sqlsrv'        => 'Aura\Sql\Connection\Sqlsrv',
     'sqlsrv_denali' => 'Aura\Sql\Connection\SqlsrvDenali',
-));
+]);
 
 //return connection
 return $factory->newInstance($type, $params);

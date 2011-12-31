@@ -22,7 +22,7 @@ abstract class AbstractConnectionTest extends \PHPUnit_Framework_TestCase
 {
     protected $extension;
     
-    protected $dsn = array();
+    protected $dsn = [];
     
     protected $connect_type;
     
@@ -30,28 +30,28 @@ abstract class AbstractConnectionTest extends \PHPUnit_Framework_TestCase
     
     protected $expect_class;
     
-    protected $expect_convert_select = array (
-        0 => array (
+    protected $expect_convert_select = [
+        0 => [
             'id' => '6',
             'name' => 'Gertrude',
-        ),
-        1 => array (
+        ],
+        1 => [
             'id' => '7',
             'name' => 'Hanna',
-        ),
-        2 => array (
+        ],
+        2 => [
             'id' => '8',
             'name' => 'Ione',
-        ), 3 => 
-        array (
+        ], 3 => 
+        [
             'id' => '9',
             'name' => 'Julia',
-        ), 4 => 
-        array (
+        ], 4 => 
+        [
             'id' => '10',
             'name' => 'Kara',
-        ),
-    );
+        ],
+    ];
     
     protected $conn;
     
@@ -61,7 +61,7 @@ abstract class AbstractConnectionTest extends \PHPUnit_Framework_TestCase
      * Sets up the fixture, for example, opens a network connection.
      * This method is called before a test is executed.
      */
-    protected function setUp()
+    public function setUp()
     {
         parent::setUp();
         
@@ -84,11 +84,11 @@ abstract class AbstractConnectionTest extends \PHPUnit_Framework_TestCase
         $params = $this->connect_params;
         $params['signal'] = $signal_manager;
         
-        $factory = new ConnectionFactory($forge, array(
+        $factory = new ConnectionFactory($forge, [
             'mysql'         => 'Aura\Sql\Connection\Mysql',
             'sqlsrv'        => 'Aura\Sql\Connection\Sqlsrv',
             'sqlsrv_denali' => 'Aura\Sql\Connection\SqlsrvDenali',
-        ));
+        ]);
         
         $this->conn = $factory->newInstance($type, $params);
         
@@ -104,18 +104,18 @@ abstract class AbstractConnectionTest extends \PHPUnit_Framework_TestCase
     
     protected function dropTable()
     {
-        $this->conn->query("DROP TABLE {$this->table}");
+        $this->conn->query("DROP TABLE IF EXISTS {$this->table}");
     }
     
     protected function fillTable()
     {
-        $names = array(
+        $names = [
             'Anna', 'Betty', 'Clara', 'Donna', 'Fiona',
             'Gertrude', 'Hanna', 'Ione', 'Julia', 'Kara',
-        );
+        ];
         
         foreach ($names as $name) {
-            $this->conn->insert($this->table, array('name' => $name));
+            $this->conn->insert($this->table, ['name' => $name]);
         }
     }
     
@@ -178,7 +178,7 @@ abstract class AbstractConnectionTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($expect, $actual);
         
         // // 1-based IDs, not 0-based sequential values
-        $expect = array(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
+        $expect = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
         $actual = array_keys($result);
         $this->assertSame($expect, $actual);
     }
@@ -192,7 +192,7 @@ abstract class AbstractConnectionTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($expect, $actual);
         
         // // 1-based IDs, not 0-based sequential values
-        $expect = array('1', '2', '3', '4', '5', '6', '7', '8', '9', '10');
+        $expect = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'];
         $this->assertSame($expect, $result);
     }
     
@@ -217,7 +217,7 @@ abstract class AbstractConnectionTest extends \PHPUnit_Framework_TestCase
     {
         $text = "SELECT id, name FROM {$this->table} ORDER BY id";
         $actual = $this->conn->fetchPairs($text);
-        $expect = array (
+        $expect = [
           1  => 'Anna',
           2  => 'Betty',
           3  => 'Clara',
@@ -228,7 +228,7 @@ abstract class AbstractConnectionTest extends \PHPUnit_Framework_TestCase
           8  => 'Ione',
           9  => 'Julia',
           10 => 'Kara',
-        );
+        ];
         $this->assertSame($expect, $actual);
     }
     
@@ -236,12 +236,12 @@ abstract class AbstractConnectionTest extends \PHPUnit_Framework_TestCase
     {
         $text = "SELECT id, name FROM {$this->table} WHERE id = 1";
         $actual = $this->conn->fetchOne($text);
-        $expect = array (
+        $expect = [
             'id'   => '1',
             'name' => 'Anna',
-        );
+        ];
         $this->assertSame($expect, $actual);
-
+    
         // use a Select
         $select = new Select;
         $select->cols[] = 'id';
@@ -249,17 +249,17 @@ abstract class AbstractConnectionTest extends \PHPUnit_Framework_TestCase
         $select->from[] = $this->table;
         $select->where['id = ?'] = 1;
         $actual = $this->conn->fetchOne($select);
-        $expect = array (
+        $expect = [
             'id'   => '1',
             'name' => 'Anna',
-        );
+        ];
         $this->assertSame($expect, $actual);
     }
     
     public function testFetchTableList()
     {
         $actual = $this->conn->fetchTableList();
-        $expect = array($this->table);
+        $expect = [$this->table];
         $this->assertSame($expect, $actual);
     }
     
@@ -277,7 +277,7 @@ abstract class AbstractConnectionTest extends \PHPUnit_Framework_TestCase
     //     // Remove the following lines when you implement this test.
     //     $this->markTestIncomplete(
     //       'This test has not been implemented yet.'
-    //     );
+    //     ];
     // }
     // 
     // /**
@@ -288,7 +288,7 @@ abstract class AbstractConnectionTest extends \PHPUnit_Framework_TestCase
     //     // Remove the following lines when you implement this test.
     //     $this->markTestIncomplete(
     //       'This test has not been implemented yet.'
-    //     );
+    //     ];
     // }
     // 
     // /**
@@ -299,7 +299,7 @@ abstract class AbstractConnectionTest extends \PHPUnit_Framework_TestCase
     //     // Remove the following lines when you implement this test.
     //     $this->markTestIncomplete(
     //       'This test has not been implemented yet.'
-    //     );
+    //     ];
     // }
     // 
     // /**
@@ -310,7 +310,7 @@ abstract class AbstractConnectionTest extends \PHPUnit_Framework_TestCase
     //     // Remove the following lines when you implement this test.
     //     $this->markTestIncomplete(
     //       'This test has not been implemented yet.'
-    //     );
+    //     ];
     // }
     // 
     // /**
@@ -321,12 +321,12 @@ abstract class AbstractConnectionTest extends \PHPUnit_Framework_TestCase
     //     // Remove the following lines when you implement this test.
     //     $this->markTestIncomplete(
     //       'This test has not been implemented yet.'
-    //     );
+    //     ];
     // }
     
     public function testInsertAndLastInsertId()
     {
-        $data = array('name' => 'Laura');
+        $data = ['name' => 'Laura'];
         $actual = $this->conn->insert($this->table, $data);
         
         // did we get the right last ID?
@@ -336,24 +336,24 @@ abstract class AbstractConnectionTest extends \PHPUnit_Framework_TestCase
         
         // did it insert?
         $actual = $this->conn->fetchOne("SELECT * FROM {$this->table} WHERE id = 11");
-        $expect = array('id' => '11', 'name' => 'Laura');
+        $expect = ['id' => '11', 'name' => 'Laura'];
         $this->assertSame($actual, $expect);
     }
     
     public function testUpdate()
     {
         $where = 'id = 1';
-        $data  = array('name' => 'Annabelle');
+        $data  = ['name' => 'Annabelle'];
         $actual = $this->conn->update($this->table, $data, $where);
         
         // did it update?
         $actual = $this->conn->fetchOne("SELECT * FROM {$this->table} WHERE id = 1");
-        $expect = array('id' => '1', 'name' => 'Annabelle');
+        $expect = ['id' => '1', 'name' => 'Annabelle'];
         $this->assertSame($actual, $expect);
         
         // did anything else update?
         $actual = $this->conn->fetchOne("SELECT * FROM {$this->table} WHERE id = 2");
-        $expect = array('id' => '2', 'name' => 'Betty');
+        $expect = ['id' => '2', 'name' => 'Betty'];
         $this->assertSame($actual, $expect);
     }
     

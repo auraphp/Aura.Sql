@@ -20,10 +20,10 @@ class Sqlsrv extends AbstractConnection
 {
     protected $dsn_prefix = 'sqlsrv';
     
-    protected $dsn = array(
+    protected $dsn = [
         'Server' => null,
         'Database' => null,
-    );
+    ];
     
     protected $ident_quote_prefix = '[';
     
@@ -52,12 +52,12 @@ class Sqlsrv extends AbstractConnection
         $text = "exec sp_pkeys @table_owner = " . $raw_cols[0]['TABLE_OWNER']
               . ", @table_name = " . $this->quoteName($table);
         $raw_keys = $this->fetchAll($text);
-        $keys = array();
+        $keys = [];
         foreach ($raw_keys as $row) {
             $keys[] = $row['COLUMN_NAME'];
         }
         
-        $cols = array();
+        $cols = [];
         foreach ($raw_cols as $row) {
             
             $name = $row['COLUMN_NAME'];

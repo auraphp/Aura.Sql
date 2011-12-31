@@ -36,7 +36,7 @@ class ConnectionFactory
      * @var array
      * 
      */
-    protected $map = array();
+    protected $map = [];
     
     /**
      * 
@@ -52,7 +52,7 @@ class ConnectionFactory
      */
     public function __construct(
         ForgeInterface $forge,
-        array $map = array()
+        array $map = []
     ) {
         $this->forge = $forge;
         $this->map   = $map;
@@ -71,7 +71,7 @@ class ConnectionFactory
      */
     public function newInstance(
         $name,
-        array $params = array()
+        array $params = []
     ) {
         if (isset($this->map[$name])) {
             $class = $this->map[$name];

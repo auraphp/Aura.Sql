@@ -19,8 +19,8 @@ class MysqlTest extends AbstractConnectionTest
         PRIMARY KEY (id)
     )";
     
-    protected $expect_fetch_table_cols = array (
-        'id' => array (
+    protected $expect_fetch_table_cols = [
+        'id' => [
             'name' => 'id',
             'type' => 'int',
             'size' => 11,
@@ -29,8 +29,8 @@ class MysqlTest extends AbstractConnectionTest
             'require' => true,
             'primary' => true,
             'autoinc' => true,
-        ),
-        'name' => array (
+        ],
+        'name' => [
             'name' => 'name',
             'type' => 'varchar',
             'size' => 50,
@@ -39,6 +39,6 @@ class MysqlTest extends AbstractConnectionTest
             'require' => false,
             'primary' => false,
             'autoinc' => false,
-        ),
-    );
+        ],
+    ];
 }

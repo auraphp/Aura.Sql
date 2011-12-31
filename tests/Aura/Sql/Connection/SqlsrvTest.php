@@ -19,36 +19,38 @@ class SqlsrvTest extends AbstractConnectionTest
         PRIMARY KEY (id)
     )";
         
-    protected $expect_convert_select = array (
-        0 => array (
+    protected $expect_convert_select = [
+        0 => [
             'id' => '6',
             'name' => 'Gertrude',
             '__rownum__' => '6',
-        ),
-        1 => array (
+        ],
+        1 => [
             'id' => '7',
             'name' => 'Hanna',
             '__rownum__' => '7',
-        ),
-        2 => array (
+        ],
+        2 => [
             'id' => '8',
             'name' => 'Ione',
             '__rownum__' => '8',
-        ), 3 => 
-        array (
+        ],
+        3 => 
+        [
             'id' => '9',
             'name' => 'Julia',
             '__rownum__' => '9',
-        ), 4 => 
-        array (
+        ],
+        4 => 
+        [
             'id' => '10',
             'name' => 'Kara',
             '__rownum__' => '10',
-        ),
-    );
+        ],
+    ];
     
-    protected $expect_fetch_table_cols = array (
-        'id' => array (
+    protected $expect_fetch_table_cols = [
+        'id' => [
             'name' => 'id',
             'type' => 'int',
             'size' => '10',
@@ -57,8 +59,8 @@ class SqlsrvTest extends AbstractConnectionTest
             'require' => true,
             'primary' => true,
             'autoinc' => true,
-        ),
-        'name' => array (
+        ],
+        'name' => [
             'name' => 'name',
             'type' => 'nvarchar',
             'size' => '50',
@@ -67,7 +69,7 @@ class SqlsrvTest extends AbstractConnectionTest
             'require' => false,
             'primary' => false,
             'autoinc' => false,
-        ),
-    );
+        ],
+    ];
 
 }

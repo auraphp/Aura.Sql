@@ -20,13 +20,13 @@ class Mysql extends AbstractConnection
 {
     protected $dsn_prefix = 'mysql';
     
-    protected $dsn = array(
+    protected $dsn = [
         'host' => null,
         'port' => null,
         'dbname' => null,
         'unix_socket' => null,
         'charset' => null,
-    );
+    ];
     
     protected $ident_quote_prefix = '`';
     
@@ -50,7 +50,7 @@ class Mysql extends AbstractConnection
         $raw_cols = $this->fetchAll($text);
         
         // where the column info will be stored
-        $cols = array();
+        $cols = [];
         
         // loop through the result rows; each describes a column.
         foreach ($raw_cols as $val) {
@@ -59,7 +59,7 @@ class Mysql extends AbstractConnection
             list($type, $size, $scope) = $this->getTypeSizeScope($val['Type']);
             
             // save the column description
-            $cols[$name] = array(
+            $cols[$name] = [
                 'name'    => $name,
                 'type'    => $type,
                 'size'    => ($size  ? (int) $size  : null),
@@ -68,7 +68,7 @@ class Mysql extends AbstractConnection
                 'require' => (bool) ($val['Null'] != 'YES'),
                 'primary' => (bool) ($val['Key'] == 'PRI'),
                 'autoinc' => (bool) (strpos($val['Extra'], 'auto_increment') !== false),
-            );
+            ];
         }
         
         // done!

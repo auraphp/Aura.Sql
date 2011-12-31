@@ -23,7 +23,7 @@ abstract class AbstractConnection
 {
     protected $dsn_prefix;
     
-    protected $dsn = array();
+    protected $dsn = [];
     
     protected $ident_quote_prefix = null;
     
@@ -33,7 +33,7 @@ abstract class AbstractConnection
     
     protected $password;
     
-    protected $options = array();
+    protected $options = [];
     
     protected $pdo;
     
@@ -74,12 +74,13 @@ abstract class AbstractConnection
                 $this->password, 
                 $this->options
             );
+            $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             $this->signal->send($this, 'post_connect', $this);
         }
         return $this->pdo;
     }
     
-    public function query($spec, array $data = array())
+    public function query($spec, array $data = [])
     {
         if ($spec instanceof Select) {
             $spec = $this->convertSelect($spec);
@@ -106,7 +107,7 @@ abstract class AbstractConnection
      * @return array
      * 
      */
-    public function fetchAll($spec, $data = array())
+    public function fetchAll($spec, $data = [])
     {
         $stmt = $this->query($spec, $data);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -129,10 +130,10 @@ abstract class AbstractConnection
      * @return array
      * 
      */
-    public function fetchAssoc($spec, array $data = array())
+    public function fetchAssoc($spec, array $data = [])
     {
         $stmt = $this->query($spec, $data);
-        $data = array();
+        $data = [];
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
             $key = current($row); // value of the first element
             $data[$key] = $row;
@@ -153,7 +154,7 @@ abstract class AbstractConnection
      * @return array
      * 
      */
-    public function fetchCol($spec, array $data = array())
+    public function fetchCol($spec, array $data = [])
     {
         $stmt = $this->query($spec, $data);
         return $stmt->fetchAll(PDO::FETCH_COLUMN, 0);
@@ -172,7 +173,7 @@ abstract class AbstractConnection
      * @return mixed
      * 
      */
-    public function fetchValue($spec, array $data = array())
+    public function fetchValue($spec, array $data = [])
     {
         if ($spec instanceof Select) {
             $spec->limit = 1;
@@ -195,10 +196,10 @@ abstract class AbstractConnection
      * @return array
      * 
      */
-    public function fetchPairs($spec, array $data = array())
+    public function fetchPairs($spec, array $data = [])
     {
         $stmt = $this->query($spec, $data);
-        $data = array();
+        $data = [];
         while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
             $data[$row[0]] = $row[1];
         }
@@ -218,7 +219,7 @@ abstract class AbstractConnection
      * @return array
      * 
      */
-    public function fetchOne($spec, array $data = array())
+    public function fetchOne($spec, array $data = [])
     {
         if ($spec instanceof Select) {
             $spec->limit = 1;
@@ -292,10 +293,10 @@ abstract class AbstractConnection
         settype($data, 'array');
         if (count($data) < $count) {
             // more placeholders than values
-            throw $this->_exception('ERR_NOT_ENOUGH_VALUES', array(
+            throw $this->_exception('ERR_NOT_ENOUGH_VALUES', [
                 'text'  => $text,
                 'data'  => $data,
-            ));
+            ]);
         }
         
         // replace each placeholder with a quoted value
@@ -329,11 +330,11 @@ abstract class AbstractConnection
      * {{code: php
      *     $sql = Solar::factory('Solar_Sql');
      *     
-     *     $list = array(
+     *     $list = [
      *          "WHERE date > ?"   => '2005-01-01',
      *          "  AND date < ?"   => '2005-02-01',
-     *          "  AND type IN(?)" => array('a', 'b', 'c'),
-     *     );
+     *          "  AND type IN(?)" => ['a', 'b', 'c'],
+     *     ];
      *     $safe = $sql->quoteMulti($list);
      *     
      *     // $safe = "WHERE date > '2005-01-02'
@@ -355,7 +356,7 @@ abstract class AbstractConnection
      */
     public function quoteMulti($list, $sep = null)
     {
-        $text = array();
+        $text = [];
         foreach ((array) $list as $key => $val) {
             if (is_int($key)) {
                 // integer $key means a literal phrase and no value to
@@ -561,7 +562,7 @@ abstract class AbstractConnection
         $keys = array_keys($data);
         
         // quote the col names
-        $cols = array();
+        $cols = [];
         foreach ($keys as $key) {
             $cols[] = $this->quoteName($key);
         }
@@ -599,7 +600,7 @@ abstract class AbstractConnection
         $text = "UPDATE $table SET ";
         
         // add "col = :col" pairs to the statement
-        $tmp = array();
+        $tmp = [];
         foreach ($data as $col => $val) {
             $tmp[] = $this->quoteName($col) . " = :$col";
         }
@@ -673,7 +674,7 @@ abstract class AbstractConnection
         );
         
         // bind values to placeholders, repeating as needed
-        $repeat = array();
+        $repeat = [];
         foreach ($matches[1] as $key) {
             
             // only attempt to bind if the data key exists.
@@ -815,7 +816,7 @@ abstract class AbstractConnection
             }
         }
         
-        return array($type, $size, $scope);
+        return [$type, $size, $scope];
     }
     
     /**

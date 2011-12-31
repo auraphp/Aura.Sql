@@ -16,7 +16,7 @@ class SqlsrvDenaliTest extends SqlsrvTest
     public function testFetchTableList()
     {
         $actual = $this->conn->fetchTableList();
-        $expect = array('artist', 'aura');
+        $expect = ['artist', 'aura'];
         $this->assertSame($expect, $actual);
     }
     
@@ -32,28 +32,28 @@ class SqlsrvDenaliTest extends SqlsrvTest
         $select->order[] = 'name';
         
         $actual = $this->conn->fetchAll($select);
-        $expect = array (
-            0 => array (
+        $expect = [
+            0 => [
                 'id' => '6',
                 'name' => 'Gertrude',
-            ),
-            1 => array (
+            ],
+            1 => [
                 'id' => '7',
                 'name' => 'Hanna',
-            ),
-            2 => array (
+            ],
+            2 => [
                 'id' => '8',
                 'name' => 'Ione',
-            ), 3 => 
-            array (
+            ], 3 => 
+            [
                 'id' => '9',
                 'name' => 'Julia',
-            ), 4 => 
-            array (
+            ], 4 => 
+            [
                 'id' => '10',
                 'name' => 'Kara',
-            ),
-        );
+            ],
+        ];
         
         $this->assertSame($expect, $actual);
     }

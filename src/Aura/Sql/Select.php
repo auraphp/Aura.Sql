@@ -18,13 +18,13 @@ namespace Aura\Sql;
 class Select
 {
     protected $distinct  = null;
-    protected $cols      = array();
-    protected $from      = array();
-    protected $join      = array();
-    protected $where     = array();
-    protected $group     = array();
-    protected $having    = array();
-    protected $order     = array();
+    protected $cols      = [];
+    protected $from      = [];
+    protected $join      = [];
+    protected $where     = [];
+    protected $group     = [];
+    protected $having    = [];
+    protected $order     = [];
     protected $limit     = null; // limit count
     protected $offset    = null; // limit offset
     
@@ -80,7 +80,7 @@ class Select
         // joined to these tables
         $joins = $this->join->getArrayCopy();
         if ($joins) {
-            $list = array();
+            $list = [];
             foreach ($joins as $join) {
                 $tmp = '';
                 // add the type (LEFT, INNER, etc)

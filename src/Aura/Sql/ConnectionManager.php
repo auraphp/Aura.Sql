@@ -20,31 +20,31 @@ use Aura\Sql\Exception\NoSuchSlave as NoSuchSlaveException;
 
 class ConnectionManager
 {
-    protected $default = array(
+    protected $default = [
         'adapter'  => null,
-        'dsn'      => array(),
+        'dsn'      => [],
         'username' => null,
         'password' => null,
-        'options'  => array(),
-    );
+        'options'  => [],
+    ];
     
-    protected $masters = array();
+    protected $masters = [];
     
-    protected $slaves = array();
+    protected $slaves = [];
     
     protected $factory;
     
-    protected $conn = array(
+    protected $conn = [
         'default' => null,
-        'masters' => array(),
-        'slaves'  => array(),
-    );
+        'masters' => [],
+        'slaves'  => [],
+    ];
     
     public function __construct(
         ConnectionFactory $factory,
-        array $default = array(),
-        array $masters = array(),
-        array $slaves = array()
+        array $default = [],
+        array $masters = [],
+        array $slaves = []
     ) {
         $this->factory = $factory;
         $this->default = $default;
@@ -124,17 +124,17 @@ class ConnectionManager
     }
     
     // merges $this->default with master or slave override values
-    protected function mergeAdapterParams(array $override = array())
+    protected function mergeAdapterParams(array $override = [])
     {
         $merged  = $this->merge($this->default, $override);
         $adapter = $merged['adapter'];
-        $params  = array(
+        $params  = [
             'dsn'      => $merged['dsn'],
             'username' => $merged['username'],
             'password' => $merged['password'],
             'options'  => $merged['options'],
-        );
-        return array($adapter, $params);
+        ];
+        return [$adapter, $params];
     }
     
     protected function merge($baseline, $override)

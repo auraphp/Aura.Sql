@@ -2,7 +2,7 @@
 namespace Aura\Sql\Connection;
 class MockConnection
 {
-    protected $params = array();
+    protected $params = [];
     
     // skip the signal manager, otherwise mimic the AbstractConnection params
     public function __construct(
@@ -11,12 +11,12 @@ class MockConnection
         $password,
         array $options
     ) {
-        $this->params = array(
+        $this->params = [
             'dsn'      => $dsn,
             'username' => $username,
             'password' => $password,
             'options'  => $options,
-        );
+        ];
     }
     
     public function getParams()

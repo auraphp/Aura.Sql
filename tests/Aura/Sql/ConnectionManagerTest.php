@@ -14,35 +14,35 @@ class ConnectionManagerTest extends \PHPUnit_Framework_TestCase
      */
     protected $manager;
     
-    protected $default = array(
+    protected $default = [
         'adapter'  => 'mock',
-        'dsn'      => array('host' => 'default.example.com', 'dbname' => 'test'),
+        'dsn'      => ['host' => 'default.example.com', 'dbname' => 'test'],
         'username' => 'default_user',
         'password' => 'default_pass',
-        'options'  => array(),
-    );
+        'options'  => [],
+    ];
     
-    protected $masters = array(
+    protected $masters = [
         // uses defaults
-        'master1' => array(),
+        'master1' => [],
         // overrides the dsn host
-        'master2' => array(
-            'dsn' => array('host' => 'master2.example.com'),
-        ),
-    );
+        'master2' => [
+            'dsn' => ['host' => 'master2.example.com'],
+        ],
+    ];
     
-    protected $slaves = array(
+    protected $slaves = [
         // uses defaults
-        'slave1' => array(),
+        'slave1' => [],
         // overrides the dsn host
-        'slave2' => array(
-            'dsn' => array('host' => 'slave2.example.com'),
-        ),
+        'slave2' => [
+            'dsn' => ['host' => 'slave2.example.com'],
+        ],
         // overrides the dsn host
-        'slave3' => array(
-            'dsn' => array('host' => 'slave3.example.com'),
-        ),
-    );
+        'slave3' => [
+            'dsn' => ['host' => 'slave3.example.com'],
+        ],
+    ];
     
     /**
      * Sets up the fixture, for example, opens a network connection.
@@ -54,14 +54,14 @@ class ConnectionManagerTest extends \PHPUnit_Framework_TestCase
     }
     
     protected function newManager(
-        array $default = array(),
-        array $masters = array(),
-        array $slaves  = array()
+        array $default = [],
+        array $masters = [],
+        array $slaves  = []
     ) {
         $forge = new Forge(new Config);
-        $map = array(
+        $map = [
             'mock' => 'Aura\Sql\Connection\MockConnection',
-        );
+        ];
         $factory = new ConnectionFactory($forge, $map);
         return new ConnectionManager($factory, $default, $masters, $slaves);
     }
@@ -90,10 +90,10 @@ class ConnectionManagerTest extends \PHPUnit_Framework_TestCase
     public function testGetReadDefaultAndMasters()
     {
         $manager = $this->newManager($this->default, $this->masters);
-        $expect = array(
+        $expect = [
             'default.example.com',
             'master2.example.com',
-        );
+        ];
         
         // try 10 times to make sure we get lots of random responses
         for ($i = 1; $i <= 10; $i++) {
@@ -106,11 +106,11 @@ class ConnectionManagerTest extends \PHPUnit_Framework_TestCase
     public function testGetReadDefaultMastersAndSlaves()
     {
         $manager = $this->newManager($this->default, $this->masters, $this->slaves);
-        $expect = array(
+        $expect = [
             'default.example.com',
             'slave2.example.com',
             'slave3.example.com',
-        );
+        ];
         
         // try 10 times to make sure we get lots of random responses
         for ($i = 1; $i <= 10; $i++) {
@@ -122,12 +122,12 @@ class ConnectionManagerTest extends \PHPUnit_Framework_TestCase
     
     public function testGetReadDefaultAndSlaves()
     {
-        $manager = $this->newManager($this->default, array(), $this->slaves);
-        $expect = array(
+        $manager = $this->newManager($this->default, [], $this->slaves);
+        $expect = [
             'default.example.com',
             'slave2.example.com',
             'slave3.example.com',
-        );
+        ];
         
         // try 10 times to make sure we get lots of random responses
         for ($i = 1; $i <= 10; $i++) {
@@ -152,10 +152,10 @@ class ConnectionManagerTest extends \PHPUnit_Framework_TestCase
     public function testGetWriteDefaultAndMasters()
     {
         $manager = $this->newManager($this->default, $this->masters);
-        $expect = array(
+        $expect = [
             'default.example.com',
             'master2.example.com',
-        );
+        ];
         
         // try 10 times to make sure we get lots of random responses
         for ($i = 1; $i <= 10; $i++) {
@@ -168,10 +168,10 @@ class ConnectionManagerTest extends \PHPUnit_Framework_TestCase
     public function testGetWriteDefaultMastersAndSlaves()
     {
         $manager = $this->newManager($this->default, $this->masters, $this->slaves);
-        $expect = array(
+        $expect = [
             'default.example.com',
             'master2.example.com',
-        );
+        ];
         
         // try 10 times to make sure we get lots of random responses
         for ($i = 1; $i <= 10; $i++) {
@@ -183,10 +183,10 @@ class ConnectionManagerTest extends \PHPUnit_Framework_TestCase
     
     public function testGetWriteDefaultAndSlaves()
     {
-        $manager = $this->newManager($this->default, array(), $this->slaves);
-        $expect = array(
+        $manager = $this->newManager($this->default, [], $this->slaves);
+        $expect = [
             'default.example.com',
-        );
+        ];
         
         // try 10 times to make sure we get lots of random responses
         for ($i = 1; $i <= 10; $i++) {

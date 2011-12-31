@@ -25,9 +25,9 @@ class ConnectionFactoryTest extends \PHPUnit_Framework_TestCase
         
         $forge = new Forge(new Config);
         
-        $map = array(
+        $map = [
             'mock' => 'Aura\Sql\Connection\MockConnection',
-        );
+        ];
         
         $this->factory = new ConnectionFactory($forge, $map);
     }
@@ -46,12 +46,12 @@ class ConnectionFactoryTest extends \PHPUnit_Framework_TestCase
      */
     public function testNewInstance()
     {
-        $params = array(
-            'dsn' => array(),
+        $params = [
+            'dsn' => [],
             'username' => null,
             'password' => null,
-            'options' => array(),
-        );
+            'options' => [],
+        ];
         $conn = $this->factory->newInstance('mock', $params);
         $this->assertInstanceOf('Aura\Sql\Connection\MockConnection', $conn);
     }
@@ -61,12 +61,12 @@ class ConnectionFactoryTest extends \PHPUnit_Framework_TestCase
      */
     public function testNoMapping()
     {
-        $params = array(
-            'dsn' => array(),
+        $params = [
+            'dsn' => [],
             'username' => null,
             'password' => null,
-            'options' => array(),
-        );
+            'options' => [],
+        ];
         $conn = $this->factory->newInstance('no_such_mapping', $params);
     }
 }
