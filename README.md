@@ -1,7 +1,6 @@
-The Aura.Sql package will provide adapters for connecting to these relational database systems:
+The Aura Sql package is not yet complete.  When initially complete, it will provide adapters for connecting to these relational database systems:
 
 - MySQL
-- Oracle
 - Postgres
 - SQL Server (Windows only)
 - Sqlite 2
