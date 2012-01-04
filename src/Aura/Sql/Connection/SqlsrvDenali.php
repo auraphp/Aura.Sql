@@ -3,19 +3,19 @@
  * 
  * This file is part of the Aura Project for PHP.
  * 
- * @package Aura.Sql
- * 
  * @license http://opensource.org/licenses/bsd-license.php BSD
+ * 
+ * @package Aura.Sql
  * 
  */
 namespace Aura\Sql\Connection;
+use Aura\Sql\Select;
 
 /**
  * 
  * Sql srv Denali adapter
  * 
  */
-use Aura\Sql\Select;
 class SqlsrvDenali extends Sqlsrv
 {
     // **MUST** have an ORDER clause to work;

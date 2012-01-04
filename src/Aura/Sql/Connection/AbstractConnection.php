@@ -3,22 +3,21 @@
  * 
  * This file is part of the Aura Project for PHP.
  * 
- * @package Aura.Sql
- * 
  * @license http://opensource.org/licenses/bsd-license.php BSD
  * 
  */
 namespace Aura\Sql\Connection;
+use Aura\Signal\Manager as SignalManager;
+use Aura\Sql\Select;
+use PDO;
 
 /**
  * 
  * Abstract Class for Connection
  * 
+ * @package Aura.Sql
+ * 
  */
-use Aura\Signal\Manager as SignalManager;
-use Aura\Sql\Select;
-use PDO;
-
 abstract class AbstractConnection
 {
     protected $dsn_prefix;
