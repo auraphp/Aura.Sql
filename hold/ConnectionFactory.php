@@ -11,12 +11,12 @@ use Aura\Di\ForgeInterface;
 
 /**
  * 
- * Connection Factory
+ * Driver Factory
  * 
  * @package Aura.Sql
  * 
  */
-class ConnectionFactory
+class DriverFactory
 {
     /**
      * 
@@ -30,7 +30,7 @@ class ConnectionFactory
     /**
      * 
      * A map of names (called at the command line) to their corresponding
-     * Connection classes.
+     * Driver classes.
      * 
      * @var array
      * 
@@ -39,13 +39,13 @@ class ConnectionFactory
     
     /**
      * 
-     * A Connection class to use when no class exists for a mapped name.
+     * A Driver class to use when no class exists for a mapped name.
      * 
      * @param ForgeInterface $forge A Forge to create objects.
      * 
-     * @param array $map A map of PDO types to Connection classes.
+     * @param array $map A map of PDO types to Driver classes.
      * 
-     * @param string $not_found A Connection class to use when no class
+     * @param string $not_found A Driver class to use when no class
      * can be found for a mapped name.
      * 
      */
@@ -59,13 +59,13 @@ class ConnectionFactory
     
     /**
      * 
-     * Creates and returns a Connection class based on a PDO type.
+     * Creates and returns a Driver class based on a PDO type.
      * 
-     * @param string $name A PDO type that maps to a Connection class.
+     * @param string $name A PDO type that maps to a Driver class.
      * 
-     * @return Connection
+     * @return Driver
      * 
-     * @throws Exception\ConnectionFactory when no mapped class can be found.
+     * @throws Exception\DriverFactory when no mapped class can be found.
      * 
      */
     public function newInstance(
@@ -75,7 +75,7 @@ class ConnectionFactory
         if (isset($this->map[$name])) {
             $class = $this->map[$name];
         } else {
-            throw new Exception\ConnectionFactory("No Connection class mapping found for '$name'.");
+            throw new Exception\DriverFactory("No Driver class mapping found for '$name'.");
         }
         
         return $this->forge->newInstance($class, $params);

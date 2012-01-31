@@ -1,6 +1,6 @@
 <?php
-namespace Aura\Sql\Connection;
-use Aura\Sql\ConnectionFactory as ConnectionFactory;
+namespace Aura\Sql\Driver;
+use Aura\Sql\DriverFactory as DriverFactory;
 use Aura\Sql\Select;
 use Aura\Di\Forge;
 use Aura\Di\Config;
@@ -31,10 +31,10 @@ $params = [
 
 $params['signal'] = $signal_manager;
 
-$factory = new ConnectionFactory($forge, [
-    'mysql'         => 'Aura\Sql\Connection\Mysql',
-    'sqlsrv'        => 'Aura\Sql\Connection\Sqlsrv',
-    'sqlsrv_denali' => 'Aura\Sql\Connection\SqlsrvDenali',
+$factory = new DriverFactory($forge, [
+    'mysql'         => 'Aura\Sql\Driver\Mysql',
+    'sqlsrv'        => 'Aura\Sql\Driver\Sqlsrv',
+    'sqlsrv_denali' => 'Aura\Sql\Driver\SqlsrvDenali',
 ]);
 
 //return connection

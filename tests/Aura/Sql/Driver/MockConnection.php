@@ -1,10 +1,10 @@
 <?php
-namespace Aura\Sql\Connection;
-class MockConnection
+namespace Aura\Sql\Driver;
+class MockDriver
 {
     protected $params = [];
     
-    // skip the signal manager, otherwise mimic the AbstractConnection params
+    // skip the signal manager, otherwise mimic the AbstractDriver params
     public function __construct(
         array $dsn,
         $username,

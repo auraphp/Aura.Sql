@@ -6,8 +6,7 @@
  * @license http://opensource.org/licenses/bsd-license.php BSD
  * 
  */
-namespace Aura\Sql\Connection;
-use Aura\Sql\Select;
+namespace Aura\Sql\Driver;
 
 /**
  * 
@@ -16,7 +15,7 @@ use Aura\Sql\Select;
  * @package Aura.Sql
  * 
  */
-class Sqlsrv extends AbstractConnection
+class Sqlsrv extends AbstractDriver
 {
     protected $dsn_prefix = 'sqlsrv';
     
@@ -74,7 +73,7 @@ class Sqlsrv extends AbstractConnection
             $cols[$name]['size']    = $row['PRECISION'];
             $cols[$name]['scope']   = $row['SCALE'];
             $cols[$name]['default'] = $row['COLUMN_DEF'];
-            $cols[$name]['require'] = ! $row['NULLABLE'];
+            $cols[$name]['notnull'] = ! $row['NULLABLE'];
             $cols[$name]['primary'] = in_array($name, $keys);
             $cols[$name]['autoinc'] = strpos(strtolower($row['TYPE_NAME']), 'identity') !== false;
         }
@@ -82,44 +81,4 @@ class Sqlsrv extends AbstractConnection
         return $cols;
     }
     
-    public function convertSelect(Select $select)
-    {
-        $limit  = $select->limit;
-        $offset = $select->offset;
-        
-        if (! $limit && ! $offset) {
-            // no limit/offset so we can leave it as-is
-            return $select->__toString();
-        }
-        
-        if ($limit && ! $offset) {
-            // limit, but no offset, so we can use TOP
-            $text = $select->__toString();
-            $text = preg_replace('/^(SELECT( DISTINCT)?)/', "$1 TOP $limit", $text);
-            return $text;
-        }
-        
-        return $this->convertSelectStrategy($select);
-    }
-    
-    protected function convertSelectStrategy(Select $select)
-    {
-        // limit and offset. a little complicated.
-        // first, get the existing order as a string, then remove it.
-        $order = $select->getOrderString();
-        $select->clearOrder();
-        
-        // we always need an order for the ROW_NUMBER() OVER(...)
-        if (! $order) {
-            // always need an order
-            $order = '(SELECT 1)';
-        }
-        
-        $start = $select->offset + 1;
-        $end   = $select->offset + $select->limit;
-        
-        return "WITH outertable AS (SELECT *, ROW_NUMBER() OVER (ORDER BY $order) AS __rownum__ FROM (\n"
-             . $select->__toString()
-             . "\n) AS innertable) SELECT * FROM outertable WHERE __rownum__ BETWEEN $start AND $end";
-    }
 }

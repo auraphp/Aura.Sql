@@ -7,17 +7,15 @@
  * 
  */
 namespace Aura\Sql;
-use Aura\Sql\Exception\NoSuchMaster as NoSuchMasterException;
-use Aura\Sql\Exception\NoSuchSlave as NoSuchSlaveException;
 
 /**
  * 
- * Connection Manager
+ * Driver Manager
  * 
  * @package Aura.Sql
  * 
  */
-class ConnectionManager
+class DriverManager
 {
     protected $default = [
         'adapter'  => null,
@@ -40,7 +38,7 @@ class ConnectionManager
     ];
     
     public function __construct(
-        ConnectionFactory $factory,
+        DriverFactory $factory,
         array $default = [],
         array $masters = [],
         array $slaves = []
@@ -73,27 +71,27 @@ class ConnectionManager
         }
     }
     
-    // converts $this->default to a Connection object and returns it
+    // converts $this->default to a Driver object and returns it
     public function getDefault()
     {
-        if (! $this->conn['default'] instanceof Connection) {
+        if (! $this->conn['default'] instanceof Driver) {
             list($adapter, $params) = $this->mergeAdapterParams();
             $this->conn['default'] = $this->factory->newInstance($adapter, $params);
         }
         return $this->conn['default'];
     }
     
-    // converts a $this->masters entry to a Connection object and returns is
+    // converts a $this->masters entry to a Driver object and returns is
     public function getMaster($key = null)
     {
         if (! $key) {
             $key = array_rand($this->masters);
         } elseif (! isset($this->masters[$key])) {
-            throw new NoSuchMasterException($key);
+            throw new Exception\NoSuchMaster($key);
         }
         
         $is_conn = ! empty($this->conn['masters'][$key])
-                && $this->conn['masters'][$key] instanceof Connection;
+                && $this->conn['masters'][$key] instanceof Driver;
                 
         if (! $is_conn) {
             list($adapter, $params) = $this->mergeAdapterParams($this->masters[$key]);
@@ -103,17 +101,17 @@ class ConnectionManager
         return $this->conn['masters'][$key];
     }
     
-    // converts a random $this->masters entry to a Connection object
+    // converts a random $this->masters entry to a Driver object
     public function getSlave($key = null)
     {
         if (! $key) {
             $key = array_rand($this->slaves);
         } elseif (! isset($this->slaves[$key])) {
-            throw new NoSuchSlaveException($key);
+            throw new Exception\NoSuchSlave($key);
         }
         
         $is_conn = ! empty($this->conn['slaves'][$key])
-                && $this->conn['slaves'][$key] instanceof Connection;
+                && $this->conn['slaves'][$key] instanceof Driver;
         
         if (! $is_conn) {
             list($adapter, $params) = $this->mergeAdapterParams($this->slaves[$key]);

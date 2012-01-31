@@ -6,8 +6,7 @@
  * @license http://opensource.org/licenses/bsd-license.php BSD
  * 
  */
-namespace Aura\Sql\Connection;
-use Aura\Sql\Select;
+namespace Aura\Sql\Driver;
 
 /**
  * 
@@ -16,7 +15,7 @@ use Aura\Sql\Select;
  * @package Aura.Sql
  * 
  */
-class Mysql extends AbstractConnection
+class Mysql extends AbstractDriver
 {
     protected $dsn_prefix = 'mysql';
     
@@ -32,19 +31,25 @@ class Mysql extends AbstractConnection
     
     protected $ident_quote_suffix = '`';
     
-    public function fetchTableList()
+    public function fetchTableList($schema = null)
     {
         $text = 'SHOW TABLES';
-        // if ($schema) {
-        //     $text .= ' IN ' . $this->_quoteName($schema);
-        // }
+        if ($schema) {
+            $text .= ' IN ' . $this->replaceName($schema);
+        }
         return $this->fetchCol($text);
     }
     
-    public function fetchTableCols($table)
+    public function fetchTableCols($table, $schema = null)
     {
         $table = $this->quoteName($table);
         $text = "SHOW COLUMNS FROM $table";
+        
+        if ($schema) {
+            $schema = preg_replace('/[^\w]/', '', $schema);
+            $schema = $this->replaceName($schema);
+            $text .= " IN $schema";
+        }
         
         // get the column descriptions
         $raw_cols = $this->fetchAll($text);
@@ -64,8 +69,8 @@ class Mysql extends AbstractConnection
                 'type'    => $type,
                 'size'    => ($size  ? (int) $size  : null),
                 'scope'   => ($scope ? (int) $scope : null),
-                'default' => $val['Default'],
-                'require' => (bool) ($val['Null'] != 'YES'),
+                'default' => $this->getDefault($val['Default']),
+                'notnull' => (bool) ($val['Null'] != 'YES'),
                 'primary' => (bool) ($val['Key'] == 'PRI'),
                 'autoinc' => (bool) (strpos($val['Extra'], 'auto_increment') !== false),
             ];
@@ -73,5 +78,17 @@ class Mysql extends AbstractConnection
         
         // done!
         return $cols;
+    }
+    
+    protected function getDefault($default)
+    {
+        $upper = strtoupper($default);
+        if ($upper == 'NULL' || $upper == 'CURRENT_TIMESTAMP') {
+            // the only non-literal allowed by MySQL is "CURRENT_TIMESTAMP"
+            return null;
+        } else {
+            // return the literal default
+            return $default;
+        }
     }
 }
