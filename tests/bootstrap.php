@@ -18,29 +18,13 @@ spl_autoload_register(function($class) {
 $GLOBALS['Aura\Sql\Driver\MysqlTest']['connect_params'] = [
     'dsn' => [
         'host' => 'localhost',
-        'dbname' => 'test',
     ],
     'username' => 'root',
     'password' => 'admin',
     'options' => [],
 ];
 
-$GLOBALS['Aura\Sql\Driver\MysqlTest']['expect_dsn_string'] = 'mysql:host=localhost;dbname=test';
-
-/**
- * SqlsrvTest
- */
-$GLOBALS['Aura\Sql\Driver\SqlsrvTest']['connect_params'] = [
-    'dsn' => [
-        'Server' => 'localhost\\SQLEXPRESS',
-        'Database' => 'test',
-    ],
-    'username' => 'sa',
-    'password' => 'JIC2011@MS',
-    'options' =>  [],
-];
-    
-$GLOBALS['Aura\Sql\Driver\SqlsrvTest']['expect_dsn_string'] = 'sqlsrv:Server=localhost\\SQLEXPRESS;Database=test';
+$GLOBALS['Aura\Sql\Driver\MysqlTest']['expect_dsn_string'] = 'mysql:host=localhost';
 
 /**
  * Sqlite

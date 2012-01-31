@@ -11,7 +11,7 @@ class MysqlTest extends AbstractDriverTest
     
     protected $driver_class = 'Aura\Sql\Driver\Mysql';    
     
-    protected $create_table = "CREATE TABLE aura (
+    protected $create_table = "CREATE TABLE aura_test_table (
          id                     INTEGER AUTO_INCREMENT PRIMARY KEY
         ,name                   VARCHAR(50) NOT NULL
         ,test_size_scope        NUMERIC(7,3)
@@ -104,4 +104,17 @@ class MysqlTest extends AbstractDriverTest
     protected $expect_quote_name_plain = '`table`';
     
     protected $expect_quote_names_in = "*, *.*, `foo`.`bar`, CONCAT('foo.bar', \"baz.dib\") AS `zim`";
+    
+    protected function createSchemas()
+    {
+        $this->conn->query("CREATE DATABASE aura_test_schema1");
+        $this->conn->query("CREATE DATABASE aura_test_schema2");
+        $this->conn->query("USE aura_test_schema1");
+    }
+    
+    protected function dropSchemas()
+    {
+        $this->conn->query("DROP DATABASE IF EXISTS aura_test_schema1");
+        $this->conn->query("DROP DATABASE IF EXISTS aura_test_schema2");
+    }
 }

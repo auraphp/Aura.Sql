@@ -25,9 +25,15 @@ abstract class AbstractDriverTest extends \PHPUnit_Framework_TestCase
     
     protected $conn;
     
-    protected $table = 'aura';
+    protected $schema1 = 'aura_test_schema1';
     
-    protected $expect_fetch_table_list = ['aura'];
+    protected $schema2 = 'aura_test_schema2';
+    
+    protected $table = 'aura_test_table';
+    
+    protected $create_table;
+    
+    protected $expect_fetch_table_list = ['aura_test_table'];
     
     protected $expect_fetch_table_cols;
     
@@ -73,21 +79,28 @@ abstract class AbstractDriverTest extends \PHPUnit_Framework_TestCase
             $params['options']
         );
         
-        $this->dropTable();
-        $this->createTable();
+        $this->dropSchemas();
+        $this->createSchemas();
+        $this->createTables();
         $this->fillTable();
     }
     
-    protected function createTable()
+    abstract protected function createSchemas();
+    
+    abstract protected function dropSchemas();
+    
+    protected function createTables()
     {
-        $this->conn->query($this->create_table);
+        // create in schema 1
+        $sql = $this->create_table;
+        $this->conn->query($sql);
+        
+        // create again in schema 2
+        $sql = str_replace($this->table, "{$this->schema2}.{$this->table}", $sql);
+        $this->conn->query($sql);
     }
     
-    protected function dropTable()
-    {
-        $this->conn->query("DROP TABLE IF EXISTS {$this->table}");
-    }
-    
+    // only fills in schema 1
     protected function fillTable()
     {
         $names = [
@@ -221,15 +234,24 @@ abstract class AbstractDriverTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($this->expect_fetch_table_list, $actual);
     }
     
+    public function testFetchTableList_schema()
+    {
+        $actual = $this->conn->fetchTableList('aura_test_schema2');
+        $this->assertSame($this->expect_fetch_table_list, $actual);
+    }
+    
     public function testFetchTableCols()
     {
         $actual = $this->conn->fetchTableCols($this->table);
         $this->assertSame($this->expect_fetch_table_cols, $actual);
     }
     
-    /**
-     * @todo Implement testQuote().
-     */
+    public function testFetchTableCols_schema()
+    {
+        $actual = $this->conn->fetchTableCols($this->table, 'aura_test_schema2');
+        $this->assertSame($this->expect_fetch_table_cols, $actual);
+    }
+    
     public function testQuote()
     {
         // quote a scalar

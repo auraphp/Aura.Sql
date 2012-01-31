@@ -11,7 +11,7 @@ class SqliteTest extends AbstractDriverTest
     
     protected $driver_class = 'Aura\Sql\Driver\Sqlite';    
     
-    protected $create_table = "CREATE TABLE aura (
+    protected $create_table = "CREATE TABLE aura_test_table (
          id                     INTEGER PRIMARY KEY AUTOINCREMENT
         ,name                   VARCHAR(50) NOT NULL
         ,test_size_scope        NUMERIC(7,3)
@@ -20,7 +20,7 @@ class SqliteTest extends AbstractDriverTest
         ,test_default_ignore    TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )";
     
-    protected $expect_fetch_table_list = ['aura', 'sqlite_sequence'];
+    protected $expect_fetch_table_list = ['aura_test_table', 'sqlite_sequence'];
     
     protected $expect_fetch_table_cols = [
         'id' => [
@@ -106,4 +106,16 @@ class SqliteTest extends AbstractDriverTest
     protected $expect_quote_name_plain = '"table"';
     
     protected $expect_quote_names_in = "*, *.*, \"foo\".\"bar\", CONCAT('foo.bar', \"baz.dib\") AS \"zim\"";
+    
+    protected function createSchemas()
+    {
+        // only need to create the second one
+        $this->conn->query("ATTACH DATABASE ':memory:' AS aura_test_schema2");
+    }
+    
+    protected function dropSchemas()
+    {
+        // since they're both in memory, no need to clean up
+    }
+    
 }
