@@ -489,23 +489,6 @@ abstract class AbstractDriver
     
     /**
      * 
-     * Get the last auto-incremented insert ID from the database.
-     * 
-     * @param string $table The table name on which the auto-increment occurred.
-     * 
-     * @param string $col The name of the auto-increment column.
-     * 
-     * @return int The last auto-increment ID value inserted to the database.
-     * 
-     */
-    public function lastInsertId($table = null, $col = null)
-    {
-        $pdo = $this->getPdo();
-        return $pdo->lastInsertId();
-    }
-    
-    /**
-     * 
      * Inserts a row of data into a table.
      * 
      * @param string $table The table to insert data into.

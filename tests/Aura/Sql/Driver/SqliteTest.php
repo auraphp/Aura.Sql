@@ -16,11 +16,14 @@ class SqliteTest extends AbstractDriverTest
         ,name                   VARCHAR(50) NOT NULL
         ,test_size_scope        NUMERIC(7,3)
         ,test_default_null      CHAR(3) DEFAULT NULL
-        ,test_default_literal   VARCHAR(7) DEFAULT 'literal'
+        ,test_default_string    VARCHAR(7) DEFAULT 'string'
+        ,test_default_number    NUMERIC(5) DEFAULT 12345
         ,test_default_ignore    TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )";
     
     protected $expect_fetch_table_list = ['aura_test_table', 'sqlite_sequence'];
+    
+    protected $expect_fetch_table_list_schema = ['aura_test_table', 'sqlite_sequence'];
     
     protected $expect_fetch_table_cols = [
         'id' => [
@@ -63,12 +66,22 @@ class SqliteTest extends AbstractDriverTest
             'primary' => false,
             'autoinc' => false,
         ],
-        'test_default_literal' => [
-            'name' => 'test_default_literal',
+        'test_default_string' => [
+            'name' => 'test_default_string',
             'type' => 'varchar',
             'size' => 7,
             'scope' => null,
-            'default' => 'literal',
+            'default' => 'string',
+            'notnull' => false,
+            'primary' => false,
+            'autoinc' => false,
+        ],
+        'test_default_number' => [
+            'name' => 'test_default_number',
+            'type' => 'numeric',
+            'size' => 5,
+            'scope' => null,
+            'default' => '12345',
             'notnull' => false,
             'primary' => false,
             'autoinc' => false,

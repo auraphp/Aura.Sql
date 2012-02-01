@@ -193,4 +193,10 @@ class Sqlite extends AbstractDriver
         // done!
         return $cols;
     }
+    
+    public function lastInsertId()
+    {
+        $pdo = $this->getPdo();
+        return $pdo->lastInsertId();
+    }
 }

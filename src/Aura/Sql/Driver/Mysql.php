@@ -91,4 +91,10 @@ class Mysql extends AbstractDriver
             return $default;
         }
     }
+    
+    public function lastInsertId()
+    {
+        $pdo = $this->getPdo();
+        return $pdo->lastInsertId();
+    }
 }

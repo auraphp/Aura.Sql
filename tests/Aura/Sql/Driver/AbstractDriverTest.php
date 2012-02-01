@@ -33,7 +33,7 @@ abstract class AbstractDriverTest extends \PHPUnit_Framework_TestCase
     
     protected $create_table;
     
-    protected $expect_fetch_table_list = ['aura_test_table'];
+    protected $expect_fetch_table_list;
     
     protected $expect_fetch_table_cols;
     
@@ -69,14 +69,12 @@ abstract class AbstractDriverTest extends \PHPUnit_Framework_TestCase
         
         $this->expect_dsn_string = $GLOBALS[$test_class]['expect_dsn_string'];
         
-        $params = $this->connect_params;
-        $class  = $this->driver_class;
-        
+        $class = $this->driver_class;
         $this->conn = new $class(
-            $params['dsn'],
-            $params['username'],
-            $params['password'],
-            $params['options']
+            $this->connect_params['dsn'],
+            $this->connect_params['username'],
+            $this->connect_params['password'],
+            $this->connect_params['options']
         );
         
         $this->dropSchemas();
@@ -119,7 +117,7 @@ abstract class AbstractDriverTest extends \PHPUnit_Framework_TestCase
     public function testGetDsnString()
     {
         $actual = $this->conn->getDsnString();
-        $this->assertSame($this->expect_dsn_string, $actual);
+        $this->assertEquals($this->expect_dsn_string, $actual);
     }
     
     /**
@@ -139,7 +137,7 @@ abstract class AbstractDriverTest extends \PHPUnit_Framework_TestCase
         $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
         $expect = 10;
         $actual = count($result);
-        $this->assertSame($expect, $actual);
+        $this->assertEquals($expect, $actual);
     }
     
     public function testQueryWithData()
@@ -151,7 +149,7 @@ abstract class AbstractDriverTest extends \PHPUnit_Framework_TestCase
         $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
         $expect = 5;
         $actual = count($result);
-        $this->assertSame($expect, $actual);
+        $this->assertEquals($expect, $actual);
     }
     
     public function testFetchAll()
@@ -160,7 +158,7 @@ abstract class AbstractDriverTest extends \PHPUnit_Framework_TestCase
         $result = $this->conn->fetchAll($text);
         $expect = 10;
         $actual = count($result);
-        $this->assertSame($expect, $actual);
+        $this->assertEquals($expect, $actual);
     }
     
     public function testFetchAssoc()
@@ -169,12 +167,12 @@ abstract class AbstractDriverTest extends \PHPUnit_Framework_TestCase
         $result = $this->conn->fetchAssoc($text);
         $expect = 10;
         $actual = count($result);
-        $this->assertSame($expect, $actual);
+        $this->assertEquals($expect, $actual);
         
         // // 1-based IDs, not 0-based sequential values
         $expect = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
         $actual = array_keys($result);
-        $this->assertSame($expect, $actual);
+        $this->assertEquals($expect, $actual);
     }
     
     public function testFetchCol()
@@ -183,11 +181,11 @@ abstract class AbstractDriverTest extends \PHPUnit_Framework_TestCase
         $result = $this->conn->fetchCol($text);
         $expect = 10;
         $actual = count($result);
-        $this->assertSame($expect, $actual);
+        $this->assertEquals($expect, $actual);
         
         // // 1-based IDs, not 0-based sequential values
         $expect = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'];
-        $this->assertSame($expect, $result);
+        $this->assertEquals($expect, $result);
     }
     
     public function testFetchValue()
@@ -195,7 +193,7 @@ abstract class AbstractDriverTest extends \PHPUnit_Framework_TestCase
         $text = "SELECT id FROM {$this->table} WHERE id = 1";
         $actual = $this->conn->fetchValue($text);
         $expect = '1';
-        $this->assertSame($expect, $actual);
+        $this->assertEquals($expect, $actual);
     }
     
     public function testFetchPairs()
@@ -214,7 +212,7 @@ abstract class AbstractDriverTest extends \PHPUnit_Framework_TestCase
           9  => 'Julia',
           10 => 'Kara',
         ];
-        $this->assertSame($expect, $actual);
+        $this->assertEquals($expect, $actual);
     }
     
     public function testFetchOne()
@@ -225,31 +223,43 @@ abstract class AbstractDriverTest extends \PHPUnit_Framework_TestCase
             'id'   => '1',
             'name' => 'Anna',
         ];
-        $this->assertSame($expect, $actual);
+        $this->assertEquals($expect, $actual);
     }
     
     public function testFetchTableList()
     {
         $actual = $this->conn->fetchTableList();
-        $this->assertSame($this->expect_fetch_table_list, $actual);
+        $this->assertEquals($this->expect_fetch_table_list, $actual);
     }
     
     public function testFetchTableList_schema()
     {
         $actual = $this->conn->fetchTableList('aura_test_schema2');
-        $this->assertSame($this->expect_fetch_table_list, $actual);
+        $this->assertEquals($this->expect_fetch_table_list_schema, $actual);
     }
     
     public function testFetchTableCols()
     {
         $actual = $this->conn->fetchTableCols($this->table);
-        $this->assertSame($this->expect_fetch_table_cols, $actual);
+        $expect = $this->expect_fetch_table_cols;
+        ksort($actual);
+        ksort($expect);
+        $this->assertSame(count($expect), count($actual));
+        foreach ($expect as $name => $info) {
+            $this->assertSame($expect[$name], $actual[$name]);
+        }
     }
     
     public function testFetchTableCols_schema()
     {
         $actual = $this->conn->fetchTableCols($this->table, 'aura_test_schema2');
-        $this->assertSame($this->expect_fetch_table_cols, $actual);
+        $expect = $this->expect_fetch_table_cols;
+        ksort($actual);
+        ksort($expect);
+        $this->assertSame(count($expect), count($actual));
+        foreach ($expect as $name => $info) {
+            $this->assertSame($expect[$name], $actual[$name]);
+        }
     }
     
     public function testQuote()
@@ -315,31 +325,31 @@ abstract class AbstractDriverTest extends \PHPUnit_Framework_TestCase
     {
         // table AS alias
         $actual = $this->conn->quoteName('table AS alias');
-        $this->assertSame($this->expect_quote_name_table_as_alias, $actual);
+        $this->assertEquals($this->expect_quote_name_table_as_alias, $actual);
         
         // table.col AS alias
         $actual = $this->conn->quoteName('table.col AS alias');
-        $this->assertSame($this->expect_quote_name_table_col_as_alias, $actual);
+        $this->assertEquals($this->expect_quote_name_table_col_as_alias, $actual);
         
         // table alias
         $actual = $this->conn->quoteName('table alias');
-        $this->assertSame($this->expect_quote_name_table_alias, $actual);
+        $this->assertEquals($this->expect_quote_name_table_alias, $actual);
         
         // table.col alias
         $actual = $this->conn->quoteName('table.col alias');
-        $this->assertSame($this->expect_quote_name_table_col_alias, $actual);
+        $this->assertEquals($this->expect_quote_name_table_col_alias, $actual);
         
         // plain old identifier
         $actual = $this->conn->quoteName('table');
-        $this->assertSame($this->expect_quote_name_plain, $actual);
+        $this->assertEquals($this->expect_quote_name_plain, $actual);
         
         // star
         $actual = $this->conn->quoteName('*');
-        $this->assertSame('*', $actual);
+        $this->assertEquals('*', $actual);
         
         // star dot star
         $actual = $this->conn->quoteName('*.*');
-        $this->assertSame('*.*', $actual);
+        $this->assertEquals('*.*', $actual);
     }
     
     /**
@@ -349,7 +359,7 @@ abstract class AbstractDriverTest extends \PHPUnit_Framework_TestCase
     {
         $sql = "*, *.*, foo.bar, CONCAT('foo.bar', \"baz.dib\") AS zim";
         $actual = $this->conn->quoteNamesIn($sql);
-        $this->assertSame($this->expect_quote_names_in, $actual);
+        $this->assertEquals($this->expect_quote_names_in, $actual);
     }
     
     public function testInsertAndLastInsertId()
@@ -358,14 +368,19 @@ abstract class AbstractDriverTest extends \PHPUnit_Framework_TestCase
         $actual = $this->conn->insert($this->table, $data);
         
         // did we get the right last ID?
-        $actual = $this->conn->lastInsertId();
+        $actual = $this->fetchLastInsertId();
         $expect = '11';
-        $this->assertSame($expect, $actual);
+        $this->assertEquals($expect, $actual);
         
         // did it insert?
         $actual = $this->conn->fetchOne("SELECT id, name FROM {$this->table} WHERE id = 11");
         $expect = ['id' => '11', 'name' => 'Laura'];
-        $this->assertSame($actual, $expect);
+        $this->assertEquals($actual, $expect);
+    }
+    
+    protected function fetchLastInsertId()
+    {
+        return $this->conn->lastInsertId();
     }
     
     public function testUpdate()
@@ -377,12 +392,12 @@ abstract class AbstractDriverTest extends \PHPUnit_Framework_TestCase
         // did it update?
         $actual = $this->conn->fetchOne("SELECT id, name FROM {$this->table} WHERE id = 1");
         $expect = ['id' => '1', 'name' => 'Annabelle'];
-        $this->assertSame($actual, $expect);
+        $this->assertEquals($actual, $expect);
         
         // did anything else update?
         $actual = $this->conn->fetchOne("SELECT id, name FROM {$this->table} WHERE id = 2");
         $expect = ['id' => '2', 'name' => 'Betty'];
-        $this->assertSame($actual, $expect);
+        $this->assertEquals($actual, $expect);
     }
     
     public function testDelete()
@@ -397,6 +412,6 @@ abstract class AbstractDriverTest extends \PHPUnit_Framework_TestCase
         // do we still have everything else?
         $actual = $this->conn->fetchAll("SELECT * FROM {$this->table}");
         $expect = 9;
-        $this->assertSame($expect, count($actual));
+        $this->assertEquals($expect, count($actual));
     }
 }

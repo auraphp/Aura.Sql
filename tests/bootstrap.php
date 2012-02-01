@@ -27,6 +27,21 @@ $GLOBALS['Aura\Sql\Driver\MysqlTest']['connect_params'] = [
 $GLOBALS['Aura\Sql\Driver\MysqlTest']['expect_dsn_string'] = 'mysql:host=localhost';
 
 /**
+ * MysqlTest
+ */
+$GLOBALS['Aura\Sql\Driver\PgsqlTest']['connect_params'] = [
+    'dsn' => [
+        'host' => 'localhost',
+        'dbname' => 'test',
+    ],
+    'username' => 'postgres',
+    'password' => 'postgres',
+    'options' => [],
+];
+
+$GLOBALS['Aura\Sql\Driver\PgsqlTest']['expect_dsn_string'] = 'pgsql:host=localhost;dbname=test';
+
+/**
  * Sqlite
  */
 $GLOBALS['Aura\Sql\Driver\SqliteTest']['connect_params'] = [
