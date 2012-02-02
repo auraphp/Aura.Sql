@@ -10,16 +10,41 @@ namespace Aura\Sql\Driver;
 
 /**
  * 
- * Sqlite Adapter
+ * SQLite driver.
  * 
  * @package Aura.Sql
  * 
  */
 class Sqlite extends AbstractDriver
 {
-    protected $dsn_prefix = 'sqlite';
+    /**
+     * 
+     * The string used for SQLite autoincrement data types.
+     * 
+     * This is different for versions 2 and 3 of SQLite.
+     * 
+     * @var string
+     * 
+     */
+    protected $autoinc_string = 'INTEGER PRIMARY KEY AUTOINCREMENT';
     
+    /**
+     * 
+     * The PDO DSN for the connection, typically a file path.
+     * 
+     * @var string
+     * 
+     */
     protected $dsn = null;
+    
+    /**
+     * 
+     * The PDO type prefix.
+     * 
+     * @var string
+     * 
+     */
+    protected $dsn_prefix = 'sqlite';
     
     /**
      * 
@@ -28,7 +53,7 @@ class Sqlite extends AbstractDriver
      * @var string
      * 
      */
-    protected $ident_quote_prefix = '"';
+    protected $quote_name_prefix = '"';
     
     /**
      * 
@@ -37,19 +62,18 @@ class Sqlite extends AbstractDriver
      * @var string
      * 
      */
-    protected $ident_quote_suffix = '"';
+    protected $quote_name_suffix = '"';
     
     /**
      * 
-     * The string used for Sqlite autoincrement data types.
+     * Returns an list of tables in the database.
      * 
-     * This is different for versions 2 and 3 of SQLite.
+     * @param string $schema Optionally, pass a schema name to get the list
+     * of tables in this schema.
      * 
-     * @var string
+     * @return array The list of tables in the database.
      * 
      */
-    protected $sqlite_autoinc = 'INTEGER PRIMARY KEY AUTOINCREMENT';
-    
     public function fetchTableList($schema = null)
     {
         if ($schema) {
@@ -118,7 +142,7 @@ class Sqlite extends AbstractDriver
             list($type, $size, $scope) = $this->getTypeSizeScope($val['type']);
             
             // find autoincrement column in CREATE TABLE sql.
-            $autoinc_find = str_replace(' ', '\s+', $this->sqlite_autoinc);
+            $autoinc_find = str_replace(' ', '\s+', $this->autoinc_string);
             $find = "(\"$name\"|\'$name\'|`$name`|\[$name\]|\\b$name)" 
                   . "\s+$autoinc_find";
             
@@ -194,6 +218,13 @@ class Sqlite extends AbstractDriver
         return $cols;
     }
     
+    /**
+     * 
+     * Returns the last ID inserted on the connection.
+     * 
+     * @return mixed
+     * 
+     */
     public function lastInsertId()
     {
         $pdo = $this->getPdo();

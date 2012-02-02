@@ -10,15 +10,21 @@ namespace Aura\Sql\Driver;
 
 /**
  * 
- * PostgreSQL Adapter
+ * PostgreSQL driver.
  * 
  * @package Aura.Sql
  * 
  */
 class Pgsql extends AbstractDriver
 {
-    protected $dsn_prefix = 'pgsql';
-    
+    /**
+     * 
+     * The PDO DSN for the connection. This can be an array of key-value pairs
+     * or a string (minus the PDO type prefix).
+     * 
+     * @var string|array
+     * 
+     */
     protected $dsn = [
         'host' => null,
         'port' => null,
@@ -29,21 +35,30 @@ class Pgsql extends AbstractDriver
     
     /**
      * 
-     * The quote character before an entity name (table, index, etc).
+     * The PDO type prefix.
      * 
      * @var string
      * 
      */
-    protected $ident_quote_prefix = '"';
+    protected $dsn_prefix = 'pgsql';
     
     /**
      * 
-     * The quote character after an entity name (table, index, etc).
+     * The prefix to use when quoting identifier names.
      * 
      * @var string
      * 
      */
-    protected $ident_quote_suffix = '"';
+    protected $quote_name_prefix = '"';
+    
+    /**
+     * 
+     * The suffix to use when quoting identifier names.
+     * 
+     * @var string
+     * 
+     */
+    protected $quote_name_suffix = '"';
     
     /**
      * 
@@ -77,13 +92,14 @@ class Pgsql extends AbstractDriver
     
     /**
      * 
-     * Describes the columns in a table.
+     * Returns an array of columns in a table.
      * 
-     * @param string $table The table name to fetch columns for.
+     * @param string $table Return the columns in this table.
      * 
-     * @param string $schema The attached database in which the table resides.
+     * @param string $schema Optionally, look for the table in this schema.
      * 
-     * @return array
+     * @return array An associative array where the key is the column name
+     * and the value is an array describing the column.
      * 
      */
     public function fetchTableCols($table, $schema = null)
@@ -167,13 +183,6 @@ class Pgsql extends AbstractDriver
         return $cols;
     }
     
-    public function lastInsertId($table, $col)
-    {
-        $name = $this->quoteName("{$table}_{$col}_seq");
-        $pdo = $this->getPdo();
-        return $pdo->lastInsertId($name);
-    }
-    
     /**
      * 
      * Given a native column SQL default value, finds a PHP literal value.
@@ -204,5 +213,28 @@ class Pgsql extends AbstractDriver
         
         // null or non-literal
         return null;
+    }
+    
+    /**
+     * 
+     * Returns the last ID inserted on the connection for a given table
+     * and column sequence.
+     * 
+     * PostgreSQL uses a sequence named for the table and column to track
+     * auto-incremented IDs; you need to pass the table and column name to
+     * tell PostgreSQL which sequence to check.
+     * 
+     * @param string $table The table to check the last inserted ID on.
+     * 
+     * @param string $col The column to check the last inserted ID on.
+     * 
+     * @return mixed
+     * 
+     */
+    public function lastInsertId($table, $col)
+    {
+        $name = $this->quoteName("{$table}_{$col}_seq");
+        $pdo = $this->getPdo();
+        return $pdo->lastInsertId($name);
     }
 }

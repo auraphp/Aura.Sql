@@ -24,9 +24,9 @@ class Sqlsrv extends AbstractDriver
         'Database' => null,
     ];
     
-    protected $ident_quote_prefix = '[';
+    protected $quote_name_prefix = '[';
     
-    protected $ident_quote_suffix = ']';
+    protected $quote_name_suffix = ']';
     
     /**
      * 

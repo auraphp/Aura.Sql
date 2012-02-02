@@ -12,29 +12,99 @@ use PDOStatement;
 
 /**
  * 
- * Abstract Class for Driver
+ * Abstract class for SQL drivers.
  * 
  * @package Aura.Sql
  * 
  */
 abstract class AbstractDriver
 {
-    protected $dsn_prefix;
-    
+    /**
+     * 
+     * The PDO DSN for the connection. This can be an array of key-value pairs
+     * or a string (minus the PDO type prefix).
+     * 
+     * @var string|array
+     * 
+     */
     protected $dsn;
     
-    protected $ident_quote_prefix = null;
+    /**
+     * 
+     * The PDO type prefix.
+     * 
+     * @var string
+     * 
+     */
+    protected $dsn_prefix;
     
-    protected $ident_quote_suffix = null;
-    
-    protected $username;
-    
-    protected $password;
-    
+    /**
+     * 
+     * PDO options for the connection.
+     * 
+     * @var array
+     * 
+     */
     protected $options = [];
     
+    /**
+     * 
+     * The password for the connection.
+     * 
+     * @var string
+     * 
+     */
+    protected $password;
+    
+    /**
+     * 
+     * The PDO connection object.
+     * 
+     * @var PDO
+     * 
+     */
     protected $pdo;
     
+    /**
+     * 
+     * The prefix to use when quoting identifier names.
+     * 
+     * @var string
+     * 
+     */
+    protected $quote_name_prefix;
+    
+    /**
+     * 
+     * The suffix to use when quoting identifier names.
+     * 
+     * @var string
+     * 
+     */
+    protected $quote_name_suffix;
+    
+    /**
+     * 
+     * The username for the connection.
+     * 
+     * @var string
+     * 
+     */
+    protected $username;
+    
+    /**
+     * 
+     * Constructor.
+     * 
+     * @param mixed $dsn DSN parameters for the PDO connection.
+     * 
+     * @param string $username The username for the PDO connection.
+     * 
+     * @param string $password The password for the PDO connection.
+     * 
+     * @param array $options Options for PDO connection.
+     * 
+     */
     public function __construct(
         $dsn,
         $username = null,
@@ -47,6 +117,13 @@ abstract class AbstractDriver
         $this->options  = array_merge($this->options, $options);
     }
     
+    /**
+     * 
+     * Returns the DSN string used by the PDO connection.
+     * 
+     * @return string
+     * 
+     */
     public function getDsnString()
     {
         if (is_array($this->dsn)) {
@@ -64,6 +141,14 @@ abstract class AbstractDriver
         return "{$this->dsn_prefix}:{$dsn_string}";
     }
     
+    /**
+     * 
+     * Returns the PDO connection object; if it does not exist, creates it to
+     * connect to the database.
+     * 
+     * @return PDO
+     * 
+     */
     public function getPdo()
     {
         if (! $this->pdo) {
@@ -78,6 +163,58 @@ abstract class AbstractDriver
         return $this->pdo;
     }
     
+    /**
+     * 
+     * Prepares and executes an SQL statement, optionally binding values
+     * to named parameters in the statement.
+     * 
+     * This is the most-direct way to interact with the database; you pass
+     * an SQL statement to the method, then the adapter uses PDO connection 
+     * object to execute the statement and return a result.
+     * 
+     * To help prevent SQL injection attacks, you should **always** quote
+     * the values used in a direct query. Use `quote()`, `quoteInto()`,
+     * or  `quoteMulti()` to accomplish this.
+     * 
+     * Even easier, use the automated value binding provided by the `query()` 
+     * method:
+     * 
+     *     // bad
+     *     $result = $sql->query('SELECT * FROM table WHERE foo = "$bar"');
+     *     
+     *     // better
+     *     $q_bar  = $sql->quote($bar);
+     *     $result = $sql->query('SELECT * FROM table WHERE foo = $q_bar');
+     *      
+     *     // best
+     *     $result = $sql->query(
+     *         'SELECT * FROM table WHERE foo = :bar',
+     *         ['bar' => $bar]
+     *     );
+     * 
+     * The `query()` method examins the statement for all `:name` placeholders
+     * and attempts to bind data from the `$data` array.  The regular
+     * expression it uses is a little braindead; it cannot tell if the `:name`
+     * placeholder is literal text or really a placeholder.
+     * 
+     * As such, you should *either* use the `$data` array for named-placeholder
+     * value binding at `query()` time, *or* quote-as-you-go when building the 
+     * statement, not both.  If you do, you are on your own to make sure
+     * that nothing looking like a `:name` placeholder exists in the literal 
+     * text.
+     * 
+     * Question-mark placeholders are not supported for automatic value
+     * binding at query() time.
+     * 
+     * @param string $text The text of the SQL statement, optionally with
+     * named placeholders.
+     * 
+     * @param array $data An associative array of data to bind to the named
+     * placeholders.
+     * 
+     * @return PDOStatement
+     * 
+     */
     public function query($text, array $data = [])
     {
         $pdo = $this->getPdo();
@@ -91,17 +228,18 @@ abstract class AbstractDriver
      * 
      * Fetches all rows from the database using sequential keys.
      * 
-     * @param string $spec The SELECT statement.
+     * @param string $text The text of the SQL statement, optionally with
+     * named placeholders.
      * 
-     * @param array $data An associative array of data to bind into the
-     * SELECT statement.
+     * @param array $data An associative array of data to bind to the named
+     * placeholders.
      * 
      * @return array
      * 
      */
-    public function fetchAll($spec, $data = [])
+    public function fetchAll($text, $data = [])
     {
-        $stmt = $this->query($spec, $data);
+        $stmt = $this->query($text, $data);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
     
@@ -113,18 +251,18 @@ abstract class AbstractDriver
      * N.b.: if multiple rows have the same first column value, the last
      * row with that value will override earlier rows.
      * 
-     * @param array|string $spec An array of component parts for a
-     * SELECT, or a literal query string.
+     * @param string $text The text of the SQL statement, optionally with
+     * named placeholders.
      * 
-     * @param array $data An associative array of data to bind into the
-     * SELECT statement.
+     * @param array $data An associative array of data to bind to the named
+     * placeholders.
      * 
      * @return array
      * 
      */
-    public function fetchAssoc($spec, array $data = [])
+    public function fetchAssoc($text, array $data = [])
     {
-        $stmt = $this->query($spec, $data);
+        $stmt = $this->query($text, $data);
         $data = [];
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
             $key = current($row); // value of the first element
@@ -137,18 +275,18 @@ abstract class AbstractDriver
      * 
      * Fetches the first column of all rows as a sequential array.
      * 
-     * @param array|string $spec An array of component parts for a
-     * SELECT, or a literal query string.
+     * @param string $text The text of the SQL statement, optionally with
+     * named placeholders.
      * 
-     * @param array $data An associative array of data to bind into the
-     * SELECT statement.
+     * @param array $data An associative array of data to bind to the named
+     * placeholders.
      * 
      * @return array
      * 
      */
-    public function fetchCol($spec, array $data = [])
+    public function fetchCol($text, array $data = [])
     {
-        $stmt = $this->query($spec, $data);
+        $stmt = $this->query($text, $data);
         return $stmt->fetchAll(PDO::FETCH_COLUMN, 0);
     }
     
@@ -156,18 +294,18 @@ abstract class AbstractDriver
      * 
      * Fetches the very first value (i.e., first column of the first row).
      * 
-     * @param array|string $spec An array of component parts for a
-     * SELECT, or a literal query string.
+     * @param string $text The text of the SQL statement, optionally with
+     * named placeholders.
      * 
-     * @param array $data An associative array of data to bind into the
-     * SELECT statement.
+     * @param array $data An associative array of data to bind to the named
+     * placeholders.
      * 
      * @return mixed
      * 
      */
-    public function fetchValue($spec, array $data = [])
+    public function fetchValue($text, array $data = [])
     {
-        $stmt = $this->query($spec, $data);
+        $stmt = $this->query($text, $data);
         return $stmt->fetchColumn(0);
     }
     
@@ -176,18 +314,18 @@ abstract class AbstractDriver
      * Fetches an associative array of all rows as key-value pairs (first 
      * column is the key, second column is the value).
      * 
-     * @param array|string $spec An array of component parts for a
-     * SELECT, or a literal query string.
+     * @param string $text The text of the SQL statement, optionally with
+     * named placeholders.
      * 
-     * @param array $data An associative array of data to bind into the
-     * SELECT statement.
+     * @param array $data An associative array of data to bind to the named
+     * placeholders.
      * 
      * @return array
      * 
      */
-    public function fetchPairs($spec, array $data = [])
+    public function fetchPairs($text, array $data = [])
     {
-        $stmt = $this->query($spec, $data);
+        $stmt = $this->query($text, $data);
         $data = [];
         while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
             $data[$row[0]] = $row[1];
@@ -199,18 +337,18 @@ abstract class AbstractDriver
      * 
      * Fetches one row from the database.
      * 
-     * @param array|string $spec An array of component parts for a
-     * SELECT, or a literal query string.
+     * @param string $text The text of the SQL statement, optionally with
+     * named placeholders.
      * 
-     * @param array $data An associative array of data to bind into the
-     * SELECT statement.
+     * @param array $data An associative array of data to bind to the named
+     * placeholders.
      * 
      * @return array
      * 
      */
-    public function fetchOne($spec, array $data = [])
+    public function fetchOne($text, array $data = [])
     {
-        $stmt = $this->query($spec, $data);
+        $stmt = $this->query($text, $data);
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
     
@@ -220,7 +358,7 @@ abstract class AbstractDriver
      * 
      * If an array is passed as the value, the array values are quoted
      * and then returned as a comma-separated string; this is useful 
-     * for generating IN() lists.
+     * for generating `IN()` lists.
      * 
      * @param mixed $val The value to quote.
      * 
@@ -305,14 +443,12 @@ abstract class AbstractDriver
      * The placeholder is a question-mark; all placeholders will be replaced
      * with the quoted value.   For example ...
      * 
-     * {{code: php
-     *     $sql = Solar::factory('Solar_Sql');
-     *     
      *     $list = [
      *          "WHERE date > ?"   => '2005-01-01',
      *          "  AND date < ?"   => '2005-02-01',
      *          "  AND type IN(?)" => ['a', 'b', 'c'],
      *     ];
+     *     
      *     $safe = $sql->quoteMulti($list);
      *     
      *     // $safe = "WHERE date > '2005-01-02'
@@ -354,10 +490,10 @@ abstract class AbstractDriver
     /**
      * 
      * Quotes a single identifier name (table, table alias, table column, 
-     * index, sequence).  Ignores empty values.
+     * index, sequence).
      * 
-     * If the name contains ' AS ', this method will separately quote the
-     * parts before and after the ' AS '.
+     * If the name contains `' AS '`, this method will separately quote the
+     * parts before and after the `' AS '`.
      * 
      * If the name contains a space, this method will separately quote the
      * parts before and after the space.
@@ -374,7 +510,7 @@ abstract class AbstractDriver
      */
     public function quoteName($spec)
     {
-        // no extraneous spaces
+        // remove extraneous spaces
         $spec = trim($spec);
         
         // `original` AS `alias` ... note the 'rr' in strripos
@@ -644,9 +780,9 @@ abstract class AbstractDriver
         if ($name == '*') {
             return $name;
         } else {
-            return $this->ident_quote_prefix
+            return $this->quote_name_prefix
                  . $name
-                 . $this->ident_quote_suffix;
+                 . $this->quote_name_suffix;
         }
     }
     
@@ -669,13 +805,13 @@ abstract class AbstractDriver
         $find = "/(\\b)($word)\\.($word)(\\b)/i";
         
         $repl = '$1'
-              . $this->ident_quote_prefix
+              . $this->quote_name_prefix
               . '$2'
-              . $this->ident_quote_suffix
+              . $this->quote_name_suffix
               . '.'
-              . $this->ident_quote_prefix
+              . $this->quote_name_prefix
               . '$3'
-              . $this->ident_quote_suffix
+              . $this->quote_name_suffix
               . '$4'
               ;
               
@@ -728,12 +864,27 @@ abstract class AbstractDriver
     
     /**
      * 
-     * Returns a list of database tables.
+     * Returns an list of tables in the database.
+     * 
+     * @param string $schema Optionally, pass a schema name to get the list
+     * of tables in this schema.
      * 
      * @return array The list of tables in the database.
      * 
      */
     abstract public function fetchTableList($schema = null);
     
+    /**
+     * 
+     * Returns an array of columns in a table.
+     * 
+     * @param string $table Return the columns in this table.
+     * 
+     * @param string $schema Optionally, look for the table in this schema.
+     * 
+     * @return array An associative array where the key is the column name
+     * and the value is an array describing the column.
+     * 
+     */
     abstract public function fetchTableCols($table, $schema = null);
 }
