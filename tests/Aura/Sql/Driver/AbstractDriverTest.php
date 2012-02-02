@@ -152,6 +152,41 @@ abstract class AbstractDriverTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expect, $actual);
     }
     
+    public function testQueryWithArrayData()
+    {
+        $text = "SELECT * FROM {$this->table} WHERE id IN (:list) OR id = :id";
+        
+        $data['list'] = [1, 2, 3, 4];
+        $data['id'] = 5;
+        
+        $stmt = $this->conn->query($text, $data);
+        $this->assertInstanceOf('PDOStatement', $stmt);
+        $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $expect = 5;
+        $actual = count($result);
+        $this->assertEquals($expect, $actual);
+    }
+    
+    public function testPrepareWithQuotedStringsAndData()
+    {
+        $text = "SELECT * FROM {$this->table}
+                 WHERE 'leave :foo alone'
+                 AND id IN (:list)
+                 AND \"leave :bar alone\"";
+        
+        $data = [
+            'list' => [1, 2, 3, 4, 5],
+            'foo' => 'WRONG',
+            'bar' => 'WRONG',
+        ];
+        
+        $stmt = $this->conn->prepare($text, $data);
+        
+        $expect = str_replace(':list', '1, 2, 3, 4, 5', $text);
+        $actual = $stmt->queryString;
+        $this->assertSame($expect, $actual);
+    }
+    
     public function testFetchAll()
     {
         $text = "SELECT * FROM {$this->table}";

@@ -217,10 +217,96 @@ abstract class AbstractDriver
      */
     public function query($text, array $data = [])
     {
-        $pdo = $this->getPdo();
-        $stmt = $pdo->prepare($text);
-        $this->bind($stmt, $data);
+        $stmt = $this->prepare($text, $data);
         $stmt->execute();
+        return $stmt;
+    }
+    
+    /**
+     * 
+     * Creates a prepared PDOStatment and binds data values to placeholders.
+     * 
+     * PDO itself is touchy about binding values.  If you attempt to bind a
+     * value that does not have a corresponding placeholder, PDO will error.
+     * This method checks the query text to find placeholders and binds only
+     * data values that have placeholders in the text.
+     * 
+     * Similarly, PDO won't bind an array value. This method checks to see if
+     * the data to be bound is an array; if it is, the array is quoted and
+     * replaced into the text directly instead of binding it.
+     * 
+     * @param string $text The text of the SQL query.
+     * 
+     * @param array $data The values to bind (or quote) into the PDOStatement.
+     * 
+     * @return PDOStatement
+     * 
+     */
+    public function prepare($text, array $data)
+    {
+        // need the PDO object regardless
+        $pdo = $this->getPdo();
+        
+        // was data passed for binding?
+        if (! $data) {
+            return $pdo->prepare($text);
+        }
+        
+        // a list of placeholders to bind at the end
+        $bind = array();
+        
+        // find all text parts not inside quotes or backslashed-quotes
+        $apos = "'";
+        $quot = '"';
+        $parts = preg_split(
+            "/(($apos+|$quot+|\\$apos+|\\$quot+).*?)\\2/m",
+            $text,
+            -1,
+            PREG_SPLIT_DELIM_CAPTURE
+        );
+        
+        // loop through the non-quoted parts (0, 3, 6, 9, etc.)
+        $k = count($parts);
+        for ($i = 0; $i <= $k; $i += 3) {
+            
+            // get the part as a reference so it can be modified in place
+            $part =& $parts[$i];
+            
+            // find all :placeholder matches in the part
+            preg_match_all(
+                "/\W:([a-zA-Z_][a-zA-Z0-9_]*)/m",
+                $part . PHP_EOL,
+                $matches
+            );
+            
+            // for each of the :placeholder matches ...
+            foreach ($matches[1] as $key) {
+                // is the corresponding data element an array?
+                if (isset($data[$key]) && is_array($data[$key])) {
+                    // quote and replace it directly, because PDO won't bind
+                    // an array.
+                    $find = "/(\W)(:$key)(\W)/m";
+                    $repl = '${1}' . $this->quote($data[$key]) . '${3}';
+                    $part = preg_replace($find, $repl, $part);
+                } else {
+                    // not an array, retain the placeholder name for later
+                    $bind[] = $key;
+                }
+            }
+        }
+        
+        // bring the parts back together in case they were modified
+        $text = implode('', $parts);
+        
+        // prepare the statement
+        $stmt = $pdo->prepare($text);
+        
+        // for the placeholders we found, bind the corresponding data values
+        foreach ($bind as $key) {
+            $stmt->bindValue($key, $data[$key]);
+        }
+        
+        // done!
         return $stmt;
     }
     
@@ -723,43 +809,6 @@ abstract class AbstractDriver
         $table = $this->quoteName($table);
         $stmt = $this->query("DELETE FROM $table WHERE $where");
         return $stmt->rowCount();
-    }
-    
-    /**
-     * 
-     * Binds an array of scalars as values into a prepared PDOStatment.
-     * 
-     * Array element values that are themselves arrays will not be bound
-     * correctly, because PDO expects scalar values only.
-     * 
-     * @param PDOStatement $stmt The prepared PDOStatement.
-     * 
-     * @param array $data The scalar values to bind into the PDOStatement.
-     * 
-     * @return void
-     * 
-     */
-    protected function bind(PDOStatement $stmt, array $data)
-    {
-        // was data passed for binding?
-        if (! $data) {
-            return;
-        }
-            
-        // find all :placeholder matches.  note that this is a little
-        // brain-dead; it will find placeholders in literal text, which
-        // will cause errors later.  so in general, you should *either*
-        // bind at query time *or* bind as you go, not both.
-        preg_match_all(
-            "/\W:([a-zA-Z_][a-zA-Z0-9_]*)/m",
-            $stmt->queryString . "\n",
-            $matches
-        );
-        
-        // bind values to placeholders
-        foreach ($matches[1] as $key) {
-            $stmt->bindValue($key, $data[$key]);
-        }
     }
     
     /**
