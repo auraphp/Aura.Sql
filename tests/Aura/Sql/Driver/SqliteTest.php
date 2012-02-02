@@ -9,7 +9,7 @@ class SqliteTest extends AbstractDriverTest
 {
     protected $extension = 'pdo_sqlite';
     
-    protected $driver_class = 'Aura\Sql\Driver\Sqlite';    
+    protected $driver_type = 'sqlite';    
     
     protected $create_table = "CREATE TABLE aura_test_table (
          id                     INTEGER PRIMARY KEY AUTOINCREMENT
@@ -123,12 +123,12 @@ class SqliteTest extends AbstractDriverTest
     protected function createSchemas()
     {
         // only need to create the second one
-        $this->conn->query("ATTACH DATABASE ':memory:' AS aura_test_schema2");
+        $this->driver->query("ATTACH DATABASE ':memory:' AS aura_test_schema2");
     }
     
     protected function dropSchemas()
     {
-        // since they're both in memory, no need to clean up
+        // all in memory, no need to clean up
     }
     
 }

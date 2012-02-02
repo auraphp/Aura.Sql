@@ -1,6 +1,7 @@
 <?php
 namespace Aura\Sql\Driver;
 use PDO;
+use Aura\Sql\DriverFactory;
 
 /**
  * Test class for AbstractDriver.
@@ -12,7 +13,7 @@ abstract class AbstractDriverTest extends \PHPUnit_Framework_TestCase
     
     protected $dsn = [];
     
-    protected $connect_params = array(
+    protected $driver_params = array(
         'dsn'      => [],
         'username' => null,
         'password' => null,
@@ -21,9 +22,9 @@ abstract class AbstractDriverTest extends \PHPUnit_Framework_TestCase
     
     protected $expect_dsn_string;
     
-    protected $driver_class;
+    protected $driver_type;
     
-    protected $conn;
+    protected $driver;
     
     protected $schema1 = 'aura_test_schema1';
     
@@ -62,19 +63,21 @@ abstract class AbstractDriverTest extends \PHPUnit_Framework_TestCase
         
         // load test config values
         $test_class = get_class($this);
-        $this->connect_params = array_merge(
-            $this->connect_params,
-            $GLOBALS[$test_class]['connect_params']
+        $this->driver_params = array_merge(
+            $this->driver_params,
+            $GLOBALS[$test_class]['driver_params']
         );
         
         $this->expect_dsn_string = $GLOBALS[$test_class]['expect_dsn_string'];
         
-        $class = $this->driver_class;
-        $this->conn = new $class(
-            $this->connect_params['dsn'],
-            $this->connect_params['username'],
-            $this->connect_params['password'],
-            $this->connect_params['options']
+        $factory = new DriverFactory;
+        
+        $this->driver = $factory->newInstance(
+            $this->driver_type,
+            $this->driver_params['dsn'],
+            $this->driver_params['username'],
+            $this->driver_params['password'],
+            $this->driver_params['options']
         );
         
         $this->dropSchemas();
@@ -91,11 +94,11 @@ abstract class AbstractDriverTest extends \PHPUnit_Framework_TestCase
     {
         // create in schema 1
         $sql = $this->create_table;
-        $this->conn->query($sql);
+        $this->driver->query($sql);
         
         // create again in schema 2
         $sql = str_replace($this->table, "{$this->schema2}.{$this->table}", $sql);
-        $this->conn->query($sql);
+        $this->driver->query($sql);
     }
     
     // only fills in schema 1
@@ -107,8 +110,14 @@ abstract class AbstractDriverTest extends \PHPUnit_Framework_TestCase
         ];
         
         foreach ($names as $name) {
-            $this->conn->insert($this->table, ['name' => $name]);
+            $this->driver->insert($this->table, ['name' => $name]);
         }
+    }
+    
+    public function testGetProfiler()
+    {
+        $actual = $this->driver->getProfiler();
+        $this->assertInstanceOf('\Aura\Sql\Profiler', $actual);
     }
     
     /**
@@ -116,7 +125,7 @@ abstract class AbstractDriverTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetDsnString()
     {
-        $actual = $this->conn->getDsnString();
+        $actual = $this->driver->getDsnString();
         $this->assertEquals($this->expect_dsn_string, $actual);
     }
     
@@ -125,14 +134,14 @@ abstract class AbstractDriverTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetPdo()
     {
-        $actual = $this->conn->getPdo();
+        $actual = $this->driver->getPdo();
         $this->assertInstanceOf('\PDO', $actual);
     }
     
     public function testQuery()
     {
         $text = "SELECT * FROM {$this->table}";
-        $stmt = $this->conn->query($text);
+        $stmt = $this->driver->query($text);
         $this->assertInstanceOf('PDOStatement', $stmt);
         $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
         $expect = 10;
@@ -144,7 +153,7 @@ abstract class AbstractDriverTest extends \PHPUnit_Framework_TestCase
     {
         $text = "SELECT * FROM {$this->table} WHERE id <= :val";
         $data['val'] = '5';
-        $stmt = $this->conn->query($text, $data);
+        $stmt = $this->driver->query($text, $data);
         $this->assertInstanceOf('PDOStatement', $stmt);
         $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
         $expect = 5;
@@ -159,7 +168,7 @@ abstract class AbstractDriverTest extends \PHPUnit_Framework_TestCase
         $data['list'] = [1, 2, 3, 4];
         $data['id'] = 5;
         
-        $stmt = $this->conn->query($text, $data);
+        $stmt = $this->driver->query($text, $data);
         $this->assertInstanceOf('PDOStatement', $stmt);
         $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
         $expect = 5;
@@ -180,7 +189,7 @@ abstract class AbstractDriverTest extends \PHPUnit_Framework_TestCase
             'bar' => 'WRONG',
         ];
         
-        $stmt = $this->conn->prepare($text, $data);
+        $stmt = $this->driver->prepare($text, $data);
         
         $expect = str_replace(':list', '1, 2, 3, 4, 5', $text);
         $actual = $stmt->queryString;
@@ -190,7 +199,7 @@ abstract class AbstractDriverTest extends \PHPUnit_Framework_TestCase
     public function testFetchAll()
     {
         $text = "SELECT * FROM {$this->table}";
-        $result = $this->conn->fetchAll($text);
+        $result = $this->driver->fetchAll($text);
         $expect = 10;
         $actual = count($result);
         $this->assertEquals($expect, $actual);
@@ -199,7 +208,7 @@ abstract class AbstractDriverTest extends \PHPUnit_Framework_TestCase
     public function testFetchAssoc()
     {
         $text = "SELECT * FROM {$this->table} ORDER BY id";
-        $result = $this->conn->fetchAssoc($text);
+        $result = $this->driver->fetchAssoc($text);
         $expect = 10;
         $actual = count($result);
         $this->assertEquals($expect, $actual);
@@ -213,7 +222,7 @@ abstract class AbstractDriverTest extends \PHPUnit_Framework_TestCase
     public function testFetchCol()
     {
         $text = "SELECT id FROM {$this->table} ORDER BY id";
-        $result = $this->conn->fetchCol($text);
+        $result = $this->driver->fetchCol($text);
         $expect = 10;
         $actual = count($result);
         $this->assertEquals($expect, $actual);
@@ -226,7 +235,7 @@ abstract class AbstractDriverTest extends \PHPUnit_Framework_TestCase
     public function testFetchValue()
     {
         $text = "SELECT id FROM {$this->table} WHERE id = 1";
-        $actual = $this->conn->fetchValue($text);
+        $actual = $this->driver->fetchValue($text);
         $expect = '1';
         $this->assertEquals($expect, $actual);
     }
@@ -234,7 +243,7 @@ abstract class AbstractDriverTest extends \PHPUnit_Framework_TestCase
     public function testFetchPairs()
     {
         $text = "SELECT id, name FROM {$this->table} ORDER BY id";
-        $actual = $this->conn->fetchPairs($text);
+        $actual = $this->driver->fetchPairs($text);
         $expect = [
           1  => 'Anna',
           2  => 'Betty',
@@ -253,7 +262,7 @@ abstract class AbstractDriverTest extends \PHPUnit_Framework_TestCase
     public function testFetchOne()
     {
         $text = "SELECT id, name FROM {$this->table} WHERE id = 1";
-        $actual = $this->conn->fetchOne($text);
+        $actual = $this->driver->fetchOne($text);
         $expect = [
             'id'   => '1',
             'name' => 'Anna',
@@ -263,19 +272,19 @@ abstract class AbstractDriverTest extends \PHPUnit_Framework_TestCase
     
     public function testFetchTableList()
     {
-        $actual = $this->conn->fetchTableList();
+        $actual = $this->driver->fetchTableList();
         $this->assertEquals($this->expect_fetch_table_list, $actual);
     }
     
     public function testFetchTableList_schema()
     {
-        $actual = $this->conn->fetchTableList('aura_test_schema2');
+        $actual = $this->driver->fetchTableList('aura_test_schema2');
         $this->assertEquals($this->expect_fetch_table_list_schema, $actual);
     }
     
     public function testFetchTableCols()
     {
-        $actual = $this->conn->fetchTableCols($this->table);
+        $actual = $this->driver->fetchTableCols($this->table);
         $expect = $this->expect_fetch_table_cols;
         ksort($actual);
         ksort($expect);
@@ -287,7 +296,7 @@ abstract class AbstractDriverTest extends \PHPUnit_Framework_TestCase
     
     public function testFetchTableCols_schema()
     {
-        $actual = $this->conn->fetchTableCols($this->table, 'aura_test_schema2');
+        $actual = $this->driver->fetchTableCols($this->table, 'aura_test_schema2');
         $expect = $this->expect_fetch_table_cols;
         ksort($actual);
         ksort($expect);
@@ -300,19 +309,19 @@ abstract class AbstractDriverTest extends \PHPUnit_Framework_TestCase
     public function testQuote()
     {
         // quote a scalar
-        $actual = $this->conn->quote('"foo" bar \'baz\'');
+        $actual = $this->driver->quote('"foo" bar \'baz\'');
         $this->assertEquals($this->expect_quote_scalar, $actual);
         
         // quote a number
-        $actual = $this->conn->quote(123.456);
+        $actual = $this->driver->quote(123.456);
         $this->assertEquals(123.456, $actual);
         
         // quote a numeric
-        $actual = $this->conn->quote('123.456');
+        $actual = $this->driver->quote('123.456');
         $this->assertEquals(123.456, $actual);
         
         // quote an array
-        $actual = $this->conn->quote(array('"foo"', 'bar', "'baz'"));
+        $actual = $this->driver->quote(array('"foo"', 'bar', "'baz'"));
         $this->assertEquals($this->expect_quote_array, $actual);
     }
     
@@ -322,20 +331,20 @@ abstract class AbstractDriverTest extends \PHPUnit_Framework_TestCase
     public function testQuoteInto()
     {
         // no placeholders
-        $actual = $this->conn->quoteInto('foo = bar', "'zim'");
+        $actual = $this->driver->quoteInto('foo = bar', "'zim'");
         $expect = 'foo = bar';
         $this->assertEquals($expect, $actual);
         
         // one placeholder, one value
-        $actual = $this->conn->quoteInto("foo = ?", "'bar'");
+        $actual = $this->driver->quoteInto("foo = ?", "'bar'");
         $this->assertEquals($this->expect_quote_into,$actual);
         
         // many placeholders, many values
-        $actual = $this->conn->quoteInto("foo = ? AND zim = ?", ["'bar'", "'baz'"]);
+        $actual = $this->driver->quoteInto("foo = ? AND zim = ?", ["'bar'", "'baz'"]);
         $this->assertEquals($this->expect_quote_into_many, $actual);
         
         // many placeholders, too many values
-        $actual = $this->conn->quoteInto("foo = ? AND zim = ?", ["'bar'", "'baz'", "'gir'"]);
+        $actual = $this->driver->quoteInto("foo = ? AND zim = ?", ["'bar'", "'baz'", "'gir'"]);
         $this->assertEquals($this->expect_quote_into_many, $actual);
     }
     
@@ -349,7 +358,7 @@ abstract class AbstractDriverTest extends \PHPUnit_Framework_TestCase
             'foo = ?' => 'bar',
             'zim IN(?)' => array('dib', 'gir', 'baz'),
         );
-        $actual = $this->conn->quoteMulti($where, ' AND ');
+        $actual = $this->driver->quoteMulti($where, ' AND ');
         $this->assertEquals($this->expect_quote_multi, $actual);
     }
     
@@ -359,31 +368,31 @@ abstract class AbstractDriverTest extends \PHPUnit_Framework_TestCase
     public function testQuoteName()
     {
         // table AS alias
-        $actual = $this->conn->quoteName('table AS alias');
+        $actual = $this->driver->quoteName('table AS alias');
         $this->assertEquals($this->expect_quote_name_table_as_alias, $actual);
         
         // table.col AS alias
-        $actual = $this->conn->quoteName('table.col AS alias');
+        $actual = $this->driver->quoteName('table.col AS alias');
         $this->assertEquals($this->expect_quote_name_table_col_as_alias, $actual);
         
         // table alias
-        $actual = $this->conn->quoteName('table alias');
+        $actual = $this->driver->quoteName('table alias');
         $this->assertEquals($this->expect_quote_name_table_alias, $actual);
         
         // table.col alias
-        $actual = $this->conn->quoteName('table.col alias');
+        $actual = $this->driver->quoteName('table.col alias');
         $this->assertEquals($this->expect_quote_name_table_col_alias, $actual);
         
         // plain old identifier
-        $actual = $this->conn->quoteName('table');
+        $actual = $this->driver->quoteName('table');
         $this->assertEquals($this->expect_quote_name_plain, $actual);
         
         // star
-        $actual = $this->conn->quoteName('*');
+        $actual = $this->driver->quoteName('*');
         $this->assertEquals('*', $actual);
         
         // star dot star
-        $actual = $this->conn->quoteName('*.*');
+        $actual = $this->driver->quoteName('*.*');
         $this->assertEquals('*.*', $actual);
     }
     
@@ -393,14 +402,14 @@ abstract class AbstractDriverTest extends \PHPUnit_Framework_TestCase
     public function testQuoteNamesIn()
     {
         $sql = "*, *.*, foo.bar, CONCAT('foo.bar', \"baz.dib\") AS zim";
-        $actual = $this->conn->quoteNamesIn($sql);
+        $actual = $this->driver->quoteNamesIn($sql);
         $this->assertEquals($this->expect_quote_names_in, $actual);
     }
     
     public function testInsertAndLastInsertId()
     {
         $data = ['name' => 'Laura'];
-        $actual = $this->conn->insert($this->table, $data);
+        $actual = $this->driver->insert($this->table, $data);
         
         // did we get the right last ID?
         $actual = $this->fetchLastInsertId();
@@ -408,29 +417,29 @@ abstract class AbstractDriverTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expect, $actual);
         
         // did it insert?
-        $actual = $this->conn->fetchOne("SELECT id, name FROM {$this->table} WHERE id = 11");
+        $actual = $this->driver->fetchOne("SELECT id, name FROM {$this->table} WHERE id = 11");
         $expect = ['id' => '11', 'name' => 'Laura'];
         $this->assertEquals($actual, $expect);
     }
     
     protected function fetchLastInsertId()
     {
-        return $this->conn->lastInsertId();
+        return $this->driver->lastInsertId();
     }
     
     public function testUpdate()
     {
         $where = 'id = 1';
         $data  = ['name' => 'Annabelle'];
-        $actual = $this->conn->update($this->table, $data, $where);
+        $actual = $this->driver->update($this->table, $data, $where);
         
         // did it update?
-        $actual = $this->conn->fetchOne("SELECT id, name FROM {$this->table} WHERE id = 1");
+        $actual = $this->driver->fetchOne("SELECT id, name FROM {$this->table} WHERE id = 1");
         $expect = ['id' => '1', 'name' => 'Annabelle'];
         $this->assertEquals($actual, $expect);
         
         // did anything else update?
-        $actual = $this->conn->fetchOne("SELECT id, name FROM {$this->table} WHERE id = 2");
+        $actual = $this->driver->fetchOne("SELECT id, name FROM {$this->table} WHERE id = 2");
         $expect = ['id' => '2', 'name' => 'Betty'];
         $this->assertEquals($actual, $expect);
     }
@@ -438,15 +447,37 @@ abstract class AbstractDriverTest extends \PHPUnit_Framework_TestCase
     public function testDelete()
     {
         $where = 'id = 1';
-        $actual = $this->conn->delete($this->table, $where);
+        $actual = $this->driver->delete($this->table, $where);
         
         // did it delete?
-        $actual = $this->conn->fetchOne("SELECT * FROM {$this->table} WHERE id = 1");
+        $actual = $this->driver->fetchOne("SELECT * FROM {$this->table} WHERE id = 1");
         $this->assertFalse($actual);
         
         // do we still have everything else?
-        $actual = $this->conn->fetchAll("SELECT * FROM {$this->table}");
+        $actual = $this->driver->fetchAll("SELECT * FROM {$this->table}");
         $expect = 9;
         $this->assertEquals($expect, count($actual));
+    }
+    
+    public function testTransactions()
+    {
+        // data
+        $data = ['name' => 'Laura'];
+
+        // begin and rollback
+        $this->driver->beginTransaction();
+        $this->driver->insert($this->table, $data);
+        $actual = $this->driver->fetchAll("SELECT * FROM {$this->table}");
+        $this->assertSame(11, count($actual));
+        $this->driver->rollback();
+        $actual = $this->driver->fetchAll("SELECT * FROM {$this->table}");
+        $this->assertSame(10, count($actual));
+        
+        // begin and commit
+        $this->driver->beginTransaction();
+        $this->driver->insert($this->table, $data);
+        $actual = $this->driver->fetchAll("SELECT * FROM {$this->table}");
+        $this->driver->commit();
+        $this->assertSame(11, count($actual));
     }
 }

@@ -9,7 +9,7 @@ class MysqlTest extends AbstractDriverTest
 {
     protected $extension = 'pdo_mysql';
     
-    protected $driver_class = 'Aura\Sql\Driver\Mysql';    
+    protected $driver_type = 'mysql';    
     
     protected $create_table = "CREATE TABLE aura_test_table (
          id                     INTEGER AUTO_INCREMENT PRIMARY KEY
@@ -19,7 +19,7 @@ class MysqlTest extends AbstractDriverTest
         ,test_default_string    VARCHAR(7) DEFAULT 'string'
         ,test_default_number    NUMERIC(5) DEFAULT 12345
         ,test_default_ignore    TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )";
+    ) ENGINE=InnoDB";
     
     protected $expect_fetch_table_list = ['aura_test_table'];
     
@@ -122,14 +122,14 @@ class MysqlTest extends AbstractDriverTest
     
     protected function createSchemas()
     {
-        $this->conn->query("CREATE DATABASE aura_test_schema1");
-        $this->conn->query("CREATE DATABASE aura_test_schema2");
-        $this->conn->query("USE aura_test_schema1");
+        $this->driver->query("CREATE DATABASE aura_test_schema1");
+        $this->driver->query("CREATE DATABASE aura_test_schema2");
+        $this->driver->query("USE aura_test_schema1");
     }
     
     protected function dropSchemas()
     {
-        $this->conn->query("DROP DATABASE IF EXISTS aura_test_schema1");
-        $this->conn->query("DROP DATABASE IF EXISTS aura_test_schema2");
+        $this->driver->query("DROP DATABASE IF EXISTS aura_test_schema1");
+        $this->driver->query("DROP DATABASE IF EXISTS aura_test_schema2");
     }
 }

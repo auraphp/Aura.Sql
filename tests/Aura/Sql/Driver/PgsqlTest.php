@@ -9,7 +9,7 @@ class PgsqlTest extends AbstractDriverTest
 {
     protected $extension = 'pdo_pgsql';
     
-    protected $driver_class = 'Aura\Sql\Driver\Pgsql';    
+    protected $driver_type = 'pgsql';    
     
     protected $create_table = "CREATE TABLE aura_test_table (
          id                     SERIAL PRIMARY KEY
@@ -125,19 +125,19 @@ class PgsqlTest extends AbstractDriverTest
     
     protected function createSchemas()
     {
-        $this->conn->query("CREATE SCHEMA aura_test_schema1");
-        $this->conn->query("CREATE SCHEMA aura_test_schema2");
-        $this->conn->query("SET search_path TO aura_test_schema1");
+        $this->driver->query("CREATE SCHEMA aura_test_schema1");
+        $this->driver->query("CREATE SCHEMA aura_test_schema2");
+        $this->driver->query("SET search_path TO aura_test_schema1");
     }
     
     protected function dropSchemas()
     {
-        $this->conn->query("DROP SCHEMA IF EXISTS aura_test_schema1 CASCADE");
-        $this->conn->query("DROP SCHEMA IF EXISTS aura_test_schema2 CASCADE");
+        $this->driver->query("DROP SCHEMA IF EXISTS aura_test_schema1 CASCADE");
+        $this->driver->query("DROP SCHEMA IF EXISTS aura_test_schema2 CASCADE");
     }
     
     protected function fetchLastInsertId()
     {
-        return $this->conn->lastInsertId($this->table, 'id');
+        return $this->driver->lastInsertId($this->table, 'id');
     }
 }

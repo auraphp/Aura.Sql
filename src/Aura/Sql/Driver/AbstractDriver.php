@@ -7,6 +7,7 @@
  * 
  */
 namespace Aura\Sql\Driver;
+use Aura\Sql\ProfilerInterface;
 use PDO;
 use PDOStatement;
 
@@ -106,15 +107,29 @@ abstract class AbstractDriver
      * 
      */
     public function __construct(
+        ProfilerInterface $profiler,
         $dsn,
         $username = null,
         $password = null,
         array $options = []
     ) {
+        $this->profiler = $profiler;
         $this->dsn      = $dsn;
         $this->username = $username;
         $this->password = $password;
         $this->options  = array_merge($this->options, $options);
+    }
+    
+    /**
+     * 
+     * Returns the profiler object.
+     * 
+     * @return ProfilerInterface
+     * 
+     */
+    public function getProfiler()
+    {
+        return $this->profiler;
     }
     
     /**
@@ -152,62 +167,40 @@ abstract class AbstractDriver
     public function getPdo()
     {
         if (! $this->pdo) {
-            $this->pdo = new PDO(
-                $this->getDsnString(), 
-                $this->username, 
-                $this->password, 
-                $this->options
-            );
-            $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            $this->connect();
         }
         return $this->pdo;
     }
     
     /**
      * 
-     * Prepares and executes an SQL statement, optionally binding values
-     * to named parameters in the statement.
+     * Connects to the database by creating the PDO object.
      * 
-     * This is the most-direct way to interact with the database; you pass
-     * an SQL statement to the method, then the adapter uses PDO connection 
-     * object to execute the statement and return a result.
+     * @return void
      * 
-     * To help prevent SQL injection attacks, you should **always** quote
-     * the values used in a direct query. Use `quote()`, `quoteInto()`,
-     * or  `quoteMulti()` to accomplish this.
+     */
+    public function connect()
+    {
+        $this->preConnect();
+        $this->pdo = $this->newPdo();
+        $this->postConnect();
+    }
+    
+    public function preConnect()
+    {
+    }
+    
+    public function postConnect()
+    {
+    }
+    
+    /**
      * 
-     * Even easier, use the automated value binding provided by the `query()` 
-     * method:
+     * Prepares and executes an SQL query, optionally binding values
+     * to named placeholders in the query text.
      * 
-     *     // bad
-     *     $result = $sql->query('SELECT * FROM table WHERE foo = "$bar"');
-     *     
-     *     // better
-     *     $q_bar  = $sql->quote($bar);
-     *     $result = $sql->query('SELECT * FROM table WHERE foo = $q_bar');
-     *      
-     *     // best
-     *     $result = $sql->query(
-     *         'SELECT * FROM table WHERE foo = :bar',
-     *         ['bar' => $bar]
-     *     );
-     * 
-     * The `query()` method examins the statement for all `:name` placeholders
-     * and attempts to bind data from the `$data` array.  The regular
-     * expression it uses is a little braindead; it cannot tell if the `:name`
-     * placeholder is literal text or really a placeholder.
-     * 
-     * As such, you should *either* use the `$data` array for named-placeholder
-     * value binding at `query()` time, *or* quote-as-you-go when building the 
-     * statement, not both.  If you do, you are on your own to make sure
-     * that nothing looking like a `:name` placeholder exists in the literal 
-     * text.
-     * 
-     * Question-mark placeholders are not supported for automatic value
-     * binding at query() time.
-     * 
-     * @param string $text The text of the SQL statement, optionally with
-     * named placeholders.
+     * @param string $text The text of the SQL query, optionally with named
+     * placeholders.
      * 
      * @param array $data An associative array of data to bind to the named
      * placeholders.
@@ -218,8 +211,35 @@ abstract class AbstractDriver
     public function query($text, array $data = [])
     {
         $stmt = $this->prepare($text, $data);
-        $stmt->execute();
+        $this->profiler->exec($stmt, $data);
         return $stmt;
+    }
+    
+    public function beginTransaction()
+    {
+        $pdo = $this->getPdo();
+        $func = function() use ($pdo) {
+            return $pdo->beginTransaction();
+        };
+        return $this->profiler->call($func, '__BEGIN_TRANSACTION__');
+    }
+    
+    public function commit()
+    {
+        $pdo = $this->getPdo();
+        $func = function() use ($pdo) {
+            return $pdo->commit();
+        };
+        return $this->profiler->call($func, '__COMMIT__');
+    }
+    
+    public function rollback()
+    {
+        $pdo = $this->getPdo();
+        $func = function() use ($pdo) {
+            return $pdo->rollBack();
+        };
+        return $this->profiler->call($func, '__ROLLBACK__');
     }
     
     /**
@@ -809,6 +829,25 @@ abstract class AbstractDriver
         $table = $this->quoteName($table);
         $stmt = $this->query("DELETE FROM $table WHERE $where");
         return $stmt->rowCount();
+    }
+    
+    /**
+     * 
+     * Creates a new PDO object.
+     * 
+     * @return PDO
+     * 
+     */
+    protected function newPdo()
+    {
+        $pdo = new PDO(
+            $this->getDsnString(), 
+            $this->username, 
+            $this->password, 
+            $this->options
+        );
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        return $pdo;
     }
     
     /**

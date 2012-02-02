@@ -15,7 +15,7 @@ spl_autoload_register(function($class) {
 /**
  * MysqlTest
  */
-$GLOBALS['Aura\Sql\Driver\MysqlTest']['connect_params'] = [
+$GLOBALS['Aura\Sql\Driver\MysqlTest']['driver_params'] = [
     'dsn' => [
         'host' => 'localhost',
     ],
@@ -29,7 +29,7 @@ $GLOBALS['Aura\Sql\Driver\MysqlTest']['expect_dsn_string'] = 'mysql:host=localho
 /**
  * MysqlTest
  */
-$GLOBALS['Aura\Sql\Driver\PgsqlTest']['connect_params'] = [
+$GLOBALS['Aura\Sql\Driver\PgsqlTest']['driver_params'] = [
     'dsn' => [
         'host' => 'localhost',
         'dbname' => 'test',
@@ -44,7 +44,7 @@ $GLOBALS['Aura\Sql\Driver\PgsqlTest']['expect_dsn_string'] = 'pgsql:host=localho
 /**
  * Sqlite
  */
-$GLOBALS['Aura\Sql\Driver\SqliteTest']['connect_params'] = [
+$GLOBALS['Aura\Sql\Driver\SqliteTest']['driver_params'] = [
     'dsn' => ':memory:',
 ];
     
