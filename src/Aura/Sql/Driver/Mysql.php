@@ -112,14 +112,14 @@ class Mysql extends AbstractDriver
         foreach ($raw_cols as $val) {
             
             $name = $val['Field'];
-            list($type, $size, $scope) = $this->getTypeSizeScope($val['Type']);
+            list($type, $size, $scale) = $this->getTypeSizeScope($val['Type']);
             
             // save the column description
             $cols[$name] = $this->column_factory->newInstance(
                 $name,
                 $type,
                 ($size  ? (int) $size  : null),
-                ($scope ? (int) $scope : null),
+                ($scale ? (int) $scale : null),
                 (bool) ($val['Null'] != 'YES'),
                 $this->getDefault($val['Default']),
                 (bool) (strpos($val['Extra'], 'auto_increment') !== false),

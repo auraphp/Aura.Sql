@@ -139,7 +139,7 @@ class Sqlite extends AbstractDriver
         // loop through the result rows; each describes a column.
         foreach ($raw_cols as $val) {
             $name = $val['name'];
-            list($type, $size, $scope) = $this->getTypeSizeScope($val['type']);
+            list($type, $size, $scale) = $this->getTypeSizeScope($val['type']);
             
             // find autoincrement column in CREATE TABLE sql.
             $autoinc_find = str_replace(' ', '\s+', $this->autoinc_string);
@@ -161,7 +161,7 @@ class Sqlite extends AbstractDriver
                 'name'    => $name,
                 'type'    => $type,
                 'size'    => ($size  ? (int) $size  : null),
-                'scope'   => ($scope ? (int) $scope : null),
+                'scale'   => ($scale ? (int) $scale : null),
                 'default' => $default,
                 'notnull' => (bool) ($val['notnull']),
                 'primary' => (bool) ($val['pk'] == 1),
@@ -217,7 +217,7 @@ class Sqlite extends AbstractDriver
                 $cols[$name]['name'],
                 $cols[$name]['type'],
                 $cols[$name]['size'],
-                $cols[$name]['scope'],
+                $cols[$name]['scale'],
                 $cols[$name]['notnull'],
                 $cols[$name]['default'],
                 $cols[$name]['autoinc'],

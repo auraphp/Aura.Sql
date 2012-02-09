@@ -14,7 +14,7 @@ class MysqlTest extends AbstractDriverTest
     protected $create_table = "CREATE TABLE aura_test_table (
          id                     INTEGER AUTO_INCREMENT PRIMARY KEY
         ,name                   VARCHAR(50) NOT NULL
-        ,test_size_scope        NUMERIC(7,3)
+        ,test_size_scale        NUMERIC(7,3)
         ,test_default_null      CHAR(3) DEFAULT NULL
         ,test_default_string    VARCHAR(7) DEFAULT 'string'
         ,test_default_number    NUMERIC(5) DEFAULT 12345
@@ -30,7 +30,7 @@ class MysqlTest extends AbstractDriverTest
             'name' => 'id',
             'type' => 'int',
             'size' => 11,
-            'scope' => null,
+            'scale' => null,
             'default' => null,
             'notnull' => true,
             'primary' => true,
@@ -40,17 +40,17 @@ class MysqlTest extends AbstractDriverTest
             'name' => 'name',
             'type' => 'varchar',
             'size' => 50,
-            'scope' => null,
+            'scale' => null,
             'default' => null,
             'notnull' => true,
             'primary' => false,
             'autoinc' => false,
         ],
-        'test_size_scope' => [
-            'name' => 'test_size_scope',
+        'test_size_scale' => [
+            'name' => 'test_size_scale',
             'type' => 'decimal',
             'size' => 7,
-            'scope' => 3,
+            'scale' => 3,
             'default' => null,
             'notnull' => false,
             'primary' => false,
@@ -60,7 +60,7 @@ class MysqlTest extends AbstractDriverTest
             'name' => 'test_default_null',
             'type' => 'char',
             'size' => 3,
-            'scope' => null,
+            'scale' => null,
             'default' => null,
             'notnull' => false,
             'primary' => false,
@@ -70,7 +70,7 @@ class MysqlTest extends AbstractDriverTest
             'name' => 'test_default_string',
             'type' => 'varchar',
             'size' => 7,
-            'scope' => null,
+            'scale' => null,
             'default' => 'string',
             'notnull' => false,
             'primary' => false,
@@ -80,7 +80,7 @@ class MysqlTest extends AbstractDriverTest
             'name' => 'test_default_number',
             'type' => 'decimal',
             'size' => 5,
-            'scope' => null,
+            'scale' => null,
             'default' => '12345',
             'notnull' => false,
             'primary' => false,
@@ -90,7 +90,7 @@ class MysqlTest extends AbstractDriverTest
             'name' => 'test_default_ignore',
             'type' => 'timestamp',
             'size' => null,
-            'scope' => null,
+            'scale' => null,
             'default' => null,
             'notnull' => true,
             'primary' => false,

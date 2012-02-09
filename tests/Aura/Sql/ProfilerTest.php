@@ -42,7 +42,7 @@ class ProfilerTest extends \PHPUnit_Framework_TestCase
         
         // should be nothing in the profile
         $expect = [];
-        $actual = $this->profiler->getProfile();
+        $actual = $this->profiler->getProfiles();
         $this->assertSame($expect, $actual);
         
         // now make it active
@@ -67,7 +67,7 @@ class ProfilerTest extends \PHPUnit_Framework_TestCase
         
         // should be nothing in the profile
         $expect = [];
-        $actual = $this->profiler->getProfile();
+        $actual = $this->profiler->getProfiles();
         $this->assertSame($expect, $actual);
         
         // now make it active

@@ -210,10 +210,24 @@ abstract class AbstractDriver
         $this->postConnect();
     }
     
+    /**
+     * 
+     * A hook that executes before the database connection is created.
+     * 
+     * @return void
+     * 
+     */
     public function preConnect()
     {
     }
     
+    /**
+     * 
+     * A hook that executes after the database connection is created.
+     * 
+     * @return void
+     * 
+     */
     public function postConnect()
     {
     }
@@ -239,6 +253,13 @@ abstract class AbstractDriver
         return $stmt;
     }
     
+    /**
+     * 
+     * Begins a database transaction and turns off autocommit.
+     * 
+     * @return mixed
+     * 
+     */
     public function beginTransaction()
     {
         $pdo = $this->getPdo();
@@ -248,6 +269,13 @@ abstract class AbstractDriver
         return $this->profiler->call($func, '__BEGIN_TRANSACTION__');
     }
     
+    /**
+     * 
+     * Commits the current database transaction and turns autocommit back on.
+     * 
+     * @return mixed
+     * 
+     */
     public function commit()
     {
         $pdo = $this->getPdo();
@@ -257,6 +285,14 @@ abstract class AbstractDriver
         return $this->profiler->call($func, '__COMMIT__');
     }
     
+    /**
+     * 
+     * Rolls back the current database transaction and turns autocommit back
+     * on.
+     * 
+     * @return mixed
+     * 
+     */
     public function rollback()
     {
         $pdo = $this->getPdo();
@@ -935,12 +971,12 @@ abstract class AbstractDriver
     /**
      * 
      * Given a column specification, parse into datatype, size, and 
-     * decimal scope.
+     * decimal scale.
      * 
      * @param string $spec The column specification; for example,
      * "VARCHAR(255)" or "NUMERIC(10,2)".
      * 
-     * @return array A sequential array of the column type, size, and scope.
+     * @return array A sequential array of the column type, size, and scale.
      * 
      */
     protected function getTypeSizeScope($spec)
@@ -948,12 +984,12 @@ abstract class AbstractDriver
         $spec  = strtolower($spec);
         $type  = null;
         $size  = null;
-        $scope = null;
+        $scale = null;
         
         // find the parens, if any
         $pos = strpos($spec, '(');
         if ($pos === false) {
-            // no parens, so no size or scope
+            // no parens, so no size or scale
             $type = $spec;
         } else {
             // find the type first.
@@ -963,15 +999,15 @@ abstract class AbstractDriver
             // remove parens to get the size.
             $size = trim(substr($spec, $pos), '()');
             
-            // a comma in the size indicates a scope.
+            // a comma in the size indicates a scale.
             $pos = strpos($size, ',');
             if ($pos !== false) {
-                $scope = substr($size, $pos + 1);
+                $scale = substr($size, $pos + 1);
                 $size  = substr($size, 0, $pos);
             }
         }
         
-        return [$type, $size, $scope];
+        return [$type, $size, $scale];
     }
     
     /**

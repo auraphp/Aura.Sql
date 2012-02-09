@@ -14,7 +14,7 @@ class PgsqlTest extends AbstractDriverTest
     protected $create_table = "CREATE TABLE aura_test_table (
          id                     SERIAL PRIMARY KEY
         ,name                   VARCHAR(50) NOT NULL
-        ,test_size_scope        NUMERIC(7,3)
+        ,test_size_scale        NUMERIC(7,3)
         ,test_default_null      CHAR(3) DEFAULT NULL
         ,test_default_string    VARCHAR(7) DEFAULT 'string'
         ,test_default_number    NUMERIC(5) DEFAULT 12345
@@ -33,7 +33,7 @@ class PgsqlTest extends AbstractDriverTest
             'name' => 'id',
             'type' => 'integer',
             'size' => null,
-            'scope' => null,
+            'scale' => null,
             'default' => null,
             'notnull' => true,
             'primary' => true,
@@ -43,17 +43,17 @@ class PgsqlTest extends AbstractDriverTest
             'name' => 'name',
             'type' => 'character varying',
             'size' => 50,
-            'scope' => null,
+            'scale' => null,
             'default' => null,
             'notnull' => true,
             'primary' => false,
             'autoinc' => false,
         ],
-        'test_size_scope' => [
-            'name' => 'test_size_scope',
+        'test_size_scale' => [
+            'name' => 'test_size_scale',
             'type' => 'numeric',
             'size' => 7,
-            'scope' => 3,
+            'scale' => 3,
             'default' => null,
             'notnull' => false,
             'primary' => false,
@@ -63,7 +63,7 @@ class PgsqlTest extends AbstractDriverTest
             'name' => 'test_default_null',
             'type' => 'character',
             'size' => 3,
-            'scope' => null,
+            'scale' => null,
             'default' => null,
             'notnull' => false,
             'primary' => false,
@@ -73,7 +73,7 @@ class PgsqlTest extends AbstractDriverTest
             'name' => 'test_default_string',
             'type' => 'character varying',
             'size' => 7,
-            'scope' => null,
+            'scale' => null,
             'default' => 'string',
             'notnull' => false,
             'primary' => false,
@@ -83,7 +83,7 @@ class PgsqlTest extends AbstractDriverTest
             'name' => 'test_default_number',
             'type' => 'numeric',
             'size' => 5,
-            'scope' => null,
+            'scale' => null,
             'default' => '12345',
             'notnull' => false,
             'primary' => false,
@@ -93,7 +93,7 @@ class PgsqlTest extends AbstractDriverTest
             'name' => 'test_default_ignore',
             'type' => 'timestamp without time zone',
             'size' => null,
-            'scope' => null,
+            'scale' => null,
             'default' => null,
             'notnull' => false,
             'primary' => false,

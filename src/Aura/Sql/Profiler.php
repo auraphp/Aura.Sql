@@ -1,64 +1,104 @@
 <?php
+/**
+ * 
+ * This file is part of the Aura Project for PHP.
+ * 
+ * @license http://opensource.org/licenses/bsd-license.php BSD
+ * 
+ */
 namespace Aura\Sql;
 use PDOStatement;
 use Exception;
 
+/**
+ * 
+ * Retains query profiles.
+ * 
+ * @package Aura.Sql
+ * 
+ */
 class Profiler implements ProfilerInterface
 {
+    /**
+     * 
+     * Is the profiler active?
+     * 
+     * @var bool
+     * 
+     */
     protected $active = false;
     
-    protected $profile = [];
+    /**
+     * 
+     * Retained profiles.
+     * 
+     * @var array
+     * 
+     */
+    protected $profiles = [];
     
-    // public function __toString()
-    // {
-    //     $t = 0;
-    //     $k = count($this->profile);
-    //     
-    //     $text = [
-    //         "$k queries, {:time} seconds total.",
-    //         "",
-    //         "========================================",
-    //     ];
-    //     
-    //     foreach ($this->profile as $i => $item) {
-    //         $t += $item->time;
-    //         $text[] = "#$i of $k ({$item->time}):";
-    //         $text[] = "Text: " . var_export($item->text, true);
-    //         $text[] = "Data: " . var_export($item->data, true);
-    //         $text[] = "Trace: " . $item->info->getTraceAsString;
-    //         $text[] = "";
-    //         $text[] = "----------------------------------------";
-    //     }
-    //     
-    //     $text[0] = str_replace('{:time}', $t, $text[0]);
-    //     return implode(PHP_EOL, $text);
-    // }
-    
+    /**
+     * 
+     * Turns the profiler on and off.
+     * 
+     * @param bool $active True to turn on, false to turn off.
+     * 
+     * @return void
+     * 
+     */
     public function setActive($active)
     {
         $this->active = (bool) $active;
     }
     
+    /**
+     * 
+     * Is the profiler active?
+     * 
+     * @return bool
+     * 
+     */
     public function isActive()
     {
         return (bool) $this->active;
     }
     
+    /**
+     * 
+     * Executes a PDOStatment and profiles it.
+     * 
+     * @param PDOStatement $stmt The PDOStatement to execute and profile.
+     * 
+     * @param array $data The data that was bound into the statement.
+     * 
+     * @return mixed
+     * 
+     */
     public function exec(PDOStatement $stmt, array $data = [])
     {
         if (! $this->isActive()) {
-            $stmt->execute();
-            return;
+            return $stmt->execute();
         }
         
         $before = microtime(true);
         $result = $stmt->execute();
         $after = microtime(true);
-        $this->addProfile($stmt->queryString, $before, $after, $data);
+        $this->addProfile($stmt->queryString, $after - $before, $data);
         return $result;
     }
     
-    public function call($func, $text)
+    /**
+     * 
+     * Calls a user function and and profile it.
+     * 
+     * @param callable $func The user function to call.
+     * 
+     * @param array $data The data that was used by the function.
+     * 
+     * @return mixed
+     * 
+     */
+    public function call($func, $text, array $data = [])
     {
         if (! $this->isActive()) {
             return call_user_func($func);
@@ -67,22 +107,42 @@ class Profiler implements ProfilerInterface
         $before = microtime(true);
         $result = call_user_func($func);
         $after  = microtime(true);
-        $this->addProfile($text, $before, $after);
+        $this->addProfile($text, $after - $before, $data);
         return $result;
     }
     
-    public function addProfile($text, $before, $after, array $data = [])
+    /**
+     * 
+     * Adds a profile to the profiler.
+     * 
+     * @param string $text The text (typically an SQL query) being profiled.
+     * 
+     * @param float $time The elapsed time in seconds.
+     * 
+     * @param array $data The data that was used.
+     * 
+     * @return mixed
+     * 
+     */
+    public function addProfile($text, $time, array $data = [])
     {
-        $this->profile[] = (object) [
+        $this->profiles[] = (object) [
             'text' => $text,
-            'time' => $after - $before,
+            'time' => $time,
             'data' => $data,
-            'info' => new Exception
+            'trace' => debug_backtrace()
         ];
     }
     
-    public function getProfile()
+    /**
+     * 
+     * Returns all the profiles.
+     * 
+     * @return array
+     * 
+     */
+    public function getProfiles()
     {
-        return $this->profile;
+        return $this->profiles;
     }
 }

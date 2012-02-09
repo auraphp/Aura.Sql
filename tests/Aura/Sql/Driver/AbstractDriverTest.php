@@ -69,7 +69,7 @@ abstract class AbstractDriverTest extends \PHPUnit_Framework_TestCase
                 $info['name'],
                 $info['type'],
                 $info['size'],
-                $info['scope'],
+                $info['scale'],
                 $info['notnull'],
                 $info['default'],
                 $info['autoinc'],

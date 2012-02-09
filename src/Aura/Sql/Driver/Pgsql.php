@@ -115,7 +115,7 @@ class Pgsql extends AbstractDriver
         //  test_int             | integer                     | (false) |         | 
         //  test_bigint          | bigint                      | (false) |         | 
         //  test_numeric_size    | numeric(5,0)                | (false) |         | 
-        //  test_numeric_scope   | numeric(5,3)                | (false) |         | 
+        //  test_numeric_scale   | numeric(5,3)                | (false) |         | 
         //  test_float           | double precision            | (false) |         | 
         //  test_clob            | text                        | (false) |         | 
         //  test_date            | date                        | (false) |         | 
@@ -166,12 +166,12 @@ class Pgsql extends AbstractDriver
         // loop through the result rows; each describes a column.
         foreach ($raw_cols as $val) {
             $name = $val['name'];
-            list($type, $size, $scope) = $this->getTypeSizeScope($val['type']);
+            list($type, $size, $scale) = $this->getTypeSizeScope($val['type']);
             $cols[$name] = $this->column_factory->newInstance(
                 $name,
                 $type,
                 ($size  ? (int) $size  : null),
-                ($scope ? (int) $scope : null),
+                ($scale ? (int) $scale : null),
                 (bool) ($val['notnull']),
                 $this->getDefault($val['default']),
                 (bool) (substr($val['default'], 0, 7) == 'nextval'),

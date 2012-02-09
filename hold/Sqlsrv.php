@@ -71,7 +71,7 @@ class Sqlsrv extends AbstractDriver
             $cols[$name]['name']    = $name;
             $cols[$name]['type']    = $type;
             $cols[$name]['size']    = $row['PRECISION'];
-            $cols[$name]['scope']   = $row['SCALE'];
+            $cols[$name]['scale']   = $row['SCALE'];
             $cols[$name]['default'] = $row['COLUMN_DEF'];
             $cols[$name]['notnull'] = ! $row['NULLABLE'];
             $cols[$name]['primary'] = in_array($name, $keys);
