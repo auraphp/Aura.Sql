@@ -77,7 +77,7 @@ interface ProfilerInterface
      * @return mixed
      * 
      */
-    public function addProfile($text, $before, $after, array $data = []);
+    public function addProfile($text, $time, array $data = []);
     
     /**
      * 

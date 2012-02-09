@@ -48,7 +48,7 @@ class ProfilerTest extends \PHPUnit_Framework_TestCase
         // now make it active
         $this->profiler->setActive(true);
         $this->profiler->exec($stmt, $data);
-        $actual = $this->profiler->getProfile();
+        $actual = $this->profiler->getProfiles();
         $this->assertSame(1, count($actual));
         $this->assertSame($text, $actual[0]->text);
         $this->assertSame($data, $actual[0]->data);
@@ -73,7 +73,7 @@ class ProfilerTest extends \PHPUnit_Framework_TestCase
         // now make it active
         $this->profiler->setActive(true);
         $this->profiler->call($func, $text);
-        $actual = $this->profiler->getProfile();
+        $actual = $this->profiler->getProfiles();
         $this->assertSame(1, count($actual));
         $this->assertSame($text, $actual[0]->text);
     }
