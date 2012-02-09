@@ -2,6 +2,8 @@
 namespace Aura\Sql\Driver;
 use PDO;
 use Aura\Sql\DriverFactory;
+use Aura\Sql\ColumnFactory;
+use Aura\Sql\Column;
 
 /**
  * Test class for AbstractDriver.
@@ -61,6 +63,20 @@ abstract class AbstractDriverTest extends \PHPUnit_Framework_TestCase
             $this->markTestSkipped("Extension '{$this->extension}' not loaded.");
         }
         
+        // convert column arrays to objects
+        foreach ($this->expect_fetch_table_cols as $name => $info) {
+            $this->expect_fetch_table_cols[$name] = new Column(
+                $info['name'],
+                $info['type'],
+                $info['size'],
+                $info['scope'],
+                $info['notnull'],
+                $info['default'],
+                $info['autoinc'],
+                $info['primary']
+            );
+        }
+        
         // load test config values
         $test_class = get_class($this);
         $this->driver_params = array_merge(
@@ -70,9 +86,9 @@ abstract class AbstractDriverTest extends \PHPUnit_Framework_TestCase
         
         $this->expect_dsn_string = $GLOBALS[$test_class]['expect_dsn_string'];
         
-        $factory = new DriverFactory;
+        $driver_factory = new DriverFactory;
         
-        $this->driver = $factory->newInstance(
+        $this->driver = $driver_factory->newInstance(
             $this->driver_type,
             $this->driver_params['dsn'],
             $this->driver_params['username'],
@@ -289,8 +305,8 @@ abstract class AbstractDriverTest extends \PHPUnit_Framework_TestCase
         ksort($actual);
         ksort($expect);
         $this->assertSame(count($expect), count($actual));
-        foreach ($expect as $name => $info) {
-            $this->assertSame($expect[$name], $actual[$name]);
+        foreach (array_keys($expect) as $name) {
+            $this->assertEquals($expect[$name], $actual[$name]);
         }
     }
     
@@ -302,7 +318,7 @@ abstract class AbstractDriverTest extends \PHPUnit_Framework_TestCase
         ksort($expect);
         $this->assertSame(count($expect), count($actual));
         foreach ($expect as $name => $info) {
-            $this->assertSame($expect[$name], $actual[$name]);
+            $this->assertEquals($expect[$name], $actual[$name]);
         }
     }
     

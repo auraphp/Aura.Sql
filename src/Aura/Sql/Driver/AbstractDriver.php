@@ -8,6 +8,7 @@
  */
 namespace Aura\Sql\Driver;
 use Aura\Sql\ProfilerInterface;
+use Aura\Sql\ColumnFactory;
 use PDO;
 use PDOStatement;
 
@@ -20,6 +21,15 @@ use PDOStatement;
  */
 abstract class AbstractDriver
 {
+    /**
+     * 
+     * A ColumnFactory for returning column information.
+     * 
+     * @var ColumnFactory
+     * 
+     */
+    protected $column_factory;
+    
     /**
      * 
      * The PDO DSN for the connection. This can be an array of key-value pairs
@@ -108,16 +118,18 @@ abstract class AbstractDriver
      */
     public function __construct(
         ProfilerInterface $profiler,
+        ColumnFactory $column_factory,
         $dsn,
         $username = null,
         $password = null,
         array $options = []
     ) {
-        $this->profiler = $profiler;
-        $this->dsn      = $dsn;
-        $this->username = $username;
-        $this->password = $password;
-        $this->options  = array_merge($this->options, $options);
+        $this->profiler       = $profiler;
+        $this->column_factory = $column_factory;
+        $this->dsn            = $dsn;
+        $this->username       = $username;
+        $this->password       = $password;
+        $this->options        = array_merge($this->options, $options);
     }
     
     /**
@@ -130,6 +142,18 @@ abstract class AbstractDriver
     public function getProfiler()
     {
         return $this->profiler;
+    }
+    
+    /**
+     * 
+     * Returns the column factory object.
+     * 
+     * @return ColumnFactory
+     * 
+     */
+    public function getColumnFactory()
+    {
+        return $this->column_factory;
     }
     
     /**

@@ -22,6 +22,14 @@ class DriverFactory
     ) {
         $class = $this->map[$type];
         $profiler = new Profiler;
-        return new $class($profiler, $dsn, $username, $password, $options);
+        $column_factory = new ColumnFactory;
+        return new $class(
+            $profiler,
+            $column_factory,
+            $dsn,
+            $username,
+            $password,
+            $options
+        );
     }
 }

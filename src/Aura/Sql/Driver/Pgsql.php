@@ -167,15 +167,15 @@ class Pgsql extends AbstractDriver
         foreach ($raw_cols as $val) {
             $name = $val['name'];
             list($type, $size, $scope) = $this->getTypeSizeScope($val['type']);
-            $cols[$name] = array(
-                'name'    => $name,
-                'type'    => $type,
-                'size'    => ($size  ? (int) $size  : null),
-                'scope'   => ($scope ? (int) $scope : null),
-                'default' => $this->getDefault($val['default']),
-                'notnull' => (bool) ($val['notnull']),
-                'primary' => (bool) ($val['primary']),
-                'autoinc' => (bool) (substr($val['default'], 0, 7) == 'nextval'),
+            $cols[$name] = $this->column_factory->newInstance(
+                $name,
+                $type,
+                ($size  ? (int) $size  : null),
+                ($scope ? (int) $scope : null),
+                (bool) ($val['notnull']),
+                $this->getDefault($val['default']),
+                (bool) (substr($val['default'], 0, 7) == 'nextval'),
+                (bool) ($val['primary'])
             );
         }
         

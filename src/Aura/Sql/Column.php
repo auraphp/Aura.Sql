@@ -1,6 +1,21 @@
 <?php
+/**
+ * 
+ * This file is part of the Aura Project for PHP.
+ * 
+ * @license http://opensource.org/licenses/bsd-license.php BSD
+ * 
+ */
 namespace Aura\Sql;
-class ColumnFactory
+
+/**
+ * 
+ * Columns of table
+ * 
+ * @package Aura.Sql
+ * 
+ */
+class Column
 {
     protected $name;
     
@@ -10,33 +25,34 @@ class ColumnFactory
     
     protected $scope;
     
-    protected $default;
-    
     protected $notnull;
     
-    protected $primary;
+    protected $default;
     
     protected $autoinc;
         
-    public function newInstance(
+    protected $primary;
+    
+    public function __construct(
         $name,
         $type, 
         $size,
         $scope,
-        $default,
         $notnull,
-        $primary,
-        $autoinc
+        $default,
+        $autoinc,
+        $primary
     ) {
         $this->name     = $name;
         $this->type     = $type; 
         $this->size     = $size;
         $this->scope    = $scope;
-        $this->default  = $default;
         $this->notnull  = (bool) $notnull;
-        $this->primary  = (bool) $primary;
+        $this->default  = $default;
         $this->autoinc  = (bool) $autoinc;
+        $this->primary  = (bool) $primary;
     }
+    
     
     public function __get($key)
     {

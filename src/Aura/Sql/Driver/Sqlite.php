@@ -190,28 +190,39 @@ class Sqlite extends AbstractDriver
         // loop through each column and find out if its default is a keyword
         foreach ($names as $curr => $name) {
             
-            // if there's no default value, there can't be a keyword.
-            if (! $cols[$name]['default']) {
-                continue;
+            // if there is a default value ...
+            if ($cols[$name]['default']) {
+            
+                // look for :curr_col :curr_type . DEFAULT CURRENT_(*)
+                $find = $cols[$name]['name'] . '\s+'
+                      . $cols[$name]['type']
+                      . '.*\s+DEFAULT\s+CURRENT_';
+                
+                // if not at the end, don't look further than the next coldef
+                if ($curr < $last) {
+                    $next = $names[$curr + 1];
+                    $find .= '.*' . $cols[$next]['name'] . '\s+'
+                           . $cols[$next]['type'];
+                }
+                
+                // is the default a keyword?
+                preg_match("/$find/ims", $create_table, $matches);
+                if (! empty($matches)) {
+                    $cols[$name]['default'] = null;
+                }
             }
             
-            // look for :curr_col :curr_type . DEFAULT CURRENT_(*)
-            $find = $cols[$name]['name'] . '\s+'
-                  . $cols[$name]['type']
-                  . '.*\s+DEFAULT\s+CURRENT_';
-            
-            // if not at the end, don't look further than the next coldef
-            if ($curr < $last) {
-                $next = $names[$curr + 1];
-                $find .= '.*' . $cols[$next]['name'] . '\s+'
-                       . $cols[$next]['type'];
-            }
-            
-            // is the default a keyword?
-            preg_match("/$find/ims", $create_table, $matches);
-            if (! empty($matches)) {
-                $cols[$name]['default'] = null;
-            }
+            // convert to a column object
+            $cols[$name] = $this->column_factory->newInstance(
+                $cols[$name]['name'],
+                $cols[$name]['type'],
+                $cols[$name]['size'],
+                $cols[$name]['scope'],
+                $cols[$name]['notnull'],
+                $cols[$name]['default'],
+                $cols[$name]['autoinc'],
+                $cols[$name]['primary']
+            );
         }
         
         // done!

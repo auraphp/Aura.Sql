@@ -115,16 +115,16 @@ class Mysql extends AbstractDriver
             list($type, $size, $scope) = $this->getTypeSizeScope($val['Type']);
             
             // save the column description
-            $cols[$name] = [
-                'name'    => $name,
-                'type'    => $type,
-                'size'    => ($size  ? (int) $size  : null),
-                'scope'   => ($scope ? (int) $scope : null),
-                'default' => $this->getDefault($val['Default']),
-                'notnull' => (bool) ($val['Null'] != 'YES'),
-                'primary' => (bool) ($val['Key'] == 'PRI'),
-                'autoinc' => (bool) (strpos($val['Extra'], 'auto_increment') !== false),
-            ];
+            $cols[$name] = $this->column_factory->newInstance(
+                $name,
+                $type,
+                ($size  ? (int) $size  : null),
+                ($scope ? (int) $scope : null),
+                (bool) ($val['Null'] != 'YES'),
+                $this->getDefault($val['Default']),
+                (bool) (strpos($val['Extra'], 'auto_increment') !== false),
+                (bool) ($val['Key'] == 'PRI')
+            );
         }
         
         // done!
