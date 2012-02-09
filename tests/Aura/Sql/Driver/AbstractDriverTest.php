@@ -136,6 +136,12 @@ abstract class AbstractDriverTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('\Aura\Sql\Profiler', $actual);
     }
     
+    public function testGetColumnFactory()
+    {
+        $actual = $this->driver->getColumnFactory();
+        $this->assertInstanceOf('\Aura\Sql\ColumnFactory', $actual);
+    }
+    
     /**
      * @todo Implement testGetDsnString().
      */
