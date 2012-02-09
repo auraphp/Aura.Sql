@@ -828,22 +828,22 @@ abstract class AbstractAdapter
     
     /**
      * 
-     * Updates a table with specified data based on a WHERE clause.
+     * Updates a table with specified data based on WHERE conditions.
      * 
      * @param string $table The table to udpate.
      * 
      * @param array $cols An associative array where the key is the column
      * name and the value is the value to use for that column.
      * 
-     * @param string|array $where The SQL WHERE clause to limit which
-     * rows are updated.
+     * @param string $cond Conditions for a WHERE clause.
      * 
-     * @param array $data Additional data to bind to the query.
+     * @param array $data Additional data to bind to the query; note that the
+     * $cols values will take precedence over these additional values.
      * 
      * @return int The number of rows affected.
      * 
      */
-    public function update($table, array $cols, $where, array $data = [])
+    public function update($table, array $cols, $cond, array $data = [])
     {
         // the base command text
         $text = 'UPDATE ' . $this->quoteName($table) . ' SET ';
@@ -856,8 +856,8 @@ abstract class AbstractAdapter
         $text .= implode(', ', $list);
         
         // add the where clause
-        if ($where) {
-            $text .= ' WHERE ' . $this->quoteNamesIn($where);
+        if ($cond) {
+            $text .= ' WHERE ' . $this->quoteNamesIn($cond);
         }
         
         // merge cols and extra data. note that the cols take precedence over
@@ -871,26 +871,25 @@ abstract class AbstractAdapter
     
     /**
      * 
-     * Deletes rows from the table based on a WHERE clause.
+     * Deletes rows from the table based on WHERE conditions.
      * 
      * @param string $table The table to delete from.
      * 
-     * @param string|array $where The SQL WHERE clause to limit which
-     * rows are deleted.
+     * @param string $cond Conditions for a WHERE clause.
      * 
      * @param array $data Additional data to bind to the query.
      * 
      * @return int The number of rows affected.
      * 
      */
-    public function delete($table, $where, array $data = [])
+    public function delete($table, $cond, array $data = [])
     {
         // the base command text
         $text = 'DELETE FROM ' . $this->quoteName($table);
         
         // add the where clause
-        if ($where) {
-            $text .= " WHERE " . $this->quoteNamesIn($where);
+        if ($cond) {
+            $text .= ' WHERE ' . $this->quoteNamesIn($cond);
         }
         
         $stmt = $this->query($text, $data);
