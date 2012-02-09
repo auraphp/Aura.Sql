@@ -88,7 +88,7 @@ class Mysql extends AbstractDriver
      * @param string $schema Optionally, look for the table in this schema.
      * 
      * @return array An associative array where the key is the column name
-     * and the value is an array describing the column.
+     * and the value is a Column object.
      * 
      */
     public function fetchTableCols($table, $schema = null)

@@ -101,7 +101,8 @@ class Sqlite extends AbstractDriver
      * 
      * @param string $schema The attached database in which the table resides.
      * 
-     * @return array
+     * @return array An associative array where the key is the column name
+     * and the value is a Column object.
      * 
      */
     public function fetchTableCols($table, $schema = null)
