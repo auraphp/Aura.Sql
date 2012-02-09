@@ -8,7 +8,7 @@
  * @package Aura.Sql
  * 
  */
-namespace Aura\Sql\Driver;
+namespace Aura\Sql\Adapter;
 use Aura\Sql\Select;
 
 /**

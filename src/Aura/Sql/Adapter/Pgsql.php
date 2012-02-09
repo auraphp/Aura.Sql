@@ -6,16 +6,16 @@
  * @license http://opensource.org/licenses/bsd-license.php BSD
  * 
  */
-namespace Aura\Sql\Driver;
+namespace Aura\Sql\Adapter;
 
 /**
  * 
- * PostgreSQL driver.
+ * PostgreSQL adapter.
  * 
  * @package Aura.Sql
  * 
  */
-class Pgsql extends AbstractDriver
+class Pgsql extends AbstractAdapter
 {
     /**
      * 

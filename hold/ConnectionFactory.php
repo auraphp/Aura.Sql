@@ -11,12 +11,12 @@ use Aura\Di\ForgeInterface;
 
 /**
  * 
- * Driver Factory
+ * Adapter Factory
  * 
  * @package Aura.Sql
  * 
  */
-class DriverFactory
+class AdapterFactory
 {
     /**
      * 
@@ -30,7 +30,7 @@ class DriverFactory
     /**
      * 
      * A map of names (called at the command line) to their corresponding
-     * Driver classes.
+     * Adapter classes.
      * 
      * @var array
      * 
@@ -39,13 +39,13 @@ class DriverFactory
     
     /**
      * 
-     * A Driver class to use when no class exists for a mapped name.
+     * A Adapter class to use when no class exists for a mapped name.
      * 
      * @param ForgeInterface $forge A Forge to create objects.
      * 
-     * @param array $map A map of PDO types to Driver classes.
+     * @param array $map A map of PDO types to Adapter classes.
      * 
-     * @param string $not_found A Driver class to use when no class
+     * @param string $not_found A Adapter class to use when no class
      * can be found for a mapped name.
      * 
      */
@@ -59,13 +59,13 @@ class DriverFactory
     
     /**
      * 
-     * Creates and returns a Driver class based on a PDO type.
+     * Creates and returns a Adapter class based on a PDO type.
      * 
-     * @param string $name A PDO type that maps to a Driver class.
+     * @param string $name A PDO type that maps to a Adapter class.
      * 
-     * @return Driver
+     * @return Adapter
      * 
-     * @throws Exception\DriverFactory when no mapped class can be found.
+     * @throws Exception\AdapterFactory when no mapped class can be found.
      * 
      */
     public function newInstance(
@@ -75,7 +75,7 @@ class DriverFactory
         if (isset($this->map[$name])) {
             $class = $this->map[$name];
         } else {
-            throw new Exception\DriverFactory("No Driver class mapping found for '$name'.");
+            throw new Exception\AdapterFactory("No Adapter class mapping found for '$name'.");
         }
         
         return $this->forge->newInstance($class, $params);

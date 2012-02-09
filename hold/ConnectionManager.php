@@ -10,12 +10,12 @@ namespace Aura\Sql;
 
 /**
  * 
- * Driver Manager
+ * Adapter Manager
  * 
  * @package Aura.Sql
  * 
  */
-class DriverManager
+class AdapterManager
 {
     protected $default = [
         'adapter'  => null,
@@ -38,7 +38,7 @@ class DriverManager
     ];
     
     public function __construct(
-        DriverFactory $factory,
+        AdapterFactory $factory,
         array $default = [],
         array $masters = [],
         array $slaves = []
@@ -71,17 +71,17 @@ class DriverManager
         }
     }
     
-    // converts $this->default to a Driver object and returns it
+    // converts $this->default to a Adapter object and returns it
     public function getDefault()
     {
-        if (! $this->conn['default'] instanceof Driver) {
+        if (! $this->conn['default'] instanceof Adapter) {
             list($adapter, $params) = $this->mergeAdapterParams();
             $this->conn['default'] = $this->factory->newInstance($adapter, $params);
         }
         return $this->conn['default'];
     }
     
-    // converts a $this->masters entry to a Driver object and returns is
+    // converts a $this->masters entry to a Adapter object and returns is
     public function getMaster($key = null)
     {
         if (! $key) {
@@ -91,7 +91,7 @@ class DriverManager
         }
         
         $is_conn = ! empty($this->conn['masters'][$key])
-                && $this->conn['masters'][$key] instanceof Driver;
+                && $this->conn['masters'][$key] instanceof Adapter;
                 
         if (! $is_conn) {
             list($adapter, $params) = $this->mergeAdapterParams($this->masters[$key]);
@@ -101,7 +101,7 @@ class DriverManager
         return $this->conn['masters'][$key];
     }
     
-    // converts a random $this->masters entry to a Driver object
+    // converts a random $this->masters entry to a Adapter object
     public function getSlave($key = null)
     {
         if (! $key) {
@@ -111,7 +111,7 @@ class DriverManager
         }
         
         $is_conn = ! empty($this->conn['slaves'][$key])
-                && $this->conn['slaves'][$key] instanceof Driver;
+                && $this->conn['slaves'][$key] instanceof Adapter;
         
         if (! $is_conn) {
             list($adapter, $params) = $this->mergeAdapterParams($this->slaves[$key]);

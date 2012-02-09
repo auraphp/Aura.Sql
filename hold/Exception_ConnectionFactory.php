@@ -10,9 +10,9 @@ namespace Aura\Sql\Exception;
 
 /**
  * 
- * Driver Factory Exception
+ * Adapter Factory Exception
  * 
  * @package Aura.Sql
  * 
  */
-class DriverFactory extends \Aura\Sql\Exception {}
+class AdapterFactory extends \Aura\Sql\Exception {}

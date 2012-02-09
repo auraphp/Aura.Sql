@@ -6,7 +6,7 @@
  * @license http://opensource.org/licenses/bsd-license.php BSD
  * 
  */
-namespace Aura\Sql\Driver;
+namespace Aura\Sql\Adapter;
 use Aura\Sql\ProfilerInterface;
 use Aura\Sql\ColumnFactory;
 use PDO;
@@ -19,7 +19,7 @@ use PDOStatement;
  * @package Aura.Sql
  * 
  */
-abstract class AbstractDriver
+abstract class AbstractAdapter
 {
     /**
      * 

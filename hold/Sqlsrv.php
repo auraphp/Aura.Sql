@@ -6,7 +6,7 @@
  * @license http://opensource.org/licenses/bsd-license.php BSD
  * 
  */
-namespace Aura\Sql\Driver;
+namespace Aura\Sql\Adapter;
 
 /**
  * 
@@ -15,7 +15,7 @@ namespace Aura\Sql\Driver;
  * @package Aura.Sql
  * 
  */
-class Sqlsrv extends AbstractDriver
+class Sqlsrv extends AbstractAdapter
 {
     protected $dsn_prefix = 'sqlsrv';
     

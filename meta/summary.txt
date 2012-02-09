@@ -1,1 +1,1 @@
-A wrapper around PDO that provides drivers and convenience methods for MySQL, PostgreSQL, and Sqlite.
+A wrapper around PDO that provides adapters and convenience methods for MySQL, PostgreSQL, and Sqlite.

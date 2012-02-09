@@ -6,16 +6,16 @@
  * @license http://opensource.org/licenses/bsd-license.php BSD
  * 
  */
-namespace Aura\Sql\Driver;
+namespace Aura\Sql\Adapter;
 
 /**
  * 
- * SQLite driver.
+ * SQLite adapter.
  * 
  * @package Aura.Sql
  * 
  */
-class Sqlite extends AbstractDriver
+class Sqlite extends AbstractAdapter
 {
     /**
      * 

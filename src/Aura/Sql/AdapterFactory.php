@@ -10,31 +10,31 @@ namespace Aura\Sql;
 
 /**
  * 
- * A factory for driver objects.
+ * A factory for adapter objects.
  * 
  * @package Aura.Sql
  * 
  */
-class DriverFactory
+class AdapterFactory
 {
     /**
      * 
-     * A map of short driver names to fully-qualified classes.
+     * A map of short adapter names to fully-qualified classes.
      * 
      * @var array
      * 
      */
     protected $map = [
-        'mysql'  => 'Aura\Sql\Driver\Mysql',
-        'pgsql'  => 'Aura\Sql\Driver\Pgsql',
-        'sqlite' => 'Aura\Sql\Driver\Sqlite',
+        'mysql'  => 'Aura\Sql\Adapter\Mysql',
+        'pgsql'  => 'Aura\Sql\Adapter\Pgsql',
+        'sqlite' => 'Aura\Sql\Adapter\Sqlite',
     ];
     
     /**
      * 
      * Constructor.
      * 
-     * @param array $map An override map of driver names to classes.
+     * @param array $map An override map of adapter names to classes.
      * 
      */
     public function __construct(array $map = [])
@@ -44,19 +44,19 @@ class DriverFactory
     
     /**
      * 
-     * Returns a new driver instance.
+     * Returns a new adapter instance.
      * 
-     * @param string $name The name of the driver.
+     * @param string $name The name of the adapter.
      * 
-     * @param mixed $dsn The DSN for the driver connection.
+     * @param mixed $dsn The DSN for the adapter.
      * 
-     * @param string $username The username for the driver connection.
+     * @param string $username The username for the adapter.
      * 
-     * @param string $password The password for the driver connection.
+     * @param string $password The password for the adapter.
      * 
-     * @param array $options PDO options for the driver connection.
+     * @param array $options PDO options for the adapter.
      * 
-     * @return AbstractDriver
+     * @return AbstractAdapter
      * 
      */
     public function newInstance(
