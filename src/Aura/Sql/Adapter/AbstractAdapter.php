@@ -793,37 +793,36 @@ abstract class AbstractAdapter
      * 
      * Inserts a row of data into a table.
      * 
-     * @param string $table The table to insert data into.
+     * @param string $table The table to insert into.
      * 
-     * @param array $data An associative array where the key is the column
+     * @param array $cols An associative array where the key is the column
      * name and the value is the value to insert for that column.
      * 
      * @return int The number of rows affected, typically 1.
      * 
      */
-    public function insert($table, $data)
+    public function insert($table, array $cols)
     {
         // the base command text
-        $table = $this->quoteName($table);
-        $text = "INSERT INTO $table ";
+        $text = 'INSERT INTO ' . $this->quoteName($table);
         
-        // col names come from the array keys
-        $keys = array_keys($data);
+        // col names
+        $keys = array_keys($cols);
         
-        // quote the col names
-        $cols = [];
+        // quote the col names for a list
+        $names = [];
         foreach ($keys as $key) {
-            $cols[] = $this->quoteName($key);
+            $names[] = $this->quoteName($key);
         }
         
-        // add quoted col names
-        $text .= '(' . implode(', ', $cols) . ') ';
+        // add quoted names as a comma-separated list
+        $text .= '(' . implode(', ', $names) . ') ';
         
         // add value placeholders (use unquoted key names)
         $text .= 'VALUES (:' . implode(', :', $keys) . ')';
         
         // execute the statement
-        $stmt = $this->query($text, $data);
+        $stmt = $this->query($text, $cols);
         return $stmt->rowCount();
     }
     
@@ -833,34 +832,37 @@ abstract class AbstractAdapter
      * 
      * @param string $table The table to udpate.
      * 
-     * @param array $data An associative array where the key is the column
+     * @param array $cols An associative array where the key is the column
      * name and the value is the value to use for that column.
      * 
      * @param string|array $where The SQL WHERE clause to limit which
      * rows are updated.
      * 
+     * @param array $data Additional data to bind to the query.
+     * 
      * @return int The number of rows affected.
      * 
      */
-    public function update($table, $data, $where)
+    public function update($table, array $cols, $where, array $data = [])
     {
         // the base command text
-        $table = $this->quoteName($table);
-        $text = "UPDATE $table SET ";
+        $text = 'UPDATE ' . $this->quoteName($table) . ' SET ';
         
         // add "col = :col" pairs to the statement
-        $tmp = [];
-        foreach ($data as $col => $val) {
-            $tmp[] = $this->quoteName($col) . " = :$col";
+        $list = [];
+        foreach ($cols as $col => $val) {
+            $list[] = $this->quoteName($col) . " = :$col";
         }
-        $text .= implode(', ', $tmp);
+        $text .= implode(', ', $list);
         
         // add the where clause
         if ($where) {
-            $where = $this->quoteMulti($where, ' AND ');
-            $where = $this->quoteNamesIn($where);
-            $text .= " WHERE $where";
+            $text .= ' WHERE ' . $this->quoteNamesIn($where);
         }
+        
+        // merge cols and extra data. note that the cols take precedence over
+        // the extra data.
+        $data = array_merge($data, $cols);
         
         // execute the statement
         $stmt = $this->query($text, $data);
@@ -876,18 +878,22 @@ abstract class AbstractAdapter
      * @param string|array $where The SQL WHERE clause to limit which
      * rows are deleted.
      * 
+     * @param array $data Additional data to bind to the query.
+     * 
      * @return int The number of rows affected.
      * 
      */
-    public function delete($table, $where)
+    public function delete($table, $where, array $data = [])
     {
+        // the base command text
+        $text = 'DELETE FROM ' . $this->quoteName($table);
+        
+        // add the where clause
         if ($where) {
-            $where = $this->quoteMulti($where, ' AND ');
-            $where = $this->quoteNamesIn($where);
+            $text .= " WHERE " . $this->quoteNamesIn($where);
         }
         
-        $table = $this->quoteName($table);
-        $stmt = $this->query("DELETE FROM $table WHERE $where");
+        $stmt = $this->query($text, $data);
         return $stmt->rowCount();
     }
     

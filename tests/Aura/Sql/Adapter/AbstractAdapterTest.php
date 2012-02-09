@@ -430,8 +430,8 @@ abstract class AbstractAdapterTest extends \PHPUnit_Framework_TestCase
     
     public function testInsertAndLastInsertId()
     {
-        $data = ['name' => 'Laura'];
-        $actual = $this->adapter->insert($this->table, $data);
+        $cols = ['name' => 'Laura'];
+        $actual = $this->adapter->insert($this->table, $cols);
         
         // did we get the right last ID?
         $actual = $this->fetchLastInsertId();
@@ -451,9 +451,10 @@ abstract class AbstractAdapterTest extends \PHPUnit_Framework_TestCase
     
     public function testUpdate()
     {
-        $where = 'id = 1';
-        $data  = ['name' => 'Annabelle'];
-        $actual = $this->adapter->update($this->table, $data, $where);
+        $cols   = ['name' => 'Annabelle'];
+        $where  = 'id = :id';
+        $data   = ['id' => 1];
+        $actual = $this->adapter->update($this->table, $cols, $where, $data);
         
         // did it update?
         $actual = $this->adapter->fetchOne("SELECT id, name FROM {$this->table} WHERE id = 1");
@@ -468,8 +469,9 @@ abstract class AbstractAdapterTest extends \PHPUnit_Framework_TestCase
     
     public function testDelete()
     {
-        $where = 'id = 1';
-        $actual = $this->adapter->delete($this->table, $where);
+        $where  = 'id = :id';
+        $data   = ['id' => 1];
+        $actual = $this->adapter->delete($this->table, $where, $data);
         
         // did it delete?
         $actual = $this->adapter->fetchOne("SELECT * FROM {$this->table} WHERE id = 1");
@@ -484,11 +486,11 @@ abstract class AbstractAdapterTest extends \PHPUnit_Framework_TestCase
     public function testTransactions()
     {
         // data
-        $data = ['name' => 'Laura'];
+        $cols = ['name' => 'Laura'];
 
         // begin and rollback
         $this->adapter->beginTransaction();
-        $this->adapter->insert($this->table, $data);
+        $this->adapter->insert($this->table, $cols);
         $actual = $this->adapter->fetchAll("SELECT * FROM {$this->table}");
         $this->assertSame(11, count($actual));
         $this->adapter->rollback();
@@ -497,7 +499,7 @@ abstract class AbstractAdapterTest extends \PHPUnit_Framework_TestCase
         
         // begin and commit
         $this->adapter->beginTransaction();
-        $this->adapter->insert($this->table, $data);
+        $this->adapter->insert($this->table, $cols);
         $actual = $this->adapter->fetchAll("SELECT * FROM {$this->table}");
         $this->adapter->commit();
         $this->assertSame(11, count($actual));
