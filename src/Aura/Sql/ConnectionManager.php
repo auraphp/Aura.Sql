@@ -94,13 +94,12 @@ class ConnectionManager
     public function getDefault()
     {
         if (! $this->conn['default'] instanceof AbstractAdapter) {
-            $params = $this->mergeParams();
             $this->conn['default'] = $this->adapter_factory->newInstance(
-                $params['adapter'],
-                $params['dsn'],
-                $params['username'],
-                $params['password'],
-                $params['options']
+                $this->default['adapter'],
+                $this->default['dsn'],
+                $this->default['username'],
+                $this->default['password'],
+                $this->default['options']
             );
         }
         return $this->conn['default'];
@@ -119,7 +118,7 @@ class ConnectionManager
                 && $this->conn['masters'][$key] instanceof AbstractAdapter;
                 
         if (! $is_conn) {
-            $params = $this->mergeParams($this->masters[$key]);
+            $params = $this->merge($this->default, $this->masters[$key]);
             $this->conn['masters'][$key] = $this->adapter_factory->newInstance(
                 $params['adapter'],
                 $params['dsn'],
@@ -145,7 +144,7 @@ class ConnectionManager
                 && $this->conn['slaves'][$key] instanceof AbstractAdapter;
         
         if (! $is_conn) {
-            $params = $this->mergeParams($this->slaves[$key]);
+            $params = $this->merge($this->default, $this->slaves[$key]);
             $this->conn['slaves'][$key] = $this->adapter_factory->newInstance(
                 $params['adapter'],
                 $params['dsn'],
@@ -158,12 +157,7 @@ class ConnectionManager
     }
     
     // merges $this->default with master or slave override values
-    protected function mergeParams(array $override = [])
-    {
-        return $this->merge($this->default, $override);
-    }
-    
-    protected function merge($baseline, $override)
+    protected function merge($baseline, $override = [])
     {
         foreach ($override as $key => $val) {
             if (array_key_exists($key, $baseline) && is_array($val)) {
