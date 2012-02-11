@@ -35,7 +35,7 @@ class Sqlsrv extends AbstractAdapter
      * @return array The list of tables in the database.
      * 
      */
-    public function fetchTableList()
+    public function fetchTableList($schema = null)
     {
         $text = "SELECT name FROM sysobjects WHERE type = 'U' ORDER BY name";
         return $this->fetchCol($text);
