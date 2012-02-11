@@ -318,7 +318,7 @@ abstract class AbstractAdapterTest extends \PHPUnit_Framework_TestCase
     
     public function testFetchTableCols_schema()
     {
-        $actual = $this->adapter->fetchTableCols($this->table, 'aura_test_schema2');
+        $actual = $this->adapter->fetchTableCols("aura_test_schema2.{$this->table}");
         $expect = $this->expect_fetch_table_cols;
         ksort($actual);
         ksort($expect);

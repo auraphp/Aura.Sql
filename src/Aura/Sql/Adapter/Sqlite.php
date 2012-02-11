@@ -97,22 +97,16 @@ class Sqlite extends AbstractAdapter
      * 
      * Describes the columns in a table.
      * 
-     * @param string $table The table name to fetch columns for.
-     * 
-     * @param string $schema The attached database in which the table resides.
+     * @param string $spec Return the columns in this table. This may be just
+     * a `table` name, or a `schema.table` name.
      * 
      * @return array An associative array where the key is the column name
      * and the value is a Column object.
      * 
      */
-    public function fetchTableCols($table, $schema = null)
+    public function fetchTableCols($spec)
     {
-        // sqlite> create table areas (id INTEGER PRIMARY KEY AUTOINCREMENT,
-        //         name VARCHAR(32) NOT NULL);
-        // sqlite> pragma table_info(areas);
-        // cid |name |type        |notnull |dflt_value |pk
-        // 0   |id   |INTEGER     |0       |           |1
-        // 1   |name |VARCHAR(32) |99      |           |0
+        list($schema, $table) = $this->splitName($spec);
         
         // strip non-word characters to try and prevent SQL injections
         $table = preg_replace('/[^\w]/', '', $table);

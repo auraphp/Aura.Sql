@@ -83,16 +83,17 @@ class Mysql extends AbstractAdapter
      * 
      * Returns an array of columns in a table.
      * 
-     * @param string $table Return the columns in this table.
-     * 
-     * @param string $schema Optionally, look for the table in this schema.
+     * @param string $spec Return the columns in this table. This may be just
+     * a `table` name, or a `schema.table` name.
      * 
      * @return array An associative array where the key is the column name
      * and the value is a Column object.
      * 
      */
-    public function fetchTableCols($table, $schema = null)
+    public function fetchTableCols($spec)
     {
+        list($schema, $table) = $this->splitName($spec);
+        
         $table = $this->quoteName($table);
         $text = "SHOW COLUMNS FROM $table";
         

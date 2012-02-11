@@ -1031,13 +1031,34 @@ abstract class AbstractAdapter
      * 
      * Returns an array of columns in a table.
      * 
-     * @param string $table Return the columns in this table.
-     * 
-     * @param string $schema Optionally, look for the table in this schema.
+     * @param string $spec Return the columns in this table. This may be just
+     * a `table` name, or a `schema.table` name.
      * 
      * @return array An associative array where the key is the column name
      * and the value is a Column object.
      * 
      */
-    abstract public function fetchTableCols($table, $schema = null);
+    abstract public function fetchTableCols($spec);
+    
+    /**
+     * 
+     * Splits an identifier name into two parts, based on the location of the
+     * first dot.
+     * 
+     * @param string $name The identifier name to be split.
+     * 
+     * @return array An array of two elements; element 0 is the parts before
+     * the dot, and element 1 is the part after the dot. If there was no dot,
+     * element 0 will be null and element 1 will be the name as given.
+     * 
+     */
+    protected function splitName($name)
+    {
+        $pos = strpos($name, '.');
+        if ($pos === false) {
+            return [null, $name];
+        } else {
+            return [substr($name, 0, $pos), substr($name, $pos+1)];
+        }
+    }
 }

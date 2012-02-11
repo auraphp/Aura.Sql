@@ -94,40 +94,16 @@ class Pgsql extends AbstractAdapter
      * 
      * Returns an array of columns in a table.
      * 
-     * @param string $table Return the columns in this table.
-     * 
-     * @param string $schema Optionally, look for the table in this schema.
+     * @param string $spec Return the columns in this table. This may be just
+     * a `table` name, or a `schema.table` name.
      * 
      * @return array An associative array where the key is the column name
      * and the value is a Column object.
      * 
      */
-    public function fetchTableCols($table, $schema = null)
+    public function fetchTableCols($spec)
     {
-        //          name         |            type             | require | primary |                           default                           
-        // ----------------------+-----------------------------+---------+---------+-------------------------------------------------------------
-        //  test_autoinc_primary | integer                     | (true)  | p       | nextval('test_describe_test_autoinc_primary_seq'::regclass)
-        //  test_require         | integer                     | (true)  |         | 
-        //  test_bool            | boolean                     | (false) |         | 
-        //  test_char            | character(7)                | (false) |         | 
-        //  test_varchar         | character varying(7)        | (false) |         | 
-        //  test_smallint        | smallint                    | (false) |         | 
-        //  test_int             | integer                     | (false) |         | 
-        //  test_bigint          | bigint                      | (false) |         | 
-        //  test_numeric_size    | numeric(5,0)                | (false) |         | 
-        //  test_numeric_scale   | numeric(5,3)                | (false) |         | 
-        //  test_float           | double precision            | (false) |         | 
-        //  test_clob            | text                        | (false) |         | 
-        //  test_date            | date                        | (false) |         | 
-        //  test_time            | time without time zone      | (false) |         | 
-        //  test_timestamp       | timestamp without time zone | (false) |         | 
-        //  test_default_null    | character(7)                | (false) |         | 
-        //  test_default_string  | character(7)                | (false) |         | 'literal'::bpchar
-        //  test_default_integer | integer                     | (false) |         | 7
-        //  test_default_numeric | numeric(5,3)                | (false) |         | 12.345
-        //  test_default_ignore  | timestamp without time zone | (false) |         | now()
-        //  test_default_varchar | character varying(17)       | (false) |         | 'literal'::character varying
-        //  test_default_date    | date                        | (false) |         | '1979-11-07'::date
+        list($schema, $table) = $this->splitName($spec);
         
         // modified from Zend_Db_Adapter_Pdo_Pgsql
         $cmd = "
