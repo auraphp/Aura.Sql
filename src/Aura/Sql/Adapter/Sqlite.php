@@ -66,7 +66,7 @@ class Sqlite extends AbstractAdapter
     
     /**
      * 
-     * Returns an list of tables in the database.
+     * Returns a list of tables in the database.
      * 
      * @param string $schema Optionally, pass a schema name to get the list
      * of tables in this schema.

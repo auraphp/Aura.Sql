@@ -17,22 +17,56 @@ namespace Aura\Sql\Adapter;
  */
 class Sqlsrv extends AbstractAdapter
 {
-    protected $dsn_prefix = 'sqlsrv';
-    
+    /**
+     * 
+     * The PDO DSN for the connection. This can be an array of key-value pairs
+     * or a string (minus the PDO type prefix).
+     * 
+     * @var string|array
+     * 
+     */
     protected $dsn = [
         'Server' => null,
         'Database' => null,
     ];
     
+    /**
+     * 
+     * The PDO type prefix.
+     * 
+     * @var string
+     * 
+     */
+    protected $dsn_prefix = 'sqlsrv';
+    
+    /**
+     * 
+     * The prefix to use when quoting identifier names.
+     * 
+     * @var string
+     * 
+     */
     protected $quote_name_prefix = '[';
     
+    /**
+     * 
+     * The suffix to use when quoting identifier names.
+     * 
+     * @var string
+     * 
+     */
     protected $quote_name_suffix = ']';
     
     /**
      * 
-     * Returns a list of database tables.
+     * Returns a list of all tables in the database.
      * 
-     * @return array The list of tables in the database.
+     * @param string $schema Fetch tbe list of tables in this schema; 
+     * when empty, uses the default schema.
+     * 
+     * @return array All table names in the database.
+     * 
+     * @todo Honor the $schema param.
      * 
      */
     public function fetchTableList($schema = null)
@@ -41,6 +75,19 @@ class Sqlsrv extends AbstractAdapter
         return $this->fetchCol($text);
     }
     
+    /**
+     * 
+     * Returns an array of columns in a table.
+     * 
+     * @param string $spec Return the columns in this table. This may be just
+     * a `table` name, or a `schema.table` name.
+     * 
+     * @return array An associative array where the key is the column name
+     * and the value is a Column object.
+     * 
+     * @todo Honor `schema.table` as the specification.
+     * 
+     */
     public function fetchTableCols($spec)
     {
         list($schema, $table) = $this->splitIdent($spec);
@@ -85,5 +132,4 @@ class Sqlsrv extends AbstractAdapter
         
         return $cols;
     }
-    
 }
