@@ -10,7 +10,7 @@ namespace Aura\Sql\Adapter;
 
 /**
  * 
- * Sqlsrv adapter
+ * Microsoft SQL Server adapter.
  * 
  * @package Aura.Sql
  * 
@@ -41,8 +41,10 @@ class Sqlsrv extends AbstractAdapter
         return $this->fetchCol($text);
     }
     
-    public function fetchTableCols($table)
+    public function fetchTableCols($spec)
     {
+        list($schema, $table) = $this->splitIdent($spec);
+        
         // get column info
         $text = "exec sp_columns @table_name = " . $this->quoteName($table);
         $raw_cols = $this->fetchAll($text);
@@ -68,14 +70,17 @@ class Sqlsrv extends AbstractAdapter
                 $type = substr($row['TYPE_NAME'], 0, $pos);
             }
             
-            $cols[$name]['name']    = $name;
-            $cols[$name]['type']    = $type;
-            $cols[$name]['size']    = $row['PRECISION'];
-            $cols[$name]['scale']   = $row['SCALE'];
-            $cols[$name]['default'] = $row['COLUMN_DEF'];
-            $cols[$name]['notnull'] = ! $row['NULLABLE'];
-            $cols[$name]['primary'] = in_array($name, $keys);
-            $cols[$name]['autoinc'] = strpos(strtolower($row['TYPE_NAME']), 'identity') !== false;
+            // save the column description
+            $cols[$name] = $this->column_factory->newInstance(
+                $name,
+                $type,
+                $row['PRECISION'],
+                $row['SCALE'],
+                ! $row['NULLABLE'],
+                $row['COLUMN_DEF'],
+                strpos(strtolower($row['TYPE_NAME']), 'identity') !== false,
+                in_array($name, $keys)
+            );
         }
         
         return $cols;
