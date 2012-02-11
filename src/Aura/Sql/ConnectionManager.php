@@ -14,9 +14,6 @@ namespace Aura\Sql;
  * 
  * @package Aura.Sql
  * 
- * @todo add setDefault(), setSlave(), and setMaster() methods for 
- * programmatic setup.
- * 
  */
 class ConnectionManager
 {
@@ -47,9 +44,28 @@ class ConnectionManager
         array $slaves  = []
     ) {
         $this->adapter_factory = $adapter_factory;
-        $this->default         = array_merge($this->default, $default);
-        $this->masters         = (array) $masters;
-        $this->slaves          = (array) $slaves;
+        $this->setDefault($default);
+        foreach ($masters as $name => $params) {
+            $this->setMaster($name, $params);
+        }
+        foreach ($slaves as $name => $params) {
+            $this->setSlave($name, $params);
+        }
+    }
+    
+    public function setDefault(array $params)
+    {
+        $this->default = array_merge($this->default, $params);
+    }
+    
+    public function setMaster($name, array $params)
+    {
+        $this->masters[$name] = $params;
+    }
+    
+    public function setSlave($name, array $params)
+    {
+        $this->slaves[$name] = $params;
     }
     
     // pick a random slave, or a random master if no slaves, or default if no masters
@@ -144,14 +160,7 @@ class ConnectionManager
     // merges $this->default with master or slave override values
     protected function mergeParams(array $override = [])
     {
-        $merged = $this->merge($this->default, $override);
-        return [
-            'adapter'  => $merged['adapter'],
-            'dsn'      => $merged['dsn'],
-            'username' => $merged['username'],
-            'password' => $merged['password'],
-            'options'  => $merged['options'],
-        ];
+        return $this->merge($this->default, $override);
     }
     
     protected function merge($baseline, $override)
