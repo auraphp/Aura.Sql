@@ -1,7 +1,7 @@
-Aura Sql
+Aura SQL
 ========
 
-The Aura Sql package provides adapters to connect to and query against SQL data sources such as MySQL, PostgreSQL, and Sqlite.  The adapters are mostly wrappers around [PDO](http://php.net/PDO) connections.
+The Aura SQL package provides adapters to connect to and query against SQL data sources such as MySQL, PostgreSQL, and Sqlite.  The adapters are mostly wrappers around [PDO](http://php.net/PDO) connections.
 
 
 Getting Started
@@ -37,7 +37,7 @@ Alternatively, you can add `'/path/to/Aura.Sql/src` to your autoloader and build
     $adapter_factory = new AdapterFactory;
     $sql = $adapter_factory->newInstance(...);
     
-Aura Sql comes with three adapters: `'mysql'` for MySQL, `'pgsql'` for PostgreSQL, and `'sqlite'` for SQLite3.
+Aura SQL comes with three adapters: `'mysql'` for MySQL, `'pgsql'` for PostgreSQL, and `'sqlite'` for SQLite3.
 
 Connecting
 ----------
@@ -79,7 +79,7 @@ Preventing SQL Injection
 
 Usually you will need to incorporate user-provided data into the query. This means you should quote all values interpolated into the query text as a security measure to [prevent SQL injection](http://bobby-tables.com/).
 
-Although Aura Sql provides quoting methods, you should instead use value binding into prepared statements.  To do so, put named placeholders in the query text, then pass an array of values to bind to the placeholders:
+Although Aura SQL provides quoting methods, you should instead use value binding into prepared statements.  To do so, put named placeholders in the query text, then pass an array of values to bind to the placeholders:
 
     <?php
     // the text of the query
@@ -94,7 +94,7 @@ Although Aura Sql provides quoting methods, you should instead use value binding
     // into a prepared statement for you
     $result = $sql->fetchOne($text, $data);
 
-Aura Sql recognizes array values and quotes them as comma-separated lists:
+Aura SQL recognizes array values and quotes them as comma-separated lists:
 
     <?php
     // the text of the query
@@ -114,7 +114,7 @@ Aura Sql recognizes array values and quotes them as comma-separated lists:
 Modifying Rows
 --------------
 
-Aura Sql comes with three convenience methods for modifying data: `insert()`, `update()`, and `delete()`. You can also retrieve the last inserted ID using `lastInsertId()`.
+Aura SQL comes with three convenience methods for modifying data: `insert()`, `update()`, and `delete()`. You can also retrieve the last inserted ID using `lastInsertId()`.
 
 First, to insert a row:
 
@@ -222,6 +222,27 @@ Each column description is a `Column` object with the following properties:
 
 - `primary`: (bool) Is the column part of the primary key?
 
+Transactions
+------------
+
+Aura SQL adapters always start in autocommit mode (the same as PDO). However, you can turn off autocommit mode and start a transaction with `beginTransaction()`, then either commit or roll back the transaction. Commits and rollbacks cause the adapter to go back into autocommit mode.
+
+    <?php
+    // turn off autocommit and start a transaction
+    $sql->beginTransaction();
+    
+    try {
+        // ... perform some queries ...
+        // now commit to the database:
+        $sql->commit();
+    } catch (Exception $e) {
+        // there was an error, roll back the queries
+        $sql->rollback();
+    }
+    
+    // at this point we are back in autocommit mode
+
+    
 Manual Queries
 --------------
 
