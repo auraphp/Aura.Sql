@@ -225,7 +225,7 @@ Each column description is a `Column` object with the following properties:
 Transactions
 ------------
 
-Aura SQL adapters always start in autocommit mode (the same as PDO). However, you can turn off autocommit mode and start a transaction with `beginTransaction()`, then either commit or roll back the transaction. Commits and rollbacks cause the adapter to go back into autocommit mode.
+Aura SQL adapters always start in autocommit mode (the same as PDO). However, you can turn off autocommit mode and start a transaction with `beginTransaction()`, then either `commit()` or `rollBack()` the transaction. Commits and rollbacks cause the adapter to go back into autocommit mode.
 
     <?php
     // turn off autocommit and start a transaction
@@ -237,7 +237,7 @@ Aura SQL adapters always start in autocommit mode (the same as PDO). However, yo
         $sql->commit();
     } catch (Exception $e) {
         // there was an error, roll back the queries
-        $sql->rollback();
+        $sql->rollBack();
     }
     
     // at this point we are back in autocommit mode
