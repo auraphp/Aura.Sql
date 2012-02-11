@@ -10,12 +10,15 @@ namespace Aura\Sql;
 
 /**
  * 
- * Adapter Manager
+ * Manages connections to master and slave databases.
  * 
  * @package Aura.Sql
  * 
+ * @todo add setDefault(), setSlave(), and setMaster() methods for 
+ * programmatic setup.
+ * 
  */
-class AdapterManager
+class ConnectionManager
 {
     protected $default = [
         'adapter'  => null,
@@ -29,7 +32,7 @@ class AdapterManager
     
     protected $slaves = [];
     
-    protected $factory;
+    protected $adapter_factory;
     
     protected $conn = [
         'default' => null,
@@ -38,15 +41,15 @@ class AdapterManager
     ];
     
     public function __construct(
-        AdapterFactory $factory,
+        AdapterFactory $adapter_factory,
         array $default = [],
         array $masters = [],
-        array $slaves = []
+        array $slaves  = []
     ) {
-        $this->factory = $factory;
-        $this->default = $default;
-        $this->masters = $masters;
-        $this->slaves = $slaves;
+        $this->adapter_factory = $adapter_factory;
+        $this->default         = array_merge($this->default, $default);
+        $this->masters         = (array) $masters;
+        $this->slaves          = (array) $slaves;
     }
     
     // pick a random slave, or a random master if no slaves, or default if no masters
@@ -74,9 +77,15 @@ class AdapterManager
     // converts $this->default to a Adapter object and returns it
     public function getDefault()
     {
-        if (! $this->conn['default'] instanceof Adapter) {
-            list($adapter, $params) = $this->mergeAdapterParams();
-            $this->conn['default'] = $this->factory->newInstance($adapter, $params);
+        if (! $this->conn['default'] instanceof AbstractAdapter) {
+            $params = $this->mergeParams();
+            $this->conn['default'] = $this->adapter_factory->newInstance(
+                $params['adapter'],
+                $params['dsn'],
+                $params['username'],
+                $params['password'],
+                $params['options']
+            );
         }
         return $this->conn['default'];
     }
@@ -90,18 +99,24 @@ class AdapterManager
             throw new Exception\NoSuchMaster($key);
         }
         
-        $is_conn = ! empty($this->conn['masters'][$key])
-                && $this->conn['masters'][$key] instanceof Adapter;
+        $is_conn = isset($this->conn['masters'][$key])
+                && $this->conn['masters'][$key] instanceof AbstractAdapter;
                 
         if (! $is_conn) {
-            list($adapter, $params) = $this->mergeAdapterParams($this->masters[$key]);
-            $this->conn['masters'][$key] = $this->factory->newInstance($adapter, $params);
+            $params = $this->mergeParams($this->masters[$key]);
+            $this->conn['masters'][$key] = $this->adapter_factory->newInstance(
+                $params['adapter'],
+                $params['dsn'],
+                $params['username'],
+                $params['password'],
+                $params['options']
+            );
         }
         
         return $this->conn['masters'][$key];
     }
     
-    // converts a random $this->masters entry to a Adapter object
+    // converts a random $this->slave entry to a Adapter object
     public function getSlave($key = null)
     {
         if (! $key) {
@@ -110,28 +125,33 @@ class AdapterManager
             throw new Exception\NoSuchSlave($key);
         }
         
-        $is_conn = ! empty($this->conn['slaves'][$key])
-                && $this->conn['slaves'][$key] instanceof Adapter;
+        $is_conn = isset($this->conn['slaves'][$key])
+                && $this->conn['slaves'][$key] instanceof AbstractAdapter;
         
         if (! $is_conn) {
-            list($adapter, $params) = $this->mergeAdapterParams($this->slaves[$key]);
-            $this->conn['slaves'][$key] = $this->factory->newInstance($adapter, $params);
+            $params = $this->mergeParams($this->slaves[$key]);
+            $this->conn['slaves'][$key] = $this->adapter_factory->newInstance(
+                $params['adapter'],
+                $params['dsn'],
+                $params['username'],
+                $params['password'],
+                $params['options']
+            );
         }
         return $this->conn['slaves'][$key];
     }
     
     // merges $this->default with master or slave override values
-    protected function mergeAdapterParams(array $override = [])
+    protected function mergeParams(array $override = [])
     {
-        $merged  = $this->merge($this->default, $override);
-        $adapter = $merged['adapter'];
-        $params  = [
+        $merged = $this->merge($this->default, $override);
+        return [
+            'adapter'  => $merged['adapter'],
             'dsn'      => $merged['dsn'],
             'username' => $merged['username'],
             'password' => $merged['password'],
             'options'  => $merged['options'],
         ];
-        return [$adapter, $params];
     }
     
     protected function merge($baseline, $override)

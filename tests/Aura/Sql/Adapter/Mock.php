@@ -1,15 +1,19 @@
 <?php
 namespace Aura\Sql\Adapter;
-class MockAdapter
+use Aura\Sql\ProfilerInterface;
+use Aura\Sql\ColumnFactory;
+
+class Mock extends AbstractAdapter
 {
     protected $params = [];
     
-    // skip the signal manager, otherwise mimic the AbstractAdapter params
     public function __construct(
-        array $dsn,
-        $username,
-        $password,
-        array $options
+        ProfilerInterface $profiler,
+        ColumnFactory $column_factory,
+        $dsn,
+        $username = null,
+        $password = null,
+        array $options = []
     ) {
         $this->params = [
             'dsn'      => $dsn,
@@ -27,5 +31,15 @@ class MockAdapter
     public function getDsnHost()
     {
         return $this->params['dsn']['host'];
+    }
+    
+    public function fetchTableList($schema = null)
+    {
+        return [];
+    }
+    
+    public function fetchTableCols($spec)
+    {
+        return [];
     }
 }
