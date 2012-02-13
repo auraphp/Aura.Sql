@@ -1,1 +1,1 @@
-Some change notes.
+Initial release (beta2 name notwithstanding).
