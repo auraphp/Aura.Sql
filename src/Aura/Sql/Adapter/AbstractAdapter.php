@@ -9,6 +9,7 @@
 namespace Aura\Sql\Adapter;
 use Aura\Sql\ProfilerInterface;
 use Aura\Sql\ColumnFactory;
+use Aura\Sql\SelectFactory;
 use PDO;
 use PDOStatement;
 
@@ -119,6 +120,7 @@ abstract class AbstractAdapter
     public function __construct(
         ProfilerInterface $profiler,
         ColumnFactory $column_factory,
+        SelectFactory $select_factory,
         $dsn,
         $username = null,
         $password = null,
@@ -126,6 +128,7 @@ abstract class AbstractAdapter
     ) {
         $this->profiler       = $profiler;
         $this->column_factory = $column_factory;
+        $this->select_factory = $select_factory;
         $this->dsn            = $dsn;
         $this->username       = $username;
         $this->password       = $password;
@@ -154,6 +157,18 @@ abstract class AbstractAdapter
     public function getColumnFactory()
     {
         return $this->column_factory;
+    }
+    
+    /**
+     * 
+     * Returns the select factory object.
+     * 
+     * @return SelectFactory
+     * 
+     */
+    public function getSelectFactory()
+    {
+        return $this->select_factory;
     }
     
     /**
@@ -894,6 +909,38 @@ abstract class AbstractAdapter
         
         $stmt = $this->query($text, $data);
         return $stmt->rowCount();
+    }
+    
+    public function newSelect()
+    {
+        return $this->select_factory->newInstance($this);
+    }
+    
+    /**
+     * 
+     * Modifies an SQL string **in place** to add a `LIMIT ... OFFSET` clause.
+     * 
+     * @param string $text The SQL string.
+     * 
+     * @param int $count The number of rows to return.
+     * 
+     * @param int $offset Skip this many rows first.
+     * 
+     * @return void
+     * 
+     */
+    public function limit(&$text, $count, $offset = 0)
+    {
+        $count  = (int) $count;
+        $offset = (int) $offset;
+        
+        if ($count) {
+            $text .= "LIMIT $count" . PHP_EOL;
+        }
+    
+        if ($offset) {
+            $text .= "OFFSET $offset" . PHP_EOL;
+        }
     }
     
     /**

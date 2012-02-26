@@ -1,23 +1,5 @@
 <?php
 
-// abstract
-public function convertSelect(Select $select)
-{
-    $text = $select->__toString();
-    
-    $limit = $select->limit;
-    if ($limit) {
-        $text .= "LIMIT $limit\n";
-    }
-    
-    $offset = $select->offset;
-    if ($offset) {
-        $text .= "OFFSET $offset";
-    }
-    
-    return $text;
-}
-
 // sqlsrv
 public function convertSelect(Select $select)
 {

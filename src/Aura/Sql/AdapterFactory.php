@@ -69,9 +69,11 @@ class AdapterFactory
         $class = $this->map[$name];
         $profiler = new Profiler;
         $column_factory = new ColumnFactory;
+        $select_factory = new SelectFactory;
         return new $class(
             $profiler,
             $column_factory,
+            $select_factory,
             $dsn,
             $username,
             $password,
