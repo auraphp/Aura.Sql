@@ -275,17 +275,19 @@ class Select
      * 
      * @param string $cond Join on this condition.
      * 
-     * @param array $cols The columns to select from the joined table.
-     * 
      * @return self
      * 
      */
-    public function join($join, $spec, $cond)
+    public function join($join, $spec, $cond = null)
     {
         $join = strtoupper(ltrim("$join JOIN"));
         $spec = $this->sql->quoteName($spec);
-        $cond = $this->sql->quoteNamesIn($cond);
-        $this->join[] = "$join $spec ON $cond";
+        if ($cond) {
+            $cond = $this->sql->quoteNamesIn($cond);
+            $this->join[] = "$join $spec ON $cond";
+        } else {
+            $this->join[] = "$join $spec";
+        }
         return $this;
     }
     
@@ -303,18 +305,20 @@ class Select
      * 
      * @param string $cond Join on this condition.
      * 
-     * @param array $cols The columns to select from the joined table.
-     * 
      * @return self
      * 
      */
-    public function joinSubSelect($join, $spec, $name, $cond)
+    public function joinSubSelect($join, $spec, $name, $cond = null)
     {
         $join = strtoupper(ltrim("$join JOIN"));
         $spec = ($spec instanceof Select) ? $spec->__toString() : $spec;
         $name = $this->sql->quoteName($name);
-        $cond = $this->sql->quoteNamesIn($cond);
-        $this->join[] = "$join ($spec) AS $name ON $cond";
+        if ($cond) {
+            $cond = $this->sql->quoteNamesIn($cond);
+            $this->join[] = "$join ($spec) AS $name ON $cond";
+        } else {
+            $this->join[] = "$join ($spec) AS $name";
+        }
         return $this;
     }
     

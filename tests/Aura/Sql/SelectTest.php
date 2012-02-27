@@ -130,10 +130,12 @@ class SelectTest extends \PHPUnit_Framework_TestCase
     {
         $this->select->join("left", "t2", "t1.id = t2.id");
         $this->select->join("inner", "t3 AS a3", "t2.id = a3.id");
+        $this->select->join("natural", "t4");
         $expect = '
             SELECT
             LEFT JOIN "t2" ON "t1"."id" = "t2"."id"
             INNER JOIN "t3" AS "a3" ON "t2"."id" = "a3"."id"
+            NATURAL JOIN "t4"
         ';
         $actual = $this->select->__toString();
         $this->assertSameSql($expect, $actual);
@@ -141,11 +143,14 @@ class SelectTest extends \PHPUnit_Framework_TestCase
     
     public function testJoinSubSelect()
     {
-        $sub = "SELECT * FROM t2";
-        $this->select->joinSubSelect("left", $sub, "a3", "t2.c1 = a3.c1");
+        $sub1 = "SELECT * FROM t2";
+        $sub2 = "SELECT * FROM t3";
+        $this->select->joinSubSelect("left", $sub1, "a2", "t2.c1 = a3.c1");
+        $this->select->joinSubSelect("natural", $sub2, "a3");
         $expect = '
             SELECT
-            LEFT JOIN (SELECT * FROM t2) AS "a3" ON "t2"."c1" = "a3"."c1"
+            LEFT JOIN (SELECT * FROM t2) AS "a2" ON "t2"."c1" = "a3"."c1"
+            NATURAL JOIN (SELECT * FROM t3) AS "a3"
         ';
         $actual = $this->select->__toString();
         $this->assertSameSql($expect, $actual);
