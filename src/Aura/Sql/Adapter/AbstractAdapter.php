@@ -934,11 +934,11 @@ abstract class AbstractAdapter
         $count  = (int) $count;
         $offset = (int) $offset;
         
-        if ($count) {
+        if ($count && $offset) {
+            $text .= "LIMIT $count OFFSET $offset" . PHP_EOL;
+        } elseif ($count) {
             $text .= "LIMIT $count" . PHP_EOL;
-        }
-    
-        if ($offset) {
+        } elseif ($offset) {
             $text .= "OFFSET $offset" . PHP_EOL;
         }
     }

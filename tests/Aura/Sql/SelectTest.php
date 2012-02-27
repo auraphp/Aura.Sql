@@ -7,27 +7,18 @@ namespace Aura\Sql;
  */
 class SelectTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var Select
-     */
     protected $select;
 
-    /**
-     * Sets up the fixture, for example, opens a network connection.
-     * This method is called before a test is executed.
-     */
+    protected $adapter;
+    
     protected function setUp()
     {
         parent::setUp();
         $adapter_factory = new AdapterFactory;
-        $adapter = $adapter_factory->newInstance('sqlite', ':memory:');
-        $this->select = $adapter->newSelect();
+        $this->adapter = $adapter_factory->newInstance('sqlite', ':memory:');
+        $this->select = $this->adapter->newSelect();
     }
     
-    /**
-     * Tears down the fixture, for example, closes a network connection.
-     * This method is called after a test is executed.
-     */
     protected function tearDown()
     {
         parent::tearDown();
@@ -46,22 +37,6 @@ class SelectTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($expect, $actual);
     }
     
-    /**
-     * @covers Aura\Sql\Select::__toString
-     * @todo Implement test__toString().
-     */
-    public function test__toString()
-    {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
-    }
-
-    /**
-     * @covers Aura\Sql\Select::setPaging
-     * @todo Implement testSetPaging().
-     */
     public function testSetAndGetPaging()
     {
         $expect = 88;
@@ -70,218 +45,306 @@ class SelectTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($expect, $actual);
     }
 
-    /**
-     * @covers Aura\Sql\Select::distinct
-     * @todo Implement testDistinct().
-     */
     public function testDistinct()
     {
-        $this->select->distinct()->from('t1', ['c1', 'c2', 'c3']);
+        $this->select->distinct()
+                     ->from('t1')
+                     ->cols(['t1.c1', 't1.c2', 't1.c3']);
+        
         $actual = $this->select->__toString();
+        
         $expect = '
             SELECT DISTINCT
-                "c1" AS "c1",
-                "c2" AS "c2",
-                "c3" AS "c3"
+                "t1"."c1",
+                "t1"."c2",
+                "t1"."c3"
             FROM
                 "t1"
         ';
         $this->assertSameSql($expect, $actual);
     }
     
-    /**
-     * @covers Aura\Sql\Select::cols
-     * @todo Implement testCols().
-     */
     public function testCols()
     {
-        $this->select->cols(['c1', 'c2', 'c3'])->from('t1');
+        $this->select->cols(['t1.c1', 'c2', 'COUNT(t1.c3)']);
         $actual = $this->select->__toString();
         $expect = '
             SELECT
-                "c1",
-                "c2",
-                "c3"
-            FROM
-                "t1"
+                "t1"."c1",
+                c2,
+                COUNT("t1"."c3")
         ';
         $this->assertSameSql($expect, $actual);
     }
-
-    /**
-     * @covers Aura\Sql\Select::from
-     * @todo Implement testFrom().
-     */
+    
     public function testFrom()
     {
-        $this->select->from('t1', ['c1', 'c2', 'c3'])
-                     ->from('t2', ['c1', 'c2', 'c3']);
+        $this->select->from('t1')
+                     ->from('t2');
                      
         $actual = $this->select->__toString();
         $expect = '
-            SELECT DISTINCT
-                "c1" AS "c1",
-                "c2" AS "c2",
-                "c3" AS "c3"
+            SELECT
             FROM
-                "t1"
+                "t1",
+                "t2"
         ';
         $this->assertSameSql($expect, $actual);
     }
-
-    /**
-     * @covers Aura\Sql\Select::fromSubSelect
-     * @todo Implement testFromSubSelect().
-     */
+    
     public function testFromSubSelect()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
+        $sub = "SELECT * FROM t2";
+        $this->select->cols(['*'])->fromSubSelect($sub, "a2");
+        $expect = '
+            SELECT
+                *
+            FROM
+                (SELECT * FROM t2) AS "a2"
+        ';
+        $actual = $this->select->__toString();
+        $this->assertSameSql($expect, $actual);
     }
-
-    /**
-     * @covers Aura\Sql\Select::join
-     * @todo Implement testJoin().
-     */
+    
+    public function testFromSubSelectObject()
+    {
+        $sub = $this->adapter->newSelect();
+        $sub->cols(['*'])->from('t2');
+        
+        $this->select->cols(['*'])->fromSubSelect($sub, "a2");
+        $expect = '
+            SELECT
+                *
+            FROM
+                (SELECT
+                    *
+                FROM
+                    "t2"
+                ) AS "a2"
+        ';
+        $actual = $this->select->__toString();
+        $this->assertSameSql($expect, $actual);
+    }
+    
     public function testJoin()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
+        $this->select->join("left", "t2", "t1.id = t2.id");
+        $this->select->join("inner", "t3 AS a3", "t2.id = a3.id");
+        $expect = '
+            SELECT
+            LEFT JOIN "t2" ON "t1"."id" = "t2"."id"
+            INNER JOIN "t3" AS "a3" ON "t2"."id" = "a3"."id"
+        ';
+        $actual = $this->select->__toString();
+        $this->assertSameSql($expect, $actual);
     }
-
-    /**
-     * @covers Aura\Sql\Select::joinSubSelect
-     * @todo Implement testJoinSubSelect().
-     */
+    
     public function testJoinSubSelect()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
+        $sub = "SELECT * FROM t2";
+        $this->select->joinSubSelect("left", $sub, "a3", "t2.c1 = a3.c1");
+        $expect = '
+            SELECT
+            LEFT JOIN (SELECT * FROM t2) AS "a3" ON "t2"."c1" = "a3"."c1"
+        ';
+        $actual = $this->select->__toString();
+        $this->assertSameSql($expect, $actual);
     }
-
-    /**
-     * @covers Aura\Sql\Select::where
-     * @todo Implement testWhere().
-     */
+    
+    public function testJoinSubSelectObject()
+    {
+        $sub = $this->adapter->newSelect();
+        $sub->cols(['*'])->from('t2');
+        
+        $this->select->joinSubSelect("left", $sub, "a3", "t2.c1 = a3.c1");
+        $expect = '
+            SELECT
+            LEFT JOIN (SELECT
+                *
+            FROM
+                "t2"
+            ) AS "a3" ON "t2"."c1" = "a3"."c1"
+        ';
+        $actual = $this->select->__toString();
+        $this->assertSameSql($expect, $actual);
+    }
+    
     public function testWhere()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
+        $this->select->where("c1 = c2")
+                     ->where("c3 = ?", 'foo');
+        $expect = '
+            SELECT
+            WHERE
+                c1 = c2
+                AND c3 = \'foo\'
+        ';
+        
+        $actual = $this->select->__toString();
+        $this->assertSameSql($expect, $actual);
     }
-
-    /**
-     * @covers Aura\Sql\Select::orWhere
-     * @todo Implement testOrWhere().
-     */
+    
     public function testOrWhere()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
+        $this->select->orWhere("c1 = c2")
+                     ->orWhere("c3 = ?", 'foo');
+        
+        $expect = '
+            SELECT
+            WHERE
+                c1 = c2
+                OR c3 = \'foo\'
+        ';
+        
+        $actual = $this->select->__toString();
+        $this->assertSameSql($expect, $actual);
     }
-
-    /**
-     * @covers Aura\Sql\Select::groupBy
-     * @todo Implement testGroupBy().
-     */
+    
     public function testGroupBy()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
+        $this->select->groupBy(['c1', 't2.c2']);
+        $expect = '
+            SELECT
+            GROUP BY
+                c1,
+                "t2"."c2"
+        ';
+        
+        $actual = $this->select->__toString();
+        $this->assertSameSql($expect, $actual);
     }
-
-    /**
-     * @covers Aura\Sql\Select::having
-     * @todo Implement testHaving().
-     */
+    
     public function testHaving()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
+        $this->select->having("c1 = c2")
+                     ->having("c3 = ?", 'foo');
+        $expect = '
+            SELECT
+            HAVING
+                c1 = c2
+                AND c3 = \'foo\'
+        ';
+        
+        $actual = $this->select->__toString();
+        $this->assertSameSql($expect, $actual);
     }
-
-    /**
-     * @covers Aura\Sql\Select::orHaving
-     * @todo Implement testOrHaving().
-     */
+    
     public function testOrHaving()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
+        $this->select->orHaving("c1 = c2")
+                     ->orHaving("c3 = ?", 'foo');
+        $expect = '
+            SELECT
+            HAVING
+                c1 = c2
+                OR c3 = \'foo\'
+        ';
+        
+        $actual = $this->select->__toString();
+        $this->assertSameSql($expect, $actual);
     }
-
-    /**
-     * @covers Aura\Sql\Select::orderBy
-     * @todo Implement testOrderBy().
-     */
+    
     public function testOrderBy()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
+        $this->select->orderBy(['c1', 'UPPER(t2.c2)', ]);
+        $expect = '
+            SELECT
+            ORDER BY
+                c1,
+                UPPER("t2"."c2")
+        ';
+        
+        $actual = $this->select->__toString();
+        $this->assertSameSql($expect, $actual);
     }
-
-    /**
-     * @covers Aura\Sql\Select::limit
-     * @todo Implement testLimit().
-     */
+    
     public function testLimit()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
+        $this->select->limit(10);
+        $expect = '
+            SELECT
+            LIMIT 10
+        ';
+        $actual = $this->select->__toString();
+        $this->assertSameSql($expect, $actual);
     }
-
-    /**
-     * @covers Aura\Sql\Select::limitPage
-     * @todo Implement testLimitPage().
-     */
-    public function testLimitPage()
+    
+    public function testOffset()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
+        $this->select->offset(40);
+        $expect = '
+            SELECT
+            OFFSET 40
+        ';
+        $actual = $this->select->__toString();
+        $this->assertSameSql($expect, $actual);
     }
-
-    /**
-     * @covers Aura\Sql\Select::union
-     * @todo Implement testUnion().
-     */
+    
+    public function testPage()
+    {
+        $this->select->page(5);
+        $expect = '
+            SELECT
+            LIMIT 10 OFFSET 40
+        ';
+        $actual = $this->select->__toString();
+        $this->assertSameSql($expect, $actual);
+    }
+    
+    public function testForUpdate()
+    {
+        $this->select->forUpdate();
+        $expect = '
+            SELECT
+            FOR UPDATE
+        ';
+        $actual = $this->select->__toString();
+        $this->assertSameSql($expect, $actual);
+    }
+    
     public function testUnion()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
+        $this->select->cols(['c1'])
+                     ->from('t1')
+                     ->union()
+                     ->cols(['c2'])
+                     ->from('t2');
+        $expect = '
+            SELECT
+                c1
+            FROM
+                "t1"
+            UNION
+            SELECT
+                c2
+            FROM
+                "t2"
+        ';
+        
+        $actual = $this->select->__toString();
+        $this->assertSameSql($expect, $actual);
     }
-
-    /**
-     * @covers Aura\Sql\Select::unionAll
-     * @todo Implement testUnionAll().
-     */
+    
     public function testUnionAll()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
+        $this->select->cols(['c1'])
+                     ->from('t1')
+                     ->unionAll()
+                     ->cols(['c2'])
+                     ->from('t2');
+        $expect = '
+            SELECT
+                c1
+            FROM
+                "t1"
+            UNION ALL
+            SELECT
+                c2
+            FROM
+                "t2"
+        ';
+        
+        $actual = $this->select->__toString();
+        $this->assertSameSql($expect, $actual);
     }
 }

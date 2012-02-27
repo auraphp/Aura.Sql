@@ -142,6 +142,12 @@ abstract class AbstractAdapterTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('\Aura\Sql\ColumnFactory', $actual);
     }
     
+    public function testGetSelectFactory()
+    {
+        $actual = $this->adapter->getSelectFactory();
+        $this->assertInstanceOf('\Aura\Sql\SelectFactory', $actual);
+    }
+    
     /**
      * @todo Implement testGetDsnString().
      */
