@@ -20,7 +20,7 @@ $GLOBALS['Aura\Sql\Adapter\MysqlTest']['adapter_params'] = [
         'host' => 'localhost',
     ],
     'username' => 'root',
-    'password' => 'admin',
+    'password' => '',
     'options' => [],
 ];
 
@@ -35,7 +35,7 @@ $GLOBALS['Aura\Sql\Adapter\PgsqlTest']['adapter_params'] = [
         'dbname' => 'test',
     ],
     'username' => 'postgres',
-    'password' => 'postgres',
+    'password' => '',
     'options' => [],
 ];
 
