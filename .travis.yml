@@ -1,6 +1,19 @@
 language: php
+env:
+  - DB=sqlite
+  - DB=mysql:
+      adapter: mysql2
+      database: test
+      username: 
+      encoding: utf8
+  - DB=postgres:
+      adapter: postgresql
+      database: test
+      username: postgres
 php:
   - 5.4
 before_script:
+  - "mysql -e 'create database test;'"
+  - "psql -c 'create database test;' -U postgres"
   - cd tests
 script: phpunit
