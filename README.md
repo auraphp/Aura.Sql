@@ -269,7 +269,7 @@ You can use profiling to see how well your queries are performing.
     
     // now get the profiler information
     foreach ($sql->getProfiler()->getProfiles() as $i => $profile) {
-        echo 'Query #' . $i + 1
+        echo 'Query #' . ($i + 1)
            . ' took ' . $profile->time . ' seconds.'
            . PHP_EOL;
     }
