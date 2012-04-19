@@ -143,4 +143,36 @@ class Column
     {
         return $this->$key;
     }
+
+    /**
+     *
+     * Returns column object for var_export. If you use "var_export" here, 
+     * there is another issue here. Saying that we're exporting an instance
+     * of the class 'foo\bar\BazClass'.
+     * Here var_export will return something like:
+     *     "foo\bar\BazClass::__set_state(...)".
+     * But we expect something like:
+     *     "\foo\bar\BazClass::__set_state(...)".
+     * You can see it here: https://bugs.php.net/bug.php?id=52740.
+     *
+     * @param array $array Column property.
+     *
+     * @return object \Aura\Sql\Column.
+     *
+     */
+    public static function __set_state($array)              
+    {
+        $column = new \Aura\Sql\Column(
+            $array['name'],
+            $array['type'],
+            $array['size'],
+            $array['scale'],
+            $array['notnull'],
+            $array['default'],
+            $array['autoinc'],
+            $array['primary']
+        );
+        
+        return $column;
+    }
 }
