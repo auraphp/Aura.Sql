@@ -232,7 +232,7 @@ class ConnectionManager
      */
     public function getMaster($name = null)
     {
-        if (! $name) {
+        if ($name === null) {
             $name = array_rand($this->masters);
         } elseif (! isset($this->masters[$name])) {
             throw new Exception\NoSuchMaster($name);
@@ -267,7 +267,7 @@ class ConnectionManager
      */
     public function getSlave($name = null)
     {
-        if (! $name) {
+        if ($name === null) {
             $name = array_rand($this->slaves);
         } elseif (! isset($this->slaves[$name])) {
             throw new Exception\NoSuchSlave($name);
