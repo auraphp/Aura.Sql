@@ -204,6 +204,22 @@ abstract class AbstractAdapterTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expect, $actual);
     }
     
+    public function testQueryWithSelect()
+    {
+        $select = $this->adapter->newSelect();
+        
+        $select->cols(['*'])
+               ->from($this->table);
+        
+        $stmt = $this->adapter->query($select);
+        
+        $this->assertInstanceOf('PDOStatement', $stmt);
+        $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $expect = 10;
+        $actual = count($result);
+        $this->assertEquals($expect, $actual);
+    }
+    
     public function testPrepareWithQuotedStringsAndData()
     {
         $text = "SELECT * FROM {$this->table}
