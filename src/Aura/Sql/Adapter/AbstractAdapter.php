@@ -7,8 +7,10 @@
  * 
  */
 namespace Aura\Sql\Adapter;
-use Aura\Sql\ProfilerInterface;
+
 use Aura\Sql\ColumnFactory;
+use Aura\Sql\ProfilerInterface;
+use Aura\Sql\Select;
 use Aura\Sql\SelectFactory;
 use PDO;
 use PDOStatement;
@@ -252,17 +254,22 @@ abstract class AbstractAdapter
      * Prepares and executes an SQL query, optionally binding values
      * to named placeholders in the query text.
      * 
-     * @param string $text The text of the SQL query, optionally with named
-     * placeholders.
+     * @param string|Select $spec The text of the SQL query; or, a Select 
+     * object.
      * 
-     * @param array $data An associative array of data to bind to the named
-     * placeholders.
+     * @param array $data An associative array of data to bind to named
+     * placeholders in the query.
      * 
      * @return PDOStatement
      * 
      */
-    public function query($text, array $data = [])
+    public function query($spec, array $data = [])
     {
+        if ($spec instanceof Select) {
+            $text = $spec->__toString();
+        } else {
+            $text = $spec;
+        }
         $stmt = $this->prepare($text, $data);
         $this->profiler->exec($stmt, $data);
         return $stmt;
