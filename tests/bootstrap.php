@@ -13,7 +13,7 @@ spl_autoload_register(function($class) {
 });
 
 /**
- * MysqlTest
+ * Mysql
  */
 $GLOBALS['Aura\Sql\Adapter\MysqlTest']['adapter_params'] = [
     'dsn' => [
@@ -27,7 +27,7 @@ $GLOBALS['Aura\Sql\Adapter\MysqlTest']['adapter_params'] = [
 $GLOBALS['Aura\Sql\Adapter\MysqlTest']['expect_dsn_string'] = 'mysql:host=localhost';
 
 /**
- * MysqlTest
+ * Pgsql
  */
 $GLOBALS['Aura\Sql\Adapter\PgsqlTest']['adapter_params'] = [
     'dsn' => [
