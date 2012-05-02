@@ -12,40 +12,14 @@ spl_autoload_register(function($class) {
     }
 });
 
-/**
- * Mysql
- */
-$GLOBALS['Aura\Sql\Adapter\MysqlTest']['adapter_params'] = [
-    'dsn' => [
-        'host' => 'localhost',
-    ],
-    'username' => 'root',
-    'password' => '',
-    'options' => [],
-];
-
-$GLOBALS['Aura\Sql\Adapter\MysqlTest']['expect_dsn_string'] = 'mysql:host=localhost';
-
-/**
- * Pgsql
- */
-$GLOBALS['Aura\Sql\Adapter\PgsqlTest']['adapter_params'] = [
-    'dsn' => [
-        'host' => 'localhost',
-        'dbname' => 'test',
-    ],
-    'username' => 'postgres',
-    'password' => '',
-    'options' => [],
-];
-
-$GLOBALS['Aura\Sql\Adapter\PgsqlTest']['expect_dsn_string'] = 'pgsql:host=localhost;dbname=test';
-
-/**
- * Sqlite
- */
-$GLOBALS['Aura\Sql\Adapter\SqliteTest']['adapter_params'] = [
-    'dsn' => ':memory:',
-];
-    
-$GLOBALS['Aura\Sql\Adapter\SqliteTest']['expect_dsn_string'] = 'sqlite::memory:';
+// set up globals for connection information
+$base = __DIR__ . DIRECTORY_SEPARATOR . 'globals';
+if (file_exists("$base.php")) {
+    // user-defined globals.php
+    require_once "$base.php";
+    echo "Database connection values read from $base.php" . PHP_EOL;
+} else {
+    // default globals-dist.php
+    require_once "$base-dist.php";
+    echo "Database connection values read from $base-dist.php" . PHP_EOL;
+}
