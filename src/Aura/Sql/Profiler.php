@@ -81,8 +81,10 @@ class Profiler implements ProfilerInterface
         
         $before = microtime(true);
         $result = $stmt->execute();
-        $after = microtime(true);
-        $this->addProfile($stmt->queryString, $after - $before, $data);
+        $after  = microtime(true);
+        $e      = new Exception;
+        $trace  = $e->getTraceAsString();
+        $this->addProfile($stmt->queryString, $after - $before, $data, $trace);
         return $result;
     }
     
@@ -106,7 +108,9 @@ class Profiler implements ProfilerInterface
         $before = microtime(true);
         $result = call_user_func($func);
         $after  = microtime(true);
-        $this->addProfile($text, $after - $before, $data);
+        $e      = new Exception;
+        $trace  = $e->getTraceAsString();
+        $this->addProfile($text, $after - $before, $data, $trace);
         return $result;
     }
     
@@ -120,16 +124,18 @@ class Profiler implements ProfilerInterface
      * 
      * @param array $data The data that was used.
      * 
+     * @param string $trace An exception backtrace as a string.
+     * 
      * @return mixed
      * 
      */
-    public function addProfile($text, $time, array $data = [])
+    public function addProfile($text, $time, array $data, $trace)
     {
         $this->profiles[] = (object) [
             'text' => $text,
             'time' => $time,
             'data' => $data,
-            'trace' => debug_backtrace()
+            'trace' => $trace
         ];
     }
     

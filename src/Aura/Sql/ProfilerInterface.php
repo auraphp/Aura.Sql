@@ -74,10 +74,12 @@ interface ProfilerInterface
      * 
      * @param array $data The data that was used.
      * 
+     * @param string $trace An exception backtrace as a string.
+     * 
      * @return mixed
      * 
      */
-    public function addProfile($text, $time, array $data = []);
+    public function addProfile($text, $time, array $data, $trace);
     
     /**
      * 
