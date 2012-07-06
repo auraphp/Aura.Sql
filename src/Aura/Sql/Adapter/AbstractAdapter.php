@@ -873,7 +873,11 @@ abstract class AbstractAdapter
         // add "col = :col" pairs to the statement
         $list = [];
         foreach ($cols as $col => $val) {
-            $list[] = $this->quoteName($col) . " = :$col";
+            if (is_int($col)) {
+                $list[] = $this->quoteNamesIn($val);
+            } else {
+                $list[] = $this->quoteName($col) . " = :$col";
+            }
         }
         $text .= implode(', ', $list);
         
