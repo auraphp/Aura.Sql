@@ -13,3 +13,5 @@ require_once __DIR__ . '/src/Aura/Sql/Exception/NoSuchMaster.php';
 require_once __DIR__ . '/src/Aura/Sql/Exception/NoSuchSlave.php';
 require_once __DIR__ . '/src/Aura/Sql/ProfilerInterface.php';
 require_once __DIR__ . '/src/Aura/Sql/Profiler.php';
+require_once __DIR__ . '/src/Aura/Sql/Select.php';
+require_once __DIR__ . '/src/Aura/Sql/SelectFactory.php';

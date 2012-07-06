@@ -1,14 +1,14 @@
 <?php
+// preload source files
+require dirname(__DIR__) . DIRECTORY_SEPARATOR . 'src.php';
+
+// autoload test files
 spl_autoload_register(function($class) {
-    $dir   = dirname(__DIR__);
-    $file  = str_replace('\\', DIRECTORY_SEPARATOR, $class) . '.php';
-    $src = $dir . DIRECTORY_SEPARATOR . 'src'. DIRECTORY_SEPARATOR . $file;
-    if (file_exists($src)) {
-        require $src;
-    }
-    $tests = $dir . DIRECTORY_SEPARATOR . 'tests' . DIRECTORY_SEPARATOR . $file;
-    if (file_exists($tests)) {
-        require $tests;
+    $file = dirname(__DIR__). DIRECTORY_SEPARATOR
+          . 'tests' . DIRECTORY_SEPARATOR
+          . str_replace('\\', DIRECTORY_SEPARATOR, $class) . '.php';
+    if (file_exists($file)) {
+        require $file;
     }
 });
 
