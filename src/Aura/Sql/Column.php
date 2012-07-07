@@ -3,6 +3,8 @@
  * 
  * This file is part of the Aura Project for PHP.
  * 
+ * @package Aura.Sql
+ * 
  * @license http://opensource.org/licenses/bsd-license.php BSD
  * 
  */
@@ -90,6 +92,7 @@ class Column
      */
     protected $primary;
     
+    // FIXME type $notnull
     /**
      * 
      * Constructor.
@@ -102,6 +105,8 @@ class Column
      * 
      * @param int $scale The scale of the column (i.e., the number of digits
      * after the decimal point).
+     * 
+     * @param type $notnull
      * 
      * @param mixed $default The default value of the column.
      * 

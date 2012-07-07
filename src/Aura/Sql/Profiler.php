@@ -3,6 +3,8 @@
  * 
  * This file is part of the Aura Project for PHP.
  * 
+ * @package Aura.Sql
+ * 
  * @license http://opensource.org/licenses/bsd-license.php BSD
  * 
  */
@@ -63,7 +65,7 @@ class Profiler implements ProfilerInterface
     }
     
     /**
-     * 
+     * PDOStatement
      * Executes a PDOStatment and profiles it.
      * 
      * @param PDOStatement $stmt The PDOStatement to execute and profile.
@@ -88,11 +90,14 @@ class Profiler implements ProfilerInterface
         return $result;
     }
     
+    // FIXME $text
     /**
      * 
      * Calls a user function and and profile it.
      * 
      * @param callable $func The user function to call.
+     * 
+     * @param type $text
      * 
      * @param array $data The data that was used by the function.
      * 

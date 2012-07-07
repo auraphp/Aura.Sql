@@ -3,6 +3,8 @@
  * 
  * This file is part of the Aura Project for PHP.
  * 
+ * @package Aura.Sql
+ * 
  * @license http://opensource.org/licenses/bsd-license.php BSD
  * 
  */
@@ -38,7 +40,7 @@ abstract class AbstractAdapter
      * The PDO DSN for the connection. This can be an array of key-value pairs
      * or a string (minus the PDO type prefix).
      * 
-     * @var string|array
+     * @var mixed
      * 
      */
     protected $dsn;
@@ -109,6 +111,12 @@ abstract class AbstractAdapter
     /**
      * 
      * Constructor.
+     * 
+     * @param ProfilerInterface $profiler
+     * 
+     * @param ColumnFactory $column_factory A factory to create Column object
+     * 
+     * @param SelectFactory $select_factory A factory to create Select object
      * 
      * @param mixed $dsn DSN parameters for the PDO connection.
      * 
@@ -922,6 +930,13 @@ abstract class AbstractAdapter
         return $stmt->rowCount();
     }
     
+    /**
+     * 
+     * Create a Select object
+     * 
+     * @return Select
+     * 
+     */
     public function newSelect()
     {
         return $this->select_factory->newInstance($this);

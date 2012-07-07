@@ -3,6 +3,8 @@
  * 
  * This file is part of the Aura Project for PHP.
  * 
+ * @package Aura.Sql
+ * 
  * @license http://opensource.org/licenses/bsd-license.php BSD
  * 
  */
@@ -51,11 +53,14 @@ interface ProfilerInterface
      */
     public function exec(PDOStatement $stmt, array $data = []);
     
+    // FIXME $text
     /**
      * 
      * Calls a user function and and profile it.
      * 
      * @param callable $func The user function to call.
+     * 
+     * @param string $text
      * 
      * @param array $data The data that was used by the function.
      * 

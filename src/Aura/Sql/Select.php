@@ -1,6 +1,23 @@
 <?php
+/**
+ * 
+ * This file is part of the Aura Project for PHP.
+ * 
+ * @package Aura.Sql
+ * 
+ * @license http://opensource.org/licenses/bsd-license.php BSD
+ * 
+ */
 namespace Aura\Sql;
 use Aura\Sql\Adapter\AbstractAdapter;
+
+/**
+ * 
+ * Select
+ * 
+ * @package Aura.Sql
+ * 
+ */
 class Select
 {
     /**
@@ -33,15 +50,96 @@ class Select
      * 
      */
     protected $distinct   = false;
+    
+    /**
+     * 
+     * columns to the query.
+     * 
+     * @var array
+     * 
+     */
     protected $cols       = [];
+    
+    /**
+     * 
+     * FROM table and columns to the query
+     * 
+     * @var array
+     * 
+     */
     protected $from       = [];
+    
+    /**
+     * 
+     * JOIN table and columns to the query.
+     * 
+     * @var array
+     * 
+     */
     protected $join       = [];
+    
+    /**
+     * 
+     * a WHERE condition to the query
+     * 
+     * @var array
+     * 
+     */
     protected $where      = [];
+    
+    /**
+     * 
+     * grouping to the query.
+     * 
+     * @var array
+     * 
+     */
     protected $group_by   = [];
+    
+    /**
+     * 
+     * a HAVING condition to the query
+     * 
+     * @var array
+     * 
+     */
     protected $having     = [];
+    
+    /**
+     * 
+     * a row order to the query.
+     * 
+     * @var array
+     * 
+     */
     protected $order_by   = [];
+    
+    /**
+     * 
+     * a limit count on the query
+     * 
+     * @var int
+     * 
+     */
     protected $limit      = 0;
+    
+    /**
+     * 
+     * Sets a limit offset on the query.
+     * 
+     * @var int
+     * 
+     */
     protected $offset     = 0;
+    
+    // FIXME
+    /**
+     * 
+     * Mark query is for update
+     * 
+     * @var type
+     * 
+     */
     protected $for_update = false;
     
     /**
@@ -508,7 +606,7 @@ class Select
      * 
      * Sets a limit count on the query.
      * 
-     * @param int $count The number of rows to return.
+     * @param int $limit The number of rows to return.
      * 
      * @return self
      * 
@@ -519,6 +617,16 @@ class Select
         return $this;
     }
     
+    // FIXME
+    /**
+     * 
+     * Mark as query is for update
+     * 
+     * @param bool $flag
+     * 
+     * @return void
+     * 
+     */
     public function forUpdate($flag = true)
     {
         $this->for_update = (bool) $flag;
