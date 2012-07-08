@@ -29,7 +29,7 @@ class Sqlsrv extends AbstractAdapter
         'Server' => null,
         'Database' => null,
     ];
-    
+
     /**
      * 
      * The PDO type prefix.
@@ -38,7 +38,7 @@ class Sqlsrv extends AbstractAdapter
      * 
      */
     protected $dsn_prefix = 'sqlsrv';
-    
+
     /**
      * 
      * The prefix to use when quoting identifier names.
@@ -47,7 +47,7 @@ class Sqlsrv extends AbstractAdapter
      * 
      */
     protected $quote_name_prefix = '[';
-    
+
     /**
      * 
      * The suffix to use when quoting identifier names.
@@ -56,7 +56,7 @@ class Sqlsrv extends AbstractAdapter
      * 
      */
     protected $quote_name_suffix = ']';
-    
+
     /**
      * 
      * Returns a list of all tables in the database.
@@ -74,7 +74,7 @@ class Sqlsrv extends AbstractAdapter
         $text = "SELECT name FROM sysobjects WHERE type = 'U' ORDER BY name";
         return $this->fetchCol($text);
     }
-    
+
     /**
      * 
      * Returns an array of columns in a table.
@@ -91,11 +91,11 @@ class Sqlsrv extends AbstractAdapter
     public function fetchTableCols($spec)
     {
         list($schema, $table) = $this->splitIdent($spec);
-        
+
         // get column info
         $text = "exec sp_columns @table_name = " . $this->quoteName($table);
         $raw_cols = $this->fetchAll($text);
-        
+
         // get primary key info
         $text = "exec sp_pkeys @table_owner = " . $raw_cols[0]['TABLE_OWNER']
               . ", @table_name = " . $this->quoteName($table);
@@ -104,19 +104,19 @@ class Sqlsrv extends AbstractAdapter
         foreach ($raw_keys as $row) {
             $keys[] = $row['COLUMN_NAME'];
         }
-        
+
         $cols = [];
         foreach ($raw_cols as $row) {
-            
+
             $name = $row['COLUMN_NAME'];
-            
+
             $pos = strpos($row['TYPE_NAME'], ' ');
             if ($pos === false) {
                 $type = $row['TYPE_NAME'];
             } else {
                 $type = substr($row['TYPE_NAME'], 0, $pos);
             }
-            
+
             // save the column description
             $cols[$name] = $this->column_factory->newInstance(
                 $name,
@@ -129,10 +129,10 @@ class Sqlsrv extends AbstractAdapter
                 in_array($name, $keys)
             );
         }
-        
+
         return $cols;
     }
-    
+
     /**
      * 
      * Modifies an SQL string **in place** to add a `TOP` or 
@@ -151,7 +151,7 @@ class Sqlsrv extends AbstractAdapter
     {
         $count  = (int) $count;
         $offset = (int) $offset;
-        
+
         if ($count && ! $offset) {
             // count, but no offset, so we can use TOP
             $text = preg_replace('/^(SELECT( DISTINCT)?)/', "$1 TOP $count", $text);
@@ -162,3 +162,4 @@ class Sqlsrv extends AbstractAdapter
         }
     }
 }
+ 
