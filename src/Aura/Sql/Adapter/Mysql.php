@@ -32,7 +32,7 @@ class Mysql extends AbstractAdapter
         'unix_socket' => null,
         'charset' => null,
     ];
-    
+
     /**
      * 
      * The PDO type prefix.
@@ -41,7 +41,7 @@ class Mysql extends AbstractAdapter
      * 
      */
     protected $dsn_prefix = 'mysql';
-    
+
     /**
      * 
      * The prefix to use when quoting identifier names.
@@ -50,7 +50,7 @@ class Mysql extends AbstractAdapter
      * 
      */
     protected $quote_name_prefix = '`';
-    
+
     /**
      * 
      * The suffix to use when quoting identifier names.
@@ -59,7 +59,7 @@ class Mysql extends AbstractAdapter
      * 
      */
     protected $quote_name_suffix = '`';
-    
+
     /**
      * 
      * Returns an list of tables in the database.
@@ -78,7 +78,7 @@ class Mysql extends AbstractAdapter
         }
         return $this->fetchCol($text);
     }
-    
+
     /**
      * 
      * Returns an array of columns in a table.
@@ -93,28 +93,28 @@ class Mysql extends AbstractAdapter
     public function fetchTableCols($spec)
     {
         list($schema, $table) = $this->splitName($spec);
-        
+
         $table = $this->quoteName($table);
         $text = "SHOW COLUMNS FROM $table";
-        
+
         if ($schema) {
             $schema = preg_replace('/[^\w]/', '', $schema);
             $schema = $this->replaceName($schema);
             $text .= " IN $schema";
         }
-        
+
         // get the column descriptions
         $raw_cols = $this->fetchAll($text);
-        
+
         // where the column info will be stored
         $cols = [];
-        
+
         // loop through the result rows; each describes a column.
         foreach ($raw_cols as $val) {
-            
+
             $name = $val['Field'];
             list($type, $size, $scale) = $this->getTypeSizeScope($val['Type']);
-            
+
             // save the column description
             $cols[$name] = $this->column_factory->newInstance(
                 $name,
@@ -127,11 +127,11 @@ class Mysql extends AbstractAdapter
                 (bool) ($val['Key'] == 'PRI')
             );
         }
-        
+
         // done!
         return $cols;
     }
-    
+
     /**
      * 
      * A helper method to get the default value for a column.
@@ -152,7 +152,7 @@ class Mysql extends AbstractAdapter
             return $default;
         }
     }
-    
+
     /**
      * 
      * Returns the last ID inserted on the connection.
@@ -166,3 +166,4 @@ class Mysql extends AbstractAdapter
         return $pdo->lastInsertId();
     }
 }
+ 

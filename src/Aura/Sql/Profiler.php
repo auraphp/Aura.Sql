@@ -7,6 +7,7 @@
  * 
  */
 namespace Aura\Sql;
+
 use PDOStatement;
 
 /**
@@ -26,7 +27,7 @@ class Profiler implements ProfilerInterface
      * 
      */
     protected $active = false;
-    
+
     /**
      * 
      * Retained profiles.
@@ -35,7 +36,7 @@ class Profiler implements ProfilerInterface
      * 
      */
     protected $profiles = [];
-    
+
     /**
      * 
      * Turns the profiler on and off.
@@ -49,7 +50,7 @@ class Profiler implements ProfilerInterface
     {
         $this->active = (bool) $active;
     }
-    
+
     /**
      * 
      * Is the profiler active?
@@ -61,7 +62,7 @@ class Profiler implements ProfilerInterface
     {
         return (bool) $this->active;
     }
-    
+
     /**
      * 
      * Executes a PDOStatment and profiles it.
@@ -78,7 +79,7 @@ class Profiler implements ProfilerInterface
         if (! $this->isActive()) {
             return $stmt->execute();
         }
-        
+
         $before = microtime(true);
         $result = $stmt->execute();
         $after  = microtime(true);
@@ -87,7 +88,7 @@ class Profiler implements ProfilerInterface
         $this->addProfile($stmt->queryString, $after - $before, $data, $trace);
         return $result;
     }
-    
+
     /**
      * 
      * Calls a user function and and profile it.
@@ -104,7 +105,7 @@ class Profiler implements ProfilerInterface
         if (! $this->isActive()) {
             return call_user_func($func);
         }
-        
+
         $before = microtime(true);
         $result = call_user_func($func);
         $after  = microtime(true);
@@ -113,7 +114,7 @@ class Profiler implements ProfilerInterface
         $this->addProfile($text, $after - $before, $data, $trace);
         return $result;
     }
-    
+
     /**
      * 
      * Adds a profile to the profiler.
@@ -138,7 +139,7 @@ class Profiler implements ProfilerInterface
             'trace' => $trace
         ];
     }
-    
+
     /**
      * 
      * Returns all the profiles.
@@ -151,3 +152,4 @@ class Profiler implements ProfilerInterface
         return $this->profiles;
     }
 }
+ 

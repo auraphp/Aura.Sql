@@ -8,6 +8,7 @@
  */
 namespace Aura\Sql\Exception;
 
+use Aura\Sql\Exception;
 /**
  * 
  * No such slave exception
@@ -15,4 +16,7 @@ namespace Aura\Sql\Exception;
  * @package Aura.Sql
  * 
  */
-class NoSuchSlave extends \Aura\Sql\Exception {}
+class NoSuchSlave extends Exception
+{
+}
+ 

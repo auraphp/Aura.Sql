@@ -25,7 +25,7 @@ class Column
      * 
      */
     protected $name;
-    
+
     /**
      * 
      * The datatype of the column.
@@ -33,8 +33,8 @@ class Column
      * @var string
      * 
      */
-    protected $type; 
-    
+    protected $type;
+
     /**
      * 
      * The size of the column; typically, this is a number of bytes or 
@@ -44,7 +44,7 @@ class Column
      * 
      */
     protected $size;
-    
+
     /**
      * 
      * The scale of the column (i.e., the number of decimal places).
@@ -53,7 +53,7 @@ class Column
      * 
      */
     protected $scale;
-    
+
     /**
      * 
      * Is the column marked as `NOT NULL`?
@@ -62,7 +62,7 @@ class Column
      * 
      */
     protected $notnull;
-    
+
     /**
      * 
      * The default value of the column.
@@ -71,7 +71,7 @@ class Column
      * 
      */
     protected $default;
-    
+
     /**
      * 
      * Is the column auto-incremented?
@@ -80,7 +80,7 @@ class Column
      * 
      */
     protected $autoinc;
-    
+
     /**
      * 
      * Is the column part of the primary key?
@@ -89,7 +89,7 @@ class Column
      * 
      */
     protected $primary;
-    
+
     /**
      * 
      * Constructor.
@@ -112,7 +112,7 @@ class Column
      */
     public function __construct(
         $name,
-        $type, 
+        $type,
         $size,
         $scale,
         $notnull,
@@ -121,7 +121,7 @@ class Column
         $primary
     ) {
         $this->name     = $name;
-        $this->type     = $type; 
+        $this->type     = $type;
         $this->size     = $size;
         $this->scale    = $scale;
         $this->notnull  = (bool) $notnull;
@@ -129,7 +129,7 @@ class Column
         $this->autoinc  = (bool) $autoinc;
         $this->primary  = (bool) $primary;
     }
-    
+
     /**
      * 
      * Returns property values.
@@ -160,7 +160,7 @@ class Column
      * @return object \Aura\Sql\Column.
      *
      */
-    public static function __set_state($array)              
+    public static function __set_state($array)
     {
         $column = new \Aura\Sql\Column(
             $array['name'],
@@ -172,7 +172,8 @@ class Column
             $array['autoinc'],
             $array['primary']
         );
-        
+
         return $column;
     }
 }
+ 

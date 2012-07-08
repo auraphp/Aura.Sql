@@ -15,4 +15,7 @@ namespace Aura\Sql;
  * @package Aura.Sql
  * 
  */
-class Exception extends \Exception {}
+class Exception extends \Exception
+{
+}
+ 
