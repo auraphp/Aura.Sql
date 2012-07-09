@@ -39,7 +39,7 @@ class ColumnFactory
      */
     public function newInstance(
         $name,
-        $type, 
+        $type,
         $size,
         $scale,
         $notnull,
@@ -49,7 +49,7 @@ class ColumnFactory
     ) {
         return new Column(
             $name,
-            $type, 
+            $type,
             $size,
             $scale,
             $notnull,
@@ -59,3 +59,4 @@ class ColumnFactory
         );
     }
 }
+ 

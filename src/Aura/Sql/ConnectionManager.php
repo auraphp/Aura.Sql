@@ -25,7 +25,7 @@ class ConnectionManager
      * 
      */
     protected $adapter_factory;
-    
+
     /**
      * 
      * SQL adapter connection objects as constructed from their params.
@@ -38,7 +38,7 @@ class ConnectionManager
         'masters' => [],
         'slaves'  => [],
     ];
-    
+
     /**
      * 
      * The default connection params.
@@ -53,7 +53,7 @@ class ConnectionManager
         'password' => null,
         'options'  => [],
     ];
-    
+
     /**
      * 
      * Params for one or more master connections. The key for each element in
@@ -64,7 +64,7 @@ class ConnectionManager
      * 
      */
     protected $masters = [];
-    
+
     /**
      * 
      * Params for one or more slave connections. The key for each element in
@@ -75,7 +75,7 @@ class ConnectionManager
      * 
      */
     protected $slaves = [];
-    
+
     /**
      * 
      * Constructor.
@@ -108,7 +108,7 @@ class ConnectionManager
             $this->setSlave($name, $params);
         }
     }
-    
+
     /**
      * 
      * Sets the default connection params.
@@ -122,7 +122,7 @@ class ConnectionManager
     {
         $this->default = array_merge($this->default, $params);
     }
-    
+
     /**
      * 
      * Sets the params for one master connection by name.
@@ -138,7 +138,7 @@ class ConnectionManager
     {
         $this->masters[$name] = $params;
     }
-    
+
     /**
      * 
      * Sets the params for one slave connection by name.
@@ -154,7 +154,7 @@ class ConnectionManager
     {
         $this->slaves[$name] = $params;
     }
-    
+
     /**
      * 
      * Returns a "read" connection.  Picks a connection in this order:
@@ -178,7 +178,7 @@ class ConnectionManager
             return $this->getDefault();
         }
     }
-    
+
     /**
      * 
      * Returns a "write" connection.  Picks a connection in this order:
@@ -198,7 +198,7 @@ class ConnectionManager
             return $this->getDefault();
         }
     }
-    
+
     /**
      * 
      * Returns the default connection object.
@@ -219,7 +219,7 @@ class ConnectionManager
         }
         return $this->conn['default'];
     }
-    
+
     /**
      * 
      * Returns a "master" connection object by name.
@@ -237,10 +237,10 @@ class ConnectionManager
         } elseif (! isset($this->masters[$name])) {
             throw new Exception\NoSuchMaster($name);
         }
-        
+
         $is_conn = isset($this->conn['masters'][$name])
                 && $this->conn['masters'][$name] instanceof AbstractAdapter;
-                
+
         if (! $is_conn) {
             $params = $this->merge($this->default, $this->masters[$name]);
             $this->conn['masters'][$name] = $this->adapter_factory->newInstance(
@@ -251,10 +251,10 @@ class ConnectionManager
                 $params['options']
             );
         }
-        
+
         return $this->conn['masters'][$name];
     }
-    
+
     /**
      * 
      * Returns a "slave" connection object by name.
@@ -272,10 +272,10 @@ class ConnectionManager
         } elseif (! isset($this->slaves[$name])) {
             throw new Exception\NoSuchSlave($name);
         }
-        
+
         $is_conn = isset($this->conn['slaves'][$name])
                 && $this->conn['slaves'][$name] instanceof AbstractAdapter;
-        
+
         if (! $is_conn) {
             $params = $this->merge($this->default, $this->slaves[$name]);
             $this->conn['slaves'][$name] = $this->adapter_factory->newInstance(
@@ -288,7 +288,7 @@ class ConnectionManager
         }
         return $this->conn['slaves'][$name];
     }
-    
+
     /**
      * 
      * A somewhat more friendly merge function thatn array_merge_recursive()
@@ -310,7 +310,8 @@ class ConnectionManager
                 $baseline[$key] = $val;
             }
         }
-        
+
         return $baseline;
     }
 }
+ 

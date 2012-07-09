@@ -29,7 +29,7 @@ class AdapterFactory
         'pgsql'  => 'Aura\Sql\Adapter\Pgsql',
         'sqlite' => 'Aura\Sql\Adapter\Sqlite',
     ];
-    
+
     /**
      * 
      * Constructor.
@@ -41,7 +41,7 @@ class AdapterFactory
     {
         $this->map = array_merge($this->map, $map);
     }
-    
+
     /**
      * 
      * Returns a new adapter instance.
@@ -81,3 +81,4 @@ class AdapterFactory
         );
     }
 }
+ 

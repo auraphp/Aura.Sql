@@ -15,7 +15,7 @@ class Select
      * 
      */
     const IGNORE = '--5a333dc50d9341d8e73e56e2ba591b87';
-    
+
     /**
      * 
      * An array of union SELECT statements.
@@ -24,7 +24,7 @@ class Select
      * 
      */
     protected $union = [];
-    
+
     /**
      * 
      * The component parts of the current select statement.
@@ -43,7 +43,7 @@ class Select
     protected $limit      = 0;
     protected $offset     = 0;
     protected $for_update = false;
-    
+
     /**
      * 
      * The number of rows per page.
@@ -52,7 +52,7 @@ class Select
      * 
      */
     protected $paging = 10;
-    
+
     /**
      * 
      * An SQL connection adapter.
@@ -61,7 +61,7 @@ class Select
      * 
      */
     protected $sql;
-    
+
     /**
      * 
      * Constructor.
@@ -75,7 +75,7 @@ class Select
     {
         $this->sql = $sql;
     }
-    
+
     /**
      * 
      * Returns this object as an SQL statement string.
@@ -83,7 +83,7 @@ class Select
      * @return string An SQL statement string.
      * 
      */
-    
+
     public function __toString()
     {
         if ($this->union) {
@@ -92,7 +92,7 @@ class Select
             return $this->toString();
         }
     }
-    
+
     /**
      * 
      * Returns the SELECT parts composed as a string (does not include
@@ -105,69 +105,69 @@ class Select
     {
         // newline and indent
         $line = PHP_EOL . '    ';
-        
+
         // comma separator, newline, and indent
         $csep = ',' . $line;
-        
+
         // open the statement
         if ($this->distinct) {
             $text = 'SELECT DISTINCT' . PHP_EOL;
         } else {
             $text = 'SELECT' . PHP_EOL;
         }
-        
+
         // add columns
         if ($this->cols) {
             $text .= $line . implode($csep, $this->cols) . PHP_EOL;
         }
-        
+
         // from these sources
         if ($this->from) {
             $text .= 'FROM' . $line;
             $text .= implode($csep, $this->from) . PHP_EOL;
         }
-        
+
         // join these sources
         foreach ($this->join as $join) {
             $text .= $join . PHP_EOL;
         }
-        
+
         // where these conditions
         if ($this->where) {
             $text .= 'WHERE' . $line;
             $text .= implode($line, $this->where) . PHP_EOL;
         }
-        
+
         // grouped by these columns
         if ($this->group_by) {
             $text .= 'GROUP BY' . $line;
             $text .= implode($csep, $this->group_by) . PHP_EOL;
         }
-        
+
         // having these conditions
         if ($this->having) {
             $text .= 'HAVING' . $line;
             $text .= implode($line, $this->having) . PHP_EOL;
         }
-        
+
         // ordered by these columns
         if ($this->order_by) {
             $text .= 'ORDER BY' . $line;
             $text .= implode($csep, $this->order_by) . PHP_EOL;
         }
-        
+
         // modify with a limit clause per the adapter
         $this->sql->limit($text, $this->limit, $this->offset) . PHP_EOL;
-        
+
         // for update?
         if ($this->for_update) {
             $text .= "FOR UPDATE" . PHP_EOL;
         }
-        
+
         // done!
         return $text;
     }
-    
+
     /**
      * 
      * Sets the number of rows per page.
@@ -182,7 +182,7 @@ class Select
         $this->paging = (int) $paging;
         return $this;
     }
-    
+
     /**
      * 
      * Gets the number of rows per page.
@@ -194,7 +194,7 @@ class Select
     {
         return $this->paging;
     }
-    
+
     /**
      * 
      * Makes the select DISTINCT (or not).
@@ -210,7 +210,7 @@ class Select
         $this->distinct = (bool) $flag;
         return $this;
     }
-    
+
     /**
      * 
      * Adds columns to the query.
@@ -230,7 +230,7 @@ class Select
         }
         return $this;
     }
-    
+
     /**
      * 
      * Adds a FROM table and columns to the query.
@@ -245,7 +245,7 @@ class Select
         $this->from[] = $this->sql->quoteName($spec);
         return $this;
     }
-    
+
     /**
      * 
      * Adds an aliased sub-select to the query.
@@ -264,7 +264,7 @@ class Select
         $this->from[] = "($spec) AS " . $this->sql->quoteName($name);
         return $this;
     }
-    
+
     /**
      * 
      * Adds a JOIN table and columns to the query.
@@ -290,7 +290,7 @@ class Select
         }
         return $this;
     }
-    
+
     /**
      * 
      * Adds a JOIN to an aliased subselect and columns to the query.
@@ -321,7 +321,7 @@ class Select
         }
         return $this;
     }
-    
+
     /**
      * 
      * Adds a WHERE condition to the query by AND.
@@ -342,21 +342,21 @@ class Select
     public function where($cond, $val = self::IGNORE)
     {
         $cond = $this->sql->quoteNamesIn($cond);
-        
+
         if ($val !== self::IGNORE) {
             $cond = $this->sql->quoteInto($cond, $val);
         }
-        
+
         if ($this->where) {
             $this->where[] = "AND $cond";
         } else {
             $this->where[] = $cond;
         }
-        
+
         // done
         return $this;
     }
-    
+
     /**
      * 
      * Adds a WHERE condition to the query by OR.
@@ -375,21 +375,21 @@ class Select
     public function orWhere($cond, $val = self::IGNORE)
     {
         $cond = $this->sql->quoteNamesIn($cond);
-        
+
         if ($val !== self::IGNORE) {
             $cond = $this->sql->quoteInto($cond, $val);
         }
-        
+
         if ($this->where) {
             $this->where[] = "OR $cond";
         } else {
             $this->where[] = $cond;
         }
-        
+
         // done
         return $this;
     }
-    
+
     /**
      * 
      * Adds grouping to the query.
@@ -406,7 +406,7 @@ class Select
         }
         return $this;
     }
-    
+
     /**
      * 
      * Adds a HAVING condition to the query by AND.
@@ -439,21 +439,21 @@ class Select
     public function having($cond, $val = self::IGNORE)
     {
         $cond = $this->sql->quoteNamesIn($cond);
-        
+
         if ($val !== self::IGNORE) {
             $cond = $this->sql->quoteInto($cond, $val);
         }
-        
+
         if ($this->having) {
             $this->having[] = "AND $cond";
         } else {
             $this->having[] = $cond;
         }
-        
+
         // done
         return $this;
     }
-    
+
     /**
      * 
      * Adds a HAVING condition to the query by OR.
@@ -474,19 +474,19 @@ class Select
         if ($val !== self::IGNORE) {
             $cond = $this->sql->quoteInto($cond, $val);
         }
-        
+
         $cond = $this->sql->quoteNamesIn($cond);
-        
+
         if ($this->having) {
             $this->having[] = "OR $cond";
         } else {
             $this->having[] = $cond;
         }
-        
+
         // done
         return $this;
     }
-    
+
     /**
      * 
      * Adds a row order to the query.
@@ -503,7 +503,7 @@ class Select
         }
         return $this;
     }
-    
+
     /**
      * 
      * Sets a limit count on the query.
@@ -518,12 +518,12 @@ class Select
         $this->limit = (int) $limit;
         return $this;
     }
-    
+
     public function forUpdate($flag = true)
     {
         $this->for_update = (bool) $flag;
     }
-    
+
     /**
      * 
      * Sets a limit offset on the query.
@@ -538,7 +538,7 @@ class Select
         $this->offset = (int) $offset;
         return $this;
     }
-    
+
     /**
      * 
      * Sets the limit and count by page number.
@@ -553,18 +553,18 @@ class Select
         // reset the count and offset
         $this->limit  = 0;
         $this->offset = 0;
-        
+
         // determine the count and offset from the page number
         $page = (int) $page;
         if ($page > 0) {
             $this->limit  = $this->paging;
             $this->offset = $this->paging * ($page - 1);
         }
-        
+
         // done
         return $this;
     }
-    
+
     /**
      * 
      * Takes the current select properties and retains them, then sets
@@ -579,7 +579,7 @@ class Select
         $this->reset();
         return $this;
     }
-    
+
     /**
      * 
      * Takes the current select properties and retains them, then sets
@@ -594,7 +594,7 @@ class Select
         $this->reset();
         return $this;
     }
-    
+
     /**
      * 
      * Clears the current select properties; generally used after adding a
@@ -613,8 +613,9 @@ class Select
         $this->group_by   = [];
         $this->having     = [];
         $this->order_by   = [];
-        $this->limit      = 0; 
+        $this->limit      = 0;
         $this->offset     = 0;
         $this->for_update = false;
     }
 }
+ 
