@@ -3,6 +3,8 @@
  * 
  * This file is part of the Aura Project for PHP.
  * 
+ * @package Aura.Sql
+ * 
  * @license http://opensource.org/licenses/bsd-license.php BSD
  * 
  */
@@ -109,6 +111,12 @@ abstract class AbstractAdapter
     /**
      * 
      * Constructor.
+     * 
+     * @param ProfilerInterface $profiler A query profiler.
+     * 
+     * @param ColumnFactory $column_factory A column object factory.
+     * 
+     * @param SelectFactory $select_factory A select object factory.
      * 
      * @param mixed $dsn DSN parameters for the PDO connection.
      * 
@@ -922,6 +930,13 @@ abstract class AbstractAdapter
         return $stmt->rowCount();
     }
 
+    /**
+     * 
+     * Returns a new Select object.
+     * 
+     * @return Select
+     * 
+     */
     public function newSelect()
     {
         return $this->select_factory->newInstance($this);

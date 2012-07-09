@@ -3,10 +3,13 @@
  * 
  * This file is part of the Aura Project for PHP.
  * 
+ * @package Aura.Sql
+ * 
  * @license http://opensource.org/licenses/bsd-license.php BSD
  * 
  */
 namespace Aura\Sql;
+
 use PDOStatement;
 
 /**
@@ -56,6 +59,8 @@ interface ProfilerInterface
      * Calls a user function and and profile it.
      * 
      * @param callable $func The user function to call.
+     * 
+     * @param string $text The text of the SQL query.
      * 
      * @param array $data The data that was used by the function.
      * 

@@ -1,6 +1,24 @@
 <?php
+/**
+ * 
+ * This file is part of the Aura Project for PHP.
+ * 
+ * @package Aura.Sql
+ * 
+ * @license http://opensource.org/licenses/bsd-license.php BSD
+ * 
+ */
 namespace Aura\Sql;
+
 use Aura\Sql\Adapter\AbstractAdapter;
+
+/**
+ * 
+ * Builds SELECT statments in an object-oriented fashion.
+ * 
+ * @package Aura.Sql
+ * 
+ */
 class Select
 {
     /**
@@ -27,23 +45,103 @@ class Select
 
     /**
      * 
-     * The component parts of the current select statement.
+     * Is this a SELECT DISTINCT ?
+     * 
+     * @var bool
+     * 
+     */
+    protected $distinct   = false;
+    
+    /**
+     * 
+     * Is this a SELECT FOR UPDATE?
+     * 
+     * @var 
+     * 
+     */
+    protected $for_update = false;
+
+    /**
+     * 
+     * The columns to be selected.
      * 
      * @var array
      * 
      */
-    protected $distinct   = false;
-    protected $cols       = [];
-    protected $from       = [];
-    protected $join       = [];
-    protected $where      = [];
-    protected $group_by   = [];
-    protected $having     = [];
-    protected $order_by   = [];
-    protected $limit      = 0;
-    protected $offset     = 0;
-    protected $for_update = false;
-
+    protected $cols = [];
+    
+    /**
+     * 
+     * Select from these tables.
+     * 
+     * @var array
+     * 
+     */
+    protected $from = [];
+    
+    /**
+     * 
+     * Use these joins.
+     * 
+     * @var array
+     * 
+     */
+    protected $join = [];
+    
+    /**
+     * 
+     * The list of WHERE conditions.
+     * 
+     * @var array
+     * 
+     */
+    protected $where = [];
+    
+    /**
+     * 
+     * GROUP BY these columns.
+     * 
+     * @var array
+     * 
+     */
+    protected $group_by = [];
+    
+    /**
+     * 
+     * The list of HAVING conditions.
+     * 
+     * @var array
+     * 
+     */
+    protected $having = [];
+    
+    /**
+     * 
+     * ORDER BY these columns.
+     * 
+     * @var array
+     * 
+     */
+    protected $order_by = [];
+    
+    /**
+     * 
+     * The number of rows to return
+     * 
+     * @var int
+     * 
+     */
+    protected $limit = 0;
+    
+    /**
+     * 
+     * Return rows after this offset.
+     * 
+     * @var int
+     * 
+     */
+    protected $offset = 0;
+    
     /**
      * 
      * The number of rows per page.
@@ -193,6 +291,21 @@ class Select
     public function getPaging()
     {
         return $this->paging;
+    }
+
+    /**
+     * 
+     * Makes the select FOR UPDATE (or not).
+     * 
+     * @param bool $flag Whether or not the SELECT is FOR UPDATE (default
+     * true).
+     * 
+     * @return self
+     * 
+     */
+    public function forUpdate($flag = true)
+    {
+        $this->for_update = (bool) $flag;
     }
 
     /**
@@ -508,7 +621,7 @@ class Select
      * 
      * Sets a limit count on the query.
      * 
-     * @param int $count The number of rows to return.
+     * @param int $limit The number of rows to return.
      * 
      * @return self
      * 
@@ -517,11 +630,6 @@ class Select
     {
         $this->limit = (int) $limit;
         return $this;
-    }
-
-    public function forUpdate($flag = true)
-    {
-        $this->for_update = (bool) $flag;
     }
 
     /**

@@ -3,6 +3,8 @@
  * 
  * This file is part of the Aura Project for PHP.
  * 
+ * @package Aura.Sql
+ * 
  * @license http://opensource.org/licenses/bsd-license.php BSD
  * 
  */
@@ -29,6 +31,9 @@ class ColumnFactory
      * 
      * @param int $scale The scale of the column (i.e., the number of digits
      * after the decimal point).
+     * 
+     * @param bool $notnull Is the column defined as NOT NULL (i.e.,
+     * required) ?
      * 
      * @param mixed $default The default value of the column.
      * 
