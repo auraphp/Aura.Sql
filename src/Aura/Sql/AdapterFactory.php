@@ -10,6 +10,8 @@
  */
 namespace Aura\Sql;
 
+use Aura\Sql\Query\Factory as QueryFactory;
+
 /**
  * 
  * A factory for adapter objects.
@@ -71,11 +73,11 @@ class AdapterFactory
         $class = $this->map[$name];
         $profiler = new Profiler;
         $column_factory = new ColumnFactory;
-        $select_factory = new SelectFactory;
+        $query_factory  = new QueryFactory;
         return new $class(
             $profiler,
             $column_factory,
-            $select_factory,
+            $query_factory,
             $dsn,
             $username,
             $password,

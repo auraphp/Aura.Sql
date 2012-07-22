@@ -8,7 +8,7 @@
  * @license http://opensource.org/licenses/bsd-license.php BSD
  * 
  */
-namespace Aura\Sql;
+namespace Aura\Sql\Query;
 
 use Aura\Sql\Adapter\AbstractAdapter;
 
@@ -19,21 +19,10 @@ use Aura\Sql\Adapter\AbstractAdapter;
  * @package Aura.Sql
  * 
  */
-class Select
+class Select extends AbstractQuery
 {
-    /**
-     * 
-     * A constant so we can find "ignored" params, to avoid func_num_args().
-     * 
-     * The md5() value of 'Solar_Sql_Select::IGNORE', so it should be unique.
-     * 
-     * Yes, this is hackery, and perhaps a micro-optimization at that.
-     * 
-     * @const
-     * 
-     */
-    const IGNORE = '--5a333dc50d9341d8e73e56e2ba591b87';
-
+    use WhereTrait;
+    
     /**
      * 
      * An array of union SELECT statements.
@@ -50,7 +39,7 @@ class Select
      * @var bool
      * 
      */
-    protected $distinct   = false;
+    protected $distinct = false;
     
     /**
      * 
@@ -87,15 +76,6 @@ class Select
      * 
      */
     protected $join = [];
-    
-    /**
-     * 
-     * The list of WHERE conditions.
-     * 
-     * @var array
-     * 
-     */
-    protected $where = [];
     
     /**
      * 
@@ -150,29 +130,6 @@ class Select
      * 
      */
     protected $paging = 10;
-
-    /**
-     * 
-     * An SQL connection adapter.
-     * 
-     * @var AbstractAdapter
-     * 
-     */
-    protected $sql;
-
-    /**
-     * 
-     * Constructor.
-     * 
-     * @param AbstractAdapter $sql An SQL adapter.
-     * 
-     * @return void
-     * 
-     */
-    public function __construct(AbstractAdapter $sql)
-    {
-        $this->sql = $sql;
-    }
 
     /**
      * 
@@ -437,74 +394,6 @@ class Select
 
     /**
      * 
-     * Adds a WHERE condition to the query by AND.
-     * 
-     * If a value is passed as the second param, it will be quoted
-     * and replaced into the condition wherever a question-mark
-     * appears.
-     * 
-     * Array values are quoted and comma-separated.
-     * 
-     * @param string $cond The WHERE condition.
-     * 
-     * @param string $val A value to quote into the condition.
-     * 
-     * @return self
-     * 
-     */
-    public function where($cond, $val = self::IGNORE)
-    {
-        $cond = $this->sql->quoteNamesIn($cond);
-
-        if ($val !== self::IGNORE) {
-            $cond = $this->sql->quoteInto($cond, $val);
-        }
-
-        if ($this->where) {
-            $this->where[] = "AND $cond";
-        } else {
-            $this->where[] = $cond;
-        }
-
-        // done
-        return $this;
-    }
-
-    /**
-     * 
-     * Adds a WHERE condition to the query by OR.
-     * 
-     * Otherwise identical to where().
-     * 
-     * @param string $cond The WHERE condition.
-     * 
-     * @param string $val A value to quote into the condition.
-     * 
-     * @return self
-     * 
-     * @see where()
-     * 
-     */
-    public function orWhere($cond, $val = self::IGNORE)
-    {
-        $cond = $this->sql->quoteNamesIn($cond);
-
-        if ($val !== self::IGNORE) {
-            $cond = $this->sql->quoteInto($cond, $val);
-        }
-
-        if ($this->where) {
-            $this->where[] = "OR $cond";
-        } else {
-            $this->where[] = $cond;
-        }
-
-        // done
-        return $this;
-    }
-
-    /**
-     * 
      * Adds grouping to the query.
      * 
      * @param array $spec The column(s) to group by.
@@ -549,12 +438,12 @@ class Select
      * @return self
      * 
      */
-    public function having($cond, $val = self::IGNORE)
+    public function having($cond)
     {
         $cond = $this->sql->quoteNamesIn($cond);
 
-        if ($val !== self::IGNORE) {
-            $cond = $this->sql->quoteInto($cond, $val);
+        if (func_num_args() > 1) {
+            $cond = $this->sql->quoteInto($cond, func_get_arg(1));
         }
 
         if ($this->having) {
@@ -582,14 +471,14 @@ class Select
      * @see having()
      * 
      */
-    public function orHaving($cond, $val = self::IGNORE)
+    public function orHaving($cond)
     {
-        if ($val !== self::IGNORE) {
-            $cond = $this->sql->quoteInto($cond, $val);
-        }
-
         $cond = $this->sql->quoteNamesIn($cond);
 
+        if (func_num_args() > 1) {
+            $cond = $this->sql->quoteInto($cond, func_get_arg(1));
+        }
+        
         if ($this->having) {
             $this->having[] = "OR $cond";
         } else {

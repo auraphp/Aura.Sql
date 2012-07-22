@@ -12,8 +12,8 @@ namespace Aura\Sql\Adapter;
 
 use Aura\Sql\ColumnFactory;
 use Aura\Sql\ProfilerInterface;
-use Aura\Sql\Select;
-use Aura\Sql\SelectFactory;
+use Aura\Sql\Query\AbstractQuery;
+use Aura\Sql\Query\Factory as QueryFactory;
 use PDO;
 use PDOStatement;
 
@@ -116,7 +116,7 @@ abstract class AbstractAdapter
      * 
      * @param ColumnFactory $column_factory A column object factory.
      * 
-     * @param SelectFactory $select_factory A select object factory.
+     * @param QueryFactory $query_factory A query object factory.
      * 
      * @param mixed $dsn DSN parameters for the PDO connection.
      * 
@@ -130,7 +130,7 @@ abstract class AbstractAdapter
     public function __construct(
         ProfilerInterface $profiler,
         ColumnFactory $column_factory,
-        SelectFactory $select_factory,
+        QueryFactory $query_factory,
         $dsn,
         $username = null,
         $password = null,
@@ -138,7 +138,7 @@ abstract class AbstractAdapter
     ) {
         $this->profiler       = $profiler;
         $this->column_factory = $column_factory;
-        $this->select_factory = $select_factory;
+        $this->query_factory  = $query_factory;
         $this->dsn            = $dsn;
         $this->username       = $username;
         $this->password       = $password;
@@ -171,14 +171,14 @@ abstract class AbstractAdapter
 
     /**
      * 
-     * Returns the select factory object.
+     * Returns the query factory object.
      * 
-     * @return SelectFactory
+     * @return QueryFactory
      * 
      */
-    public function getSelectFactory()
+    public function getQueryFactory()
     {
-        return $this->select_factory;
+        return $this->query_factory;
     }
 
     /**
@@ -262,8 +262,8 @@ abstract class AbstractAdapter
      * Prepares and executes an SQL query, optionally binding values
      * to named placeholders in the query text.
      * 
-     * @param string|Select $spec The text of the SQL query; or, a Select 
-     * object.
+     * @param string|AbstractQuery $query The text of the SQL query; or, a
+     * query object.
      * 
      * @param array $data An associative array of data to bind to named
      * placeholders in the query.
@@ -271,14 +271,10 @@ abstract class AbstractAdapter
      * @return PDOStatement
      * 
      */
-    public function query($spec, array $data = [])
+    public function query($query, array $data = [])
     {
-        if ($spec instanceof Select) {
-            $text = $spec->__toString();
-        } else {
-            $text = $spec;
-        }
-        $stmt = $this->prepare($text, $data);
+        // casts objects to string via __toString()
+        $stmt = $this->prepare((string) $query, $data);
         $this->profiler->exec($stmt, $data);
         return $stmt;
     }
@@ -939,7 +935,7 @@ abstract class AbstractAdapter
      */
     public function newSelect()
     {
-        return $this->select_factory->newInstance($this);
+        return $this->query_factory->newInstance('select', $this);
     }
 
     /**
