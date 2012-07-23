@@ -32,10 +32,6 @@ abstract class AbstractQuery
     
     protected function indentCsv(array $list)
     {
-        if (! $list) {
-            return;
-        }
-        
         return PHP_EOL
              . '    ' . implode(',' . PHP_EOL . '    ', $list)
              . PHP_EOL;
@@ -43,10 +39,6 @@ abstract class AbstractQuery
     
     protected function indent($list)
     {
-        if (! $list) {
-            return;
-        }
-        
         return PHP_EOL
              . '    ' . implode(PHP_EOL . '    ', $list)
              . PHP_EOL;

@@ -32,19 +32,7 @@ class Factory
      */
     public function newInstance($type, AbstractAdapter $sql)
     {
-        switch (strtolower($type)) {
-            case 'select':
-                return new Select($sql);
-                break;
-            case 'insert':
-                return new Insert($sql);
-                break;
-            case 'update':
-                return new Update($sql);
-                break;
-            case 'delete':
-                return new Delete($sql);
-                break;
-        }
+        $class = '\Aura\Sql\Query\\' . ucfirst($type);
+        return new $class($sql);
     }
 }
