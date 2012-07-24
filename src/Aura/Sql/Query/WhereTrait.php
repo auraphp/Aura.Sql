@@ -1,6 +1,22 @@
 <?php
+/**
+ * 
+ * This file is part of the Aura Project for PHP.
+ * 
+ * @package Aura.Sql
+ * 
+ * @license http://opensource.org/licenses/bsd-license.php BSD
+ * 
+ */
 namespace Aura\Sql\Query;
 
+/**
+ * 
+ * A trait for adding WHERE conditions.
+ * 
+ * @package Aura.Sql
+ * 
+ */
 trait WhereTrait
 {
     /**
@@ -14,19 +30,15 @@ trait WhereTrait
     
     /**
      * 
-     * Adds a WHERE condition to the query by AND.
-     * 
-     * If a value is passed as the second param, it will be quoted
-     * and replaced into the condition wherever a question-mark
-     * appears.
+     * Adds a WHERE condition to the query by AND; if a value is passed as the
+     * second param, it will be quoted and replaced into the condition 
+     * wherever a question-mark appears.
      * 
      * Array values are quoted and comma-separated.
      * 
      * @param string $cond The WHERE condition.
      * 
-     * @param string $val A value to quote into the condition.
-     * 
-     * @return self
+     * @return $this
      * 
      */
     public function where($cond)
@@ -49,15 +61,12 @@ trait WhereTrait
 
     /**
      * 
-     * Adds a WHERE condition to the query by OR.
-     * 
-     * Otherwise identical to where().
+     * Adds a WHERE condition to the query by OR; otherwise identical to 
+     * `where()`.
      * 
      * @param string $cond The WHERE condition.
      * 
-     * @param string $val A value to quote into the condition.
-     * 
-     * @return self
+     * @return $this
      * 
      * @see where()
      * 

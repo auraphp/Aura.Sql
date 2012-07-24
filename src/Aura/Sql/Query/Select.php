@@ -14,7 +14,7 @@ use Aura\Sql\Adapter\AbstractAdapter;
 
 /**
  * 
- * Builds SELECT statments in an object-oriented fashion.
+ * An object for SELECT queries.
  * 
  * @package Aura.Sql
  * 
@@ -138,7 +138,6 @@ class Select extends AbstractQuery
      * @return string An SQL statement string.
      * 
      */
-
     public function __toString()
     {
         if ($this->union) {
@@ -229,7 +228,7 @@ class Select extends AbstractQuery
      * 
      * @param int $paging The number of rows to page at.
      * 
-     * @return self
+     * @return $this
      * 
      */
     public function setPaging($paging)
@@ -257,7 +256,7 @@ class Select extends AbstractQuery
      * @param bool $flag Whether or not the SELECT is FOR UPDATE (default
      * true).
      * 
-     * @return self
+     * @return $this
      * 
      */
     public function forUpdate($flag = true)
@@ -272,7 +271,7 @@ class Select extends AbstractQuery
      * @param bool $flag Whether or not the SELECT is DISTINCT (default
      * true).
      * 
-     * @return self
+     * @return $this
      * 
      */
     public function distinct($flag = true)
@@ -290,7 +289,7 @@ class Select extends AbstractQuery
      * 
      * @param array $cols The column(s) to add to the query.
      * 
-     * @return self
+     * @return $this
      * 
      */
     public function cols(array $cols)
@@ -307,7 +306,7 @@ class Select extends AbstractQuery
      * 
      * @param string $spec The table specification; "foo" or "foo AS bar".
      * 
-     * @return self
+     * @return $this
      * 
      */
     public function from($spec)
@@ -325,7 +324,7 @@ class Select extends AbstractQuery
      * 
      * @param string $name The alias name for the sub-select.
      * 
-     * @return self
+     * @return $this
      * 
      */
     public function fromSubSelect($spec, $name)
@@ -345,7 +344,7 @@ class Select extends AbstractQuery
      * 
      * @param string $cond Join on this condition.
      * 
-     * @return self
+     * @return $this
      * 
      */
     public function join($join, $spec, $cond = null)
@@ -375,7 +374,7 @@ class Select extends AbstractQuery
      * 
      * @param string $cond Join on this condition.
      * 
-     * @return self
+     * @return $this
      * 
      */
     public function joinSubSelect($join, $spec, $name, $cond = null)
@@ -398,7 +397,7 @@ class Select extends AbstractQuery
      * 
      * @param array $spec The column(s) to group by.
      * 
-     * @return self
+     * @return $this
      * 
      */
     public function groupBy(array $spec)
@@ -411,11 +410,9 @@ class Select extends AbstractQuery
 
     /**
      * 
-     * Adds a HAVING condition to the query by AND.
-     * 
-     * If a value is passed as the second param, it will be quoted
-     * and replaced into the condition wherever a question-mark
-     * appears.
+     * Adds a HAVING condition to the query by AND; if a value is passed as 
+     * the second param, it will be quoted and replaced into the condition 
+     * wherever a question-mark appears.
      * 
      * Array values are quoted and comma-separated.
      * 
@@ -433,9 +430,7 @@ class Select extends AbstractQuery
      * 
      * @param string $cond The HAVING condition.
      * 
-     * @param string $val A value to quote into the condition.
-     * 
-     * @return self
+     * @return $this
      * 
      */
     public function having($cond)
@@ -458,15 +453,12 @@ class Select extends AbstractQuery
 
     /**
      * 
-     * Adds a HAVING condition to the query by OR.
-     * 
-     * Otherwise identical to orHaving().
+     * Adds a HAVING condition to the query by AND; otherwise identical to 
+     * `having()`.
      * 
      * @param string $cond The HAVING condition.
      * 
-     * @param string $val A value to quote into the condition.
-     * 
-     * @return self
+     * @return $this
      * 
      * @see having()
      * 
@@ -495,7 +487,7 @@ class Select extends AbstractQuery
      * 
      * @param array $spec The columns and direction to order by.
      * 
-     * @return self
+     * @return $this
      * 
      */
     public function orderBy(array $spec)
@@ -512,7 +504,7 @@ class Select extends AbstractQuery
      * 
      * @param int $limit The number of rows to return.
      * 
-     * @return self
+     * @return $this
      * 
      */
     public function limit($limit)
@@ -527,7 +519,7 @@ class Select extends AbstractQuery
      * 
      * @param int $offset Start returning after this many rows.
      * 
-     * @return self
+     * @return $this
      * 
      */
     public function offset($offset)
@@ -542,7 +534,7 @@ class Select extends AbstractQuery
      * 
      * @param int $page Limit results to this page number.
      * 
-     * @return self
+     * @return $this
      * 
      */
     public function page($page)
@@ -567,7 +559,7 @@ class Select extends AbstractQuery
      * Takes the current select properties and retains them, then sets
      * UNION for the next set of properties.
      * 
-     * @return self
+     * @return $this
      * 
      */
     public function union()
@@ -582,7 +574,7 @@ class Select extends AbstractQuery
      * Takes the current select properties and retains them, then sets
      * UNION ALL for the next set of properties.
      * 
-     * @return self
+     * @return $this
      * 
      */
     public function unionAll()
