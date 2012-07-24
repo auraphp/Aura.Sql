@@ -11,6 +11,7 @@
 namespace Aura\Sql\Query;
 
 use Aura\Sql\Adapter\AbstractAdapter;
+use Aura\Sql\Exception\NoSuchQueryType;
 
 /**
  * 
@@ -33,6 +34,10 @@ class Factory
     public function newInstance($type, AbstractAdapter $sql)
     {
         $class = '\Aura\Sql\Query\\' . ucfirst($type);
-        return new $class($sql);
+        try {
+            return new $class($sql);
+        } catch (\Exception $e) {
+            throw new NoSuchQueryType;
+        }
     }
 }
