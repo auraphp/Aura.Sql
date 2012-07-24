@@ -5,10 +5,16 @@ trait ValuesTrait
 {
     protected $values;
     
-    public function cols($cols)
+    public function col($col)
+    {
+        $key = $this->sql->quoteName($col);
+        $this->values[$key] = ":$col";
+    }
+    
+    public function cols(array $cols)
     {
         foreach ($cols as $col) {
-            $this->values[$col] = ":$col";
+            $this->col($col);
         }
         return $this;
     }
@@ -19,7 +25,9 @@ trait ValuesTrait
             $value = 'NULL';
         }
         
-        $this->values[$col] = $value;
+        $key = $this->sql->quoteName($col);
+        $value = $this->sql->quoteNamesIn($value);
+        $this->values[$key] = $value;
         return $this;
     }
 }

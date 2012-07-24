@@ -27,7 +27,7 @@ class Update extends AbstractQuery
     
     public function table($table)
     {
-        $this->table = $this->sql->quoteNamesIn($table);
+        $this->table = $this->sql->quoteName($table);
         return $this;
     }
 }

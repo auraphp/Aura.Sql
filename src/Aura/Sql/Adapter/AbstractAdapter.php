@@ -829,26 +829,10 @@ abstract class AbstractAdapter
      */
     public function insert($table, array $cols)
     {
-        // the base command text
-        $text = 'INSERT INTO ' . $this->quoteName($table);
-
-        // col names
-        $keys = array_keys($cols);
-
-        // quote the col names for a list
-        $names = [];
-        foreach ($keys as $key) {
-            $names[] = $this->quoteName($key);
-        }
-
-        // add quoted names as a comma-separated list
-        $text .= '(' . implode(', ', $names) . ') ';
-
-        // add value placeholders (use unquoted key names)
-        $text .= 'VALUES (:' . implode(', :', $keys) . ')';
-
-        // execute the statement
-        $stmt = $this->query($text, $cols);
+        $insert = $this->newInsert();
+        $insert->into($table);
+        $insert->cols(array_keys($cols));
+        $stmt = $this->query($insert, $cols);
         return $stmt->rowCount();
     }
 
@@ -863,39 +847,23 @@ abstract class AbstractAdapter
      * 
      * @param string $cond Conditions for a WHERE clause.
      * 
-     * @param array $data Additional data to bind to the query; note that the
-     * $cols values will take precedence over these additional values.
+     * @param array $data Additional data to bind to the query; these are not
+     * part of the update, and note that the $cols values will take precedence
+     * over these additional values.
      * 
      * @return int The number of rows affected.
      * 
      */
     public function update($table, array $cols, $cond, array $data = [])
     {
-        // the base command text
-        $text = 'UPDATE ' . $this->quoteName($table) . ' SET ';
-
-        // add "col = :col" pairs to the statement
-        $list = [];
-        foreach ($cols as $col => $val) {
-            if (is_int($col)) {
-                $list[] = $this->quoteNamesIn($val);
-            } else {
-                $list[] = $this->quoteName($col) . " = :$col";
-            }
-        }
-        $text .= implode(', ', $list);
-
-        // add the where clause
+        $update = $this->newUpdate();
+        $update->table($table);
+        $update->cols(array_keys($cols));
         if ($cond) {
-            $text .= ' WHERE ' . $this->quoteNamesIn($cond);
+            $update->where($cond);
         }
-
-        // merge cols and extra data. note that the cols take precedence over
-        // the extra data.
         $data = array_merge($data, $cols);
-
-        // execute the statement
-        $stmt = $this->query($text, $data);
+        $stmt = $this->query($update, $data);
         return $stmt->rowCount();
     }
 
@@ -914,15 +882,12 @@ abstract class AbstractAdapter
      */
     public function delete($table, $cond, array $data = [])
     {
-        // the base command text
-        $text = 'DELETE FROM ' . $this->quoteName($table);
-
-        // add the where clause
+        $delete = $this->newDelete();
+        $delete->from($table);
         if ($cond) {
-            $text .= ' WHERE ' . $this->quoteNamesIn($cond);
+            $delete->where($cond);
         }
-
-        $stmt = $this->query($text, $data);
+        $stmt = $this->query($delete, $data);
         return $stmt->rowCount();
     }
 
@@ -936,6 +901,42 @@ abstract class AbstractAdapter
     public function newSelect()
     {
         return $this->query_factory->newInstance('select', $this);
+    }
+
+    /**
+     * 
+     * Returns a new Insert object.
+     * 
+     * @return Insert
+     * 
+     */
+    public function newInsert()
+    {
+        return $this->query_factory->newInstance('insert', $this);
+    }
+
+    /**
+     * 
+     * Returns a new Update object.
+     * 
+     * @return Update
+     * 
+     */
+    public function newUpdate()
+    {
+        return $this->query_factory->newInstance('update', $this);
+    }
+
+    /**
+     * 
+     * Returns a new Delete object.
+     * 
+     * @return Update
+     * 
+     */
+    public function newDelete()
+    {
+        return $this->query_factory->newInstance('delete', $this);
     }
 
     /**

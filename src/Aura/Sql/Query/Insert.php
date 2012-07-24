@@ -18,7 +18,7 @@ class Insert extends AbstractQuery
     
     public function into($table)
     {
-        $this->table = $this->sql->quoteNamesIn($table);
+        $this->table = $this->sql->quoteName($table);
         return $this;
     }
 }

@@ -330,7 +330,7 @@ class Select extends AbstractQuery
      */
     public function fromSubSelect($spec, $name)
     {
-        $spec = ($spec instanceof Select) ? $spec->__toString() : $spec;
+        $spec = (string) $spec;
         $this->from[] = "($spec) AS " . $this->sql->quoteName($name);
         return $this;
     }
@@ -381,7 +381,7 @@ class Select extends AbstractQuery
     public function joinSubSelect($join, $spec, $name, $cond = null)
     {
         $join = strtoupper(ltrim("$join JOIN"));
-        $spec = ($spec instanceof Select) ? $spec->__toString() : $spec;
+        $spec = (string) $spec;
         $name = $this->sql->quoteName($name);
         if ($cond) {
             $cond = $this->sql->quoteNamesIn($cond);

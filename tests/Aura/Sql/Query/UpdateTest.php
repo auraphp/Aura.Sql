@@ -17,13 +17,13 @@ class UpdateTest extends AbstractQueryTest
                     
         $actual = $this->query->__toString();
         $expect = "
-            UPDATE t1
+            UPDATE \"t1\"
             SET
-                c1 = :c1,
-                c2 = :c2,
-                c3 = :c3,
-                c4 = NULL,
-                c5 = NOW()
+                \"c1\" = :c1,
+                \"c2\" = :c2,
+                \"c3\" = :c3,
+                \"c4\" = NULL,
+                \"c5\" = NOW()
             WHERE
                 foo = 'bar'
                 AND baz = 'dib'

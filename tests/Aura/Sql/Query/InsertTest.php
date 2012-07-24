@@ -14,12 +14,12 @@ class InsertTest extends AbstractQueryTest
         
         $actual = $this->query->__toString();
         $expect = '
-            INSERT INTO t1 (
-                c1,
-                c2,
-                c3,
-                c4,
-                c5
+            INSERT INTO \"t1\" (
+                \"c1\",
+                \"c2\",
+                \"c3\",
+                \"c4\",
+                \"c5\"
             ) VALUES (
                 :c1,
                 :c2,
