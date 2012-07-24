@@ -41,4 +41,16 @@ abstract class AbstractQueryTest extends \PHPUnit_Framework_TestCase
         
         $this->assertSame($expect, $actual);
     }
+    
+    /**
+     * @expectedException Aura\Sql\Exception\NoSuchQueryType
+     */
+    public function testNoSuchQueryTypeException()
+    {
+        $query_factory   = new QueryFactory;
+        $this->query     = $query_factory->newInstance(
+            'somestype',
+            $this->adapter
+        );
+    }
 }
