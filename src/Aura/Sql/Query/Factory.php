@@ -14,7 +14,7 @@ use Aura\Sql\Adapter\AbstractAdapter;
 
 /**
  * 
- * Create query statement objects.
+ * Creates query statement objects.
  * 
  * @package Aura.Sql
  * 
@@ -24,6 +24,8 @@ class Factory
     /**
      * 
      * Returns a new query object.
+     * 
+     * @param string $type The query object type.
      * 
      * @param AbstractAdapter $sql The SQL connection adapter.
      * 
