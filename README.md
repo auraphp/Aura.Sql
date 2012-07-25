@@ -172,6 +172,7 @@ Finally, to delete rows:
     // perform the deletion; result is number of rows affected
     $result = $sql->delete($table, $cond, $data);
 
+
 Retrieving Table Information
 ----------------------------
 
@@ -284,3 +285,140 @@ Each profile object has these properties:
 
 - `trace`: (array) A [debug_backtrace](http://php.net/debug_backtrace) so
   you can tell where the query came from.
+
+Query Objects
+=============
+
+Aura SQL provides four types of query objects so you can write your SQL
+queries in an object-oriented way.
+
+Select
+------
+
+To get a new `Select` object, invoke the `newSelect()` method on an adapter.
+You can then modify the `Select` object and pass it to the `query()` or
+`fetch*()` method.
+
+```php
+<?php
+// create a new Select object
+$select = $sql->newSelect();
+
+// SELECT * FROM foo WHERE bar > :bar ORDER BY baz
+$select->cols(['*'])
+       ->from('foo')
+       ->where('bar > :bar')
+       ->orderBy('baz');
+
+$data['foo' => '88'];
+
+$list = $sql->fetchAll($select, $data);
+```
+
+The `Select` object has these methods and more; please read the source code
+for more information.
+
+- `distinct()`: Set to `true` for a `SELECT DISTINCT`.
+
+- `cols()`: Select these columns.
+
+- `from()`: Select from these tables.
+
+- `join()`: Join these tables on specified conditions.
+
+- `where()`: `WHERE` these conditions are met (using `AND`).
+
+- `orWhere()`: `WHERE` these conditions are met (using `OR`).
+
+- `groupBy()`: `GROUP BY` these columns.
+
+- `having()`: `HAVING` these conditions met (using `AND`).
+
+- `orHaving()`: `HAVING` these conditions met (using `OR`).
+
+- `orderBy()`: `ORDER BY` these columns.
+
+- `limit()`: `LIMIT` to this many rows.
+
+- `offset()`: `OFFSET` by this many rows.
+
+- `union()`: `UNION` with a followup `SELECT`.
+
+- `unionAll()`: `UNION ALL` with a followup `SELECT`.
+
+Insert
+------
+
+To get a new `Insert` object, invoke the `newInsert()` method on an adapter.
+You can then modify the `Insert` object and pass it to the `query()` method.
+
+```php
+<?php
+// create a new Insert object
+$insert = $sql->newInsert();
+
+// INSERT INTO foo (bar, baz, date) VALUES (:foo, :bar, NOW());
+$insert->into('foo')
+       ->cols(['bar', 'baz'])
+       ->set('date', 'NOW()');
+
+$data[
+    'foo' => null,
+    'bar' => 'zim',
+];
+
+$stmt = $sql->query($insert, $data);
+```
+
+Update
+------
+
+To get a new `Update` object, invoke the `newUpdate()` method on an adapter.
+You can then modify the `Update` object and pass it to the `query()` method.
+
+```php
+<?php
+// create a new Update object
+$update = $sql->newUpdate();
+
+// UPDATE foo SET bar = :bar, baz = :baz, date = NOW() WHERE zim = :zim OR gir = :gir
+$update->table('foo')
+       ->cols(['bar', 'baz'])
+       ->set('date', 'NOW()')
+       ->where('zim = :zim')
+       ->orWhere('gir = :gir');
+
+$data[
+    'foo' => null,
+    'bar' => 'barbar',
+    'baz' => 99,
+    'zim' => 'dib',
+    'gir' => 'doom',
+];
+
+$stmt = $sql->query($update, $data);
+```
+
+Delete
+------
+
+To get a new `Delete` object, invoke the `newDelete()` method on an adapter.
+You can then modify the `Delete` object and pass it to the `query()` method.
+
+```php
+<?php
+// create a new Delete object
+$delete = $sql->newDelete();
+
+// DELETE FROM WHERE zim = :zim OR gir = :gir
+$delete->from('foo')
+       ->where('zim = :zim')
+       ->orWhere('gir = :gir');
+
+$data[
+    'zim' => 'dib',
+    'gir' => 'doom',
+];
+
+$stmt = $sql->query($delete, $data);
+```
