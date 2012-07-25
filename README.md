@@ -1,8 +1,16 @@
 Aura SQL
 ========
 
-The Aura SQL package provides adapters to connect to and query against SQL data sources such as MySQL, PostgreSQL, and Sqlite.  The adapters are mostly wrappers around [PDO](http://php.net/PDO) connections.
+The Aura SQL package provides adapters to connect to and query against SQL
+data sources such as MySQL, PostgreSQL, and Sqlite. The adapters are mostly
+wrappers around [PDO](http://php.net/PDO) connections.
 
+This package is compliant with [PSR-0][], [PSR-1][], and [PSR-2][]. If you
+notice compliance oversights, please send a patch via pull request.
+
+[PSR-0]: https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-0.md
+[PSR-1]: https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-1-basic-coding-standard.md
+[PSR-2]: https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-2-coding-style-guide.md
 
 Getting Started
 ===============
@@ -10,7 +18,8 @@ Getting Started
 Instantiation
 -------------
 
-The easiest way to get started is to use the `scripts/instance.php` script to get an `AdapterFactory` and create your adapter through it:
+The easiest way to get started is to use the `scripts/instance.php` script to
+get an `AdapterFactory` and create your adapter through it:
 
     <?php
     $adapter_factory = include '/path/to/Aura.Sql/scripts/instance.php';
@@ -30,19 +39,23 @@ The easiest way to get started is to use the `scripts/instance.php` script to ge
         'password'
     );
 
-Alternatively, you can add `'/path/to/Aura.Sql/src` to your autoloader and build an adapter factory manually:
+Alternatively, you can add `'/path/to/Aura.Sql/src` to your autoloader and
+build an adapter factory manually:
     
     <?php
     use Aura\Sql\AdapterFactory;
     $adapter_factory = new AdapterFactory;
     $sql = $adapter_factory->newInstance(...);
     
-Aura SQL comes with three adapters: `'mysql'` for MySQL, `'pgsql'` for PostgreSQL, and `'sqlite'` for SQLite3.
+Aura SQL comes with three adapters: `'mysql'` for MySQL, `'pgsql'` for
+PostgreSQL, and `'sqlite'` for SQLite3.
 
 Connecting
 ----------
 
-The adapter will lazy-connect to the database the first time you issue a query of any sort.  This means you can create the adapter object, and if you never issue a query, it will never connect to the database.
+The adapter will lazy-connect to the database the first time you issue a query
+of any sort. This means you can create the adapter object, and if you never
+issue a query, it will never connect to the database.
 
 You can connect manually by issuing `connect()`:
 
@@ -53,7 +66,8 @@ You can connect manually by issuing `connect()`:
 Fetching Results
 ----------------
 
-Once you have an adapter connection, you can begin to fetch results from the database.
+Once you have an adapter connection, you can begin to fetch results from the
+database.
 
     <?php
     // returns all rows
@@ -77,9 +91,13 @@ You can fetch results using these methods:
 Preventing SQL Injection
 ------------------------
 
-Usually you will need to incorporate user-provided data into the query. This means you should quote all values interpolated into the query text as a security measure to [prevent SQL injection](http://bobby-tables.com/).
+Usually you will need to incorporate user-provided data into the query. This
+means you should quote all values interpolated into the query text as a
+security measure to [prevent SQL injection](http://bobby-tables.com/).
 
-Although Aura SQL provides quoting methods, you should instead use value binding into prepared statements.  To do so, put named placeholders in the query text, then pass an array of values to bind to the placeholders:
+Although Aura SQL provides quoting methods, you should instead use value
+binding into prepared statements. To do so, put named placeholders in the
+query text, then pass an array of values to bind to the placeholders:
 
     <?php
     // the text of the query
@@ -114,7 +132,9 @@ Aura SQL recognizes array values and quotes them as comma-separated lists:
 Modifying Rows
 --------------
 
-Aura SQL comes with three convenience methods for modifying data: `insert()`, `update()`, and `delete()`. You can also retrieve the last inserted ID using `lastInsertId()`.
+Aura SQL comes with three convenience methods for modifying data: `insert()`,
+`update()`, and `delete()`. You can also retrieve the last inserted ID using
+`lastInsertId()`.
 
 First, to insert a row:
 
@@ -133,7 +153,9 @@ First, to insert a row:
     // now get the last inserted ID
     $id = $sql->lastInsertId();
 
-(N.b.: Because of the way PostgreSQL creates auto-incremented columns, the `pgsql` adapter needs to know the table and column name to get the last inserted ID; for example, `$id = $sql->lastInsertId($table, 'id');`.)
+(N.b.: Because of the way PostgreSQL creates auto-incremented columns, the
+`pgsql` adapter needs to know the table and column name to get the last
+inserted ID; for example, `$id = $sql->lastInsertId($table, 'id');`.)
 
 Next, to update rows:
 
@@ -155,7 +177,9 @@ Next, to update rows:
     // perform the update; result is number of rows affected
     $result = $sql->update($table, $cols, $cond, $data);
 
-(N.b.: Both `$cols` and `$data` are bound into the update query, but `$cols` takes precedence.  Be sure that the keys in `$cols` and `$data` do not conflict.)
+(N.b.: Both `$cols` and `$data` are bound into the update query, but `$cols`
+takes precedence. Be sure that the keys in `$cols` and `$data` do not
+conflict.)
 
 Finally, to delete rows:
 
@@ -226,7 +250,10 @@ Each column description is a `Column` object with the following properties:
 Transactions
 ------------
 
-Aura SQL adapters always start in autocommit mode (the same as PDO). However, you can turn off autocommit mode and start a transaction with `beginTransaction()`, then either `commit()` or `rollBack()` the transaction. Commits and rollbacks cause the adapter to go back into autocommit mode.
+Aura SQL adapters always start in autocommit mode (the same as PDO). However,
+you can turn off autocommit mode and start a transaction with
+`beginTransaction()`, then either `commit()` or `rollBack()` the transaction.
+Commits and rollbacks cause the adapter to go back into autocommit mode.
 
     <?php
     // turn off autocommit and start a transaction
@@ -247,14 +274,16 @@ Aura SQL adapters always start in autocommit mode (the same as PDO). However, yo
 Manual Queries
 --------------
 
-You can, of course, build and issue your own queries by hand.  Use the `query()` method to do so:
+You can, of course, build and issue your own queries by hand. Use the
+`query()` method to do so:
 
     <?php
     $text = "SELECT * FROM foo WHERE id = :id";
     $data = ['id' => 1];
     $stmt = $sql->query($text, $data)
 
-The returned `$stmt` is a [PDOStatement](http://php.net/PDOStatement) that you may manipulate as you wish.
+The returned `$stmt` is a [PDOStatement](http://php.net/PDOStatement) that you
+may manipulate as you wish.
 
 Profiling
 ---------
