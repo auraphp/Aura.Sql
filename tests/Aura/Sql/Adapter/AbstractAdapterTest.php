@@ -142,10 +142,10 @@ abstract class AbstractAdapterTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('\Aura\Sql\ColumnFactory', $actual);
     }
     
-    public function testGetSelectFactory()
+    public function testGetQueryFactory()
     {
-        $actual = $this->adapter->getSelectFactory();
-        $this->assertInstanceOf('\Aura\Sql\SelectFactory', $actual);
+        $actual = $this->adapter->getQueryFactory();
+        $this->assertInstanceOf('\Aura\Sql\Query\Factory', $actual);
     }
     
     /**
@@ -488,6 +488,24 @@ abstract class AbstractAdapterTest extends \PHPUnit_Framework_TestCase
         $expect = ['id' => '2', 'name' => 'Betty'];
         $this->assertEquals($actual, $expect);
     }
+    
+    // public function testUpdateNoBinding()
+    // {
+    //     $cols   = ['name = 99'];
+    //     $where  = 'id = :id';
+    //     $data   = ['id' => 1];
+    //     $actual = $this->adapter->update($this->table, $cols, $where, $data);
+    //     
+    //     // did it update?
+    //     $actual = $this->adapter->fetchOne("SELECT id, name FROM {$this->table} WHERE id = 1");
+    //     $expect = ['id' => '1', 'name' => '99'];
+    //     $this->assertEquals($actual, $expect);
+    //     
+    //     // did anything else update?
+    //     $actual = $this->adapter->fetchOne("SELECT id, name FROM {$this->table} WHERE id = 2");
+    //     $expect = ['id' => '2', 'name' => 'Betty'];
+    //     $this->assertEquals($actual, $expect);
+    // }
     
     public function testDelete()
     {

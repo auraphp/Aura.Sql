@@ -2,7 +2,7 @@
 namespace Aura\Sql\Adapter;
 use Aura\Sql\ProfilerInterface;
 use Aura\Sql\ColumnFactory;
-use Aura\Sql\SelectFactory;
+use Aura\Sql\Query\Factory as QueryFactory;
 
 class Mock extends AbstractAdapter
 {
@@ -11,7 +11,7 @@ class Mock extends AbstractAdapter
     public function __construct(
         ProfilerInterface $profiler,
         ColumnFactory $column_factory,
-        SelectFactory $select_factory,
+        QueryFactory $query_factory,
         $dsn,
         $username = null,
         $password = null,

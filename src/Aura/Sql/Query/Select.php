@@ -1,20 +1,27 @@
 <?php
-namespace Aura\Sql;
+/**
+ * 
+ * This file is part of the Aura Project for PHP.
+ * 
+ * @package Aura.Sql
+ * 
+ * @license http://opensource.org/licenses/bsd-license.php BSD
+ * 
+ */
+namespace Aura\Sql\Query;
+
 use Aura\Sql\Adapter\AbstractAdapter;
-class Select
+
+/**
+ * 
+ * An object for SELECT queries.
+ * 
+ * @package Aura.Sql
+ * 
+ */
+class Select extends AbstractQuery
 {
-    /**
-     * 
-     * A constant so we can find "ignored" params, to avoid func_num_args().
-     * 
-     * The md5() value of 'Solar_Sql_Select::IGNORE', so it should be unique.
-     * 
-     * Yes, this is hackery, and perhaps a micro-optimization at that.
-     * 
-     * @const
-     * 
-     */
-    const IGNORE = '--5a333dc50d9341d8e73e56e2ba591b87';
+    use WhereTrait;
     
     /**
      * 
@@ -24,25 +31,96 @@ class Select
      * 
      */
     protected $union = [];
+
+    /**
+     * 
+     * Is this a SELECT DISTINCT ?
+     * 
+     * @var bool
+     * 
+     */
+    protected $distinct = false;
     
     /**
      * 
-     * The component parts of the current select statement.
+     * Is this a SELECT FOR UPDATE?
+     * 
+     * @var 
+     * 
+     */
+    protected $for_update = false;
+
+    /**
+     * 
+     * The columns to be selected.
      * 
      * @var array
      * 
      */
-    protected $distinct   = false;
-    protected $cols       = [];
-    protected $from       = [];
-    protected $join       = [];
-    protected $where      = [];
-    protected $group_by   = [];
-    protected $having     = [];
-    protected $order_by   = [];
-    protected $limit      = 0;
-    protected $offset     = 0;
-    protected $for_update = false;
+    protected $cols = [];
+    
+    /**
+     * 
+     * Select from these tables.
+     * 
+     * @var array
+     * 
+     */
+    protected $from = [];
+    
+    /**
+     * 
+     * Use these joins.
+     * 
+     * @var array
+     * 
+     */
+    protected $join = [];
+    
+    /**
+     * 
+     * GROUP BY these columns.
+     * 
+     * @var array
+     * 
+     */
+    protected $group_by = [];
+    
+    /**
+     * 
+     * The list of HAVING conditions.
+     * 
+     * @var array
+     * 
+     */
+    protected $having = [];
+    
+    /**
+     * 
+     * ORDER BY these columns.
+     * 
+     * @var array
+     * 
+     */
+    protected $order_by = [];
+    
+    /**
+     * 
+     * The number of rows to return
+     * 
+     * @var int
+     * 
+     */
+    protected $limit = 0;
+    
+    /**
+     * 
+     * Return rows after this offset.
+     * 
+     * @var int
+     * 
+     */
+    protected $offset = 0;
     
     /**
      * 
@@ -52,30 +130,7 @@ class Select
      * 
      */
     protected $paging = 10;
-    
-    /**
-     * 
-     * An SQL connection adapter.
-     * 
-     * @var AbstractAdapter
-     * 
-     */
-    protected $sql;
-    
-    /**
-     * 
-     * Constructor.
-     * 
-     * @param AbstractAdapter $sql An SQL adapter.
-     * 
-     * @return void
-     * 
-     */
-    public function __construct(AbstractAdapter $sql)
-    {
-        $this->sql = $sql;
-    }
-    
+
     /**
      * 
      * Returns this object as an SQL statement string.
@@ -83,7 +138,6 @@ class Select
      * @return string An SQL statement string.
      * 
      */
-    
     public function __toString()
     {
         if ($this->union) {
@@ -92,7 +146,7 @@ class Select
             return $this->toString();
         }
     }
-    
+
     /**
      * 
      * Returns the SELECT parts composed as a string (does not include
@@ -105,76 +159,76 @@ class Select
     {
         // newline and indent
         $line = PHP_EOL . '    ';
-        
+
         // comma separator, newline, and indent
         $csep = ',' . $line;
-        
+
         // open the statement
         if ($this->distinct) {
             $text = 'SELECT DISTINCT' . PHP_EOL;
         } else {
             $text = 'SELECT' . PHP_EOL;
         }
-        
+
         // add columns
         if ($this->cols) {
             $text .= $line . implode($csep, $this->cols) . PHP_EOL;
         }
-        
+
         // from these sources
         if ($this->from) {
             $text .= 'FROM' . $line;
             $text .= implode($csep, $this->from) . PHP_EOL;
         }
-        
+
         // join these sources
         foreach ($this->join as $join) {
             $text .= $join . PHP_EOL;
         }
-        
+
         // where these conditions
         if ($this->where) {
             $text .= 'WHERE' . $line;
             $text .= implode($line, $this->where) . PHP_EOL;
         }
-        
+
         // grouped by these columns
         if ($this->group_by) {
             $text .= 'GROUP BY' . $line;
             $text .= implode($csep, $this->group_by) . PHP_EOL;
         }
-        
+
         // having these conditions
         if ($this->having) {
             $text .= 'HAVING' . $line;
             $text .= implode($line, $this->having) . PHP_EOL;
         }
-        
+
         // ordered by these columns
         if ($this->order_by) {
             $text .= 'ORDER BY' . $line;
             $text .= implode($csep, $this->order_by) . PHP_EOL;
         }
-        
+
         // modify with a limit clause per the adapter
         $this->sql->limit($text, $this->limit, $this->offset) . PHP_EOL;
-        
+
         // for update?
         if ($this->for_update) {
             $text .= "FOR UPDATE" . PHP_EOL;
         }
-        
+
         // done!
         return $text;
     }
-    
+
     /**
      * 
      * Sets the number of rows per page.
      * 
      * @param int $paging The number of rows to page at.
      * 
-     * @return self
+     * @return $this
      * 
      */
     public function setPaging($paging)
@@ -182,7 +236,7 @@ class Select
         $this->paging = (int) $paging;
         return $this;
     }
-    
+
     /**
      * 
      * Gets the number of rows per page.
@@ -194,7 +248,22 @@ class Select
     {
         return $this->paging;
     }
-    
+
+    /**
+     * 
+     * Makes the select FOR UPDATE (or not).
+     * 
+     * @param bool $flag Whether or not the SELECT is FOR UPDATE (default
+     * true).
+     * 
+     * @return $this
+     * 
+     */
+    public function forUpdate($flag = true)
+    {
+        $this->for_update = (bool) $flag;
+    }
+
     /**
      * 
      * Makes the select DISTINCT (or not).
@@ -202,7 +271,7 @@ class Select
      * @param bool $flag Whether or not the SELECT is DISTINCT (default
      * true).
      * 
-     * @return self
+     * @return $this
      * 
      */
     public function distinct($flag = true)
@@ -210,7 +279,7 @@ class Select
         $this->distinct = (bool) $flag;
         return $this;
     }
-    
+
     /**
      * 
      * Adds columns to the query.
@@ -220,7 +289,7 @@ class Select
      * 
      * @param array $cols The column(s) to add to the query.
      * 
-     * @return self
+     * @return $this
      * 
      */
     public function cols(array $cols)
@@ -230,14 +299,14 @@ class Select
         }
         return $this;
     }
-    
+
     /**
      * 
      * Adds a FROM table and columns to the query.
      * 
      * @param string $spec The table specification; "foo" or "foo AS bar".
      * 
-     * @return self
+     * @return $this
      * 
      */
     public function from($spec)
@@ -245,7 +314,7 @@ class Select
         $this->from[] = $this->sql->quoteName($spec);
         return $this;
     }
-    
+
     /**
      * 
      * Adds an aliased sub-select to the query.
@@ -255,16 +324,16 @@ class Select
      * 
      * @param string $name The alias name for the sub-select.
      * 
-     * @return self
+     * @return $this
      * 
      */
     public function fromSubSelect($spec, $name)
     {
-        $spec = ($spec instanceof Select) ? $spec->__toString() : $spec;
+        $spec = (string) $spec;
         $this->from[] = "($spec) AS " . $this->sql->quoteName($name);
         return $this;
     }
-    
+
     /**
      * 
      * Adds a JOIN table and columns to the query.
@@ -275,7 +344,7 @@ class Select
      * 
      * @param string $cond Join on this condition.
      * 
-     * @return self
+     * @return $this
      * 
      */
     public function join($join, $spec, $cond = null)
@@ -290,7 +359,7 @@ class Select
         }
         return $this;
     }
-    
+
     /**
      * 
      * Adds a JOIN to an aliased subselect and columns to the query.
@@ -305,13 +374,13 @@ class Select
      * 
      * @param string $cond Join on this condition.
      * 
-     * @return self
+     * @return $this
      * 
      */
     public function joinSubSelect($join, $spec, $name, $cond = null)
     {
         $join = strtoupper(ltrim("$join JOIN"));
-        $spec = ($spec instanceof Select) ? $spec->__toString() : $spec;
+        $spec = (string) $spec;
         $name = $this->sql->quoteName($name);
         if ($cond) {
             $cond = $this->sql->quoteNamesIn($cond);
@@ -321,82 +390,14 @@ class Select
         }
         return $this;
     }
-    
-    /**
-     * 
-     * Adds a WHERE condition to the query by AND.
-     * 
-     * If a value is passed as the second param, it will be quoted
-     * and replaced into the condition wherever a question-mark
-     * appears.
-     * 
-     * Array values are quoted and comma-separated.
-     * 
-     * @param string $cond The WHERE condition.
-     * 
-     * @param string $val A value to quote into the condition.
-     * 
-     * @return self
-     * 
-     */
-    public function where($cond, $val = self::IGNORE)
-    {
-        $cond = $this->sql->quoteNamesIn($cond);
-        
-        if ($val !== self::IGNORE) {
-            $cond = $this->sql->quoteInto($cond, $val);
-        }
-        
-        if ($this->where) {
-            $this->where[] = "AND $cond";
-        } else {
-            $this->where[] = $cond;
-        }
-        
-        // done
-        return $this;
-    }
-    
-    /**
-     * 
-     * Adds a WHERE condition to the query by OR.
-     * 
-     * Otherwise identical to where().
-     * 
-     * @param string $cond The WHERE condition.
-     * 
-     * @param string $val A value to quote into the condition.
-     * 
-     * @return self
-     * 
-     * @see where()
-     * 
-     */
-    public function orWhere($cond, $val = self::IGNORE)
-    {
-        $cond = $this->sql->quoteNamesIn($cond);
-        
-        if ($val !== self::IGNORE) {
-            $cond = $this->sql->quoteInto($cond, $val);
-        }
-        
-        if ($this->where) {
-            $this->where[] = "OR $cond";
-        } else {
-            $this->where[] = $cond;
-        }
-        
-        // done
-        return $this;
-    }
-    
+
     /**
      * 
      * Adds grouping to the query.
      * 
      * @param array $spec The column(s) to group by.
      * 
-     * @return self
+     * @return $this
      * 
      */
     public function groupBy(array $spec)
@@ -406,14 +407,12 @@ class Select
         }
         return $this;
     }
-    
+
     /**
      * 
-     * Adds a HAVING condition to the query by AND.
-     * 
-     * If a value is passed as the second param, it will be quoted
-     * and replaced into the condition wherever a question-mark
-     * appears.
+     * Adds a HAVING condition to the query by AND; if a value is passed as 
+     * the second param, it will be quoted and replaced into the condition 
+     * wherever a question-mark appears.
      * 
      * Array values are quoted and comma-separated.
      * 
@@ -431,69 +430,64 @@ class Select
      * 
      * @param string $cond The HAVING condition.
      * 
-     * @param string $val A value to quote into the condition.
-     * 
-     * @return self
+     * @return $this
      * 
      */
-    public function having($cond, $val = self::IGNORE)
+    public function having($cond)
     {
         $cond = $this->sql->quoteNamesIn($cond);
-        
-        if ($val !== self::IGNORE) {
-            $cond = $this->sql->quoteInto($cond, $val);
+
+        if (func_num_args() > 1) {
+            $cond = $this->sql->quoteInto($cond, func_get_arg(1));
         }
-        
+
         if ($this->having) {
             $this->having[] = "AND $cond";
         } else {
             $this->having[] = $cond;
         }
-        
+
         // done
         return $this;
     }
-    
+
     /**
      * 
-     * Adds a HAVING condition to the query by OR.
-     * 
-     * Otherwise identical to orHaving().
+     * Adds a HAVING condition to the query by AND; otherwise identical to 
+     * `having()`.
      * 
      * @param string $cond The HAVING condition.
      * 
-     * @param string $val A value to quote into the condition.
-     * 
-     * @return self
+     * @return $this
      * 
      * @see having()
      * 
      */
-    public function orHaving($cond, $val = self::IGNORE)
+    public function orHaving($cond)
     {
-        if ($val !== self::IGNORE) {
-            $cond = $this->sql->quoteInto($cond, $val);
-        }
-        
         $cond = $this->sql->quoteNamesIn($cond);
+
+        if (func_num_args() > 1) {
+            $cond = $this->sql->quoteInto($cond, func_get_arg(1));
+        }
         
         if ($this->having) {
             $this->having[] = "OR $cond";
         } else {
             $this->having[] = $cond;
         }
-        
+
         // done
         return $this;
     }
-    
+
     /**
      * 
      * Adds a row order to the query.
      * 
      * @param array $spec The columns and direction to order by.
      * 
-     * @return self
+     * @return $this
      * 
      */
     public function orderBy(array $spec)
@@ -503,14 +497,14 @@ class Select
         }
         return $this;
     }
-    
+
     /**
      * 
      * Sets a limit count on the query.
      * 
-     * @param int $count The number of rows to return.
+     * @param int $limit The number of rows to return.
      * 
-     * @return self
+     * @return $this
      * 
      */
     public function limit($limit)
@@ -518,19 +512,14 @@ class Select
         $this->limit = (int) $limit;
         return $this;
     }
-    
-    public function forUpdate($flag = true)
-    {
-        $this->for_update = (bool) $flag;
-    }
-    
+
     /**
      * 
      * Sets a limit offset on the query.
      * 
      * @param int $offset Start returning after this many rows.
      * 
-     * @return self
+     * @return $this
      * 
      */
     public function offset($offset)
@@ -538,14 +527,14 @@ class Select
         $this->offset = (int) $offset;
         return $this;
     }
-    
+
     /**
      * 
      * Sets the limit and count by page number.
      * 
      * @param int $page Limit results to this page number.
      * 
-     * @return self
+     * @return $this
      * 
      */
     public function page($page)
@@ -553,24 +542,24 @@ class Select
         // reset the count and offset
         $this->limit  = 0;
         $this->offset = 0;
-        
+
         // determine the count and offset from the page number
         $page = (int) $page;
         if ($page > 0) {
             $this->limit  = $this->paging;
             $this->offset = $this->paging * ($page - 1);
         }
-        
+
         // done
         return $this;
     }
-    
+
     /**
      * 
      * Takes the current select properties and retains them, then sets
      * UNION for the next set of properties.
      * 
-     * @return self
+     * @return $this
      * 
      */
     public function union()
@@ -579,13 +568,13 @@ class Select
         $this->reset();
         return $this;
     }
-    
+
     /**
      * 
      * Takes the current select properties and retains them, then sets
      * UNION ALL for the next set of properties.
      * 
-     * @return self
+     * @return $this
      * 
      */
     public function unionAll()
@@ -594,7 +583,7 @@ class Select
         $this->reset();
         return $this;
     }
-    
+
     /**
      * 
      * Clears the current select properties; generally used after adding a
@@ -613,8 +602,9 @@ class Select
         $this->group_by   = [];
         $this->having     = [];
         $this->order_by   = [];
-        $this->limit      = 0; 
+        $this->limit      = 0;
         $this->offset     = 0;
         $this->for_update = false;
     }
 }
+ 

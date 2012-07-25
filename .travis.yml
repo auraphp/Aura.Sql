@@ -1,15 +1,8 @@
 language: php
 env:
   - DB=sqlite
-  - DB=mysql:
-      adapter: mysql2
-      database: test
-      username: 
-      encoding: utf8
-  - DB=postgres:
-      adapter: postgresql
-      database: test
-      username: postgres
+  - DB=mysql
+  - DB=postgres
 php:
   - 5.4
 before_script:

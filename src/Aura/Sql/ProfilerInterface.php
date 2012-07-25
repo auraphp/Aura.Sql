@@ -3,10 +3,13 @@
  * 
  * This file is part of the Aura Project for PHP.
  * 
+ * @package Aura.Sql
+ * 
  * @license http://opensource.org/licenses/bsd-license.php BSD
  * 
  */
 namespace Aura\Sql;
+
 use PDOStatement;
 
 /**
@@ -28,7 +31,7 @@ interface ProfilerInterface
      * 
      */
     public function setActive($active);
-    
+
     /**
      * 
      * Is the profiler active?
@@ -37,7 +40,7 @@ interface ProfilerInterface
      * 
      */
     public function isActive();
-    
+
     /**
      * 
      * Executes a PDOStatment and profiles it.
@@ -50,12 +53,14 @@ interface ProfilerInterface
      * 
      */
     public function exec(PDOStatement $stmt, array $data = []);
-    
+
     /**
      * 
      * Calls a user function and and profile it.
      * 
      * @param callable $func The user function to call.
+     * 
+     * @param string $text The text of the SQL query.
      * 
      * @param array $data The data that was used by the function.
      * 
@@ -63,7 +68,7 @@ interface ProfilerInterface
      * 
      */
     public function call($func, $text, array $data = []);
-    
+
     /**
      * 
      * Adds a profile to the profiler.
@@ -80,7 +85,7 @@ interface ProfilerInterface
      * 
      */
     public function addProfile($text, $time, array $data, $trace);
-    
+
     /**
      * 
      * Returns all the profiles.
@@ -90,3 +95,4 @@ interface ProfilerInterface
      */
     public function getProfiles();
 }
+ 

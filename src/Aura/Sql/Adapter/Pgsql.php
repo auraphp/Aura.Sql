@@ -3,6 +3,8 @@
  * 
  * This file is part of the Aura Project for PHP.
  * 
+ * @package Aura.Sql
+ * 
  * @license http://opensource.org/licenses/bsd-license.php BSD
  * 
  */
@@ -32,7 +34,7 @@ class Pgsql extends AbstractAdapter
         'user' => null,
         'password' => null,
     ];
-    
+
     /**
      * 
      * The PDO type prefix.
@@ -41,7 +43,7 @@ class Pgsql extends AbstractAdapter
      * 
      */
     protected $dsn_prefix = 'pgsql';
-    
+
     /**
      * 
      * The prefix to use when quoting identifier names.
@@ -50,7 +52,7 @@ class Pgsql extends AbstractAdapter
      * 
      */
     protected $quote_name_prefix = '"';
-    
+
     /**
      * 
      * The suffix to use when quoting identifier names.
@@ -59,7 +61,7 @@ class Pgsql extends AbstractAdapter
      * 
      */
     protected $quote_name_suffix = '"';
-    
+
     /**
      * 
      * Returns a list of all tables in the database.
@@ -86,10 +88,10 @@ class Pgsql extends AbstractAdapter
                 AND table_schema != 'information_schema'
             ";
         }
-        
+
         return $this->fetchCol($cmd, array('schema' => $schema));
     }
-    
+
     /**
      * 
      * Returns an array of columns in a table.
@@ -104,7 +106,7 @@ class Pgsql extends AbstractAdapter
     public function fetchTableCols($spec)
     {
         list($schema, $table) = $this->splitName($spec);
-        
+
         // modified from Zend_Db_Adapter_Pdo_Pgsql
         $cmd = "
             SELECT
@@ -123,22 +125,22 @@ class Pgsql extends AbstractAdapter
                 ON (d.adrelid = c.oid AND d.adnum = a.attnum)
             WHERE a.attnum > 0 AND c.relname = :table
         ";
-        
+
         if ($schema) {
             $cmd .= " AND n.nspname = :schema";
         }
-        
+
         $cmd .= "\n            ORDER BY a.attnum";
-        
+
         // where the columns are stored
         $cols = array();
-        
+
         // get the column descriptions
         $raw_cols = $this->fetchAll($cmd, array(
             'table' => $table,
             'schema' => $schema,
         ));
-        
+
         // loop through the result rows; each describes a column.
         foreach ($raw_cols as $val) {
             $name = $val['name'];
@@ -154,11 +156,11 @@ class Pgsql extends AbstractAdapter
                 (bool) ($val['primary'])
             );
         }
-        
+
         // done
         return $cols;
     }
-    
+
     /**
      * 
      * Given a native column SQL default value, finds a PHP literal value.
@@ -177,7 +179,7 @@ class Pgsql extends AbstractAdapter
         if (is_numeric($default)) {
             return $default;
         }
-        
+
         // string literal?
         $k = substr($default, 0, 1);
         if ($k == '"' || $k == "'") {
@@ -186,11 +188,11 @@ class Pgsql extends AbstractAdapter
             // also remove the leading and trailing quotes
             return substr($default, 1, $pos-2);
         }
-        
+
         // null or non-literal
         return null;
     }
-    
+
     /**
      * 
      * Returns the last ID inserted on the connection for a given table
@@ -214,3 +216,4 @@ class Pgsql extends AbstractAdapter
         return $pdo->lastInsertId($name);
     }
 }
+ 

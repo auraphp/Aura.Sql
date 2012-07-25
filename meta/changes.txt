@@ -1,1 +1,22 @@
-Initial release (beta2 name notwithstanding).
+- [NEW] Select object and SelectFactory.
+
+- [ADD] AbstractAdapter::newSelect() to return a new Select object.
+
+- [CHG] AbstractAdapter::query() can now take a Select object directly.
+
+- [FIX] In ConnectionManager::getMaster() and getSlate(), use `=== null` when
+  comparing connection names; this allows integer zero keys in the pool
+  arrays.
+
+- [FIX] Profiler output now numbers queries correctly.
+
+- [ADD] Method Column::__set_state() to make it easier to var_export() a
+  Column object.
+
+- [CHG] In tests, you can now specify your own globals.php file to set local
+  database connection params.
+
+- [CHG] AbstractAdapter::update() $data values can now be literals instead
+  of just key-value pairs.
+
+- [CHG] PSR-1 and 2 compliance.
