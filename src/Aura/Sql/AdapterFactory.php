@@ -3,10 +3,14 @@
  * 
  * This file is part of the Aura Project for PHP.
  * 
+ * @package Aura.Sql
+ * 
  * @license http://opensource.org/licenses/bsd-license.php BSD
  * 
  */
 namespace Aura\Sql;
+
+use Aura\Sql\Query\Factory as QueryFactory;
 
 /**
  * 
@@ -29,7 +33,7 @@ class AdapterFactory
         'pgsql'  => 'Aura\Sql\Adapter\Pgsql',
         'sqlite' => 'Aura\Sql\Adapter\Sqlite',
     ];
-    
+
     /**
      * 
      * Constructor.
@@ -41,7 +45,7 @@ class AdapterFactory
     {
         $this->map = array_merge($this->map, $map);
     }
-    
+
     /**
      * 
      * Returns a new adapter instance.
@@ -69,11 +73,11 @@ class AdapterFactory
         $class = $this->map[$name];
         $profiler = new Profiler;
         $column_factory = new ColumnFactory;
-        $select_factory = new SelectFactory;
+        $query_factory  = new QueryFactory;
         return new $class(
             $profiler,
             $column_factory,
-            $select_factory,
+            $query_factory,
             $dsn,
             $username,
             $password,
@@ -81,3 +85,4 @@ class AdapterFactory
         );
     }
 }
+ 

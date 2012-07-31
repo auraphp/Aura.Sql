@@ -3,6 +3,8 @@
  * 
  * This file is part of the Aura Project for PHP.
  * 
+ * @package Aura.Sql
+ * 
  * @license http://opensource.org/licenses/bsd-license.php BSD
  * 
  */
@@ -10,8 +12,8 @@ namespace Aura\Sql\Adapter;
 
 use Aura\Sql\ColumnFactory;
 use Aura\Sql\ProfilerInterface;
-use Aura\Sql\Select;
-use Aura\Sql\SelectFactory;
+use Aura\Sql\Query\AbstractQuery;
+use Aura\Sql\Query\Factory as QueryFactory;
 use PDO;
 use PDOStatement;
 
@@ -32,7 +34,7 @@ abstract class AbstractAdapter
      * 
      */
     protected $column_factory;
-    
+
     /**
      * 
      * The PDO DSN for the connection. This can be an array of key-value pairs
@@ -42,7 +44,7 @@ abstract class AbstractAdapter
      * 
      */
     protected $dsn;
-    
+
     /**
      * 
      * The PDO type prefix.
@@ -51,7 +53,7 @@ abstract class AbstractAdapter
      * 
      */
     protected $dsn_prefix;
-    
+
     /**
      * 
      * PDO options for the connection.
@@ -60,7 +62,7 @@ abstract class AbstractAdapter
      * 
      */
     protected $options = [];
-    
+
     /**
      * 
      * The password for the connection.
@@ -69,7 +71,7 @@ abstract class AbstractAdapter
      * 
      */
     protected $password;
-    
+
     /**
      * 
      * The PDO connection object.
@@ -78,7 +80,7 @@ abstract class AbstractAdapter
      * 
      */
     protected $pdo;
-    
+
     /**
      * 
      * The prefix to use when quoting identifier names.
@@ -87,7 +89,7 @@ abstract class AbstractAdapter
      * 
      */
     protected $quote_name_prefix;
-    
+
     /**
      * 
      * The suffix to use when quoting identifier names.
@@ -96,7 +98,7 @@ abstract class AbstractAdapter
      * 
      */
     protected $quote_name_suffix;
-    
+
     /**
      * 
      * The username for the connection.
@@ -105,10 +107,16 @@ abstract class AbstractAdapter
      * 
      */
     protected $username;
-    
+
     /**
      * 
      * Constructor.
+     * 
+     * @param ProfilerInterface $profiler A query profiler.
+     * 
+     * @param ColumnFactory $column_factory A column object factory.
+     * 
+     * @param QueryFactory $query_factory A query object factory.
      * 
      * @param mixed $dsn DSN parameters for the PDO connection.
      * 
@@ -122,7 +130,7 @@ abstract class AbstractAdapter
     public function __construct(
         ProfilerInterface $profiler,
         ColumnFactory $column_factory,
-        SelectFactory $select_factory,
+        QueryFactory $query_factory,
         $dsn,
         $username = null,
         $password = null,
@@ -130,13 +138,13 @@ abstract class AbstractAdapter
     ) {
         $this->profiler       = $profiler;
         $this->column_factory = $column_factory;
-        $this->select_factory = $select_factory;
+        $this->query_factory  = $query_factory;
         $this->dsn            = $dsn;
         $this->username       = $username;
         $this->password       = $password;
         $this->options        = array_merge($this->options, $options);
     }
-    
+
     /**
      * 
      * Returns the profiler object.
@@ -148,7 +156,7 @@ abstract class AbstractAdapter
     {
         return $this->profiler;
     }
-    
+
     /**
      * 
      * Returns the column factory object.
@@ -160,19 +168,19 @@ abstract class AbstractAdapter
     {
         return $this->column_factory;
     }
-    
+
     /**
      * 
-     * Returns the select factory object.
+     * Returns the query factory object.
      * 
-     * @return SelectFactory
+     * @return QueryFactory
      * 
      */
-    public function getSelectFactory()
+    public function getQueryFactory()
     {
-        return $this->select_factory;
+        return $this->query_factory;
     }
-    
+
     /**
      * 
      * Returns the DSN string used by the PDO connection.
@@ -193,10 +201,10 @@ abstract class AbstractAdapter
         } else {
             $dsn_string = $this->dsn;
         }
-        
+
         return "{$this->dsn_prefix}:{$dsn_string}";
     }
-    
+
     /**
      * 
      * Returns the PDO connection object; if it does not exist, creates it to
@@ -212,7 +220,7 @@ abstract class AbstractAdapter
         }
         return $this->pdo;
     }
-    
+
     /**
      * 
      * Connects to the database by creating the PDO object.
@@ -226,7 +234,7 @@ abstract class AbstractAdapter
         $this->pdo = $this->newPdo();
         $this->postConnect();
     }
-    
+
     /**
      * 
      * A hook that executes before the database connection is created.
@@ -237,7 +245,7 @@ abstract class AbstractAdapter
     public function preConnect()
     {
     }
-    
+
     /**
      * 
      * A hook that executes after the database connection is created.
@@ -248,14 +256,14 @@ abstract class AbstractAdapter
     public function postConnect()
     {
     }
-    
+
     /**
      * 
      * Prepares and executes an SQL query, optionally binding values
      * to named placeholders in the query text.
      * 
-     * @param string|Select $spec The text of the SQL query; or, a Select 
-     * object.
+     * @param string|AbstractQuery $query The text of the SQL query; or, a
+     * query object.
      * 
      * @param array $data An associative array of data to bind to named
      * placeholders in the query.
@@ -263,18 +271,14 @@ abstract class AbstractAdapter
      * @return PDOStatement
      * 
      */
-    public function query($spec, array $data = [])
+    public function query($query, array $data = [])
     {
-        if ($spec instanceof Select) {
-            $text = $spec->__toString();
-        } else {
-            $text = $spec;
-        }
-        $stmt = $this->prepare($text, $data);
+        // casts objects to string via __toString()
+        $stmt = $this->prepare((string) $query, $data);
         $this->profiler->exec($stmt, $data);
         return $stmt;
     }
-    
+
     /**
      * 
      * Begins a database transaction and turns off autocommit.
@@ -290,7 +294,7 @@ abstract class AbstractAdapter
         };
         return $this->profiler->call($func, '__BEGIN_TRANSACTION__');
     }
-    
+
     /**
      * 
      * Commits the current database transaction and turns autocommit back on.
@@ -306,7 +310,7 @@ abstract class AbstractAdapter
         };
         return $this->profiler->call($func, '__COMMIT__');
     }
-    
+
     /**
      * 
      * Rolls back the current database transaction and turns autocommit back
@@ -323,7 +327,7 @@ abstract class AbstractAdapter
         };
         return $this->profiler->call($func, '__ROLLBACK__');
     }
-    
+
     /**
      * 
      * Creates a prepared PDOStatment and binds data values to placeholders.
@@ -348,15 +352,15 @@ abstract class AbstractAdapter
     {
         // need the PDO object regardless
         $pdo = $this->getPdo();
-        
+
         // was data passed for binding?
         if (! $data) {
             return $pdo->prepare($text);
         }
-        
+
         // a list of placeholders to bind at the end
         $bind = array();
-        
+
         // find all text parts not inside quotes or backslashed-quotes
         $apos = "'";
         $quot = '"';
@@ -366,21 +370,21 @@ abstract class AbstractAdapter
             -1,
             PREG_SPLIT_DELIM_CAPTURE
         );
-        
+
         // loop through the non-quoted parts (0, 3, 6, 9, etc.)
         $k = count($parts);
         for ($i = 0; $i <= $k; $i += 3) {
-            
+
             // get the part as a reference so it can be modified in place
             $part =& $parts[$i];
-            
+
             // find all :placeholder matches in the part
             preg_match_all(
                 "/\W:([a-zA-Z_][a-zA-Z0-9_]*)/m",
                 $part . PHP_EOL,
                 $matches
             );
-            
+
             // for each of the :placeholder matches ...
             foreach ($matches[1] as $key) {
                 // is the corresponding data element an array?
@@ -396,22 +400,22 @@ abstract class AbstractAdapter
                 }
             }
         }
-        
+
         // bring the parts back together in case they were modified
         $text = implode('', $parts);
-        
+
         // prepare the statement
         $stmt = $pdo->prepare($text);
-        
+
         // for the placeholders we found, bind the corresponding data values
         foreach ($bind as $key) {
             $stmt->bindValue($key, $data[$key]);
         }
-        
+
         // done!
         return $stmt;
     }
-    
+
     /**
      * 
      * Fetches all rows from the database using sequential keys.
@@ -430,7 +434,7 @@ abstract class AbstractAdapter
         $stmt = $this->query($text, $data);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
-    
+
     /**
      * 
      * Fetches all rows from the database using associative keys (defined by
@@ -458,7 +462,7 @@ abstract class AbstractAdapter
         }
         return $data;
     }
-    
+
     /**
      * 
      * Fetches the first column of all rows as a sequential array.
@@ -477,7 +481,7 @@ abstract class AbstractAdapter
         $stmt = $this->query($text, $data);
         return $stmt->fetchAll(PDO::FETCH_COLUMN, 0);
     }
-    
+
     /**
      * 
      * Fetches the very first value (i.e., first column of the first row).
@@ -496,7 +500,7 @@ abstract class AbstractAdapter
         $stmt = $this->query($text, $data);
         return $stmt->fetchColumn(0);
     }
-    
+
     /**
      * 
      * Fetches an associative array of all rows as key-value pairs (first 
@@ -520,7 +524,7 @@ abstract class AbstractAdapter
         }
         return $data;
     }
-    
+
     /**
      * 
      * Fetches one row from the database.
@@ -539,7 +543,7 @@ abstract class AbstractAdapter
         $stmt = $this->query($text, $data);
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
-    
+
     /**
      * 
      * Safely quotes a value for an SQL statement.
@@ -570,7 +574,7 @@ abstract class AbstractAdapter
             return $pdo->quote($val);
         }
     }
-    
+
     /**
      * 
      * Quotes a value and places into a piece of text at a placeholder; the
@@ -594,36 +598,36 @@ abstract class AbstractAdapter
             // no replacements needed
             return $text;
         }
-        
+
         // only one placeholder?
         if ($count == 1) {
             $data = $this->quote($data);
             $text = str_replace('?', $data, $text);
             return $text;
         }
-        
+
         // more than one placeholder
         $offset = 0;
         foreach ((array) $data as $val) {
-            
+
             // find the next placeholder
             $pos = strpos($text, '?', $offset);
             if ($pos === false) {
                 // no more placeholders, exit the data loop
                 break;
             }
-            
+
             // replace this question mark with a quoted value
             $val  = $this->quote($val);
             $text = substr_replace($text, $val, $pos, 1);
-            
+
             // update the offset to move us past the quoted value
             $offset = $pos + strlen($val);
         }
-        
+
         return $text;
     }
-    
+
     /**
      * 
      * Quote multiple text-and-value pieces.
@@ -667,14 +671,14 @@ abstract class AbstractAdapter
             } else {
                 // string $key means a phrase with a placeholder, and
                 // $val should be bound into it.
-                $text[] = $this->quoteInto($key, $val); 
+                $text[] = $this->quoteInto($key, $val);
             }
         }
-        
+
         // return the condition list
         return implode($sep, $text);
     }
-    
+
     /**
      * 
      * Quotes a single identifier name (table, table alias, table column, 
@@ -700,7 +704,7 @@ abstract class AbstractAdapter
     {
         // remove extraneous spaces
         $spec = trim($spec);
-        
+
         // `original` AS `alias` ... note the 'rr' in strripos
         $pos = strripos($spec, ' AS ');
         if ($pos) {
@@ -711,7 +715,7 @@ abstract class AbstractAdapter
             // done
             return "$orig AS $alias";
         }
-        
+
         // `original` `alias`
         $pos = strrpos($spec, ' ');
         if ($pos) {
@@ -722,7 +726,7 @@ abstract class AbstractAdapter
             // done
             return "$orig $alias";
         }
-        
+
         // `table`.`column`
         $pos = strrpos($spec, '.');
         if ($pos) {
@@ -731,11 +735,11 @@ abstract class AbstractAdapter
             $col   = $this->replaceName(substr($spec, $pos + 1));
             return "$table.$col";
         }
-        
+
         // `name`
         return $this->replaceName($spec);
     }
-    
+
     /**
      * 
      * Quotes all fully-qualified identifier names ("table.col") in a string,
@@ -759,7 +763,7 @@ abstract class AbstractAdapter
         // single and double quotes
         $apos = "'";
         $quot = '"';
-        
+
         // look for ', ", \', or \" in the string.
         // match closing quotes against the same number of opening quotes.
         $list = preg_split(
@@ -768,12 +772,12 @@ abstract class AbstractAdapter
             -1,
             PREG_SPLIT_DELIM_CAPTURE
         );
-        
+
         // concat the pieces back together, quoting names as we go.
         $text = null;
         $last = count($list) - 1;
         foreach ($list as $key => $val) {
-            
+
             // skip elements 2, 5, 8, 11, etc. as artifacts of the back-
             // referenced split; these are the trailing/ending quote
             // portions, and already included in the previous element.
@@ -781,11 +785,11 @@ abstract class AbstractAdapter
             if (($key+1) % 3 == 0) {
                 continue;
             }
-            
+
             // is there an apos or quot anywhere in the part?
             $is_string = strpos($val, $apos) !== false ||
                          strpos($val, $quot) !== false;
-            
+
             if ($is_string) {
                 // string literal
                 $text .= $val;
@@ -801,16 +805,16 @@ abstract class AbstractAdapter
                         $val = substr($val, 0, $pos) . " AS $alias";
                     }
                 }
-                
+
                 // now quote names in the language.
                 $text .= $this->replaceNamesIn($val);
             }
         }
-        
+
         // done!
         return $text;
     }
-    
+
     /**
      * 
      * Inserts a row of data into a table.
@@ -825,29 +829,13 @@ abstract class AbstractAdapter
      */
     public function insert($table, array $cols)
     {
-        // the base command text
-        $text = 'INSERT INTO ' . $this->quoteName($table);
-        
-        // col names
-        $keys = array_keys($cols);
-        
-        // quote the col names for a list
-        $names = [];
-        foreach ($keys as $key) {
-            $names[] = $this->quoteName($key);
-        }
-        
-        // add quoted names as a comma-separated list
-        $text .= '(' . implode(', ', $names) . ') ';
-        
-        // add value placeholders (use unquoted key names)
-        $text .= 'VALUES (:' . implode(', :', $keys) . ')';
-        
-        // execute the statement
-        $stmt = $this->query($text, $cols);
+        $insert = $this->newInsert();
+        $insert->into($table);
+        $insert->cols(array_keys($cols));
+        $stmt = $this->query($insert, $cols);
         return $stmt->rowCount();
     }
-    
+
     /**
      * 
      * Updates a table with specified data based on WHERE conditions.
@@ -859,42 +847,26 @@ abstract class AbstractAdapter
      * 
      * @param string $cond Conditions for a WHERE clause.
      * 
-     * @param array $data Additional data to bind to the query; note that the
-     * $cols values will take precedence over these additional values.
+     * @param array $data Additional data to bind to the query; these are not
+     * part of the update, and note that the $cols values will take precedence
+     * over these additional values.
      * 
      * @return int The number of rows affected.
      * 
      */
     public function update($table, array $cols, $cond, array $data = [])
     {
-        // the base command text
-        $text = 'UPDATE ' . $this->quoteName($table) . ' SET ';
-        
-        // add "col = :col" pairs to the statement
-        $list = [];
-        foreach ($cols as $col => $val) {
-            if (is_int($col)) {
-                $list[] = $this->quoteNamesIn($val);
-            } else {
-                $list[] = $this->quoteName($col) . " = :$col";
-            }
-        }
-        $text .= implode(', ', $list);
-        
-        // add the where clause
+        $update = $this->newUpdate();
+        $update->table($table);
+        $update->cols(array_keys($cols));
         if ($cond) {
-            $text .= ' WHERE ' . $this->quoteNamesIn($cond);
+            $update->where($cond);
         }
-        
-        // merge cols and extra data. note that the cols take precedence over
-        // the extra data.
         $data = array_merge($data, $cols);
-        
-        // execute the statement
-        $stmt = $this->query($text, $data);
+        $stmt = $this->query($update, $data);
         return $stmt->rowCount();
     }
-    
+
     /**
      * 
      * Deletes rows from the table based on WHERE conditions.
@@ -910,23 +882,63 @@ abstract class AbstractAdapter
      */
     public function delete($table, $cond, array $data = [])
     {
-        // the base command text
-        $text = 'DELETE FROM ' . $this->quoteName($table);
-        
-        // add the where clause
+        $delete = $this->newDelete();
+        $delete->from($table);
         if ($cond) {
-            $text .= ' WHERE ' . $this->quoteNamesIn($cond);
+            $delete->where($cond);
         }
-        
-        $stmt = $this->query($text, $data);
+        $stmt = $this->query($delete, $data);
         return $stmt->rowCount();
     }
-    
+
+    /**
+     * 
+     * Returns a new Select object.
+     * 
+     * @return Select
+     * 
+     */
     public function newSelect()
     {
-        return $this->select_factory->newInstance($this);
+        return $this->query_factory->newInstance('select', $this);
     }
-    
+
+    /**
+     * 
+     * Returns a new Insert object.
+     * 
+     * @return Insert
+     * 
+     */
+    public function newInsert()
+    {
+        return $this->query_factory->newInstance('insert', $this);
+    }
+
+    /**
+     * 
+     * Returns a new Update object.
+     * 
+     * @return Update
+     * 
+     */
+    public function newUpdate()
+    {
+        return $this->query_factory->newInstance('update', $this);
+    }
+
+    /**
+     * 
+     * Returns a new Delete object.
+     * 
+     * @return Update
+     * 
+     */
+    public function newDelete()
+    {
+        return $this->query_factory->newInstance('delete', $this);
+    }
+
     /**
      * 
      * Modifies an SQL string **in place** to add a `LIMIT ... OFFSET` clause.
@@ -944,7 +956,7 @@ abstract class AbstractAdapter
     {
         $count  = (int) $count;
         $offset = (int) $offset;
-        
+
         if ($count && $offset) {
             $text .= "LIMIT $count OFFSET $offset" . PHP_EOL;
         } elseif ($count) {
@@ -953,7 +965,7 @@ abstract class AbstractAdapter
             $text .= "OFFSET $offset" . PHP_EOL;
         }
     }
-    
+
     /**
      * 
      * Creates a new PDO object.
@@ -964,15 +976,15 @@ abstract class AbstractAdapter
     protected function newPdo()
     {
         $pdo = new PDO(
-            $this->getDsnString(), 
-            $this->username, 
-            $this->password, 
+            $this->getDsnString(),
+            $this->username,
+            $this->password,
             $this->options
         );
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         return $pdo;
     }
-    
+
     /**
      * 
      * Quotes an identifier name (table, index, etc); ignores empty values and
@@ -996,7 +1008,7 @@ abstract class AbstractAdapter
                  . $this->quote_name_suffix;
         }
     }
-    
+
     /**
      * 
      * Quotes all fully-qualified identifier names ("table.col") in a string.
@@ -1012,9 +1024,9 @@ abstract class AbstractAdapter
     protected function replaceNamesIn($text)
     {
         $word = "[a-z_][a-z0-9_]+";
-        
+
         $find = "/(\\b)($word)\\.($word)(\\b)/i";
-        
+
         $repl = '$1'
               . $this->quote_name_prefix
               . '$2'
@@ -1025,12 +1037,12 @@ abstract class AbstractAdapter
               . $this->quote_name_suffix
               . '$4'
               ;
-              
+
         $text = preg_replace($find, $repl, $text);
-        
+
         return $text;
     }
-    
+
     /**
      * 
      * Given a column specification, parse into datatype, size, and 
@@ -1048,7 +1060,7 @@ abstract class AbstractAdapter
         $type  = null;
         $size  = null;
         $scale = null;
-        
+
         // find the parens, if any
         $pos = strpos($spec, '(');
         if ($pos === false) {
@@ -1057,11 +1069,11 @@ abstract class AbstractAdapter
         } else {
             // find the type first.
             $type = substr($spec, 0, $pos);
-            
+
             // there were parens, so there's at least a size.
             // remove parens to get the size.
             $size = trim(substr($spec, $pos), '()');
-            
+
             // a comma in the size indicates a scale.
             $pos = strpos($size, ',');
             if ($pos !== false) {
@@ -1069,10 +1081,10 @@ abstract class AbstractAdapter
                 $size  = substr($size, 0, $pos);
             }
         }
-        
+
         return [$type, $size, $scale];
     }
-    
+
     /**
      * 
      * Returns an list of tables in the database.
@@ -1084,7 +1096,7 @@ abstract class AbstractAdapter
      * 
      */
     abstract public function fetchTableList($schema = null);
-    
+
     /**
      * 
      * Returns an array of columns in a table.
@@ -1097,7 +1109,7 @@ abstract class AbstractAdapter
      * 
      */
     abstract public function fetchTableCols($spec);
-    
+
     /**
      * 
      * Splits an identifier name into two parts, based on the location of the
@@ -1120,3 +1132,4 @@ abstract class AbstractAdapter
         }
     }
 }
+ 
