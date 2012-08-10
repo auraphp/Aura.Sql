@@ -1,6 +1,6 @@
 {
     "name": "Aura/Sql",
-    "type": "library",
+    "type": "aura-package",
     "description": "A wrapper around PDO that provides adapters and convenience methods for MySQL, PostgreSQL, SQLite, and SQL Server.",
     "keywords": [
         "mysql",
