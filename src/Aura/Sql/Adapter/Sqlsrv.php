@@ -164,4 +164,3 @@ class Sqlsrv extends AbstractAdapter
         }
     }
 }
- 

@@ -181,4 +181,3 @@ class Column
         return $column;
     }
 }
- 

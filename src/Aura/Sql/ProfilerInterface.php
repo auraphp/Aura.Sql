@@ -95,4 +95,3 @@ interface ProfilerInterface
      */
     public function getProfiles();
 }
- 

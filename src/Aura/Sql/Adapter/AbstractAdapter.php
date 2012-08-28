@@ -1132,4 +1132,3 @@ abstract class AbstractAdapter
         }
     }
 }
- 

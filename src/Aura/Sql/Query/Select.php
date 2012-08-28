@@ -607,4 +607,3 @@ class Select extends AbstractQuery
         $this->for_update = false;
     }
 }
- 

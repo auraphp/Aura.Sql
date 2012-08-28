@@ -216,4 +216,3 @@ class Pgsql extends AbstractAdapter
         return $pdo->lastInsertId($name);
     }
 }
- 

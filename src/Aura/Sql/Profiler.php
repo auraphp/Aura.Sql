@@ -156,4 +156,3 @@ class Profiler implements ProfilerInterface
         return $this->profiles;
     }
 }
- 

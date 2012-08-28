@@ -239,4 +239,3 @@ class Sqlite extends AbstractAdapter
         return $pdo->lastInsertId();
     }
 }
- 

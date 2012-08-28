@@ -21,4 +21,3 @@ use Aura\Sql\Exception;
 class NoSuchSlave extends Exception
 {
 }
- 

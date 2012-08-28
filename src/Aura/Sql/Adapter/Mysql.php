@@ -168,4 +168,3 @@ class Mysql extends AbstractAdapter
         return $pdo->lastInsertId();
     }
 }
- 

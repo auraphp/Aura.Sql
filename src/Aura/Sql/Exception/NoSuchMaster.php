@@ -21,4 +21,3 @@ use Aura\Sql\Exception;
 class NoSuchMaster extends Exception
 {
 }
- 
