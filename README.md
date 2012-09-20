@@ -41,7 +41,7 @@ $sql = $adapter_factory->newInstance(
 );
 ```
 
-Alternatively, you can add `'/path/to/Aura.Sql/src` to your autoloader and
+Alternatively, you can add `'/path/to/Aura.Sql/src'` to your autoloader and
 build an adapter factory manually:
     
 ```php
