@@ -35,7 +35,7 @@ class ConnectionLocator
      * @var array
      * 
      */
-    protected $conn = [
+    protected $connection = [
         'default' => null,
         'masters' => [],
         'slaves'  => [],
@@ -210,8 +210,8 @@ class ConnectionLocator
      */
     public function getDefault()
     {
-        if (! $this->conn['default'] instanceof AbstractConnection) {
-            $this->conn['default'] = $this->connection_factory->newInstance(
+        if (! $this->connection['default'] instanceof AbstractConnection) {
+            $this->connection['default'] = $this->connection_factory->newInstance(
                 $this->default['connection'],
                 $this->default['dsn'],
                 $this->default['username'],
@@ -219,7 +219,7 @@ class ConnectionLocator
                 $this->default['options']
             );
         }
-        return $this->conn['default'];
+        return $this->connection['default'];
     }
 
     /**
@@ -240,12 +240,12 @@ class ConnectionLocator
             throw new Exception\NoSuchMaster($name);
         }
 
-        $is_conn = isset($this->conn['masters'][$name])
-                && $this->conn['masters'][$name] instanceof AbstractConnection;
+        $is_conn = isset($this->connection['masters'][$name])
+                && $this->connection['masters'][$name] instanceof AbstractConnection;
 
         if (! $is_conn) {
             $params = $this->merge($this->default, $this->masters[$name]);
-            $this->conn['masters'][$name] = $this->connection_factory->newInstance(
+            $this->connection['masters'][$name] = $this->connection_factory->newInstance(
                 $params['connection'],
                 $params['dsn'],
                 $params['username'],
@@ -254,7 +254,7 @@ class ConnectionLocator
             );
         }
 
-        return $this->conn['masters'][$name];
+        return $this->connection['masters'][$name];
     }
 
     /**
@@ -275,12 +275,12 @@ class ConnectionLocator
             throw new Exception\NoSuchSlave($name);
         }
 
-        $is_conn = isset($this->conn['slaves'][$name])
-                && $this->conn['slaves'][$name] instanceof AbstractConnection;
+        $is_conn = isset($this->connection['slaves'][$name])
+                && $this->connection['slaves'][$name] instanceof AbstractConnection;
 
         if (! $is_conn) {
             $params = $this->merge($this->default, $this->slaves[$name]);
-            $this->conn['slaves'][$name] = $this->connection_factory->newInstance(
+            $this->connection['slaves'][$name] = $this->connection_factory->newInstance(
                 $params['connection'],
                 $params['dsn'],
                 $params['username'],
@@ -288,7 +288,7 @@ class ConnectionLocator
                 $params['options']
             );
         }
-        return $this->conn['slaves'][$name];
+        return $this->connection['slaves'][$name];
     }
 
     /**
