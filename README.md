@@ -24,7 +24,7 @@ get an `ConnectionFactory` and create your connection through it:
 ```php
 <?php
 $connection_factory = include '/path/to/Aura.Sql/scripts/instance.php';
-$sql = $connection_factory->newInstance(
+$connection = $connection_factory->newInstance(
     
     // connection name
     'mysql',
@@ -48,11 +48,11 @@ build an connection factory manually:
 <?php
 use Aura\Sql\ConnectionFactory;
 $connection_factory = new ConnectionFactory;
-$sql = $connection_factory->newInstance(...);
+$connection = $connection_factory->newInstance(...);
 ```
     
-Aura SQL comes with three connections: `'mysql'` for MySQL, `'pgsql'` for
-PostgreSQL, and `'sqlite'` for SQLite3.
+Aura SQL comes with three connection adapters: `'mysql'` for MySQL, `'pgsql'`
+for PostgreSQL, and `'sqlite'` for SQLite3.
 
 Connecting
 ----------
@@ -65,7 +65,7 @@ You can connect manually by issuing `connect()`:
 
 ```php
 <?php
-$sql->connect();
+$connection->connect();
 ```
 
 
@@ -78,7 +78,7 @@ database.
 ```php
 <?php
 // returns all rows
-$result = $sql->fetchAll('SELECT * FROM foo');
+$result = $connection->fetchAll('SELECT * FROM foo');
 ```
 
 You can fetch results using these methods:
@@ -113,13 +113,13 @@ query text, then pass an array of values to bind to the placeholders:
 $text = 'SELECT * FROM foo WHERE id = :id';
 
 // values to bind to query placeholders
-$data = [
+$bind = [
     'id' => 1,
 ];
 
 // returns one row; the data has been parameterized
 // into a prepared statement for you
-$result = $sql->fetchOne($text, $data);
+$result = $connection->fetchOne($text, $bind);
 ```
 
 Aura SQL recognizes array values and quotes them as comma-separated lists:
@@ -130,14 +130,14 @@ Aura SQL recognizes array values and quotes them as comma-separated lists:
 $text = 'SELECT * FROM foo WHERE id = :id AND bar IN(:bar_list)';
 
 // values to bind to query placeholders
-$data = [
+$bind = [
     'id' => 1,
     'bar_list' => ['a', 'b', 'c'],
 ];
 
 // returns all rows; the query ends up being
 // "SELECT * FROM foo WHERE id = 1 AND bar IN('a', 'b', 'c')"
-$result = $sql->fetchOne($text, $data);
+$result = $connection->fetchOne($text, $bind);
 ```
 
 
@@ -161,15 +161,15 @@ $cols = [
 ];
 
 // perform the insert; result is number of rows affected
-$result = $sql->insert($table, $cols);
+$result = $connection->insert($table, $cols);
 
 // now get the last inserted ID
-$id = $sql->lastInsertId();
+$id = $connection->lastInsertId();
 ```
 
 (N.b.: Because of the way PostgreSQL creates auto-incremented columns, the
 `pgsql` connection needs to know the table and column name to get the last
-inserted ID; for example, `$id = $sql->lastInsertId($table, 'id');`.)
+inserted ID; for example, `$id = $connection->lastInsertId($table, 'id');`.)
 
 Next, to update rows:
 
@@ -187,14 +187,14 @@ $cols = [
 $cond = 'id = :id';
 
 // additional data to bind to the query
-$data = ['id' => 1];
+$bind = ['id' => 1];
 
 // perform the update; result is number of rows affected
-$result = $sql->update($table, $cols, $cond, $data);
+$result = $connection->update($table, $cols, $cond, $bind);
 ```
 
-> (N.b.: Both `$cols` and `$data` are bound into the update query, but `$cols`
-> takes precedence. Be sure that the keys in `$cols` and `$data` do not
+> (N.b.: Both `$cols` and `$bind` are bound into the update query, but `$cols`
+> takes precedence. Be sure that the keys in `$cols` and `$bind` do not
 > conflict.)
 
 Finally, to delete rows:
@@ -208,10 +208,10 @@ $table = 'foo';
 $cond = 'id = :id';
 
 // data to bind to the query
-$data = ['id' => 1];
+$bind = ['id' => 1];
 
 // perform the deletion; result is number of rows affected
-$result = $sql->delete($table, $cond, $data);
+$result = $connection->delete($table, $cond, $bind);
 ```
 
 
@@ -223,7 +223,7 @@ To get a list of tables in the database, issue `fetchTableList()`:
 ```php
 <?php
 // get the list of tables
-$list = $sql->fetchTableList();
+$list = $connection->fetchTableList();
 
 // show them
 foreach ($list as $table) {
@@ -239,7 +239,7 @@ To get information about the columns in a table, issue `fetchTableCols()`:
 $table = 'foo';
 
 // get the cols
-$cols = $sql->fetchTableCols($table);
+$cols = $connection->fetchTableCols($table);
 
 // show them
 foreach ($cols as $name => $col) {
@@ -280,15 +280,15 @@ Commits and rollbacks cause the connection to go back into autocommit mode.
 ```php
 <?php
 // turn off autocommit and start a transaction
-$sql->beginTransaction();
+$connection->beginTransaction();
 
 try {
     // ... perform some queries ...
     // now commit to the database:
-    $sql->commit();
+    $connection->commit();
 } catch (Exception $e) {
     // there was an error, roll back the queries
-    $sql->rollBack();
+    $connection->rollBack();
 }
 
 // at this point we are back in autocommit mode
@@ -304,8 +304,8 @@ You can, of course, build and issue your own queries by hand. Use the
 ```php
 <?php
 $text = "SELECT * FROM foo WHERE id = :id";
-$data = ['id' => 1];
-$stmt = $sql->query($text, $data)
+$bind = ['id' => 1];
+$stmt = $connection->query($text, $bind)
 ```
 
 The returned `$stmt` is a [PDOStatement](http://php.net/PDOStatement) that you
@@ -319,13 +319,13 @@ You can use profiling to see how well your queries are performing.
 ```php
 <?php
 // turn on the profiler
-$sql->getProfiler()->setActive(true);
+$connection->getProfiler()->setActive(true);
 
 // issue a query
-$result = $sql->fetchAll('SELECT * FROM foo');
+$result = $connection->fetchAll('SELECT * FROM foo');
 
 // now get the profiler information
-foreach ($sql->getProfiler()->getProfiles() as $i => $profile) {
+foreach ($connection->getProfiler()->getProfiles() as $i => $profile) {
     echo 'Query #' . ($i + 1)
        . ' took ' . $profile->time . ' seconds.'
        . PHP_EOL;
@@ -360,7 +360,7 @@ You can then modify the `Select` object and pass it to the `query()` or
 ```php
 <?php
 // create a new Select object
-$select = $sql->newSelect();
+$select = $connection->newSelect();
 
 // SELECT * FROM foo WHERE bar > :bar ORDER BY baz
 $select->cols(['*'])
@@ -368,9 +368,9 @@ $select->cols(['*'])
        ->where('bar > :bar')
        ->orderBy('baz');
 
-$data['foo' => '88'];
+$bind['foo' => '88'];
 
-$list = $sql->fetchAll($select, $data);
+$list = $connection->fetchAll($select, $bind);
 ```
 
 The `Select` object has these methods and more; please read the source code
@@ -413,19 +413,19 @@ You can then modify the `Insert` object and pass it to the `query()` method.
 ```php
 <?php
 // create a new Insert object
-$insert = $sql->newInsert();
+$insert = $connection->newInsert();
 
 // INSERT INTO foo (bar, baz, date) VALUES (:foo, :bar, NOW());
 $insert->into('foo')
        ->cols(['bar', 'baz'])
        ->set('date', 'NOW()');
 
-$data[
+$bind[
     'foo' => null,
     'bar' => 'zim',
 ];
 
-$stmt = $sql->query($insert, $data);
+$stmt = $connection->query($insert, $bind);
 ```
 
 Update
@@ -437,7 +437,7 @@ You can then modify the `Update` object and pass it to the `query()` method.
 ```php
 <?php
 // create a new Update object
-$update = $sql->newUpdate();
+$update = $connection->newUpdate();
 
 // UPDATE foo SET bar = :bar, baz = :baz, date = NOW() WHERE zim = :zim OR gir = :gir
 $update->table('foo')
@@ -446,7 +446,7 @@ $update->table('foo')
        ->where('zim = :zim')
        ->orWhere('gir = :gir');
 
-$data[
+$bind[
     'foo' => null,
     'bar' => 'barbar',
     'baz' => 99,
@@ -454,7 +454,7 @@ $data[
     'gir' => 'doom',
 ];
 
-$stmt = $sql->query($update, $data);
+$stmt = $connection->query($update, $bind);
 ```
 
 Delete
@@ -466,17 +466,17 @@ You can then modify the `Delete` object and pass it to the `query()` method.
 ```php
 <?php
 // create a new Delete object
-$delete = $sql->newDelete();
+$delete = $connection->newDelete();
 
 // DELETE FROM WHERE zim = :zim OR gir = :gir
 $delete->from('foo')
        ->where('zim = :zim')
        ->orWhere('gir = :gir');
 
-$data[
+$bind[
     'zim' => 'dib',
     'gir' => 'doom',
 ];
 
-$stmt = $sql->query($delete, $data);
+$stmt = $connection->query($delete, $bind);
 ```

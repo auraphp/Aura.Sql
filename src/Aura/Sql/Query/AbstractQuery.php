@@ -37,7 +37,7 @@ abstract class AbstractQuery
      * @var array
      * 
      */
-    protected $data = [];
+    protected $bind = [];
 
     /**
      * 
@@ -99,17 +99,17 @@ abstract class AbstractQuery
              . PHP_EOL;
     }
     
-    public function setData(array $data)
+    public function setBind(array $bind)
     {
-        $this->data = $data;
+        $this->data = $bind;
     }
     
-    public function addData(array $data)
+    public function addBind(array $bind)
     {
-        $this->data = array_merge($this->data, $data);
+        $this->data = array_merge($this->data, $bind);
     }
     
-    public function getData()
+    public function getBind()
     {
         return $this->data;
     }

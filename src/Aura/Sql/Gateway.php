@@ -31,7 +31,7 @@ class Gateway
         $connection = $this->connections->getWrite();
         $insert = $connection->newInsert();
         $this->mapper->modifyInsert($insert, $object);
-        $connection->query($insert, $insert->getData());
+        $connection->query($insert, $insert->getBind());
         return $connection->lastInsertId();
     }
     
@@ -40,7 +40,7 @@ class Gateway
         $connection = $this->connections->getWrite();
         $update = $connection->newUpdate();
         $this->mapper->modifyUpdate($update, $new_object, $old_object);
-        return $connection->query($update, $update->getData());
+        return $connection->query($update, $update->getBind());
     }
     
     public function delete($object)
@@ -48,37 +48,37 @@ class Gateway
         $connection = $this->connections->getWrite();
         $delete = $connection->newDelete();
         $this->mapper->modifyDelete($delete, $object);
-        return $connection->query($delete, $delete->getData());
+        return $connection->query($delete, $delete->getBind());
     }
     
-    public function fetchAll(Select $select, array $data = [])
+    public function fetchAll(Select $select, array $bind = [])
     {
         $connection = $select->getConnection();
-        return $connection->fetchAll($select, $data);
+        return $connection->fetchAll($select, $bind);
     }
     
-    public function fetchCol(Select $select, array $data = [])
+    public function fetchCol(Select $select, array $bind = [])
     {
         $connection = $select->getConnection();
-        return $connection->fetchCol($select, $data);
+        return $connection->fetchCol($select, $bind);
     }
     
-    public function fetchOne(Select $select, array $data = [])
+    public function fetchOne(Select $select, array $bind = [])
     {
         $connection = $select->getConnection();
-        return $connection->fetchOne($select, $data);
+        return $connection->fetchOne($select, $bind);
     }
     
-    public function fetchPairs(Select $select, array $data = [])
+    public function fetchPairs(Select $select, array $bind = [])
     {
         $connection = $select->getConnection();
-        return $connection->fetchPairs($select, $data);
+        return $connection->fetchPairs($select, $bind);
     }
     
-    public function fetchValue(Select $select, array $data = [])
+    public function fetchValue(Select $select, array $bind = [])
     {
         $connection = $select->getConnection();
-        return $connection->fetchValue($select, $data);
+        return $connection->fetchValue($select, $bind);
     }
 
     public function newSelect(array $cols = [])

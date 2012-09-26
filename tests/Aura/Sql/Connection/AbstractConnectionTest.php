@@ -180,8 +180,8 @@ abstract class AbstractConnectionTest extends \PHPUnit_Framework_TestCase
     public function testQueryWithData()
     {
         $text = "SELECT * FROM {$this->table} WHERE id <= :val";
-        $data['val'] = '5';
-        $stmt = $this->connection->query($text, $data);
+        $bind['val'] = '5';
+        $stmt = $this->connection->query($text, $bind);
         $this->assertInstanceOf('PDOStatement', $stmt);
         $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
         $expect = 5;
@@ -193,10 +193,10 @@ abstract class AbstractConnectionTest extends \PHPUnit_Framework_TestCase
     {
         $text = "SELECT * FROM {$this->table} WHERE id IN (:list) OR id = :id";
         
-        $data['list'] = [1, 2, 3, 4];
-        $data['id'] = 5;
+        $bind['list'] = [1, 2, 3, 4];
+        $bind['id'] = 5;
         
-        $stmt = $this->connection->query($text, $data);
+        $stmt = $this->connection->query($text, $bind);
         $this->assertInstanceOf('PDOStatement', $stmt);
         $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
         $expect = 5;
@@ -227,13 +227,13 @@ abstract class AbstractConnectionTest extends \PHPUnit_Framework_TestCase
                  AND id IN (:list)
                  AND \"leave :bar alone\"";
         
-        $data = [
+        $bind = [
             'list' => [1, 2, 3, 4, 5],
             'foo' => 'WRONG',
             'bar' => 'WRONG',
         ];
         
-        $stmt = $this->connection->prepare($text, $data);
+        $stmt = $this->connection->prepare($text, $bind);
         
         $expect = str_replace(':list', '1, 2, 3, 4, 5', $text);
         $actual = $stmt->queryString;
@@ -461,8 +461,8 @@ abstract class AbstractConnectionTest extends \PHPUnit_Framework_TestCase
     {
         $cols   = ['name' => 'Annabelle'];
         $where  = 'id = :id';
-        $data   = ['id' => 1];
-        $actual = $this->connection->update($this->table, $cols, $where, $data);
+        $bind   = ['id' => 1];
+        $actual = $this->connection->update($this->table, $cols, $where, $bind);
         
         // did it update?
         $actual = $this->connection->fetchOne("SELECT id, name FROM {$this->table} WHERE id = 1");
@@ -479,8 +479,8 @@ abstract class AbstractConnectionTest extends \PHPUnit_Framework_TestCase
     // {
     //     $cols   = ['name = 99'];
     //     $where  = 'id = :id';
-    //     $data   = ['id' => 1];
-    //     $actual = $this->connection->update($this->table, $cols, $where, $data);
+    //     $bind   = ['id' => 1];
+    //     $actual = $this->connection->update($this->table, $cols, $where, $bind);
     //     
     //     // did it update?
     //     $actual = $this->connection->fetchOne("SELECT id, name FROM {$this->table} WHERE id = 1");
@@ -496,8 +496,8 @@ abstract class AbstractConnectionTest extends \PHPUnit_Framework_TestCase
     public function testDelete()
     {
         $where  = 'id = :id';
-        $data   = ['id' => 1];
-        $actual = $this->connection->delete($this->table, $where, $data);
+        $bind   = ['id' => 1];
+        $actual = $this->connection->delete($this->table, $where, $bind);
         
         // did it delete?
         $actual = $this->connection->fetchOne("SELECT * FROM {$this->table} WHERE id = 1");

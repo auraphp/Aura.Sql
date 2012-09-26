@@ -100,18 +100,18 @@ abstract class AbstractMapper
     
     public function modifyInsert(Insert $insert, $object)
     {
-        $data = $this->getInsertData($object);
+        $bind = $this->getInsertData($object);
         $insert->into($this->table);
-        $insert->cols(array_keys($data));
-        $insert->addData($data);
+        $insert->cols(array_keys($bind));
+        $insert->addBind($bind);
     }
     
     public function modifyUpdate(Update $update, $new_object, $old_object = null)
     {
-        $data = $this->getUpdateData($new_object, $old_object);
+        $bind = $this->getUpdateData($new_object, $old_object);
         $update->table($this->getTable());
-        $update->cols(array_keys($data));
-        $update->addData($data);
+        $update->cols(array_keys($bind));
+        $update->addBind($bind);
         $update->where(
             $this->getPrimaryCol() . ' = ?',
             $this->getIdentityValue($object)
@@ -129,11 +129,11 @@ abstract class AbstractMapper
     
     public function getInsertData($object)
     {
-        $data = [];
+        $bind = [];
         foreach ($this->cols_fields as $col => $field) {
-            $data[$col] = $object->$field;
+            $bind[$col] = $object->$field;
         }
-        return $data;
+        return $bind;
     }
     
     public function getUpdateData($new_object, $old_object = null)
@@ -142,24 +142,24 @@ abstract class AbstractMapper
             return $this->getUpdateDataChanges();
         }
         
-        $data = [];
+        $bind = [];
         foreach ($this->cols_fields as $col => $field) {
-            $data[$col] = $new_object->$field;
+            $bind[$col] = $new_object->$field;
         }
-        return $data;
+        return $bind;
     }
     
     public function getUpdateDataChanges($new_object, $old_object)
     {
-        $data = [];
+        $bind = [];
         foreach ($this->cols_fields as $col => $field) {
             $new = $new_object->$field;
             $old = $old_object->$field;
             if (! $this->compare($new, $old)) {
-                $data[$col] = $new;
+                $bind[$col] = $new;
             }
         }
-        return $data;
+        return $bind;
     }
     
     public function compare($new, $old)
