@@ -62,6 +62,11 @@ abstract class AbstractQuery
      */
     abstract public function __toString();
     
+    public function getSql()
+    {
+        return $this->sql;
+    }
+    
     /**
      * 
      * Returns an array as an indented comma-separated values string.
