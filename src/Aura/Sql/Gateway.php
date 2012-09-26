@@ -28,63 +28,63 @@ class Gateway
     
     public function insert($object)
     {
-        $sql = $this->connections->getWrite();
-        $insert = $sql->newInsert();
+        $connection = $this->connections->getWrite();
+        $insert = $connection->newInsert();
         $this->mapper->modifyInsert($insert, $object);
-        $this->sql->query($insert, $insert->getData());
-        return $this->sql->lastInsertId();
+        $connection->query($insert, $insert->getData());
+        return $connection->lastInsertId();
     }
     
     public function update($new_object, $old_object = null)
     {
-        $sql = $this->connections->getWrite();
-        $update = $sql->newUpdate();
+        $connection = $this->connections->getWrite();
+        $update = $connection->newUpdate();
         $this->mapper->modifyUpdate($update, $new_object, $old_object);
-        return $this->sql->query($update, $update->getData());
+        return $connection->query($update, $update->getData());
     }
     
     public function delete($object)
     {
-        $sql = $this->connections->getWrite();
-        $delete = $sql->newDelete();
+        $connection = $this->connections->getWrite();
+        $delete = $connection->newDelete();
         $this->mapper->modifyDelete($delete, $object);
-        return $this->sql->query($delete, $delete->getData());
+        return $connection->query($delete, $delete->getData());
     }
     
     public function fetchAll(Select $select, array $data = [])
     {
-        $sql = $select->getSql();
-        return $sql->fetchAll($select, $data);
+        $connection = $select->getConnection();
+        return $connection->fetchAll($select, $data);
     }
     
     public function fetchCol(Select $select, array $data = [])
     {
-        $sql = $select->getSql();
-        return $sql->fetchCol($select, $data);
+        $connection = $select->getConnection();
+        return $connection->fetchCol($select, $data);
     }
     
     public function fetchOne(Select $select, array $data = [])
     {
-        $sql = $select->getSql();
-        return $sql->fetchOne($select, $data);
+        $connection = $select->getConnection();
+        return $connection->fetchOne($select, $data);
     }
     
     public function fetchPairs(Select $select, array $data = [])
     {
-        $sql = $select->getSql();
-        return $sql->fetchPairs($select, $data);
+        $connection = $select->getConnection();
+        return $connection->fetchPairs($select, $data);
     }
     
     public function fetchValue(Select $select, array $data = [])
     {
-        $sql = $select->getSql();
-        return $sql->fetchValue($select, $data);
+        $connection = $select->getConnection();
+        return $connection->fetchValue($select, $data);
     }
 
     public function newSelect(array $cols = [])
     {
-        $sql = $this->connections->getRead();
-        $select = $sql->newSelect();
+        $connection = $this->connections->getRead();
+        $select = $connection->newSelect();
         $this->mapper->modifySelect($select, $cols);
         return $select;
     }

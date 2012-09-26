@@ -58,7 +58,7 @@ class Delete extends AbstractQuery
      */
     public function from($table)
     {
-        $this->table = $this->sql->quoteName($table);
+        $this->table = $this->connection->quoteName($table);
         return $this;
     }
 }

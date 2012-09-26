@@ -57,7 +57,7 @@ class Insert extends AbstractQuery
      */
     public function into($table)
     {
-        $this->table = $this->sql->quoteName($table);
+        $this->table = $this->connection->quoteName($table);
         return $this;
     }
 }

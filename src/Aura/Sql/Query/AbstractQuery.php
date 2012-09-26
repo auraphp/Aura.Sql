@@ -28,7 +28,7 @@ abstract class AbstractQuery
      * @var AbstractConnection
      * 
      */
-    protected $sql;
+    protected $connection;
 
     /**
      * 
@@ -43,14 +43,14 @@ abstract class AbstractQuery
      * 
      * Constructor.
      * 
-     * @param AbstractConnection $sql An SQL connection.
+     * @param AbstractConnection $connection An SQL connection.
      * 
      * @return void
      * 
      */
-    public function __construct(AbstractConnection $sql)
+    public function __construct(AbstractConnection $connection)
     {
-        $this->sql = $sql;
+        $this->connection = $connection;
     }
     
     /**
@@ -62,9 +62,9 @@ abstract class AbstractQuery
      */
     abstract public function __toString();
     
-    public function getSql()
+    public function getConnection()
     {
-        return $this->sql;
+        return $this->connection;
     }
     
     /**
