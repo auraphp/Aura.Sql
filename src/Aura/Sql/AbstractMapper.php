@@ -154,7 +154,7 @@ abstract class AbstractMapper
         $data = [];
         foreach ($this->cols_fields as $col => $field) {
             $new = $new_object->$field;
-            $old = $old_object->$field];
+            $old = $old_object->$field;
             if (! $this->compare($new, $old)) {
                 $data[$col] = $new;
             }
