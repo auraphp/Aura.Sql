@@ -17,7 +17,7 @@ namespace Aura\Sql;
  * @package Aura.Sql
  * 
  */
-class ConnectionManager
+class AdapterLocator
 {
     /**
      * 
@@ -293,7 +293,7 @@ class ConnectionManager
 
     /**
      * 
-     * A somewhat more friendly merge function thatn array_merge_recursive()
+     * A merge function somewhat more friendly than array_merge_recursive()
      * (we need to override sequential values, not append them).
      * 
      * @param array $baseline The baseline values.
