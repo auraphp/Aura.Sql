@@ -1,10 +1,10 @@
 <?php
-namespace Aura\Sql\Adapter;
+namespace Aura\Sql\Connection;
 use Aura\Sql\ProfilerInterface;
 use Aura\Sql\ColumnFactory;
 use Aura\Sql\Query\Factory as QueryFactory;
 
-class Mock extends AbstractAdapter
+class Mock extends AbstractConnection
 {
     protected $params = [];
     

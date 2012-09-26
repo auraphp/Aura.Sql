@@ -4,21 +4,21 @@ namespace Aura\Sql;
 // table data gateway
 class Gateway
 {
-    protected $adapters;
+    protected $connections;
     
     protected $mapper;
     
     public function __construct(
-        AdapterLocator $adapters,
+        ConnectionLocator $connections,
         AbstractMapper $mapper
     ) {
-        $this->adapters = $adapters;
+        $this->connections = $connections;
         $this->mapper   = $mapper;
     }
     
-    public function getAdapters()
+    public function getConnections()
     {
-        return $this->adapters;
+        return $this->connections;
     }
     
     public function getMapper()
@@ -28,7 +28,7 @@ class Gateway
     
     public function insert($object)
     {
-        $sql = $this->adapters->getWrite();
+        $sql = $this->connections->getWrite();
         $insert = $sql->newInsert();
         $this->mapper->modifyInsert($insert, $object);
         $this->sql->query($insert, $insert->getData());
@@ -37,7 +37,7 @@ class Gateway
     
     public function update($new_object, $old_object = null)
     {
-        $sql = $this->adapters->getWrite();
+        $sql = $this->connections->getWrite();
         $update = $sql->newUpdate();
         $this->mapper->modifyUpdate($update, $new_object, $old_object);
         return $this->sql->query($update, $update->getData());
@@ -45,7 +45,7 @@ class Gateway
     
     public function delete($object)
     {
-        $sql = $this->adapters->getWrite();
+        $sql = $this->connections->getWrite();
         $delete = $sql->newDelete();
         $this->mapper->modifyDelete($delete, $object);
         return $this->sql->query($delete, $delete->getData());
@@ -83,7 +83,7 @@ class Gateway
 
     public function newSelect(array $cols = [])
     {
-        $sql = $this->adapters->getRead();
+        $sql = $this->connections->getRead();
         $select = $sql->newSelect();
         $this->mapper->modifySelect($select, $cols);
         return $select;

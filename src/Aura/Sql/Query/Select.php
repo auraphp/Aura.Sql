@@ -10,7 +10,7 @@
  */
 namespace Aura\Sql\Query;
 
-use Aura\Sql\Adapter\AbstractAdapter;
+use Aura\Sql\Connection\AbstractConnection;
 
 /**
  * 
@@ -210,7 +210,7 @@ class Select extends AbstractQuery
             $text .= implode($csep, $this->order_by) . PHP_EOL;
         }
 
-        // modify with a limit clause per the adapter
+        // modify with a limit clause per the connection
         $this->sql->limit($text, $this->limit, $this->offset) . PHP_EOL;
 
         // for update?

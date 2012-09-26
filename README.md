@@ -1,8 +1,8 @@
 Aura SQL
 ========
 
-The Aura SQL package provides adapters to connect to and query against SQL
-data sources such as MySQL, PostgreSQL, and Sqlite. The adapters are mostly
+The Aura SQL package provides connections to connect to and query against SQL
+data sources such as MySQL, PostgreSQL, and Sqlite. The connections are mostly
 wrappers around [PDO](http://php.net/PDO) connections.
 
 This package is compliant with [PSR-0][], [PSR-1][], and [PSR-2][]. If you
@@ -19,14 +19,14 @@ Instantiation
 -------------
 
 The easiest way to get started is to use the `scripts/instance.php` script to
-get an `AdapterFactory` and create your adapter through it:
+get an `ConnectionFactory` and create your connection through it:
 
 ```php
 <?php
-$adapter_factory = include '/path/to/Aura.Sql/scripts/instance.php';
-$sql = $adapter_factory->newInstance(
+$connection_factory = include '/path/to/Aura.Sql/scripts/instance.php';
+$sql = $connection_factory->newInstance(
     
-    // adapter name
+    // connection name
     'mysql',
     
     // DSN elements for PDO; this can also be
@@ -42,23 +42,23 @@ $sql = $adapter_factory->newInstance(
 ```
 
 Alternatively, you can add `'/path/to/Aura.Sql/src'` to your autoloader and
-build an adapter factory manually:
+build an connection factory manually:
     
 ```php
 <?php
-use Aura\Sql\AdapterFactory;
-$adapter_factory = new AdapterFactory;
-$sql = $adapter_factory->newInstance(...);
+use Aura\Sql\ConnectionFactory;
+$connection_factory = new ConnectionFactory;
+$sql = $connection_factory->newInstance(...);
 ```
     
-Aura SQL comes with three adapters: `'mysql'` for MySQL, `'pgsql'` for
+Aura SQL comes with three connections: `'mysql'` for MySQL, `'pgsql'` for
 PostgreSQL, and `'sqlite'` for SQLite3.
 
 Connecting
 ----------
 
-The adapter will lazy-connect to the database the first time you issue a query
-of any sort. This means you can create the adapter object, and if you never
+The connection will lazy-connect to the database the first time you issue a query
+of any sort. This means you can create the connection object, and if you never
 issue a query, it will never connect to the database.
 
 You can connect manually by issuing `connect()`:
@@ -72,7 +72,7 @@ $sql->connect();
 Fetching Results
 ----------------
 
-Once you have an adapter connection, you can begin to fetch results from the
+Once you have an connection connection, you can begin to fetch results from the
 database.
 
 ```php
@@ -168,7 +168,7 @@ $id = $sql->lastInsertId();
 ```
 
 (N.b.: Because of the way PostgreSQL creates auto-incremented columns, the
-`pgsql` adapter needs to know the table and column name to get the last
+`pgsql` connection needs to know the table and column name to get the last
 inserted ID; for example, `$id = $sql->lastInsertId($table, 'id');`.)
 
 Next, to update rows:
@@ -272,10 +272,10 @@ Each column description is a `Column` object with the following properties:
 Transactions
 ------------
 
-Aura SQL adapters always start in autocommit mode (the same as PDO). However,
+Aura SQL connections always start in autocommit mode (the same as PDO). However,
 you can turn off autocommit mode and start a transaction with
 `beginTransaction()`, then either `commit()` or `rollBack()` the transaction.
-Commits and rollbacks cause the adapter to go back into autocommit mode.
+Commits and rollbacks cause the connection to go back into autocommit mode.
 
 ```php
 <?php
@@ -353,7 +353,7 @@ queries in an object-oriented way.
 Select
 ------
 
-To get a new `Select` object, invoke the `newSelect()` method on an adapter.
+To get a new `Select` object, invoke the `newSelect()` method on an connection.
 You can then modify the `Select` object and pass it to the `query()` or
 `fetch*()` method.
 
@@ -407,7 +407,7 @@ for more information.
 Insert
 ------
 
-To get a new `Insert` object, invoke the `newInsert()` method on an adapter.
+To get a new `Insert` object, invoke the `newInsert()` method on an connection.
 You can then modify the `Insert` object and pass it to the `query()` method.
 
 ```php
@@ -431,7 +431,7 @@ $stmt = $sql->query($insert, $data);
 Update
 ------
 
-To get a new `Update` object, invoke the `newUpdate()` method on an adapter.
+To get a new `Update` object, invoke the `newUpdate()` method on an connection.
 You can then modify the `Update` object and pass it to the `query()` method.
 
 ```php
@@ -460,7 +460,7 @@ $stmt = $sql->query($update, $data);
 Delete
 ------
 
-To get a new `Delete` object, invoke the `newDelete()` method on an adapter.
+To get a new `Delete` object, invoke the `newDelete()` method on an connection.
 You can then modify the `Delete` object and pass it to the `query()` method.
 
 ```php

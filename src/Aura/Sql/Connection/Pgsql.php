@@ -8,16 +8,16 @@
  * @license http://opensource.org/licenses/bsd-license.php BSD
  * 
  */
-namespace Aura\Sql\Adapter;
+namespace Aura\Sql\Connection;
 
 /**
  * 
- * PostgreSQL adapter.
+ * PostgreSQL connection.
  * 
  * @package Aura.Sql
  * 
  */
-class Pgsql extends AbstractAdapter
+class Pgsql extends AbstractConnection
 {
     /**
      * 
@@ -107,7 +107,7 @@ class Pgsql extends AbstractAdapter
     {
         list($schema, $table) = $this->splitName($spec);
 
-        // modified from Zend_Db_Adapter_Pdo_Pgsql
+        // modified from Zend_Db_Connection_Pdo_Pgsql
         $cmd = "
             SELECT
                 a.attname AS name,

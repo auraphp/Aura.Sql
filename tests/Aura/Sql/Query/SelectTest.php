@@ -76,7 +76,7 @@ class SelectTest extends AbstractQueryTest
     
     public function testFromSubSelectObject()
     {
-        $sub = $this->adapter->newSelect();
+        $sub = $this->connection->newSelect();
         $sub->cols(['*'])->from('t2');
         
         $this->query->cols(['*'])->fromSubSelect($sub, "a2");
@@ -126,7 +126,7 @@ class SelectTest extends AbstractQueryTest
     
     public function testJoinSubSelectObject()
     {
-        $sub = $this->adapter->newSelect();
+        $sub = $this->connection->newSelect();
         $sub->cols(['*'])->from('t2');
         
         $this->query->joinSubSelect("left", $sub, "a3", "t2.c1 = a3.c1");

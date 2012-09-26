@@ -2,7 +2,7 @@
 /**
  * Mysql
  */
-$GLOBALS['Aura\Sql\Adapter\MysqlTest']['adapter_params'] = [
+$GLOBALS['Aura\Sql\Connection\MysqlTest']['connection_params'] = [
     'dsn' => [
         'host' => 'localhost',
     ],
@@ -11,12 +11,12 @@ $GLOBALS['Aura\Sql\Adapter\MysqlTest']['adapter_params'] = [
     'options' => [],
 ];
 
-$GLOBALS['Aura\Sql\Adapter\MysqlTest']['expect_dsn_string'] = 'mysql:host=localhost';
+$GLOBALS['Aura\Sql\Connection\MysqlTest']['expect_dsn_string'] = 'mysql:host=localhost';
 
 /**
  * Pgsql
  */
-$GLOBALS['Aura\Sql\Adapter\PgsqlTest']['adapter_params'] = [
+$GLOBALS['Aura\Sql\Connection\PgsqlTest']['connection_params'] = [
     'dsn' => [
         'host' => 'localhost',
         'dbname' => 'test',
@@ -26,13 +26,13 @@ $GLOBALS['Aura\Sql\Adapter\PgsqlTest']['adapter_params'] = [
     'options' => [],
 ];
 
-$GLOBALS['Aura\Sql\Adapter\PgsqlTest']['expect_dsn_string'] = 'pgsql:host=localhost;dbname=test';
+$GLOBALS['Aura\Sql\Connection\PgsqlTest']['expect_dsn_string'] = 'pgsql:host=localhost;dbname=test';
 
 /**
  * Sqlite
  */
-$GLOBALS['Aura\Sql\Adapter\SqliteTest']['adapter_params'] = [
+$GLOBALS['Aura\Sql\Connection\SqliteTest']['connection_params'] = [
     'dsn' => ':memory:',
 ];
     
-$GLOBALS['Aura\Sql\Adapter\SqliteTest']['expect_dsn_string'] = 'sqlite::memory:';
+$GLOBALS['Aura\Sql\Connection\SqliteTest']['expect_dsn_string'] = 'sqlite::memory:';

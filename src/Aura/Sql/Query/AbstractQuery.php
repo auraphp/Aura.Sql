@@ -10,7 +10,7 @@
  */
 namespace Aura\Sql\Query;
 
-use Aura\Sql\Adapter\AbstractAdapter;
+use Aura\Sql\Connection\AbstractConnection;
 
 /**
  * 
@@ -23,9 +23,9 @@ abstract class AbstractQuery
 {
     /**
      * 
-     * An SQL connection adapter.
+     * An SQL connection connection.
      * 
-     * @var AbstractAdapter
+     * @var AbstractConnection
      * 
      */
     protected $sql;
@@ -43,12 +43,12 @@ abstract class AbstractQuery
      * 
      * Constructor.
      * 
-     * @param AbstractAdapter $sql An SQL adapter.
+     * @param AbstractConnection $sql An SQL connection.
      * 
      * @return void
      * 
      */
-    public function __construct(AbstractAdapter $sql)
+    public function __construct(AbstractConnection $sql)
     {
         $this->sql = $sql;
     }

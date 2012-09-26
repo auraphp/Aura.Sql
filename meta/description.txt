@@ -1,1 +1,1 @@
-The Aura Sql package is a wrapper around PDO that provides adapters and convenience methods for MySQL, PostgreSQL, SQLite, and SQL Server.
+The Aura Sql package is a wrapper around PDO that provides connections and convenience methods for MySQL, PostgreSQL, SQLite, and SQL Server.

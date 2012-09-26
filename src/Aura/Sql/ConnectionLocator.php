@@ -17,20 +17,20 @@ namespace Aura\Sql;
  * @package Aura.Sql
  * 
  */
-class AdapterLocator
+class ConnectionLocator
 {
     /**
      * 
-     * An SQL adapter factory.
+     * An SQL connection factory.
      * 
-     * @var AdapterFactory
+     * @var ConnectionFactory
      * 
      */
-    protected $adapter_factory;
+    protected $connection_factory;
 
     /**
      * 
-     * SQL adapter connection objects as constructed from their params.
+     * SQL connection connection objects as constructed from their params.
      * 
      * @var array
      * 
@@ -49,7 +49,7 @@ class AdapterLocator
      * 
      */
     protected $default = [
-        'adapter'  => null,
+        'connection'  => null,
         'dsn'      => [],
         'username' => null,
         'password' => null,
@@ -82,7 +82,7 @@ class AdapterLocator
      * 
      * Constructor.
      * 
-     * @param AdapterFactory $adapter_factory An adapter factory to create 
+     * @param ConnectionFactory $connection_factory An connection factory to create 
      * connection objects.
      * 
      * @param array $default An array of key-value pairs for the default
@@ -96,12 +96,12 @@ class AdapterLocator
      * 
      */
     public function __construct(
-        AdapterFactory $adapter_factory,
+        ConnectionFactory $connection_factory,
         array $default = [],
         array $masters = [],
         array $slaves  = []
     ) {
-        $this->adapter_factory = $adapter_factory;
+        $this->connection_factory = $connection_factory;
         $this->setDefault($default);
         foreach ($masters as $name => $params) {
             $this->setMaster($name, $params);
@@ -167,7 +167,7 @@ class AdapterLocator
      * 
      * - If there are no masters, the default connection.
      * 
-     * @return AbstractAdapter
+     * @return AbstractConnection
      * 
      */
     public function getRead()
@@ -189,7 +189,7 @@ class AdapterLocator
      * 
      * - If there are no masters, the default connection.
      * 
-     * @return AbstractAdapter
+     * @return AbstractConnection
      * 
      */
     public function getWrite()
@@ -205,14 +205,14 @@ class AdapterLocator
      * 
      * Returns the default connection object.
      * 
-     * @return AbstractAdapter
+     * @return AbstractConnection
      * 
      */
     public function getDefault()
     {
-        if (! $this->conn['default'] instanceof AbstractAdapter) {
-            $this->conn['default'] = $this->adapter_factory->newInstance(
-                $this->default['adapter'],
+        if (! $this->conn['default'] instanceof AbstractConnection) {
+            $this->conn['default'] = $this->connection_factory->newInstance(
+                $this->default['connection'],
                 $this->default['dsn'],
                 $this->default['username'],
                 $this->default['password'],
@@ -229,7 +229,7 @@ class AdapterLocator
      * @param string $name The master connection name; if not specified,
      * returns a random master connection.
      * 
-     * @return AbstractAdapter
+     * @return AbstractConnection
      * 
      */
     public function getMaster($name = null)
@@ -241,12 +241,12 @@ class AdapterLocator
         }
 
         $is_conn = isset($this->conn['masters'][$name])
-                && $this->conn['masters'][$name] instanceof AbstractAdapter;
+                && $this->conn['masters'][$name] instanceof AbstractConnection;
 
         if (! $is_conn) {
             $params = $this->merge($this->default, $this->masters[$name]);
-            $this->conn['masters'][$name] = $this->adapter_factory->newInstance(
-                $params['adapter'],
+            $this->conn['masters'][$name] = $this->connection_factory->newInstance(
+                $params['connection'],
                 $params['dsn'],
                 $params['username'],
                 $params['password'],
@@ -264,7 +264,7 @@ class AdapterLocator
      * @param string $name The slave connection name; if not specified,
      * returns a random slave.
      * 
-     * @return AbstractAdapter
+     * @return AbstractConnection
      * 
      */
     public function getSlave($name = null)
@@ -276,12 +276,12 @@ class AdapterLocator
         }
 
         $is_conn = isset($this->conn['slaves'][$name])
-                && $this->conn['slaves'][$name] instanceof AbstractAdapter;
+                && $this->conn['slaves'][$name] instanceof AbstractConnection;
 
         if (! $is_conn) {
             $params = $this->merge($this->default, $this->slaves[$name]);
-            $this->conn['slaves'][$name] = $this->adapter_factory->newInstance(
-                $params['adapter'],
+            $this->conn['slaves'][$name] = $this->connection_factory->newInstance(
+                $params['connection'],
                 $params['dsn'],
                 $params['username'],
                 $params['password'],

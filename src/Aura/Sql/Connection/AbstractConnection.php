@@ -8,7 +8,7 @@
  * @license http://opensource.org/licenses/bsd-license.php BSD
  * 
  */
-namespace Aura\Sql\Adapter;
+namespace Aura\Sql\Connection;
 
 use Aura\Sql\ColumnFactory;
 use Aura\Sql\ProfilerInterface;
@@ -24,7 +24,7 @@ use PDOStatement;
  * @package Aura.Sql
  * 
  */
-abstract class AbstractAdapter
+abstract class AbstractConnection
 {
     /**
      * 
