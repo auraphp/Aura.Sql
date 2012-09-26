@@ -135,6 +135,9 @@ class Sqlite extends AbstractAdapter
 
         // loop through the result rows; each describes a column.
         foreach ($raw_cols as $val) {
+            
+            $val = (array) $val;
+            
             $name = $val['name'];
             list($type, $size, $scale) = $this->getTypeSizeScope($val['type']);
 

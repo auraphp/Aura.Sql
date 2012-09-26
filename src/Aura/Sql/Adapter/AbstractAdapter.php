@@ -418,33 +418,10 @@ abstract class AbstractAdapter
 
     /**
      * 
-     * Fetches all rows from the database using sequential keys.
+     * Fetches an array of all rows from the database as objects.
      * 
-     * @param string $text The text of the SQL statement, optionally with
-     * named placeholders.
-     * 
-     * @param array $data An associative array of data to bind to the named
-     * placeholders.
-     * 
-     * @return array
-     * 
-     */
-    public function fetchAll($text, $data = [])
-    {
-        $stmt = $this->query($text, $data);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
-
-    /**
-     * 
-     * Fetches all rows from the database using associative keys (defined by
-     * the first column).
-     * 
-     * N.b.: if multiple rows have the same first column value, the last
-     * row with that value will override earlier rows.
-     * 
-     * @param string $text The text of the SQL statement, optionally with
-     * named placeholders.
+     * @param string|AbstractQuery $query The text of the SQL query; or, a
+     * query object.
      * 
      * @param array $data An associative array of data to bind to the named
      * placeholders.
@@ -452,23 +429,18 @@ abstract class AbstractAdapter
      * @return array
      * 
      */
-    public function fetchAssoc($text, array $data = [])
+    public function fetchAll($query, $data = [])
     {
-        $stmt = $this->query($text, $data);
-        $data = [];
-        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $key = current($row); // value of the first element
-            $data[$key] = $row;
-        }
-        return $data;
+        $stmt = $this->query($query, $data);
+        return $stmt->fetchAll(PDO::FETCH_OBJ);
     }
 
     /**
      * 
      * Fetches the first column of all rows as a sequential array.
      * 
-     * @param string $text The text of the SQL statement, optionally with
-     * named placeholders.
+     * @param string|AbstractQuery $query The text of the SQL query; or, a
+     * query object.
      * 
      * @param array $data An associative array of data to bind to the named
      * placeholders.
@@ -476,9 +448,9 @@ abstract class AbstractAdapter
      * @return array
      * 
      */
-    public function fetchCol($text, array $data = [])
+    public function fetchCol($query, array $data = [])
     {
-        $stmt = $this->query($text, $data);
+        $stmt = $this->query($query, $data);
         return $stmt->fetchAll(PDO::FETCH_COLUMN, 0);
     }
 
@@ -486,8 +458,8 @@ abstract class AbstractAdapter
      * 
      * Fetches the very first value (i.e., first column of the first row).
      * 
-     * @param string $text The text of the SQL statement, optionally with
-     * named placeholders.
+     * @param string|AbstractQuery $query The text of the SQL query; or, a
+     * query object.
      * 
      * @param array $data An associative array of data to bind to the named
      * placeholders.
@@ -495,9 +467,9 @@ abstract class AbstractAdapter
      * @return mixed
      * 
      */
-    public function fetchValue($text, array $data = [])
+    public function fetchValue($query, array $data = [])
     {
-        $stmt = $this->query($text, $data);
+        $stmt = $this->query($query, $data);
         return $stmt->fetchColumn(0);
     }
 
@@ -506,8 +478,8 @@ abstract class AbstractAdapter
      * Fetches an associative array of all rows as key-value pairs (first 
      * column is the key, second column is the value).
      * 
-     * @param string $text The text of the SQL statement, optionally with
-     * named placeholders.
+     * @param string|AbstractQuery $query The text of the SQL query; or, a
+     * query object.
      * 
      * @param array $data An associative array of data to bind to the named
      * placeholders.
@@ -515,9 +487,9 @@ abstract class AbstractAdapter
      * @return array
      * 
      */
-    public function fetchPairs($text, array $data = [])
+    public function fetchPairs($query, array $data = [])
     {
-        $stmt = $this->query($text, $data);
+        $stmt = $this->query($query, $data);
         $data = [];
         while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
             $data[$row[0]] = $row[1];
@@ -527,21 +499,21 @@ abstract class AbstractAdapter
 
     /**
      * 
-     * Fetches one row from the database.
+     * Fetches one row from the database as an object.
      * 
-     * @param string $text The text of the SQL statement, optionally with
-     * named placeholders.
+     * @param string|AbstractQuery $query The text of the SQL query; or, a
+     * query object.
      * 
      * @param array $data An associative array of data to bind to the named
      * placeholders.
      * 
-     * @return array
+     * @return object
      * 
      */
-    public function fetchOne($text, array $data = [])
+    public function fetchOne($query, array $data = [])
     {
-        $stmt = $this->query($text, $data);
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+        $stmt = $this->query($query, $data);
+        return $stmt->fetch(PDO::FETCH_OBJ);
     }
 
     /**

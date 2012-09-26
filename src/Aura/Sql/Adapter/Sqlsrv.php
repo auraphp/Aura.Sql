@@ -104,12 +104,14 @@ class Sqlsrv extends AbstractAdapter
         $raw_keys = $this->fetchAll($text);
         $keys = [];
         foreach ($raw_keys as $row) {
+            $row = (array) $row;
             $keys[] = $row['COLUMN_NAME'];
         }
 
         $cols = [];
         foreach ($raw_cols as $row) {
 
+            $row = (array) $row;
             $name = $row['COLUMN_NAME'];
 
             $pos = strpos($row['TYPE_NAME'], ' ');
