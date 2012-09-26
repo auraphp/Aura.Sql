@@ -32,6 +32,15 @@ abstract class AbstractQuery
 
     /**
      * 
+     * Data to be bound to the query.
+     * 
+     * @var array
+     * 
+     */
+    protected $data = [];
+
+    /**
+     * 
      * Constructor.
      * 
      * @param AbstractAdapter $sql An SQL adapter.
@@ -83,5 +92,20 @@ abstract class AbstractQuery
         return PHP_EOL
              . '    ' . implode(PHP_EOL . '    ', $list)
              . PHP_EOL;
+    }
+    
+    public function setData(array $data)
+    {
+        $this->data = $data;
+    }
+    
+    public function addData(array $data)
+    {
+        $this->data = array_merge($this->data, $data);
+    }
+    
+    public function getData()
+    {
+        return $this->data;
     }
 }
