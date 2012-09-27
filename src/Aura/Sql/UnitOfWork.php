@@ -5,18 +5,25 @@ use SplObjectStorage;
 
 class UnitOfWork
 {
+    // the gateways used for inserting, updating, and deleting data objects
     protected $gateways;
     
+    // the various database connections extracted from gateways
     protected $connections;
     
+    // a collection of data objects to be sent to the database
     protected $objects;
     
+    // a collection of data objects that were successfully inserted
     protected $inserts;
     
+    // a collection of data objects that were successfully updated
     protected $udpates;
     
+    // a collection of data objects that were successfully deleted
     protected $deletes;
     
+    // the exception that occurred during exec(), causing a rollback
     protected $exception;
     
     // the object that caused the exception
@@ -28,15 +35,15 @@ class UnitOfWork
         $this->objects  = new SplObjectStorage;
     }
     
-    // add a object to the unit of work for insertion
+    // attach an object to the unit of work for insertion
     public function insert($object)
     {
         $this->objects->detach($object);
         $this->objects->attach($object, ['method' => 'execInsert']);
     }
     
-    // add a object to the unit of work for updating
-    public function update($new_object)
+    // attach an object to the unit of work for updating
+    public function update($new_object, $old_object = null)
     {
         $this->objects->detach($object);
         $this->objects->attach(
@@ -48,20 +55,20 @@ class UnitOfWork
         );
     }
     
-    // add a object to the unit of work for deletion
+    // attach an object to the unit of work for deletion
     public function delete($object)
     {
         $this->objects->detach($object);
         $this->objects->attach($object, ['method' => 'execDelete']);
     }
     
-    // attach a object to the unit of work
+    // attach an object to the unit of work
     protected function attach($object, $info)
     {
         $this->objects->attach($object, $info);
     }
     
-    // detach a object from the unit of work
+    // detach an object from the unit of work
     public function detach($object)
     {
         $this->objects->detach($object);
@@ -77,6 +84,8 @@ class UnitOfWork
         }
     }
     
+    // do we need pre/post hooks, so we can handle things like
+    // optimistic/pessimistic locking?
     public function exec()
     {
         // clear tracking properties
@@ -87,7 +96,7 @@ class UnitOfWork
         $this->inserts       = new SplObjectStorage;
         $this->updates       = new SplObjectStorage;
         
-        // load the connections for the gateways
+        // load the connections from the gateways for transaction management
         $this->loadConnections();
         
         // perform the unit of work
