@@ -114,7 +114,7 @@ abstract class AbstractMapper
         $update->addBind($data);
         $update->where(
             $this->getPrimaryCol() . ' = ?',
-            $this->getIdentityValue($object)
+            $this->getIdentityValue($new_object)
         );
     }
     

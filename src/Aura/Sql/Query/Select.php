@@ -165,9 +165,9 @@ class Select extends AbstractQuery
 
         // open the statement
         if ($this->distinct) {
-            $text = 'SELECT DISTINCT' . PHP_EOL;
+            $text = 'SELECT DISTINCT';
         } else {
-            $text = 'SELECT' . PHP_EOL;
+            $text = 'SELECT';
         }
 
         // add columns

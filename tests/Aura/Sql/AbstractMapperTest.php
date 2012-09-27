@@ -249,31 +249,80 @@ class AbstractMapperTest extends \PHPUnit_Framework_TestCase
             'name_last' => 'Shagnasty',
         ];
         $this->assertSame($expect, $actual);
-        
     }
 
     /**
-     * @covers Aura\Sql\AbstractMapper::modifyUpdate
      * @todo Implement testModifyUpdate().
      */
     public function testModifyUpdate()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
+        $object = (object) [
+            'identity' => 88,
+            'firstName' => 'Bolivar',
+            'lastName' => 'Shagnasty',
+        ];
+        
+        $connection = $this->newConnection();
+        $update = $connection->newUpdate();
+        $this->mapper->modifyUpdate($update, $object);
+        
+        $actual = $update->__toString();
+        $expect = "
+            UPDATE fake_table
+            SET
+                id = :id,
+                name_first = :name_first,
+                name_last = :name_last
+            WHERE
+                id = 88
+        ";
+        $this->assertSameSql($expect, $actual);
+        
+        $actual = $update->getBind();
+        $expect = [
+            'id' => 88,
+            'name_first' => 'Bolivar',
+            'name_last' => 'Shagnasty',
+        ];
+        $this->assertSame($expect, $actual);
     }
 
     /**
-     * @covers Aura\Sql\AbstractMapper::modifyUpdate
      * @todo Implement testModifyUpdate().
      */
     public function testModifyUpdateChanges()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
+        $new_object = (object) [
+            'identity' => 88,
+            'firstName' => 'Bolivar',
+            'lastName' => 'Shagnasty',
+        ];
+        
+        $old_object = (object) [
+            'identity' => 88,
+            'firstName' => 'Boliver',
+            'lastName' => 'Shagnasty',
+        ];
+        
+        $connection = $this->newConnection();
+        $update = $connection->newUpdate();
+        $this->mapper->modifyUpdate($update, $new_object, $old_object);
+        
+        $actual = $update->__toString();
+        $expect = "
+            UPDATE fake_table
+            SET
+                name_first = :name_first
+            WHERE
+                id = 88
+        ";
+        $this->assertSameSql($expect, $actual);
+        
+        $actual = $update->getBind();
+        $expect = [
+            'name_first' => 'Bolivar',
+        ];
+        $this->assertSame($expect, $actual);
     }
 
     /**
@@ -282,10 +331,27 @@ class AbstractMapperTest extends \PHPUnit_Framework_TestCase
      */
     public function testModifyDelete()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
+        $object = (object) [
+            'identity' => 88,
+            'firstName' => 'Bolivar',
+            'lastName' => 'Shagnasty',
+        ];
+        
+        $connection = $this->newConnection();
+        $delete = $connection->newDelete();
+        $this->mapper->modifyDelete($delete, $object);
+        
+        $actual = $delete->__toString();
+        $expect = "
+            DELETE FROM fake_table
+            WHERE
+                id = 88
+        ";
+        $this->assertSameSql($expect, $actual);
+        
+        $actual = $delete->getBind();
+        $expect = [];
+        $this->assertSame($expect, $actual);
     }
 
     /**
