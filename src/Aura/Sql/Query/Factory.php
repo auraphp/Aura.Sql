@@ -27,14 +27,14 @@ class Factory
      * 
      * @param string $type The query object type.
      * 
-     * @param AbstractConnection $sql The SQL connection connection.
+     * @param AbstractConnection $connection The SQL connection.
      * 
      * @return AbstractQuery
      * 
      */
-    public function newInstance($type, AbstractConnection $sql)
+    public function newInstance($type, AbstractConnection $connection)
     {
         $class = '\Aura\Sql\Query\\' . ucfirst($type);
-        return new $class($sql);
+        return new $class($connection);
     }
 }
