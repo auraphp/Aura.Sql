@@ -23,7 +23,7 @@ abstract class AbstractQuery
 {
     /**
      * 
-     * An SQL connection connection.
+     * An SQL connection.
      * 
      * @var AbstractConnection
      * 
