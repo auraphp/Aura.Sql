@@ -10,6 +10,8 @@
  */
 namespace Aura\Sql;
 
+// @todo add iterator
+
 /**
  * 
  * A ServiceLocator implementation for loading and retaining gateway objects.

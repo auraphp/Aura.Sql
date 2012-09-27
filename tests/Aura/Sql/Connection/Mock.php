@@ -17,6 +17,16 @@ class Mock extends AbstractConnection
         $password = null,
         array $options = []
     ) {
+        parent::__construct(
+            $profiler,
+            $column_factory,
+            $query_factory,
+            $dsn,
+            $username,
+            $password,
+            $options
+        );
+        
         $this->params = [
             'dsn'      => $dsn,
             'username' => $username,

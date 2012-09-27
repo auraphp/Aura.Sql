@@ -29,7 +29,7 @@ abstract class AbstractMapper
     
     public function getColForField($field)
     {
-        return array_search($this->cols_fields, $field);
+        return array_search($field, $this->cols_fields);
     }
     
     public function getFields()
@@ -91,10 +91,10 @@ abstract class AbstractMapper
     {
         if (! $cols) {
             // by default, select all cols
-            $cols = $this->getStorageNames();
+            $cols = $this->getCols();
         }
         
-        $select->from($this->cols_fieldsper->getTable());
+        $select->from($this->getTable());
         $select->cols($this->getTableColsAsFields($cols));
     }
     
