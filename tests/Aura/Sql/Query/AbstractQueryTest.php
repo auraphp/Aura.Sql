@@ -29,6 +29,28 @@ abstract class AbstractQueryTest extends \PHPUnit_Framework_TestCase
         parent::tearDown();
     }
 
+    public function testGetConnection()
+    {
+        $connection = $this->query->getConnection();
+        $this->assertSame($this->connection, $connection);
+    }
+    
+    public function testSetAddGetBind()
+    {
+        $actual = $this->query->getBind();
+        $this->assertSame([], $actual);
+        
+        $expect = ['foo' => 'bar', 'baz' => 'dib'];
+        $this->query->setBind($expect);
+        $actual = $this->query->getBind();
+        $this->assertSame($expect, $actual);
+        
+        $this->query->addBind(['zim' => 'gir']);
+        $expect = ['foo' => 'bar', 'baz' => 'dib', 'zim' => 'gir'];
+        $actual = $this->query->getBind();
+        $this->assertSame($expect, $actual);
+    }
+    
     protected function assertSameSql($expect, $actual)
     {
         $expect = trim($expect);

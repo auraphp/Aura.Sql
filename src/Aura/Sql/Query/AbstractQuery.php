@@ -101,16 +101,16 @@ abstract class AbstractQuery
     
     public function setBind(array $bind)
     {
-        $this->data = $bind;
+        $this->bind = $bind;
     }
     
     public function addBind(array $bind)
     {
-        $this->data = array_merge($this->data, $bind);
+        $this->bind = array_merge($this->bind, $bind);
     }
     
     public function getBind()
     {
-        return $this->data;
+        return $this->bind;
     }
 }
