@@ -135,20 +135,20 @@ abstract class AbstractMapper
         }
         return $data;
     }
-    
+
     public function getUpdateData($new_object, $old_object = null)
     {
         if ($old_object) {
-            return $this->getUpdateDataChanges();
+            return $this->getUpdateDataChanges($new_object, $old_object);
         }
-        
+
         $data = [];
         foreach ($this->cols_fields as $col => $field) {
             $data[$col] = $new_object->$field;
         }
         return $data;
     }
-    
+
     public function getUpdateDataChanges($new_object, $old_object)
     {
         $data = [];
