@@ -329,7 +329,7 @@ class Select extends AbstractQuery
      */
     public function fromSubSelect($spec, $name)
     {
-        $spec = (string) $spec;
+        $spec = ltrim(preg_replace('/^/m', '    ', (string) $spec));
         $this->from[] = "($spec) AS " . $this->connection->quoteName($name);
         return $this;
     }
@@ -380,7 +380,7 @@ class Select extends AbstractQuery
     public function joinSubSelect($join, $spec, $name, $cond = null)
     {
         $join = strtoupper(ltrim("$join JOIN"));
-        $spec = (string) $spec;
+        $spec = ltrim(preg_replace('/^/m', '    ', (string) $spec));
         $name = $this->connection->quoteName($name);
         if ($cond) {
             $cond = $this->connection->quoteNamesIn($cond);
