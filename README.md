@@ -368,7 +368,7 @@ $select->cols(['*'])
        ->where('bar > :bar')
        ->orderBy('baz');
 
-$bind['foo' => '88'];
+$bind['bar' => '88'];
 
 $list = $connection->fetchAll($select, $bind);
 ```
@@ -415,14 +415,14 @@ You can then modify the `Insert` object and pass it to the `query()` method.
 // create a new Insert object
 $insert = $connection->newInsert();
 
-// INSERT INTO foo (bar, baz, date) VALUES (:foo, :bar, NOW());
+// INSERT INTO foo (bar, baz, date) VALUES (:bar, :baz, NOW());
 $insert->into('foo')
        ->cols(['bar', 'baz'])
        ->set('date', 'NOW()');
 
 $bind[
-    'foo' => null,
-    'bar' => 'zim',
+    'bar' => null,
+    'baz' => 'zim',
 ];
 
 $stmt = $connection->query($insert, $bind);
@@ -447,7 +447,6 @@ $update->table('foo')
        ->orWhere('gir = :gir');
 
 $bind[
-    'foo' => null,
     'bar' => 'barbar',
     'baz' => 99,
     'zim' => 'dib',
