@@ -11,16 +11,6 @@ class SqliteTest extends AbstractConnectionTest
     
     protected $connection_type = 'sqlite';    
     
-    protected $create_table = "CREATE TABLE aura_test_table (
-         id                     INTEGER PRIMARY KEY AUTOINCREMENT
-        ,name                   VARCHAR(50) NOT NULL
-        ,test_size_scale        NUMERIC(7,3)
-        ,test_default_null      CHAR(3) DEFAULT NULL
-        ,test_default_string    VARCHAR(7) DEFAULT 'string'
-        ,test_default_number    NUMERIC(5) DEFAULT 12345
-        ,test_default_ignore    TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )";
-    
     protected $expect_fetch_table_list = ['aura_test_table', 'sqlite_sequence'];
     
     protected $expect_fetch_table_list_schema = ['aura_test_table', 'sqlite_sequence'];
@@ -119,16 +109,4 @@ class SqliteTest extends AbstractConnectionTest
     protected $expect_quote_name_plain = '"table"';
     
     protected $expect_quote_names_in = "*, *.*, \"foo\".\"bar\", CONCAT('foo.bar', \"baz.dib\") AS \"zim\"";
-    
-    protected function createSchemas()
-    {
-        // only need to create the second one
-        $this->connection->query("ATTACH DATABASE ':memory:' AS aura_test_schema2");
-    }
-    
-    protected function dropSchemas()
-    {
-        // all in memory, no need to clean up
-    }
-    
 }

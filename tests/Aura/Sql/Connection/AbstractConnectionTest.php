@@ -34,8 +34,6 @@ abstract class AbstractConnectionTest extends \PHPUnit_Framework_TestCase
     
     protected $table = 'aura_test_table';
     
-    protected $create_table;
-    
     protected $expect_fetch_table_list;
     
     protected $expect_fetch_table_cols;
@@ -96,38 +94,15 @@ abstract class AbstractConnectionTest extends \PHPUnit_Framework_TestCase
             $this->connection_params['options']
         );
         
-        $this->dropSchemas();
-        $this->createSchemas();
-        $this->createTables();
-        $this->fillTable();
-    }
-    
-    abstract protected function createSchemas();
-    
-    abstract protected function dropSchemas();
-    
-    protected function createTables()
-    {
-        // create in schema 1
-        $sql = $this->create_table;
-        $this->connection->query($sql);
-        
-        // create again in schema 2
-        $sql = str_replace($this->table, "{$this->schema2}.{$this->table}", $sql);
-        $this->connection->query($sql);
-    }
-    
-    // only fills in schema 1
-    protected function fillTable()
-    {
-        $names = [
-            'Anna', 'Betty', 'Clara', 'Donna', 'Fiona',
-            'Gertrude', 'Hanna', 'Ione', 'Julia', 'Kara',
-        ];
-        
-        foreach ($names as $name) {
-            $this->connection->insert($this->table, ['name' => $name]);
-        }
+        // database setup
+        $db_setup_class = $GLOBALS[$test_class]['db_setup_class'];
+        $this->db_setup = new $db_setup_class(
+            $this->connection,
+            $this->table,
+            $this->schema1,
+            $this->schema2
+        );
+        $this->db_setup->exec();
     }
     
     public function testGetProfiler()
