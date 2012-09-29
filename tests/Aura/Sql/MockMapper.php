@@ -3,7 +3,7 @@ namespace Aura\Sql;
 
 class MockMapper extends AbstractMapper
 {
-    protected $table = 'fake_table';
+    protected $table = 'aura_test_table';
     
     protected $cols_fields = [
         'id'                    => 'identity',
