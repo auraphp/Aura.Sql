@@ -3,9 +3,12 @@ namespace Aura\Sql\Query;
 
 use Aura\Sql\ConnectionFactory;
 use Aura\Sql\Query\Factory as QueryFactory;
+use Aura\Sql\Assertions;
 
 abstract class AbstractQueryTest extends \PHPUnit_Framework_TestCase
 {
+    use Assertions;
+    
     protected $query_type;
     
     protected $query;
@@ -48,19 +51,6 @@ abstract class AbstractQueryTest extends \PHPUnit_Framework_TestCase
         $this->query->addBind(['zim' => 'gir']);
         $expect = ['foo' => 'bar', 'baz' => 'dib', 'zim' => 'gir'];
         $actual = $this->query->getBind();
-        $this->assertSame($expect, $actual);
-    }
-    
-    protected function assertSameSql($expect, $actual)
-    {
-        $expect = trim($expect);
-        $expect = preg_replace('/^\s*/m', '', $expect);
-        $expect = preg_replace('/\s*$/m', '', $expect);
-        
-        $actual = trim($actual);
-        $actual = preg_replace('/^\s*/m', '', $actual);
-        $actual = preg_replace('/\s*$/m', '', $actual);
-        
         $this->assertSame($expect, $actual);
     }
 }

@@ -7,6 +7,8 @@ namespace Aura\Sql;
  */
 class AbstractMapperTest extends \PHPUnit_Framework_TestCase
 {
+    use Assertions;
+    
     /**
      * @var AbstractMapper
      */
@@ -147,7 +149,7 @@ class AbstractMapperTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetTable()
     {
-        $expect = 'fake_table';
+        $expect = 'aura_test_table';
         $actual = $this->mapper->getTable();
         $this->assertSame($expect, $actual);
     }
@@ -158,7 +160,7 @@ class AbstractMapperTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetTableCol()
     {
-        $expect = 'fake_table.name';
+        $expect = 'aura_test_table.name';
         $actual = $this->mapper->getTableCol('name');
         $this->assertSame($expect, $actual);
     }
@@ -169,7 +171,7 @@ class AbstractMapperTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetTableColAsField()
     {
-        $expect = 'fake_table.name AS firstName';
+        $expect = 'aura_test_table.name AS firstName';
         $actual = $this->mapper->getTableColAsField('name');
         $this->assertSame($expect, $actual);
     }
@@ -180,7 +182,7 @@ class AbstractMapperTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetTablePrimaryCol()
     {
-        $expect = 'fake_table.id';
+        $expect = 'aura_test_table.id';
         $actual = $this->mapper->getTablePrimaryCol();
         $this->assertSame($expect, $actual);
     }
@@ -192,13 +194,13 @@ class AbstractMapperTest extends \PHPUnit_Framework_TestCase
     public function testGetTableColsAsFields()
     {
         $expect = [
-        'fake_table.id AS identity',
-        'fake_table.name AS firstName',
-        'fake_table.test_size_scale AS sizeScale',
-        'fake_table.test_default_null AS defaultNull',
-        'fake_table.test_default_string AS defaultString',
-        'fake_table.test_default_number AS defaultNumber',
-        'fake_table.test_default_ignore AS defaultIgnore',
+        'aura_test_table.id AS identity',
+        'aura_test_table.name AS firstName',
+        'aura_test_table.test_size_scale AS sizeScale',
+        'aura_test_table.test_default_null AS defaultNull',
+        'aura_test_table.test_default_string AS defaultString',
+        'aura_test_table.test_default_number AS defaultNumber',
+        'aura_test_table.test_default_ignore AS defaultIgnore',
         ];
         
         $actual = $this->mapper->getTableColsAsFields([
@@ -226,15 +228,15 @@ class AbstractMapperTest extends \PHPUnit_Framework_TestCase
         $actual = $select->__toString();
         $expect = "
             SELECT
-                fake_table.id AS identity,
-                fake_table.name AS firstName,
-                fake_table.test_size_scale AS sizeScale,
-                fake_table.test_default_null AS defaultNull,
-                fake_table.test_default_string AS defaultString,
-                fake_table.test_default_number AS defaultNumber,
-                fake_table.test_default_ignore AS defaultIgnore
+                aura_test_table.id AS identity,
+                aura_test_table.name AS firstName,
+                aura_test_table.test_size_scale AS sizeScale,
+                aura_test_table.test_default_null AS defaultNull,
+                aura_test_table.test_default_string AS defaultString,
+                aura_test_table.test_default_number AS defaultNumber,
+                aura_test_table.test_default_ignore AS defaultIgnore
             FROM
-                fake_table
+                aura_test_table
         ";
         
         $this->assertSameSql($expect, $actual);
@@ -262,7 +264,7 @@ class AbstractMapperTest extends \PHPUnit_Framework_TestCase
         
         $actual = $insert->__toString();
         $expect = "
-            INSERT INTO fake_table (
+            INSERT INTO aura_test_table (
                 id,
                 name,
                 test_size_scale,
@@ -316,7 +318,7 @@ class AbstractMapperTest extends \PHPUnit_Framework_TestCase
         
         $actual = $update->__toString();
         $expect = "
-            UPDATE fake_table
+            UPDATE aura_test_table
             SET
                 id = :id,
                 name = :name,
@@ -374,7 +376,7 @@ class AbstractMapperTest extends \PHPUnit_Framework_TestCase
         
         $actual = $update->__toString();
         $expect = "
-            UPDATE fake_table
+            UPDATE aura_test_table
             SET
                 name = :name
             WHERE
@@ -411,7 +413,7 @@ class AbstractMapperTest extends \PHPUnit_Framework_TestCase
         
         $actual = $delete->__toString();
         $expect = "
-            DELETE FROM fake_table
+            DELETE FROM aura_test_table
             WHERE
                 id = 88
         ";
@@ -540,18 +542,5 @@ class AbstractMapperTest extends \PHPUnit_Framework_TestCase
         $old_string = "Foo";
         $compare = $this->mapper->compare($new_string, $old_string);
         $this->assertTrue($compare);
-    }
-
-    protected function assertSameSql($expect, $actual)
-    {
-        $expect = trim($expect);
-        $expect = preg_replace('/^\s*/m', '', $expect);
-        $expect = preg_replace('/\s*$/m', '', $expect);
-        
-        $actual = trim($actual);
-        $actual = preg_replace('/^\s*/m', '', $actual);
-        $actual = preg_replace('/\s*$/m', '', $actual);
-        
-        $this->assertSame($expect, $actual);
     }
 }
