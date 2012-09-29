@@ -1,6 +1,11 @@
 <?php
 namespace Aura\Sql;
 
+use Aura\Sql\Query\Select;
+use Aura\Sql\Query\Insert;
+use Aura\Sql\Query\Update;
+use Aura\Sql\Query\Delete;
+
 // table data gateway
 class Gateway
 {
@@ -50,6 +55,14 @@ class Gateway
         $this->mapper->modifyDelete($delete, $object);
         return $connection->query($delete, $delete->getBind());
     }
+
+    public function newSelect(array $cols = [])
+    {
+        $connection = $this->connections->getRead();
+        $select = $connection->newSelect();
+        $this->mapper->modifySelect($select, $cols);
+        return $select;
+    }
     
     public function fetchAll(Select $select, array $bind = [])
     {
@@ -79,13 +92,5 @@ class Gateway
     {
         $connection = $select->getConnection();
         return $connection->fetchValue($select, $bind);
-    }
-
-    public function newSelect(array $cols = [])
-    {
-        $connection = $this->connections->getRead();
-        $select = $connection->newSelect();
-        $this->mapper->modifySelect($select, $cols);
-        return $select;
     }
 }
