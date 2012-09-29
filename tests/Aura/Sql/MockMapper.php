@@ -6,9 +6,13 @@ class MockMapper extends AbstractMapper
     protected $table = 'fake_table';
     
     protected $cols_fields = [
-        'id'         => 'identity',
-        'name_first' => 'firstName',
-        'name_last'  => 'lastName',
+        'id'                    => 'identity',
+        'name'                  => 'firstName',
+        'test_size_scale'       => 'sizeScale',
+        'test_default_null'     => 'defaultNull',
+        'test_default_string'   => 'defaultString',
+        'test_default_number'   => 'defaultNumber',
+        'test_default_ignore'   => 'defaultIgnore',
     ];
     
     protected $primary_col = 'id';

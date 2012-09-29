@@ -49,7 +49,15 @@ class AbstractMapperTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetCols()
     {
-        $expect = ['id', 'name_first', 'name_last'];
+        $expect = [
+            'id',
+            'name',
+            'test_size_scale',
+            'test_default_null',
+            'test_default_string',
+            'test_default_number',
+            'test_default_ignore',
+        ];
         $actual = $this->mapper->getCols();
         $this->assertSame($expect, $actual);
     }
@@ -71,7 +79,15 @@ class AbstractMapperTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetFields()
     {
-        $expect = ['identity', 'firstName', 'lastName'];
+        $expect = [
+            'identity',             
+            'firstName',
+            'sizeScale',
+            'defaultNull',
+            'defaultString',
+            'defaultNumber',
+            'defaultIgnore',
+        ];
         $actual = $this->mapper->getFields();
         $this->assertSame($expect, $actual);
     }
@@ -142,8 +158,8 @@ class AbstractMapperTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetTableCol()
     {
-        $expect = 'fake_table.name_last';
-        $actual = $this->mapper->getTableCol('name_last');
+        $expect = 'fake_table.name';
+        $actual = $this->mapper->getTableCol('name');
         $this->assertSame($expect, $actual);
     }
 
@@ -153,8 +169,8 @@ class AbstractMapperTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetTableColAsField()
     {
-        $expect = 'fake_table.name_last AS lastName';
-        $actual = $this->mapper->getTableColAsField('name_last');
+        $expect = 'fake_table.name AS firstName';
+        $actual = $this->mapper->getTableColAsField('name');
         $this->assertSame($expect, $actual);
     }
 
@@ -176,15 +192,23 @@ class AbstractMapperTest extends \PHPUnit_Framework_TestCase
     public function testGetTableColsAsFields()
     {
         $expect = [
-            'fake_table.id AS identity',
-            'fake_table.name_first AS firstName',
-            'fake_table.name_last AS lastName',
+        'fake_table.id AS identity',
+        'fake_table.name AS firstName',
+        'fake_table.test_size_scale AS sizeScale',
+        'fake_table.test_default_null AS defaultNull',
+        'fake_table.test_default_string AS defaultString',
+        'fake_table.test_default_number AS defaultNumber',
+        'fake_table.test_default_ignore AS defaultIgnore',
         ];
         
         $actual = $this->mapper->getTableColsAsFields([
             'id',
-            'name_first',
-            'name_last',
+            'name',
+            'test_size_scale',
+            'test_default_null',
+            'test_default_string',
+            'test_default_number',
+            'test_default_ignore',
         ]);
         
         $this->assertSame($expect, $actual);
@@ -203,8 +227,12 @@ class AbstractMapperTest extends \PHPUnit_Framework_TestCase
         $expect = "
             SELECT
                 fake_table.id AS identity,
-                fake_table.name_first AS firstName,
-                fake_table.name_last AS lastName
+                fake_table.name AS firstName,
+                fake_table.test_size_scale AS sizeScale,
+                fake_table.test_default_null AS defaultNull,
+                fake_table.test_default_string AS defaultString,
+                fake_table.test_default_number AS defaultNumber,
+                fake_table.test_default_ignore AS defaultIgnore
             FROM
                 fake_table
         ";
@@ -220,8 +248,12 @@ class AbstractMapperTest extends \PHPUnit_Framework_TestCase
     {
         $object = (object) [
             'identity' => null,
-            'firstName' => 'Bolivar',
-            'lastName' => 'Shagnasty',
+            'firstName' => 'Laura',
+            'sizeScale' => 10,
+            'defaultNull' => null,
+            'defaultString' => null,
+            'defaultNumber' => null,
+            'defaultIgnore' => null,
         ];
         
         $connection = $this->newConnection();
@@ -232,12 +264,20 @@ class AbstractMapperTest extends \PHPUnit_Framework_TestCase
         $expect = "
             INSERT INTO fake_table (
                 id,
-                name_first,
-                name_last
+                name,
+                test_size_scale,
+                test_default_null,
+                test_default_string,
+                test_default_number,
+                test_default_ignore
             ) VALUES (
                 :id,
-                :name_first,
-                :name_last
+                :name,
+                :test_size_scale,
+                :test_default_null,
+                :test_default_string,
+                :test_default_number,
+                :test_default_ignore
             )
         ";
         $this->assertSameSql($expect, $actual);
@@ -245,8 +285,12 @@ class AbstractMapperTest extends \PHPUnit_Framework_TestCase
         $actual = $insert->getBind();
         $expect = [
             'id' => null,
-            'name_first' => 'Bolivar',
-            'name_last' => 'Shagnasty',
+            'name' => 'Laura',
+            'test_size_scale' => 10,
+            'test_default_null' => null,
+            'test_default_string' => null,
+            'test_default_number' => null,
+            'test_default_ignore' => null,
         ];
         $this->assertSame($expect, $actual);
     }
@@ -258,8 +302,12 @@ class AbstractMapperTest extends \PHPUnit_Framework_TestCase
     {
         $object = (object) [
             'identity' => 88,
-            'firstName' => 'Bolivar',
-            'lastName' => 'Shagnasty',
+            'firstName' => 'Laura',
+            'sizeScale' => 10,
+            'defaultNull' => null,
+            'defaultString' => null,
+            'defaultNumber' => null,
+            'defaultIgnore' => null,
         ];
         
         $connection = $this->newConnection();
@@ -271,8 +319,12 @@ class AbstractMapperTest extends \PHPUnit_Framework_TestCase
             UPDATE fake_table
             SET
                 id = :id,
-                name_first = :name_first,
-                name_last = :name_last
+                name = :name,
+                test_size_scale = :test_size_scale,
+                test_default_null = :test_default_null,
+                test_default_string = :test_default_string,
+                test_default_number = :test_default_number,
+                test_default_ignore = :test_default_ignore
             WHERE
                 id = 88
         ";
@@ -281,8 +333,12 @@ class AbstractMapperTest extends \PHPUnit_Framework_TestCase
         $actual = $update->getBind();
         $expect = [
             'id' => 88,
-            'name_first' => 'Bolivar',
-            'name_last' => 'Shagnasty',
+            'name' => 'Laura',
+            'test_size_scale' => 10,
+            'test_default_null' => null,
+            'test_default_string' => null,
+            'test_default_number' => null,
+            'test_default_ignore' => null,
         ];
         $this->assertSame($expect, $actual);
     }
@@ -294,14 +350,22 @@ class AbstractMapperTest extends \PHPUnit_Framework_TestCase
     {
         $new_object = (object) [
             'identity' => 88,
-            'firstName' => 'Bolivar',
-            'lastName' => 'Shagnasty',
+            'firstName' => 'Laura',
+            'sizeScale' => 10,
+            'defaultNull' => null,
+            'defaultString' => null,
+            'defaultNumber' => null,
+            'defaultIgnore' => null,
         ];
         
         $old_object = (object) [
             'identity' => 88,
-            'firstName' => 'Boliver',
-            'lastName' => 'Shagnasty',
+            'firstName' => 'Lora',
+            'sizeScale' => 10,
+            'defaultNull' => null,
+            'defaultString' => null,
+            'defaultNumber' => null,
+            'defaultIgnore' => null,
         ];
         
         $connection = $this->newConnection();
@@ -312,7 +376,7 @@ class AbstractMapperTest extends \PHPUnit_Framework_TestCase
         $expect = "
             UPDATE fake_table
             SET
-                name_first = :name_first
+                name = :name
             WHERE
                 id = 88
         ";
@@ -320,7 +384,7 @@ class AbstractMapperTest extends \PHPUnit_Framework_TestCase
         
         $actual = $update->getBind();
         $expect = [
-            'name_first' => 'Bolivar',
+            'name' => 'Laura',
         ];
         $this->assertSame($expect, $actual);
     }
@@ -333,8 +397,12 @@ class AbstractMapperTest extends \PHPUnit_Framework_TestCase
     {
         $object = (object) [
             'identity' => 88,
-            'firstName' => 'Bolivar',
-            'lastName' => 'Shagnasty',
+            'firstName' => 'Laura',
+            'sizeScale' => 10,
+            'defaultNull' => null,
+            'defaultString' => null,
+            'defaultNumber' => null,
+            'defaultIgnore' => null,
         ];
         
         $connection = $this->newConnection();
@@ -362,14 +430,22 @@ class AbstractMapperTest extends \PHPUnit_Framework_TestCase
     {
         $object = (object) [
             'identity' => null,
-            'firstName' => 'Bolivar',
-            'lastName' => 'Shagnasty',
+            'firstName' => 'Laura',
+            'sizeScale' => 10,
+            'defaultNull' => null,
+            'defaultString' => null,
+            'defaultNumber' => null,
+            'defaultIgnore' => null,
         ];
         
         $expect = [
             'id' => null,
-            'name_first' => 'Bolivar',
-            'name_last' => 'Shagnasty',
+            'name' => 'Laura',
+            'test_size_scale' => 10,
+            'test_default_null' => null,
+            'test_default_string' => null,
+            'test_default_number' => null,
+            'test_default_ignore' => null,
         ];
         
         $actual = $this->mapper->getInsertData($object);
@@ -383,14 +459,22 @@ class AbstractMapperTest extends \PHPUnit_Framework_TestCase
     {
         $object = (object) [
             'identity' => 88,
-            'firstName' => 'Bolivar',
-            'lastName' => 'Shagnasty',
+            'firstName' => 'Laura',
+            'sizeScale' => 10,
+            'defaultNull' => null,
+            'defaultString' => null,
+            'defaultNumber' => null,
+            'defaultIgnore' => null,
         ];
         
         $expect = [
             'id' => 88,
-            'name_first' => 'Bolivar',
-            'name_last' => 'Shagnasty',
+            'name' => 'Laura',
+            'test_size_scale' => 10,
+            'test_default_null' => null,
+            'test_default_string' => null,
+            'test_default_number' => null,
+            'test_default_ignore' => null,
         ];
         
         $actual = $this->mapper->getUpdateData($object);
@@ -404,18 +488,26 @@ class AbstractMapperTest extends \PHPUnit_Framework_TestCase
     {
         $new_object = (object) [
             'identity' => 88,
-            'firstName' => 'Bolivar',
-            'lastName' => 'Shagnasty',
+            'firstName' => 'Laura',
+            'sizeScale' => 10,
+            'defaultNull' => null,
+            'defaultString' => null,
+            'defaultNumber' => null,
+            'defaultIgnore' => null,
         ];
         
         $old_object = (object) [
             'identity' => 88,
-            'firstName' => 'Boliver',
-            'lastName' => 'Shagnasty',
+            'firstName' => 'Lora',
+            'sizeScale' => 10,
+            'defaultNull' => null,
+            'defaultString' => null,
+            'defaultNumber' => null,
+            'defaultIgnore' => null,
         ];
         
         $expect = [
-            'name_first' => 'Bolivar',
+            'name' => 'Laura',
         ];
         
         // uses getUpdateDataChanges()
