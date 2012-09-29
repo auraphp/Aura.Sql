@@ -206,6 +206,14 @@ class ConnectionLocatorTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($conn->getParams(), $expect);
     }
 
+    public function testGetDefaultSameObject()
+    {
+        $manager = $this->newManager($this->default);
+        $conn1 = $manager->getDefault();
+        $conn2 = $manager->getDefault();
+        $this->assertSame($conn1, $conn2);
+    }
+    
     /**
      * @todo Implement testGetMaster().
      */

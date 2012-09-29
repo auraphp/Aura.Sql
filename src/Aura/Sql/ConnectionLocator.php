@@ -10,6 +10,8 @@
  */
 namespace Aura\Sql;
 
+use Aura\Sql\Connection\AbstractConnection;
+
 /**
  * 
  * Manages connections to default, master, and slave databases.
