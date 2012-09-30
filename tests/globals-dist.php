@@ -4,14 +4,14 @@
  */
 $GLOBALS['Aura\Sql\Connection\MysqlTest']['connection_params'] = [
     'dsn' => [
-        'host' => 'localhost',
+        'host' => '127.0.0.1',
     ],
     'username' => 'root',
     'password' => '',
     'options' => [],
 ];
 
-$GLOBALS['Aura\Sql\Connection\MysqlTest']['expect_dsn_string'] = 'mysql:host=localhost';
+$GLOBALS['Aura\Sql\Connection\MysqlTest']['expect_dsn_string'] = 'mysql:host=127.0.0.1';
 
 $GLOBALS['Aura\Sql\Connection\MysqlTest']['db_setup_class'] = 'Aura\Sql\DbSetup\Mysql';
 
@@ -20,7 +20,7 @@ $GLOBALS['Aura\Sql\Connection\MysqlTest']['db_setup_class'] = 'Aura\Sql\DbSetup\
  */
 $GLOBALS['Aura\Sql\Connection\PgsqlTest']['connection_params'] = [
     'dsn' => [
-        'host' => 'localhost',
+        'host' => '127.0.0.1',
         'dbname' => 'test',
     ],
     'username' => 'postgres',
@@ -28,7 +28,7 @@ $GLOBALS['Aura\Sql\Connection\PgsqlTest']['connection_params'] = [
     'options' => [],
 ];
 
-$GLOBALS['Aura\Sql\Connection\PgsqlTest']['expect_dsn_string'] = 'pgsql:host=localhost;dbname=test';
+$GLOBALS['Aura\Sql\Connection\PgsqlTest']['expect_dsn_string'] = 'pgsql:host=127.0.0.1;dbname=test';
 
 $GLOBALS['Aura\Sql\Connection\PgsqlTest']['db_setup_class'] = 'Aura\Sql\DbSetup\Pgsql';
 
