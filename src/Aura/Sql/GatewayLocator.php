@@ -10,16 +10,16 @@
  */
 namespace Aura\Sql;
 
-// @todo add iterator
+use IteratorAggregate;
 
 /**
  * 
  * A ServiceLocator implementation for loading and retaining gateway objects.
  * 
- * @package Glow.Domain
+ * @package Aura.Sql
  * 
  */
-class GatewayLocator
+class GatewayLocator implements IteratorAggregate
 {
     /**
      * 
@@ -48,6 +48,11 @@ class GatewayLocator
         }
     }
 
+    public function getIterator()
+    {
+        return new GatewayIterator($this, array_keys($this->registry));
+    }
+    
     /**
      * 
      * Sets a gateway into the registry by name.
