@@ -83,7 +83,7 @@ class GatewayLocator implements IteratorAggregate
     public function get($name)
     {
         if (! isset($this->registry[$name])) {
-            throw new Exception\GatewayNotMapped($name);
+            throw new Exception\NoSuchGateway($name);
         }
 
         if ($this->registry[$name] instanceof \Closure) {

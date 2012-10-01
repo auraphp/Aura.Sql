@@ -14,11 +14,11 @@ use Aura\Sql\Exception;
 
 /**
  * 
- * No such master exception
+ * No such slave exception
  * 
  * @package Aura.Sql
  * 
  */
-class NoSuchMaster extends Exception
+class NoSuchGateway extends Exception
 {
 }
