@@ -16,8 +16,6 @@ class GatewayTest extends \PHPUnit_Framework_TestCase
 
     protected $mapper;
     
-    protected $connection;
-    
     protected $connections;
     
     protected $default = [
@@ -43,9 +41,8 @@ class GatewayTest extends \PHPUnit_Framework_TestCase
         $this->gateway = new Gateway($this->connections, $this->mapper);
         
         $db_setup_class = 'Aura\Sql\DbSetup\Sqlite';
-        $this->connection = $this->connections->getWrite();
         $db_setup = new DbSetup\Sqlite(
-            $this->connection,
+            $this->connections->getWrite(),
             $this->mapper->getTable(),
             'aura_test_schema1',
             'aura_test_schema2'
@@ -112,7 +109,7 @@ class GatewayTest extends \PHPUnit_Framework_TestCase
     
     protected function fetchLastInsertId()
     {
-        return $this->connection->lastInsertId();
+        return $this->connections->getWrite()->lastInsertId();
     }
     
     public function testUpdate()
@@ -153,7 +150,7 @@ class GatewayTest extends \PHPUnit_Framework_TestCase
         
         // do we still have everything else?
         $select = $this->gateway->newSelect();
-        $actual = $this->connection->fetchAll($select);
+        $actual = $this->gateway->fetchAll($select);
         $expect = 9;
         $this->assertEquals($expect, count($actual));
     }
@@ -166,7 +163,7 @@ class GatewayTest extends \PHPUnit_Framework_TestCase
     {
         $select = $this->gateway->newSelect();
         $connection = $select->getConnection();
-        $this->assertSame($this->connection, $connection);
+        $this->assertSame($this->connections->getRead(), $connection);
         $expect = '
             SELECT
                 "aura_test_table"."id" AS "identity",
@@ -196,14 +193,10 @@ class GatewayTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expect, $actual);
     }
 
-    /**
-     * @covers Aura\Sql\Gateway::fetchCol
-     * @todo Implement testFetchCol().
-     */
     public function testFetchCol()
     {
         $select = $this->gateway->newSelect(['id'])->orderBy(['id']);
-        $result = $this->connection->fetchCol($select);
+        $result = $this->gateway->fetchCol($select);
 
         $expect = 10;
         $actual = count($result);
@@ -236,7 +229,7 @@ class GatewayTest extends \PHPUnit_Framework_TestCase
     public function testFetchPairs()
     {
         $select = $this->gateway->newSelect(['id', 'name'])->orderBy(['id']);
-        $actual = $this->connection->fetchPairs($select);
+        $actual = $this->gateway->fetchPairs($select);
         $expect = [
           1  => 'Anna',
           2  => 'Betty',
@@ -259,7 +252,7 @@ class GatewayTest extends \PHPUnit_Framework_TestCase
     public function testFetchValue()
     {
         $select = $this->gateway->newSelect(['id'])->where('id = ?', 1);
-        $actual = $this->connection->fetchValue($select);
+        $actual = $this->gateway->fetchValue($select);
         $expect = '1';
         $this->assertEquals($expect, $actual);
     }
