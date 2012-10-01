@@ -137,21 +137,26 @@ class GatewayTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($actual, $expect);
     }
     
-    // public function testDelete()
-    // {
-    //     $where  = 'id = :id';
-    //     $bind   = ['id' => 1];
-    //     $actual = $this->connection->delete($this->table, $where, $bind);
-    //     
-    //     // did it delete?
-    //     $actual = $this->connection->fetchOne("SELECT * FROM {$this->table} WHERE id = 1");
-    //     $this->assertFalse($actual);
-    //     
-    //     // do we still have everything else?
-    //     $actual = $this->connection->fetchAll("SELECT * FROM {$this->table}");
-    //     $expect = 9;
-    //     $this->assertEquals($expect, count($actual));
-    // }
+    public function testDelete()
+    {
+        // select an object ...
+        $select = $this->gateway->newSelect()->where('name = ?', 'Anna');
+        $object = $this->gateway->fetchOne($select);
+        
+        // then delete it.
+        $this->gateway->delete($object);
+        
+        // did it delete?
+        $select = $this->gateway->newSelect()->where('name = ?', 'Anna');
+        $actual = $this->gateway->fetchOne($select);
+        $this->assertFalse($actual);
+        
+        // do we still have everything else?
+        $select = $this->gateway->newSelect();
+        $actual = $this->connection->fetchAll($select);
+        $expect = 9;
+        $this->assertEquals($expect, count($actual));
+    }
 
     /**
      * @covers Aura\Sql\Gateway::newSelect
