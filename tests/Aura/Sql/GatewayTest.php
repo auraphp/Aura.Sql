@@ -82,41 +82,76 @@ class GatewayTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($this->mapper, $actual);
     }
 
-    /**
-     * @covers Aura\Sql\Gateway::insert
-     * @todo Implement testInsert().
-     */
-    public function testInsert()
+    // when mapping, add an "if isset()" so that the object does not need
+    // all the columns?
+    public function testInsertAndLastInsertId()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
+        $object = (object) [
+            'identity' => null,
+            'firstName' => 'Laura',
+            'sizeScale' => 10,
+            'defaultNull' => null,
+            'defaultString' => null,
+            'defaultNumber' => null,
+            'defaultIgnore' => null,
+        ];
+        
+        // do the insert and retain last insert id
+        $last_insert_id = $this->gateway->insert($object);
+        
+        // did we get the right last ID?
+        $expect = '11';
+        $this->assertEquals($expect, $last_insert_id);
+        
+        // did it insert?
+        $select = $this->gateway->newSelect(['id', 'name'])->where('id = ?', 11);
+        $actual = $this->gateway->fetchOne($select);
+        $expect = (object) ['identity' => '11', 'firstName' => 'Laura'];
+        $this->assertEquals($actual, $expect);
     }
-
-    /**
-     * @covers Aura\Sql\Gateway::update
-     * @todo Implement testUpdate().
-     */
+    
+    protected function fetchLastInsertId()
+    {
+        return $this->connection->lastInsertId();
+    }
+    
     public function testUpdate()
     {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
+        // select an object ...
+        $select = $this->gateway->newSelect()->where('name = ?', 'Anna');
+        $object = $this->gateway->fetchOne($select);
+        
+        // ... then modify and update it.
+        $object->firstName = 'Annabelle';
+        $this->gateway->update($object);
+        
+        // did it update?
+        $select = $this->gateway->newSelect()->where('name = ?', 'Annabelle');
+        $actual = $this->gateway->fetchOne($select);
+        $this->assertEquals($actual, $object);
+        
+        // did anything else update?
+        $select = $this->gateway->newSelect(['id', 'name'])->where('id = ?', 2);
+        $actual = $this->gateway->fetchOne($select);
+        $expect = (object) ['identity' => '2', 'firstName' => 'Betty'];
+        $this->assertEquals($actual, $expect);
     }
-
-    /**
-     * @covers Aura\Sql\Gateway::delete
-     * @todo Implement testDelete().
-     */
-    public function testDelete()
-    {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
-    }
+    
+    // public function testDelete()
+    // {
+    //     $where  = 'id = :id';
+    //     $bind   = ['id' => 1];
+    //     $actual = $this->connection->delete($this->table, $where, $bind);
+    //     
+    //     // did it delete?
+    //     $actual = $this->connection->fetchOne("SELECT * FROM {$this->table} WHERE id = 1");
+    //     $this->assertFalse($actual);
+    //     
+    //     // do we still have everything else?
+    //     $actual = $this->connection->fetchAll("SELECT * FROM {$this->table}");
+    //     $expect = 9;
+    //     $this->assertEquals($expect, count($actual));
+    // }
 
     /**
      * @covers Aura\Sql\Gateway::newSelect
