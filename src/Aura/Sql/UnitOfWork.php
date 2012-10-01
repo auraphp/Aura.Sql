@@ -2,6 +2,7 @@
 namespace Aura\Sql;
 
 use SplObjectStorage;
+use Exception as PhpException;
 
 class UnitOfWork
 {
@@ -15,19 +16,19 @@ class UnitOfWork
     protected $objects;
     
     // a collection of data objects that were successfully inserted
-    protected $inserts;
+    protected $inserted;
     
     // a collection of data objects that were successfully updated
     protected $udpates;
     
     // a collection of data objects that were successfully deleted
-    protected $deletes;
+    protected $deleted;
     
     // the exception that occurred during exec(), causing a rollback
     protected $exception;
     
     // the object that caused the exception
-    protected $failed_object;
+    protected $failed;
     
     public function __construct(GatewayLocator $gateways)
     {
@@ -38,16 +39,16 @@ class UnitOfWork
     // attach an object to the unit of work for insertion
     public function insert($object)
     {
-        $this->objects->detach($object);
-        $this->objects->attach($object, ['method' => 'execInsert']);
+        $this->detach($object);
+        $this->attach($object, ['method' => 'execInsert']);
     }
     
     // attach an object to the unit of work for updating
     public function update($new_object, $old_object = null)
     {
-        $this->objects->detach($object);
-        $this->objects->attach(
-            $object,
+        $this->detach($new_object);
+        $this->attach(
+            $new_object,
             [
                 'method' => 'execUpdate',
                 'old_object' => $old_object,
@@ -58,8 +59,8 @@ class UnitOfWork
     // attach an object to the unit of work for deletion
     public function delete($object)
     {
-        $this->objects->detach($object);
-        $this->objects->attach($object, ['method' => 'execDelete']);
+        $this->detach($object);
+        $this->attach($object, ['method' => 'execDelete']);
     }
     
     // attach an object to the unit of work
@@ -76,12 +77,16 @@ class UnitOfWork
     
     public function loadConnections()
     {
+        $this->connections = new SplObjectStorage;
         foreach ($this->gateways as $gateway) {
-            $connection = $gateway->getConnection();
-            if (! in_array($connection, $this->connections, true)) {
-                $this->connections[] = $connection;
-            }
+            $connection = $gateway->getConnections()->getWrite();
+            $this->connections->attach($connection);
         }
+    }
+    
+    public function getConnections()
+    {
+        return $this->connections;
     }
     
     // do we need pre/post hooks, so we can handle things like
@@ -89,12 +94,11 @@ class UnitOfWork
     public function exec()
     {
         // clear tracking properties
-        $this->connections   = null;
         $this->exception     = null;
-        $this->failed_object = null;
-        $this->deletes       = new SplObjectStorage;
-        $this->inserts       = new SplObjectStorage;
-        $this->updates       = new SplObjectStorage;
+        $this->failed = null;
+        $this->deleted       = new SplObjectStorage;
+        $this->inserted       = new SplObjectStorage;
+        $this->updated       = new SplObjectStorage;
         
         // load the connections from the gateways for transaction management
         $this->loadConnections();
@@ -123,8 +127,8 @@ class UnitOfWork
             $this->execCommit();
             return true;
             
-        } catch (Exception $e) {
-            $this->failed_object = $object; // from the loop above
+        } catch (PhpException $e) {
+            $this->failed = $object; // from the loop above
             $this->exception = $e;
             $this->execRollback();
             return false;
@@ -141,7 +145,7 @@ class UnitOfWork
     protected function execInsert($gateway, $object, $info)
     {
         $last_insert_id = $gateway->insert($object);
-        $this->inserts->attach($object, [
+        $this->inserted->attach($object, [
             'last_insert_id' => $last_insert_id,
         ]);
     }
@@ -150,13 +154,13 @@ class UnitOfWork
     {
         $old_object = $info['old_object'];
         $gateway->update($object, $old_object);
-        $this->updates->attach($object);
+        $this->updated->attach($object);
     }
     
     protected function execDelete($gateway, $object, $info)
     {
         $gateway->delete($object);
-        $this->deletes->attach($object);
+        $this->deleted->attach($object);
     }
     
     protected function execCommit()
@@ -178,19 +182,19 @@ class UnitOfWork
         return $this->objects;
     }
     
-    public function getInserts()
+    public function getInserted()
     {
-        return $this->inserts;
+        return $this->inserted;
     }
     
-    public function getUpdates()
+    public function getUpdated()
     {
-        return $this->updates;
+        return $this->updated;
     }
     
-    public function getDeletes()
+    public function getDeleted()
     {
-        return $this->deletes;
+        return $this->deleted;
     }
     
     public function getException()
@@ -198,8 +202,8 @@ class UnitOfWork
         return $this->exception;
     }
     
-    public function getFailedObject()
+    public function getFailed()
     {
-        return $this->failed_object;
+        return $this->failed;
     }
 }
