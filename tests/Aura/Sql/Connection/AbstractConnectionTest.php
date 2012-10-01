@@ -450,24 +450,6 @@ abstract class AbstractConnectionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($actual, $expect);
     }
     
-    // public function testUpdateNoBinding()
-    // {
-    //     $cols   = ['name = 99'];
-    //     $where  = 'id = :id';
-    //     $bind   = ['id' => 1];
-    //     $actual = $this->connection->update($this->table, $cols, $where, $bind);
-    //     
-    //     // did it update?
-    //     $actual = $this->connection->fetchOne("SELECT id, name FROM {$this->table} WHERE id = 1");
-    //     $expect = ['id' => '1', 'name' => '99'];
-    //     $this->assertEquals($actual, $expect);
-    //     
-    //     // did anything else update?
-    //     $actual = $this->connection->fetchOne("SELECT id, name FROM {$this->table} WHERE id = 2");
-    //     $expect = ['id' => '2', 'name' => 'Betty'];
-    //     $this->assertEquals($actual, $expect);
-    // }
-    
     public function testDelete()
     {
         $where  = 'id = :id';
