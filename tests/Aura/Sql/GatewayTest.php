@@ -256,4 +256,36 @@ class GatewayTest extends \PHPUnit_Framework_TestCase
         $expect = '1';
         $this->assertEquals($expect, $actual);
     }
+    
+    public function testFetchOneBy()
+    {
+        $actual = $this->gateway->fetchOneBy('id', 1);
+        unset($actual->defaultIgnore); // creation date-time
+        $expect = (object) [
+            'identity' => '1',
+            'firstName' => 'Anna',
+            'sizeScale' => null,
+            'defaultNull' => null,
+            'defaultString' => 'string',
+            'defaultNumber' => '12345',
+        ];
+        $this->assertEquals($expect, $actual);
+    }
+    
+    public function testFetchAllBy()
+    {
+        $actual = $this->gateway->fetchAllBy('id', [1]);
+        unset($actual[0]->defaultIgnore); // creation date-time
+        $expect = [
+            (object) [
+                'identity' => '1',
+                'firstName' => 'Anna',
+                'sizeScale' => null,
+                'defaultNull' => null,
+                'defaultString' => 'string',
+                'defaultNumber' => '12345',
+            ],
+        ];
+        $this->assertEquals($expect, $actual);
+    }
 }

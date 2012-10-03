@@ -64,6 +64,32 @@ class Gateway
         return $select;
     }
     
+    public function fetchOneBy($col, $val)
+    {
+        $select = $this->newSelect();
+        $where = $this->getMapper()->getTableCol($col);
+        if (is_array($val)) {
+            $where .= ' IN (?)';
+        } else {
+            $where .= ' = ?';
+        }
+        $select->where($where, $val);
+        return $this->fetchOne($select);
+    }
+    
+    public function fetchAllBy($col, $val)
+    {
+        $select = $this->newSelect();
+        $where = $this->getMapper()->getTableCol($col);
+        if (is_array($val)) {
+            $where .= ' IN (?)';
+        } else {
+            $where .= ' = ?';
+        }
+        $select->where($where, $val);
+        return $this->fetchAll($select);
+    }
+    
     public function fetchAll(Select $select, array $bind = [])
     {
         $connection = $select->getConnection();
