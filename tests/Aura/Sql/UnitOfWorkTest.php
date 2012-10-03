@@ -49,7 +49,7 @@ class UnitOfWorkTest extends \PHPUnit_Framework_TestCase
         $this->gateway = new Gateway($this->connections, $this->mapper);
         
         $this->gateways = new GatewayLocator([
-            'Aura\Sql\MockEntity' => $this->gateway,
+            'mock' => $this->gateway,
         ]);
         
         $this->work = new UnitOfWork($this->gateways);
@@ -78,13 +78,13 @@ class UnitOfWorkTest extends \PHPUnit_Framework_TestCase
         $entity = new MockEntity;
         $entity->firstName = 'Laura';
         $entity->sizeScope = 10;
-        $this->work->insert($entity);
+        $this->work->insert('mock', $entity);
         
         $storage = $this->work->getObjects();
         $this->assertSame(1, count($storage));
         $this->assertTrue($storage->contains($entity));
         
-        $expect = ['method' => 'execInsert'];
+        $expect = ['method' => 'execInsert', 'gateway' => 'mock'];
         $actual = $storage[$entity];
         $this->assertSame($expect, $actual);
     }
@@ -98,14 +98,14 @@ class UnitOfWorkTest extends \PHPUnit_Framework_TestCase
         
         // modify it and attach for update
         $entity->firstName = 'Annabelle';
-        $this->work->update($entity);
+        $this->work->update('mock', $entity);
         
         // get it and see if it's set up right
         $storage = $this->work->getObjects();
         $this->assertSame(1, count($storage));
         $this->assertTrue($storage->contains($entity));
         
-        $expect = ['method' => 'execUpdate', 'old_object' => null];
+        $expect = ['method' => 'execUpdate', 'gateway' => 'mock', 'old_object' => null];
         $actual = $storage[$entity];
         $this->assertSame($expect, $actual);
     }
@@ -118,14 +118,14 @@ class UnitOfWorkTest extends \PHPUnit_Framework_TestCase
         $entity = new MockEntity($this->gateway->fetchOne($select));
         
         // attach for delete
-        $this->work->delete($entity);
+        $this->work->delete('mock', $entity);
         
         // get it and see if it's set up right
         $storage = $this->work->getObjects();
         $this->assertSame(1, count($storage));
         $this->assertTrue($storage->contains($entity));
         
-        $expect = ['method' => 'execDelete'];
+        $expect = ['method' => 'execDelete', 'gateway' => 'mock'];
         $actual = $storage[$entity];
         $this->assertSame($expect, $actual);
     }
@@ -138,13 +138,13 @@ class UnitOfWorkTest extends \PHPUnit_Framework_TestCase
         $entity->sizeScope = 10;
         
         // attach it
-        $this->work->insert($entity);
+        $this->work->insert('mock', $entity);
         
         // make sure it's attached
         $storage = $this->work->getObjects();
         $this->assertSame(1, count($storage));
         $this->assertTrue($storage->contains($entity));
-        $expect = ['method' => 'execInsert'];
+        $expect = ['method' => 'execInsert', 'gateway' => 'mock'];
         $actual = $storage[$entity];
         $this->assertSame($expect, $actual);
         
@@ -172,20 +172,20 @@ class UnitOfWorkTest extends \PHPUnit_Framework_TestCase
         $coll[0] = new MockEntity;
         $coll[0]->firstName = 'Laura';
         $coll[0]->sizeScope = 10;
-        $this->work->insert($coll[0]);
+        $this->work->insert('mock', $coll[0]);
         
         // update
         $select = $this->gateway->newSelect();
         $select->where('name = ?', 'Anna');
         $coll[1] = new MockEntity($this->gateway->fetchOne($select));
         $coll[1]->firstName = 'Annabelle';
-        $this->work->update($coll[1]);
+        $this->work->update('mock', $coll[1]);
         
         // delete
         $select = $this->gateway->newSelect();
         $select->where('name = ?', 'Betty');
         $coll[2] = new MockEntity($this->gateway->fetchOne($select));
-        $this->work->delete($coll[2]);
+        $this->work->delete('mock', $coll[2]);
         
         // execute
         $result = $this->work->exec();
@@ -210,7 +210,7 @@ class UnitOfWorkTest extends \PHPUnit_Framework_TestCase
     {
         // insert without name; this should cause an exception and failure
         $entity = new MockEntity;
-        $this->work->insert($entity);
+        $this->work->insert('mock', $entity);
         
         // execute
         $result = $this->work->exec();

@@ -57,8 +57,7 @@ class GatewayLocator implements IteratorAggregate
      * 
      * Sets a gateway into the registry by name.
      * 
-     * @param string $name The gateway name, typically the record class for the
-     * gateway.
+     * @param string $name The gateway name.
      * 
      * @param string $spec The gateway specification, typically a closure that
      * builds and returns a gateway object.

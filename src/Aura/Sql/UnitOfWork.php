@@ -37,30 +37,43 @@ class UnitOfWork
     }
     
     // attach an object to the unit of work for insertion
-    public function insert($object)
+    public function insert($gateway, $object)
     {
         $this->detach($object);
-        $this->attach($object, ['method' => 'execInsert']);
+        $this->attach(
+            $object,
+            [
+                'method' => 'execInsert',
+                'gateway' => $gateway,
+            ]
+        );
     }
     
     // attach an object to the unit of work for updating
-    public function update($new_object, $old_object = null)
+    public function update($gateway, $new_object, $old_object = null)
     {
         $this->detach($new_object);
         $this->attach(
             $new_object,
             [
                 'method' => 'execUpdate',
+                'gateway' => $gateway,
                 'old_object' => $old_object,
             ]
         );
     }
     
     // attach an object to the unit of work for deletion
-    public function delete($object)
+    public function delete($gateway, $object)
     {
         $this->detach($object);
-        $this->attach($object, ['method' => 'execDelete']);
+        $this->attach(
+            $object,
+            [
+                'method' => 'execDelete',
+                'gateway' => $gateway,
+            ]
+        );
     }
     
     // attach an object to the unit of work
@@ -94,11 +107,11 @@ class UnitOfWork
     public function exec()
     {
         // clear tracking properties
-        $this->exception     = null;
-        $this->failed = null;
-        $this->deleted       = new SplObjectStorage;
-        $this->inserted       = new SplObjectStorage;
-        $this->updated       = new SplObjectStorage;
+        $this->exception = null;
+        $this->failed    = null;
+        $this->deleted   = new SplObjectStorage;
+        $this->inserted  = new SplObjectStorage;
+        $this->updated   = new SplObjectStorage;
         
         // load the connections from the gateways for transaction management
         $this->loadConnections();
@@ -110,14 +123,14 @@ class UnitOfWork
             
             foreach ($this->objects as $object) {
                 
-                // locate the gateway for this object
-                $class = get_class($object);
-                $gateway = $this->gateways->get($class);
-                
-                // get the method and info for this object
+                // get the info for this object
                 $info = $this->objects[$object];
                 $method = $info['method'];
+                $gateway = $this->gateways->get($info['gateway']);
+                
+                // remove used info
                 unset($info['method']);
+                unset($info['gateway']);
                 
                 // execute the method
                 $this->$method($gateway, $object, $info);

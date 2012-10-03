@@ -20,15 +20,15 @@ class GatewayLocatorTest extends \PHPUnit_Framework_TestCase
     {
         parent::setUp();
         $registry = [
-            'Domain\Post\Entity' => function() {
+            'posts' => function() {
                 $gateway = (object) ['type' => 'post'];
                 return $gateway;
             },
-            'Domain\Comment\Entity' => function() {
+            'comments' => function() {
                 $gateway = (object) ['type' => 'comment'];
                 return $gateway;
             },
-            'Domain\Author\Entity' => function() {
+            'authors' => function() {
                 $gateway = (object) ['type' => 'author'];
                 return $gateway;
             },
@@ -52,13 +52,13 @@ class GatewayLocatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testSetAndGet()
     {
-        $this->gateways->set('Domain\Category\Entity', function () {
-            $gateway = (object) ['type' => 'category'];
+        $this->gateways->set('tags', function () {
+            $gateway = (object) ['type' => 'tag'];
             return $gateway;
         });
         
-        $gateway = $this->gateways->get('Domain\Category\Entity');
-        $this->assertTrue($gateway->type == 'category');
+        $gateway = $this->gateways->get('tags');
+        $this->assertTrue($gateway->type == 'tag');
     }
 
     public function testGet_noSuchGateway()
