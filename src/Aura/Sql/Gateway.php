@@ -66,18 +66,17 @@ class Gateway
     
     public function fetchOneBy($col, $val)
     {
-        $select = $this->newSelect();
-        $where = $this->getMapper()->getTableCol($col);
-        if (is_array($val)) {
-            $where .= ' IN (?)';
-        } else {
-            $where .= ' = ?';
-        }
-        $select->where($where, $val);
+        $select = $this->newSelectBy($col, $val);
         return $this->fetchOne($select);
     }
     
     public function fetchAllBy($col, $val)
+    {
+        $select = $this->newSelectBy($col, $val);
+        return $this->fetchAll($select);
+    }
+    
+    protected function newSelectBy($col, $val)
     {
         $select = $this->newSelect();
         $where = $this->getMapper()->getTableCol($col);
@@ -87,7 +86,7 @@ class Gateway
             $where .= ' = ?';
         }
         $select->where($where, $val);
-        return $this->fetchAll($select);
+        return $select;
     }
     
     public function fetchAll(Select $select, array $bind = [])
