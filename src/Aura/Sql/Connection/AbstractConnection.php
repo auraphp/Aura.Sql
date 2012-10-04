@@ -432,7 +432,35 @@ abstract class AbstractConnection
     public function fetchAll($query, $bind = [])
     {
         $stmt = $this->query($query, $bind);
-        return $stmt->fetchAll(PDO::FETCH_OBJ);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * 
+     * Fetches all rows from the database using associative keys (defined by
+     * the first column).
+     * 
+     * N.b.: if multiple rows have the same first column value, the last
+     * row with that value will override earlier rows.
+     * 
+     * @param string $text The text of the SQL statement, optionally with
+     * named placeholders.
+     * 
+     * @param array $data An associative array of data to bind to the named
+     * placeholders.
+     * 
+     * @return array
+     * 
+     */
+    public function fetchAssoc($text, array $data = [])
+    {
+        $stmt = $this->query($text, $data);
+        $data = [];
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $key = current($row); // value of the first element
+            $data[$key] = $row;
+        }
+        return $data;
     }
 
     /**
@@ -513,7 +541,7 @@ abstract class AbstractConnection
     public function fetchOne($query, array $bind = [])
     {
         $stmt = $this->query($query, $bind);
-        return $stmt->fetch(PDO::FETCH_OBJ);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
     /**

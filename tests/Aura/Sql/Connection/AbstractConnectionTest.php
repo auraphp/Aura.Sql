@@ -224,6 +224,20 @@ abstract class AbstractConnectionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expect, $actual);
     }
     
+    public function testFetchAssoc()
+    {
+        $text = "SELECT * FROM {$this->table} ORDER BY id";
+        $result = $this->connection->fetchAssoc($text);
+        $expect = 10;
+        $actual = count($result);
+        $this->assertEquals($expect, $actual);
+        
+        // 1-based IDs, not 0-based sequential values
+        $expect = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+        $actual = array_keys($result);
+        $this->assertEquals($expect, $actual);
+    }
+    
     public function testFetchCol()
     {
         $text = "SELECT id FROM {$this->table} ORDER BY id";
@@ -268,7 +282,7 @@ abstract class AbstractConnectionTest extends \PHPUnit_Framework_TestCase
     {
         $text = "SELECT id, name FROM {$this->table} WHERE id = 1";
         $actual = $this->connection->fetchOne($text);
-        $expect = (object) [
+        $expect = [
             'id'   => '1',
             'name' => 'Anna',
         ];
@@ -423,7 +437,7 @@ abstract class AbstractConnectionTest extends \PHPUnit_Framework_TestCase
         
         // did it insert?
         $actual = $this->connection->fetchOne("SELECT id, name FROM {$this->table} WHERE id = 11");
-        $expect = (object) ['id' => '11', 'name' => 'Laura'];
+        $expect = ['id' => '11', 'name' => 'Laura'];
         $this->assertEquals($actual, $expect);
     }
     
@@ -441,12 +455,12 @@ abstract class AbstractConnectionTest extends \PHPUnit_Framework_TestCase
         
         // did it update?
         $actual = $this->connection->fetchOne("SELECT id, name FROM {$this->table} WHERE id = 1");
-        $expect = (object) ['id' => '1', 'name' => 'Annabelle'];
+        $expect = ['id' => '1', 'name' => 'Annabelle'];
         $this->assertEquals($actual, $expect);
         
         // did anything else update?
         $actual = $this->connection->fetchOne("SELECT id, name FROM {$this->table} WHERE id = 2");
-        $expect = (object) ['id' => '2', 'name' => 'Betty'];
+        $expect = ['id' => '2', 'name' => 'Betty'];
         $this->assertEquals($actual, $expect);
     }
     
