@@ -103,7 +103,7 @@ class GatewayTest extends \PHPUnit_Framework_TestCase
         // did it insert?
         $select = $this->gateway->newSelect(['id', 'name'])->where('id = ?', 11);
         $actual = $this->gateway->fetchOne($select);
-        $expect = (object) ['identity' => '11', 'firstName' => 'Laura'];
+        $expect = ['identity' => '11', 'firstName' => 'Laura'];
         $this->assertEquals($actual, $expect);
     }
     
@@ -116,7 +116,7 @@ class GatewayTest extends \PHPUnit_Framework_TestCase
     {
         // select an object ...
         $select = $this->gateway->newSelect()->where('name = ?', 'Anna');
-        $object = $this->gateway->fetchOne($select);
+        $object = (object) $this->gateway->fetchOne($select);
         
         // ... then modify and update it.
         $object->firstName = 'Annabelle';
@@ -124,13 +124,13 @@ class GatewayTest extends \PHPUnit_Framework_TestCase
         
         // did it update?
         $select = $this->gateway->newSelect()->where('name = ?', 'Annabelle');
-        $actual = $this->gateway->fetchOne($select);
+        $actual = (object) $this->gateway->fetchOne($select);
         $this->assertEquals($actual, $object);
         
         // did anything else update?
         $select = $this->gateway->newSelect(['id', 'name'])->where('id = ?', 2);
         $actual = $this->gateway->fetchOne($select);
-        $expect = (object) ['identity' => '2', 'firstName' => 'Betty'];
+        $expect = ['identity' => '2', 'firstName' => 'Betty'];
         $this->assertEquals($actual, $expect);
     }
     
@@ -138,7 +138,7 @@ class GatewayTest extends \PHPUnit_Framework_TestCase
     {
         // select an object ...
         $select = $this->gateway->newSelect()->where('name = ?', 'Anna');
-        $object = $this->gateway->fetchOne($select);
+        $object = (object) $this->gateway->fetchOne($select);
         
         // then delete it.
         $this->gateway->delete($object);
@@ -215,7 +215,7 @@ class GatewayTest extends \PHPUnit_Framework_TestCase
     {
         $select = $this->gateway->newSelect(['id', 'name'])->where('id = ?', 1);
         $actual = $this->gateway->fetchOne($select);
-        $expect = (object) [
+        $expect = [
             'identity'  => '1',
             'firstName' => 'Anna',
         ];
@@ -260,8 +260,8 @@ class GatewayTest extends \PHPUnit_Framework_TestCase
     public function testFetchOneBy()
     {
         $actual = $this->gateway->fetchOneBy('id', 1);
-        unset($actual->defaultIgnore); // creation date-time
-        $expect = (object) [
+        unset($actual['defaultIgnore']); // creation date-time
+        $expect = [
             'identity' => '1',
             'firstName' => 'Anna',
             'sizeScale' => null,
@@ -275,9 +275,9 @@ class GatewayTest extends \PHPUnit_Framework_TestCase
     public function testFetchAllBy()
     {
         $actual = $this->gateway->fetchAllBy('id', [1]);
-        unset($actual[0]->defaultIgnore); // creation date-time
+        unset($actual[0]['defaultIgnore']); // creation date-time
         $expect = [
-            (object) [
+            [
                 'identity' => '1',
                 'firstName' => 'Anna',
                 'sizeScale' => null,

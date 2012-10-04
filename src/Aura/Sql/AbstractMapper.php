@@ -106,15 +106,15 @@ abstract class AbstractMapper
         $insert->addBind($data);
     }
     
-    public function modifyUpdate(Update $update, $new_object, $old_object = null)
+    public function modifyUpdate(Update $update, $object, $initial_data = null)
     {
-        $data = $this->getUpdateData($new_object, $old_object);
+        $data = $this->getUpdateData($object, $initial_data);
         $update->table($this->getTable());
         $update->cols(array_keys($data));
         $update->addBind($data);
         $update->where(
             $this->getPrimaryCol() . ' = ?',
-            $this->getIdentityValue($new_object)
+            $this->getIdentityValue($object)
         );
     }
     
@@ -136,25 +136,26 @@ abstract class AbstractMapper
         return $data;
     }
 
-    public function getUpdateData($new_object, $old_object = null)
+    public function getUpdateData($object, $initial_data = null)
     {
-        if ($old_object) {
-            return $this->getUpdateDataChanges($new_object, $old_object);
+        if ($initial_data) {
+            return $this->getUpdateDataChanges($object, $initial_data);
         }
 
         $data = [];
         foreach ($this->cols_fields as $col => $field) {
-            $data[$col] = $new_object->$field;
+            $data[$col] = $object->$field;
         }
         return $data;
     }
 
-    public function getUpdateDataChanges($new_object, $old_object)
+    public function getUpdateDataChanges($object, $initial_data)
     {
+        $initial_data = (object) $initial_data;
         $data = [];
         foreach ($this->cols_fields as $col => $field) {
-            $new = $new_object->$field;
-            $old = $old_object->$field;
+            $new = $object->$field;
+            $old = $initial_data->$field;
             if (! $this->compare($new, $old)) {
                 $data[$col] = $new;
             }

@@ -105,7 +105,11 @@ class UnitOfWorkTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(1, count($storage));
         $this->assertTrue($storage->contains($entity));
         
-        $expect = ['method' => 'execUpdate', 'gateway' => 'mock', 'old_object' => null];
+        $expect = [
+            'method' => 'execUpdate',
+            'gateway' => 'mock',
+            'initial_data' => null
+        ];
         $actual = $storage[$entity];
         $this->assertSame($expect, $actual);
     }

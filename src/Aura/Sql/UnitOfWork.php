@@ -50,15 +50,15 @@ class UnitOfWork
     }
     
     // attach an object to the unit of work for updating
-    public function update($gateway, $new_object, $old_object = null)
+    public function update($gateway, $new_object, $initial_data = null)
     {
         $this->detach($new_object);
         $this->attach(
             $new_object,
             [
-                'method' => 'execUpdate',
-                'gateway' => $gateway,
-                'old_object' => $old_object,
+                'method'       => 'execUpdate',
+                'gateway'      => $gateway,
+                'initial_data' => $initial_data,
             ]
         );
     }
@@ -165,8 +165,8 @@ class UnitOfWork
     
     protected function execUpdate($gateway, $object, $info)
     {
-        $old_object = $info['old_object'];
-        $gateway->update($object, $old_object);
+        $initial_data = $info['initial_data'];
+        $gateway->update($object, $initial_data);
         $this->updated->attach($object);
     }
     

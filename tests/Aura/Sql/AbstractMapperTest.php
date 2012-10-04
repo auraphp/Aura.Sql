@@ -350,7 +350,7 @@ class AbstractMapperTest extends \PHPUnit_Framework_TestCase
      */
     public function testModifyUpdateChanges()
     {
-        $new_object = (object) [
+        $object = (object) [
             'identity' => 88,
             'firstName' => 'Laura',
             'sizeScale' => 10,
@@ -360,7 +360,7 @@ class AbstractMapperTest extends \PHPUnit_Framework_TestCase
             'defaultIgnore' => null,
         ];
         
-        $old_object = (object) [
+        $initial_data = [
             'identity' => 88,
             'firstName' => 'Lora',
             'sizeScale' => 10,
@@ -372,7 +372,7 @@ class AbstractMapperTest extends \PHPUnit_Framework_TestCase
         
         $connection = $this->newConnection();
         $update = $connection->newUpdate();
-        $this->mapper->modifyUpdate($update, $new_object, $old_object);
+        $this->mapper->modifyUpdate($update, $object, $initial_data);
         
         $actual = $update->__toString();
         $expect = "
@@ -488,7 +488,7 @@ class AbstractMapperTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetUpdateDataChanges()
     {
-        $new_object = (object) [
+        $object = (object) [
             'identity' => 88,
             'firstName' => 'Laura',
             'sizeScale' => 10,
@@ -498,7 +498,7 @@ class AbstractMapperTest extends \PHPUnit_Framework_TestCase
             'defaultIgnore' => null,
         ];
         
-        $old_object = (object) [
+        $initial_data = [
             'identity' => 88,
             'firstName' => 'Lora',
             'sizeScale' => 10,
@@ -513,7 +513,7 @@ class AbstractMapperTest extends \PHPUnit_Framework_TestCase
         ];
         
         // uses getUpdateDataChanges()
-        $actual = $this->mapper->getUpdateData($new_object, $old_object);
+        $actual = $this->mapper->getUpdateData($object, $initial_data);
         $this->assertSame($expect, $actual);
     }
 

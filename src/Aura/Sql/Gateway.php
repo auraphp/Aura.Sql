@@ -40,11 +40,11 @@ class Gateway
         return $connection->lastInsertId();
     }
     
-    public function update($new_object, $old_object = null)
+    public function update($object, $initial_data = null)
     {
         $connection = $this->connections->getWrite();
         $update = $connection->newUpdate();
-        $this->mapper->modifyUpdate($update, $new_object, $old_object);
+        $this->mapper->modifyUpdate($update, $object, $initial_data);
         return $connection->query($update, $update->getBind());
     }
     
