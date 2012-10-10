@@ -43,10 +43,10 @@ trait WhereTrait
      */
     public function where($cond)
     {
-        $cond = $this->sql->quoteNamesIn($cond);
+        $cond = $this->connection->quoteNamesIn($cond);
         
         if (func_num_args() > 1) {
-            $cond = $this->sql->quoteInto($cond, func_get_arg(1));
+            $cond = $this->connection->quoteInto($cond, func_get_arg(1));
         }
 
         if ($this->where) {
@@ -73,10 +73,10 @@ trait WhereTrait
      */
     public function orWhere($cond)
     {
-        $cond = $this->sql->quoteNamesIn($cond);
+        $cond = $this->connection->quoteNamesIn($cond);
 
         if (func_num_args() > 1) {
-            $cond = $this->sql->quoteInto($cond, func_get_arg(1));
+            $cond = $this->connection->quoteInto($cond, func_get_arg(1));
         }
 
         if ($this->where) {

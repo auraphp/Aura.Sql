@@ -1,26 +1,29 @@
 <?php
 namespace Aura\Sql\Query;
 
-use Aura\Sql\AdapterFactory;
+use Aura\Sql\ConnectionFactory;
 use Aura\Sql\Query\Factory as QueryFactory;
+use Aura\Sql\Assertions;
 
 abstract class AbstractQueryTest extends \PHPUnit_Framework_TestCase
 {
+    use Assertions;
+    
     protected $query_type;
     
     protected $query;
 
-    protected $adapter;
+    protected $connection;
     
     protected function setUp()
     {
         parent::setUp();
-        $adapter_factory = new AdapterFactory;
+        $connection_factory = new ConnectionFactory;
         $query_factory   = new QueryFactory;
-        $this->adapter   = $adapter_factory->newInstance('sqlite', ':memory:');
+        $this->connection   = $connection_factory->newInstance('sqlite', ':memory:');
         $this->query     = $query_factory->newInstance(
             $this->query_type,
-            $this->adapter
+            $this->connection
         );
     }
     
@@ -29,16 +32,25 @@ abstract class AbstractQueryTest extends \PHPUnit_Framework_TestCase
         parent::tearDown();
     }
 
-    protected function assertSameSql($expect, $actual)
+    public function testGetConnection()
     {
-        $expect = trim($expect);
-        $expect = preg_replace('/^\s*/m', '', $expect);
-        $expect = preg_replace('/\s*$/m', '', $expect);
+        $connection = $this->query->getConnection();
+        $this->assertSame($this->connection, $connection);
+    }
+    
+    public function testSetAddGetBind()
+    {
+        $actual = $this->query->getBind();
+        $this->assertSame([], $actual);
         
-        $actual = trim($actual);
-        $actual = preg_replace('/^\s*/m', '', $actual);
-        $actual = preg_replace('/\s*$/m', '', $actual);
+        $expect = ['foo' => 'bar', 'baz' => 'dib'];
+        $this->query->setBind($expect);
+        $actual = $this->query->getBind();
+        $this->assertSame($expect, $actual);
         
+        $this->query->addBind(['zim' => 'gir']);
+        $expect = ['foo' => 'bar', 'baz' => 'dib', 'zim' => 'gir'];
+        $actual = $this->query->getBind();
         $this->assertSame($expect, $actual);
     }
 }

@@ -6,7 +6,9 @@ env:
 php:
   - 5.4
 before_script:
+  - "mysql -e 'DROP DATABASE IF EXISTS test;'"
   - "mysql -e 'create database test;'"
+  - "psql -c 'DROP DATABASE IF EXISTS test;' -U postgres"
   - "psql -c 'create database test;' -U postgres"
   - cd tests
 script: phpunit

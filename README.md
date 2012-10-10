@@ -1,8 +1,8 @@
 Aura SQL
 ========
 
-The Aura SQL package provides adapters to connect to and query against SQL
-data sources such as MySQL, PostgreSQL, and Sqlite. The adapters are mostly
+The Aura SQL package provides connections to connect to and query against SQL
+data sources such as MySQL, PostgreSQL, and Sqlite. The connections are mostly
 wrappers around [PDO](http://php.net/PDO) connections.
 
 This package is compliant with [PSR-0][], [PSR-1][], and [PSR-2][]. If you
@@ -19,12 +19,12 @@ Instantiation
 -------------
 
 The easiest way to get started is to use the `scripts/instance.php` script to
-get an `AdapterFactory` and create your adapter through it:
+get a `ConnectionFactory` and create your connection through it:
 
 ```php
 <?php
-$adapter_factory = include '/path/to/Aura.Sql/scripts/instance.php';
-$sql = $adapter_factory->newInstance(
+$connection_factory = include '/path/to/Aura.Sql/scripts/instance.php';
+$connection = $connection_factory->newInstance(
     
     // adapter name
     'mysql',
@@ -42,56 +42,60 @@ $sql = $adapter_factory->newInstance(
 ```
 
 Alternatively, you can add `'/path/to/Aura.Sql/src'` to your autoloader and
-build an adapter factory manually:
+build an connection factory manually:
     
 ```php
 <?php
-use Aura\Sql\AdapterFactory;
-$adapter_factory = new AdapterFactory;
-$sql = $adapter_factory->newInstance(...);
+use Aura\Sql\ConnectionFactory;
+$connection_factory = new ConnectionFactory;
+$connection = $connection_factory->newInstance(...);
 ```
     
-Aura SQL comes with three adapters: `'mysql'` for MySQL, `'pgsql'` for
-PostgreSQL, and `'sqlite'` for SQLite3.
+Aura SQL comes with four connection adapters: `'mysql'` for MySQL, `'pgsql'`
+for PostgreSQL, `'sqlite'` for SQLite3, and `'sqlsrv'` for Microsoft SQL
+Server.
 
 Connecting
 ----------
 
-The adapter will lazy-connect to the database the first time you issue a query
-of any sort. This means you can create the adapter object, and if you never
-issue a query, it will never connect to the database.
+The connection will lazy-connect to the database the first time you issue a
+query of any sort. This means you can create the connection object, and if you
+never issue a query, it will never connect to the database.
 
 You can connect manually by issuing `connect()`:
 
 ```php
 <?php
-$sql->connect();
+$connection->connect();
 ```
 
 
 Fetching Results
 ----------------
 
-Once you have an adapter connection, you can begin to fetch results from the
-database.
+Once you have a connection, you can begin to fetch results from the database.
 
 ```php
 <?php
 // returns all rows
-$result = $sql->fetchAll('SELECT * FROM foo');
+$result = $connection->fetchAll('SELECT * FROM foo');
 ```
 
 You can fetch results using these methods:
 
-- `fetchAll()` returns a sequential array of all rows. The rows themselves are associative arrays where the keys are the column names.
+- `fetchAll()` returns a sequential array of all rows. The rows themselves are
+  associative arrays where the keys are the column names.
 
-- `fetchAssoc()` returns an associative array of all rows where the key is the first column.
+- `fetchAssoc()` returns an associative array of all rows where the key is the
+  first column.
 
 - `fetchCol()` returns a sequential array of all values in the first column.
 
-- `fetchOne()` returns the first row as an associative array where the keys are the column names.
+- `fetchOne()` returns the first row as an associative array where the keys
+  are the column names.
 
-- `fetchPairs()` returns an associative array where each key is the first column and each value is the second column.
+- `fetchPairs()` returns an associative array where each key is the first
+  column and each value is the second column.
 
 - `fetchValue()` returns the value of the first row in the first column.
 
@@ -113,13 +117,13 @@ query text, then pass an array of values to bind to the placeholders:
 $text = 'SELECT * FROM foo WHERE id = :id';
 
 // values to bind to query placeholders
-$data = [
+$bind = [
     'id' => 1,
 ];
 
 // returns one row; the data has been parameterized
 // into a prepared statement for you
-$result = $sql->fetchOne($text, $data);
+$result = $connection->fetchOne($text, $bind);
 ```
 
 Aura SQL recognizes array values and quotes them as comma-separated lists:
@@ -130,14 +134,14 @@ Aura SQL recognizes array values and quotes them as comma-separated lists:
 $text = 'SELECT * FROM foo WHERE id = :id AND bar IN(:bar_list)';
 
 // values to bind to query placeholders
-$data = [
+$bind = [
     'id' => 1,
     'bar_list' => ['a', 'b', 'c'],
 ];
 
 // returns all rows; the query ends up being
 // "SELECT * FROM foo WHERE id = 1 AND bar IN('a', 'b', 'c')"
-$result = $sql->fetchOne($text, $data);
+$result = $connection->fetchOne($text, $bind);
 ```
 
 
@@ -161,15 +165,15 @@ $cols = [
 ];
 
 // perform the insert; result is number of rows affected
-$result = $sql->insert($table, $cols);
+$result = $connection->insert($table, $cols);
 
 // now get the last inserted ID
-$id = $sql->lastInsertId();
+$id = $connection->lastInsertId();
 ```
 
 (N.b.: Because of the way PostgreSQL creates auto-incremented columns, the
 `pgsql` adapter needs to know the table and column name to get the last
-inserted ID; for example, `$id = $sql->lastInsertId($table, 'id');`.)
+inserted ID; for example, `$id = $connection->lastInsertId($table, 'id');`.)
 
 Next, to update rows:
 
@@ -187,14 +191,14 @@ $cols = [
 $cond = 'id = :id';
 
 // additional data to bind to the query
-$data = ['id' => 1];
+$bind = ['id' => 1];
 
 // perform the update; result is number of rows affected
-$result = $sql->update($table, $cols, $cond, $data);
+$result = $connection->update($table, $cols, $cond, $bind);
 ```
 
-> (N.b.: Both `$cols` and `$data` are bound into the update query, but `$cols`
-> takes precedence. Be sure that the keys in `$cols` and `$data` do not
+> (N.b.: Both `$cols` and `$bind` are bound into the update query, but `$cols`
+> takes precedence. Be sure that the keys in `$cols` and `$bind` do not
 > conflict.)
 
 Finally, to delete rows:
@@ -208,10 +212,10 @@ $table = 'foo';
 $cond = 'id = :id';
 
 // data to bind to the query
-$data = ['id' => 1];
+$bind = ['id' => 1];
 
 // perform the deletion; result is number of rows affected
-$result = $sql->delete($table, $cond, $data);
+$result = $connection->delete($table, $cond, $bind);
 ```
 
 
@@ -223,7 +227,7 @@ To get a list of tables in the database, issue `fetchTableList()`:
 ```php
 <?php
 // get the list of tables
-$list = $sql->fetchTableList();
+$list = $connection->fetchTableList();
 
 // show them
 foreach ($list as $table) {
@@ -239,7 +243,7 @@ To get information about the columns in a table, issue `fetchTableCols()`:
 $table = 'foo';
 
 // get the cols
-$cols = $sql->fetchTableCols($table);
+$cols = $connection->fetchTableCols($table);
 
 // show them
 foreach ($cols as $name => $col) {
@@ -272,23 +276,23 @@ Each column description is a `Column` object with the following properties:
 Transactions
 ------------
 
-Aura SQL adapters always start in autocommit mode (the same as PDO). However,
+Aura SQL connections always start in autocommit mode (the same as PDO). However,
 you can turn off autocommit mode and start a transaction with
 `beginTransaction()`, then either `commit()` or `rollBack()` the transaction.
-Commits and rollbacks cause the adapter to go back into autocommit mode.
+Commits and rollbacks cause the connection to go back into autocommit mode.
 
 ```php
 <?php
 // turn off autocommit and start a transaction
-$sql->beginTransaction();
+$connection->beginTransaction();
 
 try {
     // ... perform some queries ...
     // now commit to the database:
-    $sql->commit();
+    $connection->commit();
 } catch (Exception $e) {
     // there was an error, roll back the queries
-    $sql->rollBack();
+    $connection->rollBack();
 }
 
 // at this point we are back in autocommit mode
@@ -304,8 +308,8 @@ You can, of course, build and issue your own queries by hand. Use the
 ```php
 <?php
 $text = "SELECT * FROM foo WHERE id = :id";
-$data = ['id' => 1];
-$stmt = $sql->query($text, $data)
+$bind = ['id' => 1];
+$stmt = $connection->query($text, $bind)
 ```
 
 The returned `$stmt` is a [PDOStatement](http://php.net/PDOStatement) that you
@@ -319,13 +323,13 @@ You can use profiling to see how well your queries are performing.
 ```php
 <?php
 // turn on the profiler
-$sql->getProfiler()->setActive(true);
+$connection->getProfiler()->setActive(true);
 
 // issue a query
-$result = $sql->fetchAll('SELECT * FROM foo');
+$result = $connection->fetchAll('SELECT * FROM foo');
 
 // now get the profiler information
-foreach ($sql->getProfiler()->getProfiles() as $i => $profile) {
+foreach ($connection->getProfiler()->getProfiles() as $i => $profile) {
     echo 'Query #' . ($i + 1)
        . ' took ' . $profile->time . ' seconds.'
        . PHP_EOL;
@@ -353,14 +357,14 @@ queries in an object-oriented way.
 Select
 ------
 
-To get a new `Select` object, invoke the `newSelect()` method on an adapter.
+To get a new `Select` object, invoke the `newSelect()` method on an connection.
 You can then modify the `Select` object and pass it to the `query()` or
 `fetch*()` method.
 
 ```php
 <?php
 // create a new Select object
-$select = $sql->newSelect();
+$select = $connection->newSelect();
 
 // SELECT * FROM foo WHERE bar > :bar ORDER BY baz
 $select->cols(['*'])
@@ -368,9 +372,9 @@ $select->cols(['*'])
        ->where('bar > :bar')
        ->orderBy('baz');
 
-$data['foo' => '88'];
+$bind['bar' => '88'];
 
-$list = $sql->fetchAll($select, $data);
+$list = $connection->fetchAll($select, $bind);
 ```
 
 The `Select` object has these methods and more; please read the source code
@@ -407,37 +411,37 @@ for more information.
 Insert
 ------
 
-To get a new `Insert` object, invoke the `newInsert()` method on an adapter.
+To get a new `Insert` object, invoke the `newInsert()` method on an connection.
 You can then modify the `Insert` object and pass it to the `query()` method.
 
 ```php
 <?php
 // create a new Insert object
-$insert = $sql->newInsert();
+$insert = $connection->newInsert();
 
-// INSERT INTO foo (bar, baz, date) VALUES (:foo, :bar, NOW());
+// INSERT INTO foo (bar, baz, date) VALUES (:bar, :baz, NOW());
 $insert->into('foo')
        ->cols(['bar', 'baz'])
        ->set('date', 'NOW()');
 
-$data[
-    'foo' => null,
-    'bar' => 'zim',
+$bind[
+    'bar' => null,
+    'baz' => 'zim',
 ];
 
-$stmt = $sql->query($insert, $data);
+$stmt = $connection->query($insert, $bind);
 ```
 
 Update
 ------
 
-To get a new `Update` object, invoke the `newUpdate()` method on an adapter.
+To get a new `Update` object, invoke the `newUpdate()` method on an connection.
 You can then modify the `Update` object and pass it to the `query()` method.
 
 ```php
 <?php
 // create a new Update object
-$update = $sql->newUpdate();
+$update = $connection->newUpdate();
 
 // UPDATE foo SET bar = :bar, baz = :baz, date = NOW() WHERE zim = :zim OR gir = :gir
 $update->table('foo')
@@ -446,37 +450,36 @@ $update->table('foo')
        ->where('zim = :zim')
        ->orWhere('gir = :gir');
 
-$data[
-    'foo' => null,
+$bind[
     'bar' => 'barbar',
     'baz' => 99,
     'zim' => 'dib',
     'gir' => 'doom',
 ];
 
-$stmt = $sql->query($update, $data);
+$stmt = $connection->query($update, $bind);
 ```
 
 Delete
 ------
 
-To get a new `Delete` object, invoke the `newDelete()` method on an adapter.
+To get a new `Delete` object, invoke the `newDelete()` method on an connection.
 You can then modify the `Delete` object and pass it to the `query()` method.
 
 ```php
 <?php
 // create a new Delete object
-$delete = $sql->newDelete();
+$delete = $connection->newDelete();
 
 // DELETE FROM WHERE zim = :zim OR gir = :gir
 $delete->from('foo')
        ->where('zim = :zim')
        ->orWhere('gir = :gir');
 
-$data[
+$bind[
     'zim' => 'dib',
     'gir' => 'doom',
 ];
 
-$stmt = $sql->query($delete, $data);
+$stmt = $connection->query($delete, $bind);
 ```

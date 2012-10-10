@@ -37,8 +37,8 @@ class ProfilerTest extends \PHPUnit_Framework_TestCase
     {
         $text = 'SELECT * FROM test';
         $stmt = $this->pdo->prepare($text);
-        $data = ['foo' => 'bar'];
-        $this->profiler->exec($stmt, $data);
+        $bind = ['foo' => 'bar'];
+        $this->profiler->exec($stmt, $bind);
         
         // should be nothing in the profile
         $expect = [];
@@ -47,11 +47,11 @@ class ProfilerTest extends \PHPUnit_Framework_TestCase
         
         // now make it active
         $this->profiler->setActive(true);
-        $this->profiler->exec($stmt, $data);
+        $this->profiler->exec($stmt, $bind);
         $actual = $this->profiler->getProfiles();
         $this->assertSame(1, count($actual));
         $this->assertSame($text, $actual[0]->text);
-        $this->assertSame($data, $actual[0]->data);
+        $this->assertSame($bind, $actual[0]->data);
     }
 
     public function testCall()

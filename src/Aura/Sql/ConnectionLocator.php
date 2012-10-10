@@ -10,6 +10,8 @@
  */
 namespace Aura\Sql;
 
+use Aura\Sql\Connection\AbstractConnection;
+
 /**
  * 
  * Manages connections to default, master, and slave databases.
@@ -17,25 +19,25 @@ namespace Aura\Sql;
  * @package Aura.Sql
  * 
  */
-class ConnectionManager
+class ConnectionLocator
 {
     /**
      * 
-     * An SQL adapter factory.
+     * An SQL connection factory.
      * 
-     * @var AdapterFactory
+     * @var ConnectionFactory
      * 
      */
-    protected $adapter_factory;
+    protected $connection_factory;
 
     /**
      * 
-     * SQL adapter connection objects as constructed from their params.
+     * SQL connection connection objects as constructed from their params.
      * 
      * @var array
      * 
      */
-    protected $conn = [
+    protected $connection = [
         'default' => null,
         'masters' => [],
         'slaves'  => [],
@@ -82,7 +84,7 @@ class ConnectionManager
      * 
      * Constructor.
      * 
-     * @param AdapterFactory $adapter_factory An adapter factory to create 
+     * @param ConnectionFactory $connection_factory An connection factory to create 
      * connection objects.
      * 
      * @param array $default An array of key-value pairs for the default
@@ -96,12 +98,12 @@ class ConnectionManager
      * 
      */
     public function __construct(
-        AdapterFactory $adapter_factory,
+        ConnectionFactory $connection_factory,
         array $default = [],
         array $masters = [],
         array $slaves  = []
     ) {
-        $this->adapter_factory = $adapter_factory;
+        $this->connection_factory = $connection_factory;
         $this->setDefault($default);
         foreach ($masters as $name => $params) {
             $this->setMaster($name, $params);
@@ -167,7 +169,7 @@ class ConnectionManager
      * 
      * - If there are no masters, the default connection.
      * 
-     * @return AbstractAdapter
+     * @return AbstractConnection
      * 
      */
     public function getRead()
@@ -189,7 +191,7 @@ class ConnectionManager
      * 
      * - If there are no masters, the default connection.
      * 
-     * @return AbstractAdapter
+     * @return AbstractConnection
      * 
      */
     public function getWrite()
@@ -205,13 +207,13 @@ class ConnectionManager
      * 
      * Returns the default connection object.
      * 
-     * @return AbstractAdapter
+     * @return AbstractConnection
      * 
      */
     public function getDefault()
     {
-        if (! $this->conn['default'] instanceof AbstractAdapter) {
-            $this->conn['default'] = $this->adapter_factory->newInstance(
+        if (! $this->connection['default'] instanceof AbstractConnection) {
+            $this->connection['default'] = $this->connection_factory->newInstance(
                 $this->default['adapter'],
                 $this->default['dsn'],
                 $this->default['username'],
@@ -219,7 +221,7 @@ class ConnectionManager
                 $this->default['options']
             );
         }
-        return $this->conn['default'];
+        return $this->connection['default'];
     }
 
     /**
@@ -229,7 +231,7 @@ class ConnectionManager
      * @param string $name The master connection name; if not specified,
      * returns a random master connection.
      * 
-     * @return AbstractAdapter
+     * @return AbstractConnection
      * 
      */
     public function getMaster($name = null)
@@ -240,12 +242,12 @@ class ConnectionManager
             throw new Exception\NoSuchMaster($name);
         }
 
-        $is_conn = isset($this->conn['masters'][$name])
-                && $this->conn['masters'][$name] instanceof AbstractAdapter;
+        $is_conn = isset($this->connection['masters'][$name])
+                && $this->connection['masters'][$name] instanceof AbstractConnection;
 
         if (! $is_conn) {
             $params = $this->merge($this->default, $this->masters[$name]);
-            $this->conn['masters'][$name] = $this->adapter_factory->newInstance(
+            $this->connection['masters'][$name] = $this->connection_factory->newInstance(
                 $params['adapter'],
                 $params['dsn'],
                 $params['username'],
@@ -254,7 +256,7 @@ class ConnectionManager
             );
         }
 
-        return $this->conn['masters'][$name];
+        return $this->connection['masters'][$name];
     }
 
     /**
@@ -264,7 +266,7 @@ class ConnectionManager
      * @param string $name The slave connection name; if not specified,
      * returns a random slave.
      * 
-     * @return AbstractAdapter
+     * @return AbstractConnection
      * 
      */
     public function getSlave($name = null)
@@ -275,12 +277,12 @@ class ConnectionManager
             throw new Exception\NoSuchSlave($name);
         }
 
-        $is_conn = isset($this->conn['slaves'][$name])
-                && $this->conn['slaves'][$name] instanceof AbstractAdapter;
+        $is_conn = isset($this->connection['slaves'][$name])
+                && $this->connection['slaves'][$name] instanceof AbstractConnection;
 
         if (! $is_conn) {
             $params = $this->merge($this->default, $this->slaves[$name]);
-            $this->conn['slaves'][$name] = $this->adapter_factory->newInstance(
+            $this->connection['slaves'][$name] = $this->connection_factory->newInstance(
                 $params['adapter'],
                 $params['dsn'],
                 $params['username'],
@@ -288,12 +290,12 @@ class ConnectionManager
                 $params['options']
             );
         }
-        return $this->conn['slaves'][$name];
+        return $this->connection['slaves'][$name];
     }
 
     /**
      * 
-     * A somewhat more friendly merge function thatn array_merge_recursive()
+     * A merge function somewhat more friendly than array_merge_recursive()
      * (we need to override sequential values, not append them).
      * 
      * @param array $baseline The baseline values.

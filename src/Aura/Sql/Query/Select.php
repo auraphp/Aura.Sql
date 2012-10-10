@@ -10,7 +10,7 @@
  */
 namespace Aura\Sql\Query;
 
-use Aura\Sql\Adapter\AbstractAdapter;
+use Aura\Sql\Connection\AbstractConnection;
 
 /**
  * 
@@ -172,7 +172,7 @@ class Select extends AbstractQuery
 
         // add columns
         if ($this->cols) {
-            $text .= $line . implode($csep, $this->cols) . PHP_EOL;
+            $text .= '    ' . implode($csep, $this->cols) . PHP_EOL;
         }
 
         // from these sources
@@ -210,8 +210,8 @@ class Select extends AbstractQuery
             $text .= implode($csep, $this->order_by) . PHP_EOL;
         }
 
-        // modify with a limit clause per the adapter
-        $this->sql->limit($text, $this->limit, $this->offset) . PHP_EOL;
+        // modify with a limit clause per the connection
+        $this->connection->limit($text, $this->limit, $this->offset) . PHP_EOL;
 
         // for update?
         if ($this->for_update) {
@@ -295,7 +295,7 @@ class Select extends AbstractQuery
     public function cols(array $cols)
     {
         foreach ($cols as $col) {
-            $this->cols[] = $this->sql->quoteNamesIn($col);
+            $this->cols[] = $this->connection->quoteNamesIn($col);
         }
         return $this;
     }
@@ -311,7 +311,7 @@ class Select extends AbstractQuery
      */
     public function from($spec)
     {
-        $this->from[] = $this->sql->quoteName($spec);
+        $this->from[] = $this->connection->quoteName($spec);
         return $this;
     }
 
@@ -329,8 +329,8 @@ class Select extends AbstractQuery
      */
     public function fromSubSelect($spec, $name)
     {
-        $spec = (string) $spec;
-        $this->from[] = "($spec) AS " . $this->sql->quoteName($name);
+        $spec = ltrim(preg_replace('/^/m', '    ', (string) $spec));
+        $this->from[] = "($spec) AS " . $this->connection->quoteName($name);
         return $this;
     }
 
@@ -350,9 +350,9 @@ class Select extends AbstractQuery
     public function join($join, $spec, $cond = null)
     {
         $join = strtoupper(ltrim("$join JOIN"));
-        $spec = $this->sql->quoteName($spec);
+        $spec = $this->connection->quoteName($spec);
         if ($cond) {
-            $cond = $this->sql->quoteNamesIn($cond);
+            $cond = $this->connection->quoteNamesIn($cond);
             $this->join[] = "$join $spec ON $cond";
         } else {
             $this->join[] = "$join $spec";
@@ -380,10 +380,10 @@ class Select extends AbstractQuery
     public function joinSubSelect($join, $spec, $name, $cond = null)
     {
         $join = strtoupper(ltrim("$join JOIN"));
-        $spec = (string) $spec;
-        $name = $this->sql->quoteName($name);
+        $spec = ltrim(preg_replace('/^/m', '    ', (string) $spec));
+        $name = $this->connection->quoteName($name);
         if ($cond) {
-            $cond = $this->sql->quoteNamesIn($cond);
+            $cond = $this->connection->quoteNamesIn($cond);
             $this->join[] = "$join ($spec) AS $name ON $cond";
         } else {
             $this->join[] = "$join ($spec) AS $name";
@@ -403,7 +403,7 @@ class Select extends AbstractQuery
     public function groupBy(array $spec)
     {
         foreach ($spec as $col) {
-            $this->group_by[] = $this->sql->quoteNamesIn($col);
+            $this->group_by[] = $this->connection->quoteNamesIn($col);
         }
         return $this;
     }
@@ -435,10 +435,10 @@ class Select extends AbstractQuery
      */
     public function having($cond)
     {
-        $cond = $this->sql->quoteNamesIn($cond);
+        $cond = $this->connection->quoteNamesIn($cond);
 
         if (func_num_args() > 1) {
-            $cond = $this->sql->quoteInto($cond, func_get_arg(1));
+            $cond = $this->connection->quoteInto($cond, func_get_arg(1));
         }
 
         if ($this->having) {
@@ -465,10 +465,10 @@ class Select extends AbstractQuery
      */
     public function orHaving($cond)
     {
-        $cond = $this->sql->quoteNamesIn($cond);
+        $cond = $this->connection->quoteNamesIn($cond);
 
         if (func_num_args() > 1) {
-            $cond = $this->sql->quoteInto($cond, func_get_arg(1));
+            $cond = $this->connection->quoteInto($cond, func_get_arg(1));
         }
         
         if ($this->having) {
@@ -493,7 +493,7 @@ class Select extends AbstractQuery
     public function orderBy(array $spec)
     {
         foreach ($spec as $col) {
-            $this->order_by[] = $this->sql->quoteNamesIn($col);
+            $this->order_by[] = $this->connection->quoteNamesIn($col);
         }
         return $this;
     }

@@ -8,7 +8,7 @@
  * @license http://opensource.org/licenses/bsd-license.php BSD
  * 
  */
-namespace Aura\Sql\Adapter;
+namespace Aura\Sql\Connection;
 
 use Aura\Sql\ColumnFactory;
 use Aura\Sql\ProfilerInterface;
@@ -24,7 +24,7 @@ use PDOStatement;
  * @package Aura.Sql
  * 
  */
-abstract class AbstractAdapter
+abstract class AbstractConnection
 {
     /**
      * 
@@ -265,17 +265,17 @@ abstract class AbstractAdapter
      * @param string|AbstractQuery $query The text of the SQL query; or, a
      * query object.
      * 
-     * @param array $data An associative array of data to bind to named
+     * @param array $bind An associative array of data to bind to named
      * placeholders in the query.
      * 
      * @return PDOStatement
      * 
      */
-    public function query($query, array $data = [])
+    public function query($query, array $bind = [])
     {
         // casts objects to string via __toString()
-        $stmt = $this->prepare((string) $query, $data);
-        $this->profiler->exec($stmt, $data);
+        $stmt = $this->prepare((string) $query, $bind);
+        $this->profiler->exec($stmt, $bind);
         return $stmt;
     }
 
@@ -343,23 +343,23 @@ abstract class AbstractAdapter
      * 
      * @param string $text The text of the SQL query.
      * 
-     * @param array $data The values to bind (or quote) into the PDOStatement.
+     * @param array $bind The values to bind (or quote) into the PDOStatement.
      * 
      * @return PDOStatement
      * 
      */
-    public function prepare($text, array $data)
+    public function prepare($text, array $bind)
     {
         // need the PDO object regardless
         $pdo = $this->getPdo();
 
         // was data passed for binding?
-        if (! $data) {
+        if (! $bind) {
             return $pdo->prepare($text);
         }
 
         // a list of placeholders to bind at the end
-        $bind = array();
+        $placeholders = array();
 
         // find all text parts not inside quotes or backslashed-quotes
         $apos = "'";
@@ -388,15 +388,15 @@ abstract class AbstractAdapter
             // for each of the :placeholder matches ...
             foreach ($matches[1] as $key) {
                 // is the corresponding data element an array?
-                if (isset($data[$key]) && is_array($data[$key])) {
+                if (isset($bind[$key]) && is_array($bind[$key])) {
                     // quote and replace it directly, because PDO won't bind
                     // an array.
                     $find = "/(\W)(:$key)(\W)/m";
-                    $repl = '${1}' . $this->quote($data[$key]) . '${3}';
+                    $repl = '${1}' . $this->quote($bind[$key]) . '${3}';
                     $part = preg_replace($find, $repl, $part);
                 } else {
                     // not an array, retain the placeholder name for later
-                    $bind[] = $key;
+                    $placeholders[] = $key;
                 }
             }
         }
@@ -408,8 +408,8 @@ abstract class AbstractAdapter
         $stmt = $pdo->prepare($text);
 
         // for the placeholders we found, bind the corresponding data values
-        foreach ($bind as $key) {
-            $stmt->bindValue($key, $data[$key]);
+        foreach ($placeholders as $key) {
+            $stmt->bindValue($key, $bind[$key]);
         }
 
         // done!
@@ -418,20 +418,20 @@ abstract class AbstractAdapter
 
     /**
      * 
-     * Fetches all rows from the database using sequential keys.
+     * Fetches an array of all rows from the database as objects.
      * 
-     * @param string $text The text of the SQL statement, optionally with
-     * named placeholders.
+     * @param string|AbstractQuery $query The text of the SQL query; or, a
+     * query object.
      * 
-     * @param array $data An associative array of data to bind to the named
+     * @param array $bind An associative array of data to bind to the named
      * placeholders.
      * 
      * @return array
      * 
      */
-    public function fetchAll($text, $data = [])
+    public function fetchAll($query, $bind = [])
     {
-        $stmt = $this->query($text, $data);
+        $stmt = $this->query($query, $bind);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
@@ -467,18 +467,18 @@ abstract class AbstractAdapter
      * 
      * Fetches the first column of all rows as a sequential array.
      * 
-     * @param string $text The text of the SQL statement, optionally with
-     * named placeholders.
+     * @param string|AbstractQuery $query The text of the SQL query; or, a
+     * query object.
      * 
-     * @param array $data An associative array of data to bind to the named
+     * @param array $bind An associative array of data to bind to the named
      * placeholders.
      * 
      * @return array
      * 
      */
-    public function fetchCol($text, array $data = [])
+    public function fetchCol($query, array $bind = [])
     {
-        $stmt = $this->query($text, $data);
+        $stmt = $this->query($query, $bind);
         return $stmt->fetchAll(PDO::FETCH_COLUMN, 0);
     }
 
@@ -486,18 +486,18 @@ abstract class AbstractAdapter
      * 
      * Fetches the very first value (i.e., first column of the first row).
      * 
-     * @param string $text The text of the SQL statement, optionally with
-     * named placeholders.
+     * @param string|AbstractQuery $query The text of the SQL query; or, a
+     * query object.
      * 
-     * @param array $data An associative array of data to bind to the named
+     * @param array $bind An associative array of data to bind to the named
      * placeholders.
      * 
      * @return mixed
      * 
      */
-    public function fetchValue($text, array $data = [])
+    public function fetchValue($query, array $bind = [])
     {
-        $stmt = $this->query($text, $data);
+        $stmt = $this->query($query, $bind);
         return $stmt->fetchColumn(0);
     }
 
@@ -506,41 +506,41 @@ abstract class AbstractAdapter
      * Fetches an associative array of all rows as key-value pairs (first 
      * column is the key, second column is the value).
      * 
-     * @param string $text The text of the SQL statement, optionally with
-     * named placeholders.
+     * @param string|AbstractQuery $query The text of the SQL query; or, a
+     * query object.
      * 
-     * @param array $data An associative array of data to bind to the named
+     * @param array $bind An associative array of data to bind to the named
      * placeholders.
      * 
      * @return array
      * 
      */
-    public function fetchPairs($text, array $data = [])
+    public function fetchPairs($query, array $bind = [])
     {
-        $stmt = $this->query($text, $data);
-        $data = [];
+        $stmt = $this->query($query, $bind);
+        $bind = [];
         while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
-            $data[$row[0]] = $row[1];
+            $bind[$row[0]] = $row[1];
         }
-        return $data;
+        return $bind;
     }
 
     /**
      * 
-     * Fetches one row from the database.
+     * Fetches one row from the database as an object.
      * 
-     * @param string $text The text of the SQL statement, optionally with
-     * named placeholders.
+     * @param string|AbstractQuery $query The text of the SQL query; or, a
+     * query object.
      * 
-     * @param array $data An associative array of data to bind to the named
+     * @param array $bind An associative array of data to bind to the named
      * placeholders.
      * 
-     * @return array
+     * @return object
      * 
      */
-    public function fetchOne($text, array $data = [])
+    public function fetchOne($query, array $bind = [])
     {
-        $stmt = $this->query($text, $data);
+        $stmt = $this->query($query, $bind);
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
@@ -582,7 +582,7 @@ abstract class AbstractAdapter
      * 
      * @param string $text The text with placeholder(s).
      * 
-     * @param mixed $data The data value(s) to quote.
+     * @param mixed $bind The data value(s) to quote.
      * 
      * @return mixed An SQL-safe quoted value (or string of separated values)
      * placed into the orignal text.
@@ -590,7 +590,7 @@ abstract class AbstractAdapter
      * @see quote()
      * 
      */
-    public function quoteInto($text, $data)
+    public function quoteInto($text, $bind)
     {
         // how many placeholders are there?
         $count = substr_count($text, '?');
@@ -601,14 +601,14 @@ abstract class AbstractAdapter
 
         // only one placeholder?
         if ($count == 1) {
-            $data = $this->quote($data);
-            $text = str_replace('?', $data, $text);
+            $bind = $this->quote($bind);
+            $text = str_replace('?', $bind, $text);
             return $text;
         }
 
         // more than one placeholder
         $offset = 0;
-        foreach ((array) $data as $val) {
+        foreach ((array) $bind as $val) {
 
             // find the next placeholder
             $pos = strpos($text, '?', $offset);
@@ -847,14 +847,14 @@ abstract class AbstractAdapter
      * 
      * @param string $cond Conditions for a WHERE clause.
      * 
-     * @param array $data Additional data to bind to the query; these are not
+     * @param array $bind Additional data to bind to the query; these are not
      * part of the update, and note that the $cols values will take precedence
      * over these additional values.
      * 
      * @return int The number of rows affected.
      * 
      */
-    public function update($table, array $cols, $cond, array $data = [])
+    public function update($table, array $cols, $cond, array $bind = [])
     {
         $update = $this->newUpdate();
         $update->table($table);
@@ -862,8 +862,8 @@ abstract class AbstractAdapter
         if ($cond) {
             $update->where($cond);
         }
-        $data = array_merge($data, $cols);
-        $stmt = $this->query($update, $data);
+        $bind = array_merge($bind, $cols);
+        $stmt = $this->query($update, $bind);
         return $stmt->rowCount();
     }
 
@@ -875,19 +875,19 @@ abstract class AbstractAdapter
      * 
      * @param string $cond Conditions for a WHERE clause.
      * 
-     * @param array $data Additional data to bind to the query.
+     * @param array $bind Additional data to bind to the query.
      * 
      * @return int The number of rows affected.
      * 
      */
-    public function delete($table, $cond, array $data = [])
+    public function delete($table, $cond, array $bind = [])
     {
         $delete = $this->newDelete();
         $delete->from($table);
         if ($cond) {
             $delete->where($cond);
         }
-        $stmt = $this->query($delete, $data);
+        $stmt = $this->query($delete, $bind);
         return $stmt->rowCount();
     }
 

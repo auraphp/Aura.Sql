@@ -10,7 +10,7 @@
  */
 namespace Aura\Sql\Query;
 
-use Aura\Sql\Adapter\AbstractAdapter;
+use Aura\Sql\Connection\AbstractConnection;
 
 /**
  * 
@@ -27,14 +27,14 @@ class Factory
      * 
      * @param string $type The query object type.
      * 
-     * @param AbstractAdapter $sql The SQL connection adapter.
+     * @param AbstractConnection $connection The SQL connection.
      * 
      * @return AbstractQuery
      * 
      */
-    public function newInstance($type, AbstractAdapter $sql)
+    public function newInstance($type, AbstractConnection $connection)
     {
         $class = '\Aura\Sql\Query\\' . ucfirst($type);
-        return new $class($sql);
+        return new $class($connection);
     }
 }

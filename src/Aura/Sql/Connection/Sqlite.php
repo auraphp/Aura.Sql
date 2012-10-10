@@ -8,16 +8,16 @@
  * @license http://opensource.org/licenses/bsd-license.php BSD
  * 
  */
-namespace Aura\Sql\Adapter;
+namespace Aura\Sql\Connection;
 
 /**
  * 
- * SQLite adapter.
+ * SQLite connection adapter.
  * 
  * @package Aura.Sql
  * 
  */
-class Sqlite extends AbstractAdapter
+class Sqlite extends AbstractConnection
 {
     /**
      * 
@@ -135,6 +135,7 @@ class Sqlite extends AbstractAdapter
 
         // loop through the result rows; each describes a column.
         foreach ($raw_cols as $val) {
+            
             $name = $val['name'];
             list($type, $size, $scale) = $this->getTypeSizeScope($val['type']);
 
