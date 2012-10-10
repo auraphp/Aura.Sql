@@ -23,7 +23,7 @@ class ConnectionFactory
 {
     /**
      * 
-     * A map of short connection names to fully-qualified classes.
+     * A map of short adapter names to fully-qualified classes.
      * 
      * @var array
      * 
@@ -50,7 +50,7 @@ class ConnectionFactory
      * 
      * Returns a new connection instance.
      * 
-     * @param string $name The name of the connection.
+     * @param string $adapter The short adapter name.
      * 
      * @param mixed $dsn The DSN for the connection.
      * 
@@ -64,13 +64,13 @@ class ConnectionFactory
      * 
      */
     public function newInstance(
-        $name,
+        $adapter,
         $dsn,
         $username = null,
         $password = null,
         $options = []
     ) {
-        $class = $this->map[$name];
+        $class = $this->map[$adapter];
         $profiler = new Profiler;
         $column_factory = new ColumnFactory;
         $query_factory  = new QueryFactory;

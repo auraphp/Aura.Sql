@@ -51,7 +51,7 @@ class ConnectionLocator
      * 
      */
     protected $default = [
-        'connection'  => null,
+        'adapter'  => null,
         'dsn'      => [],
         'username' => null,
         'password' => null,
@@ -214,7 +214,7 @@ class ConnectionLocator
     {
         if (! $this->connection['default'] instanceof AbstractConnection) {
             $this->connection['default'] = $this->connection_factory->newInstance(
-                $this->default['connection'],
+                $this->default['adapter'],
                 $this->default['dsn'],
                 $this->default['username'],
                 $this->default['password'],
@@ -248,7 +248,7 @@ class ConnectionLocator
         if (! $is_conn) {
             $params = $this->merge($this->default, $this->masters[$name]);
             $this->connection['masters'][$name] = $this->connection_factory->newInstance(
-                $params['connection'],
+                $params['adapter'],
                 $params['dsn'],
                 $params['username'],
                 $params['password'],
@@ -283,7 +283,7 @@ class ConnectionLocator
         if (! $is_conn) {
             $params = $this->merge($this->default, $this->slaves[$name]);
             $this->connection['slaves'][$name] = $this->connection_factory->newInstance(
-                $params['connection'],
+                $params['adapter'],
                 $params['dsn'],
                 $params['username'],
                 $params['password'],

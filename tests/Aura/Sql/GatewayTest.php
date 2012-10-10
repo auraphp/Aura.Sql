@@ -19,7 +19,7 @@ class GatewayTest extends \PHPUnit_Framework_TestCase
     protected $connections;
     
     protected $default = [
-        'connection' => 'sqlite',
+        'adapter' => 'sqlite',
         'dsn'        => ':memory:',
     ];
     

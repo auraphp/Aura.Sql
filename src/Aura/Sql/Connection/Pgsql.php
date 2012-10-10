@@ -12,7 +12,7 @@ namespace Aura\Sql\Connection;
 
 /**
  * 
- * PostgreSQL connection.
+ * PostgreSQL connection adapter.
  * 
  * @package Aura.Sql
  * 

@@ -12,7 +12,7 @@ namespace Aura\Sql\Connection;
 
 /**
  * 
- * Microsoft SQL Server connection.
+ * Microsoft SQL Server connection adapter.
  * 
  * @package Aura.Sql
  * 

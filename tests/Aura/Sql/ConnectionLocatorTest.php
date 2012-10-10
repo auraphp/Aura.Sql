@@ -12,7 +12,7 @@ class ConnectionLocatorTest extends \PHPUnit_Framework_TestCase
     protected $manager;
     
     protected $default = [
-        'connection'  => 'mock',
+        'adapter'  => 'mock',
         'dsn'      => ['host' => 'default.example.com', 'dbname' => 'test'],
         'username' => 'default_user',
         'password' => 'default_pass',
@@ -202,7 +202,7 @@ class ConnectionLocatorTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Aura\Sql\Connection\Mock', $conn);
         
         $expect = $this->default;
-        unset($expect['connection']);
+        unset($expect['adapter']);
         $this->assertSame($conn->getParams(), $expect);
     }
 

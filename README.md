@@ -19,14 +19,14 @@ Instantiation
 -------------
 
 The easiest way to get started is to use the `scripts/instance.php` script to
-get an `ConnectionFactory` and create your connection through it:
+get a `ConnectionFactory` and create your connection through it:
 
 ```php
 <?php
 $connection_factory = include '/path/to/Aura.Sql/scripts/instance.php';
 $connection = $connection_factory->newInstance(
     
-    // connection name
+    // adapter name
     'mysql',
     
     // DSN elements for PDO; this can also be
@@ -51,15 +51,16 @@ $connection_factory = new ConnectionFactory;
 $connection = $connection_factory->newInstance(...);
 ```
     
-Aura SQL comes with three connection adapters: `'mysql'` for MySQL, `'pgsql'`
-for PostgreSQL, and `'sqlite'` for SQLite3.
+Aura SQL comes with four connection adapters: `'mysql'` for MySQL, `'pgsql'`
+for PostgreSQL, `'sqlite'` for SQLite3, and `'sqlsrv'` for Microsoft SQL
+Server.
 
 Connecting
 ----------
 
-The connection will lazy-connect to the database the first time you issue a query
-of any sort. This means you can create the connection object, and if you never
-issue a query, it will never connect to the database.
+The connection will lazy-connect to the database the first time you issue a
+query of any sort. This means you can create the connection object, and if you
+never issue a query, it will never connect to the database.
 
 You can connect manually by issuing `connect()`:
 
@@ -72,8 +73,7 @@ $connection->connect();
 Fetching Results
 ----------------
 
-Once you have an connection connection, you can begin to fetch results from the
-database.
+Once you have a connection, you can begin to fetch results from the database.
 
 ```php
 <?php
@@ -83,15 +83,19 @@ $result = $connection->fetchAll('SELECT * FROM foo');
 
 You can fetch results using these methods:
 
-- `fetchAll()` returns a sequential array of all rows. The rows themselves are associative arrays where the keys are the column names.
+- `fetchAll()` returns a sequential array of all rows. The rows themselves are
+  associative arrays where the keys are the column names.
 
-- `fetchAssoc()` returns an associative array of all rows where the key is the first column.
+- `fetchAssoc()` returns an associative array of all rows where the key is the
+  first column.
 
 - `fetchCol()` returns a sequential array of all values in the first column.
 
-- `fetchOne()` returns the first row as an associative array where the keys are the column names.
+- `fetchOne()` returns the first row as an associative array where the keys
+  are the column names.
 
-- `fetchPairs()` returns an associative array where each key is the first column and each value is the second column.
+- `fetchPairs()` returns an associative array where each key is the first
+  column and each value is the second column.
 
 - `fetchValue()` returns the value of the first row in the first column.
 
@@ -168,7 +172,7 @@ $id = $connection->lastInsertId();
 ```
 
 (N.b.: Because of the way PostgreSQL creates auto-incremented columns, the
-`pgsql` connection needs to know the table and column name to get the last
+`pgsql` adapter needs to know the table and column name to get the last
 inserted ID; for example, `$id = $connection->lastInsertId($table, 'id');`.)
 
 Next, to update rows:

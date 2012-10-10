@@ -12,7 +12,7 @@ namespace Aura\Sql\Connection;
 
 /**
  * 
- * SQLite connection.
+ * SQLite connection adapter.
  * 
  * @package Aura.Sql
  * 

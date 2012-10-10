@@ -23,7 +23,7 @@ class UnitOfWorkTest extends \PHPUnit_Framework_TestCase
     protected $gateways;
     
     protected $default = [
-        'connection' => 'sqlite',
+        'adapter' => 'sqlite',
         'dsn'        => ':memory:',
     ];
     

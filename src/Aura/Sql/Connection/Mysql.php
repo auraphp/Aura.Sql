@@ -12,7 +12,7 @@ namespace Aura\Sql\Connection;
 
 /**
  * 
- * MySql connection.
+ * MySQL connection adapter.
  * 
  * @package Aura.Sql
  * 
