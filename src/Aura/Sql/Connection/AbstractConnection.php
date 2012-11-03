@@ -418,7 +418,8 @@ abstract class AbstractConnection
 
     /**
      * 
-     * Fetches an array of all rows from the database as objects.
+     * Fetches a sequential array of all rows from the database; the rows
+     * are represented as associative arrays.
      * 
      * @param string|AbstractQuery $query The text of the SQL query; or, a
      * query object.
@@ -437,13 +438,14 @@ abstract class AbstractConnection
 
     /**
      * 
-     * Fetches all rows from the database using associative keys (defined by
-     * the first column).
+     * Fetches an associative array of all rows from the database; the rows
+     * are represented as associative arrays. The array of all rows is keyed
+     * on the first column of each row.
      * 
      * N.b.: if multiple rows have the same first column value, the last
      * row with that value will override earlier rows.
      * 
-     * @param string $text The text of the SQL statement, optionally with
+     * @param string $query The text of the SQL statement, optionally with
      * named placeholders.
      * 
      * @param array $data An associative array of data to bind to the named
@@ -452,9 +454,9 @@ abstract class AbstractConnection
      * @return array
      * 
      */
-    public function fetchAssoc($text, array $data = [])
+    public function fetchAssoc($query, array $data = [])
     {
-        $stmt = $this->query($text, $data);
+        $stmt = $this->query($query, $data);
         $data = [];
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
             $key = current($row); // value of the first element
@@ -527,7 +529,7 @@ abstract class AbstractConnection
 
     /**
      * 
-     * Fetches one row from the database as an object.
+     * Fetches one row from the database as an associative array.
      * 
      * @param string|AbstractQuery $query The text of the SQL query; or, a
      * query object.
@@ -535,7 +537,7 @@ abstract class AbstractConnection
      * @param array $bind An associative array of data to bind to the named
      * placeholders.
      * 
-     * @return object
+     * @return array
      * 
      */
     public function fetchOne($query, array $bind = [])
