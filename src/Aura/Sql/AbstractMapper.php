@@ -102,7 +102,7 @@ abstract class AbstractMapper
      * 
      * Returns the entity field name for a given table column name.
      * 
-     * @param string $field The table column name.
+     * @param string $col The table column name.
      * 
      * @return string The mapped entity field name.
      * 
@@ -210,6 +210,8 @@ abstract class AbstractMapper
      * Returns an array of fully-qualified table columns names "AS" their
      * mapped entity field names.
      * 
+     * @param array $cols The column names.
+     * 
      * @return array
      * 
      */
@@ -305,7 +307,7 @@ abstract class AbstractMapper
      * to use the mapped table, and to set a where condition to match the
      * primary column to the identity value.
      * 
-     * @param Update $update The Update query object.
+     * @param Delete $delete The Delete query object.
      * 
      * @param object $entity The entity object.
      * 
@@ -347,6 +349,8 @@ abstract class AbstractMapper
      * present, the returned array will have only changed values.
      * 
      * @param object $entity The entity object.
+     * 
+     * @param array $initial_data The initial data for the entity.
      * 
      * @return array
      * 
@@ -395,6 +399,10 @@ abstract class AbstractMapper
      * Compares a new value and an old value to see if they are the same.
      * If they are both numeric, use loose (==) equality; otherwise, use
      * strict (===) equality.
+     * 
+     * @param mixed $new The new value.
+     * 
+     * @param mixed $old The old value.
      * 
      * @return bool True if they are equal, false if not.
      * 

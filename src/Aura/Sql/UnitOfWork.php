@@ -1,9 +1,25 @@
 <?php
+/**
+ * 
+ * This file is part of the Aura Project for PHP.
+ * 
+ * @package Aura.Sql
+ * 
+ * @license http://opensource.org/licenses/bsd-license.php BSD
+ * 
+ */
 namespace Aura\Sql;
 
 use SplObjectStorage;
 use Exception as PhpException;
 
+/**
+ * 
+ * A unit-of-work implementation.
+ * 
+ * @package Aura.Sql
+ * 
+ */
 class UnitOfWork
 {
     /**

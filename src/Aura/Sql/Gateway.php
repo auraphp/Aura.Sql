@@ -109,6 +109,8 @@ class Gateway
      * 
      * @param object $entity The entity to update.
      * 
+     * @param array $initial_data Initial data for the entity.
+     * 
      * @return bool True if the update succeeded, false if not.  (This is
      * determined by checking the number of rows affected by the query.)
      * 
