@@ -48,6 +48,13 @@ class GatewayLocator implements IteratorAggregate
         }
     }
 
+    /**
+     * 
+     * IteratorAggregate: Returns an iterator for this locator.
+     * 
+     * @return GatewayIterator
+     * 
+     */
     public function getIterator()
     {
         return new GatewayIterator($this, array_keys($this->registry));

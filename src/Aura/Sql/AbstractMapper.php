@@ -17,11 +17,8 @@ use Aura\Sql\Query\Update;
 
 /**
  * 
- * An abstract Mapper class for SQL tables.
+ * An abstract class to map entity fields to table columns.
  *  
- * @todo Right now we have to extend this to make it useful. Make it so that 
- * it's constructed instead?
- * 
  * @package Aura.Sql
  * 
  */

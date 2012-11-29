@@ -62,6 +62,13 @@ abstract class AbstractQuery
      */
     abstract public function __toString();
     
+    /**
+     * 
+     * Gets the database connection for this query object.
+     * 
+     * @return AbstractConnection
+     * 
+     */
     public function getConnection()
     {
         return $this->connection;
@@ -99,16 +106,42 @@ abstract class AbstractQuery
              . PHP_EOL;
     }
     
+    /**
+     * 
+     * Sets values to bind into the query; this overrides any previous
+     * bindings.
+     * 
+     * @param array $bind Values to bind to the query.
+     * 
+     * @return void
+     * 
+     */
     public function setBind(array $bind)
     {
         $this->bind = $bind;
     }
     
+    /**
+     * 
+     * Adds values to bind into the query; merges with existing values.
+     * 
+     * @param array $bind Values to bind to the query.
+     * 
+     * @return void
+     * 
+     */
     public function addBind(array $bind)
     {
         $this->bind = array_merge($this->bind, $bind);
     }
     
+    /**
+     * 
+     * Gets the values to bind into the query.
+     * 
+     * @return array
+     * 
+     */
     public function getBind()
     {
         return $this->bind;

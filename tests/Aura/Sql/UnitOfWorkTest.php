@@ -80,11 +80,11 @@ class UnitOfWorkTest extends \PHPUnit_Framework_TestCase
         $entity->sizeScope = 10;
         $this->work->insert('mock', $entity);
         
-        $storage = $this->work->getObjects();
+        $storage = $this->work->getEntities();
         $this->assertSame(1, count($storage));
         $this->assertTrue($storage->contains($entity));
         
-        $expect = ['method' => 'execInsert', 'gateway' => 'mock'];
+        $expect = ['method' => 'execInsert', 'gateway_name' => 'mock'];
         $actual = $storage[$entity];
         $this->assertSame($expect, $actual);
     }
@@ -101,13 +101,13 @@ class UnitOfWorkTest extends \PHPUnit_Framework_TestCase
         $this->work->update('mock', $entity);
         
         // get it and see if it's set up right
-        $storage = $this->work->getObjects();
+        $storage = $this->work->getEntities();
         $this->assertSame(1, count($storage));
         $this->assertTrue($storage->contains($entity));
         
         $expect = [
             'method' => 'execUpdate',
-            'gateway' => 'mock',
+            'gateway_name' => 'mock',
             'initial_data' => null
         ];
         $actual = $storage[$entity];
@@ -125,11 +125,11 @@ class UnitOfWorkTest extends \PHPUnit_Framework_TestCase
         $this->work->delete('mock', $entity);
         
         // get it and see if it's set up right
-        $storage = $this->work->getObjects();
+        $storage = $this->work->getEntities();
         $this->assertSame(1, count($storage));
         $this->assertTrue($storage->contains($entity));
         
-        $expect = ['method' => 'execDelete', 'gateway' => 'mock'];
+        $expect = ['method' => 'execDelete', 'gateway_name' => 'mock'];
         $actual = $storage[$entity];
         $this->assertSame($expect, $actual);
     }
@@ -145,10 +145,10 @@ class UnitOfWorkTest extends \PHPUnit_Framework_TestCase
         $this->work->insert('mock', $entity);
         
         // make sure it's attached
-        $storage = $this->work->getObjects();
+        $storage = $this->work->getEntities();
         $this->assertSame(1, count($storage));
         $this->assertTrue($storage->contains($entity));
-        $expect = ['method' => 'execInsert', 'gateway' => 'mock'];
+        $expect = ['method' => 'execInsert', 'gateway_name' => 'mock'];
         $actual = $storage[$entity];
         $this->assertSame($expect, $actual);
         
@@ -156,7 +156,7 @@ class UnitOfWorkTest extends \PHPUnit_Framework_TestCase
         $this->work->detach($entity);
         
         // make sure it's detached
-        $storage = $this->work->getObjects();
+        $storage = $this->work->getEntities();
         $this->assertSame(0, count($storage));
     }
 
