@@ -6,88 +6,192 @@ use Exception as PhpException;
 
 class UnitOfWork
 {
-    // the gateways used for inserting, updating, and deleting data objects
+    /**
+     * 
+     * A GatewayLocator for the gateways used to insert, update, and delete
+     * entity objects.
+     * 
+     * @var GatewayLocator
+     * 
+     */
     protected $gateways;
     
-    // the various database connections extracted from gateways
+    /**
+     * 
+     * A collection of database connections extracted from the gateways.
+     * 
+     * @var SplObjectStorage
+     * 
+     */
     protected $connections;
     
-    // a collection of data objects to be sent to the database
-    protected $objects;
+    /**
+     * 
+     * A collection of all entity objects to be sent to the database.
+     * 
+     * @var SplObjectStorage
+     * 
+     */
+    protected $entities;
     
-    // a collection of data objects that were successfully inserted
+    /**
+     * 
+     * A collection of all entity objects that were successfully inserted.
+     * 
+     * @var SplObjectStorage
+     * 
+     */
     protected $inserted;
     
-    // a collection of data objects that were successfully updated
+    /**
+     * 
+     * A collection of all entity objects that were successfully updated.
+     * 
+     * @var SplObjectStorage
+     * 
+     */
     protected $udpates;
     
-    // a collection of data objects that were successfully deleted
+    /**
+     * 
+     * A collection of all entity objects that were successfully deleted.
+     * 
+     * @var SplObjectStorage
+     * 
+     */
     protected $deleted;
     
-    // the exception that occurred during exec(), causing a rollback
+    /**
+     * 
+     * The exception that occurred during exec(), causing a rollback.
+     * 
+     * @var PhpException
+     * 
+     */
     protected $exception;
     
-    // the object that caused the exception
+    /**
+     * 
+     * The entity object that caused the exception.
+     * 
+     * @var object
+     * 
+     */
     protected $failed;
     
+    /**
+     * 
+     * Constructor.
+     * 
+     * @param GatewayLocator $gateways The gateway locator.
+     * 
+     */
     public function __construct(GatewayLocator $gateways)
     {
         $this->gateways = $gateways;
-        $this->objects  = new SplObjectStorage;
+        $this->entities = new SplObjectStorage;
     }
     
-    // attach an object to the unit of work for insertion
-    public function insert($gateway, $object)
+    /**
+     * 
+     * Attached an entity object for insertion.
+     * 
+     * @param string $gateway_name The gateway name in the locator.
+     * 
+     * @param object $entity The entity object to insert.
+     * 
+     * @return void
+     * 
+     */
+    public function insert($gateway_name, $entity)
     {
-        $this->detach($object);
-        $this->attach(
-            $object,
-            [
-                'method' => 'execInsert',
-                'gateway' => $gateway,
-            ]
-        );
+        $this->detach($entity);
+        $this->attach($entity, [
+            'method'       => 'execInsert',
+            'gateway_name' => $gateway_name,
+        ]);
     }
     
-    // attach an object to the unit of work for updating
-    public function update($gateway, $new_object, $initial_data = null)
+    /**
+     * 
+     * Attached an entity object for updating.
+     * 
+     * @param string $gateway_name The gateway name in the locator.
+     * 
+     * @param object $entity The entity object to update.
+     * 
+     * @param array $initial_data Initial data for the entity.
+     * 
+     * @return void
+     * 
+     */
+    public function update($gateway_name, $entity, array $initial_data = null)
     {
-        $this->detach($new_object);
-        $this->attach(
-            $new_object,
-            [
-                'method'       => 'execUpdate',
-                'gateway'      => $gateway,
-                'initial_data' => $initial_data,
-            ]
-        );
+        $this->detach($entity);
+        $this->attach($entity, [
+            'method'       => 'execUpdate',
+            'gateway_name' => $gateway_name,
+            'initial_data' => $initial_data,
+        ]);
     }
     
-    // attach an object to the unit of work for deletion
-    public function delete($gateway, $object)
+    /**
+     * 
+     * Attached an entity object for deletion.
+     * 
+     * @param string $gateway_name The gateway name in the locator.
+     * 
+     * @param object $entity The entity object to delete.
+     * 
+     * @return void
+     * 
+     */
+    public function delete($gateway_name, $entity)
     {
-        $this->detach($object);
-        $this->attach(
-            $object,
-            [
-                'method' => 'execDelete',
-                'gateway' => $gateway,
-            ]
-        );
+        $this->detach($entity);
+        $this->attach($entity, [
+            'method'       => 'execDelete',
+            'gateway_name' => $gateway_name,
+        ]);
     }
     
-    // attach an object to the unit of work
-    protected function attach($object, $info)
+    /**
+     * 
+     * Attaches an entity to this unit of work.
+     * 
+     * @param object $entity The entity to attach.
+     * 
+     * @param array $info Information about what to do with the entity.
+     * 
+     * @return void
+     * 
+     */
+    protected function attach($entity, $info)
     {
-        $this->objects->attach($object, $info);
+        $this->entities->attach($entity, $info);
     }
     
-    // detach an object from the unit of work
-    public function detach($object)
+    /**
+     * 
+     * Detaches an entity from this unit of work.
+     * 
+     * @param object $entity The entity to detach.
+     * 
+     * @return void
+     * 
+     */
+    public function detach($entity)
     {
-        $this->objects->detach($object);
+        $this->entities->detach($entity);
     }
     
+    /**
+     * 
+     * Loads all database connections from the gateways.
+     * 
+     * @return void
+     * 
+     */
     public function loadConnections()
     {
         $this->connections = new SplObjectStorage;
@@ -97,13 +201,28 @@ class UnitOfWork
         }
     }
     
+    /**
+     * 
+     * Gets the collection of database connections.
+     * 
+     * @return SplObjectStorage
+     * 
+     */
     public function getConnections()
     {
         return $this->connections;
     }
     
-    // do we need pre/post hooks, so we can handle things like
-    // optimistic/pessimistic locking?
+    /**
+     * 
+     * Executes the unit of work.
+     * 
+     * @return bool True if the unit succeeded, false if not.
+     * 
+     * @todo Add pre/post hooks, so we can handle things like optimistic and
+     * pessimistic locking?
+     * 
+     */
     public function exec()
     {
         // clear tracking properties
@@ -121,19 +240,19 @@ class UnitOfWork
             
             $this->execBegin();
             
-            foreach ($this->objects as $object) {
+            foreach ($this->entities as $entity) {
                 
-                // get the info for this object
-                $info = $this->objects[$object];
+                // get the info for this entity
+                $info = $this->entities[$entity];
                 $method = $info['method'];
-                $gateway = $this->gateways->get($info['gateway']);
+                $gateway = $this->gateways->get($info['gateway_name']);
                 
                 // remove used info
                 unset($info['method']);
                 unset($info['gateway']);
                 
                 // execute the method
-                $this->$method($gateway, $object, $info);
+                $this->$method($gateway, $entity, $info);
                 
             }
             
@@ -141,13 +260,20 @@ class UnitOfWork
             return true;
             
         } catch (PhpException $e) {
-            $this->failed = $object; // from the loop above
+            $this->failed = $entity; // from the loop above
             $this->exception = $e;
             $this->execRollback();
             return false;
         }
     }
     
+    /**
+     * 
+     * Begins a transaction on all connections.
+     * 
+     * @return void
+     * 
+     */
     protected function execBegin()
     {
         foreach ($this->connections as $connection) {
@@ -155,27 +281,73 @@ class UnitOfWork
         }
     }
     
-    protected function execInsert($gateway, $object, $info)
+    /**
+     * 
+     * Inserts an entity via a gateway.
+     * 
+     * @param Gateway $gateway Insert using this gateway.
+     * 
+     * @param object $entity Insert this entity.
+     * 
+     * @param array $info Information about the operation.
+     * 
+     * @return void
+     * 
+     */
+    protected function execInsert(Gateway $gateway, $entity, array $info)
     {
-        $last_insert_id = $gateway->insert($object);
-        $this->inserted->attach($object, [
+        $last_insert_id = $gateway->insert($entity);
+        $this->inserted->attach($entity, [
             'last_insert_id' => $last_insert_id,
         ]);
     }
     
-    protected function execUpdate($gateway, $object, $info)
+    /**
+     * 
+     * Updates an entity via a gateway.
+     * 
+     * @param Gateway $gateway Update using this gateway.
+     * 
+     * @param object $entity Update this entity.
+     * 
+     * @param array $info Information about the operation.
+     * 
+     * @return void
+     * 
+     */
+    protected function execUpdate(Gateway $gateway, $entity, array $info)
     {
         $initial_data = $info['initial_data'];
-        $gateway->update($object, $initial_data);
-        $this->updated->attach($object);
+        $gateway->update($entity, $initial_data);
+        $this->updated->attach($entity);
     }
     
-    protected function execDelete($gateway, $object, $info)
+    /**
+     * 
+     * Deletes an entity via a gateway.
+     * 
+     * @param Gateway $gateway Delete using this gateway.
+     * 
+     * @param object $entity Delete this entity.
+     * 
+     * @param array $info Information about the operation.
+     * 
+     * @return void
+     * 
+     */
+    protected function execDelete(Gateway $gateway, $entity, array $info)
     {
-        $gateway->delete($object);
-        $this->deleted->attach($object);
+        $gateway->delete($entity);
+        $this->deleted->attach($entity);
     }
     
+    /**
+     * 
+     * Commits the transactions on all connections.
+     * 
+     * @return void
+     * 
+     */
     protected function execCommit()
     {
         foreach ($this->connections as $connection) {
@@ -183,6 +355,13 @@ class UnitOfWork
         }
     }
     
+    /**
+     * 
+     * Rolls back the transactions on all connections.
+     * 
+     * @return void
+     * 
+     */
     protected function execRollback()
     {
         foreach ($this->connections as $connection) {
@@ -190,31 +369,73 @@ class UnitOfWork
         }
     }
     
-    public function getObjects()
+    /**
+     * 
+     * Gets all the attached entities.
+     * 
+     * @return SplObjectStorage
+     * 
+     */
+    public function getEntities()
     {
-        return $this->objects;
+        return $this->entities;
     }
     
+    /**
+     * 
+     * Gets all the inserted entities.
+     * 
+     * @return SplObjectStorage
+     * 
+     */
     public function getInserted()
     {
         return $this->inserted;
     }
     
+    /**
+     * 
+     * Gets all the updated entities.
+     * 
+     * @return SplObjectStorage
+     * 
+     */
     public function getUpdated()
     {
         return $this->updated;
     }
     
+    /**
+     * 
+     * Gets all the deleted entities.
+     * 
+     * @return SplObjectStorage
+     * 
+     */
     public function getDeleted()
     {
         return $this->deleted;
     }
     
+    /**
+     * 
+     * Gets the exception that caused a rollback in exec().
+     * 
+     * @return PhpException
+     * 
+     */
     public function getException()
     {
         return $this->exception;
     }
     
+    /**
+     * 
+     * Gets the entity that caused the exception in exec().
+     * 
+     * @return object
+     * 
+     */
     public function getFailed()
     {
         return $this->failed;
