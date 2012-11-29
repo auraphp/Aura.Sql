@@ -10,7 +10,7 @@
  */
 namespace Aura\Sql\Query;
 
-use Aura\Sql\Adapter\AbstractAdapter;
+use Aura\Sql\Connection\AbstractConnection;
 
 /**
  * 
@@ -23,25 +23,34 @@ abstract class AbstractQuery
 {
     /**
      * 
-     * An SQL connection adapter.
+     * An SQL connection.
      * 
-     * @var AbstractAdapter
+     * @var AbstractConnection
      * 
      */
-    protected $sql;
+    protected $connection;
+
+    /**
+     * 
+     * Data to be bound to the query.
+     * 
+     * @var array
+     * 
+     */
+    protected $bind = [];
 
     /**
      * 
      * Constructor.
      * 
-     * @param AbstractAdapter $sql An SQL adapter.
+     * @param AbstractConnection $connection An SQL connection.
      * 
      * @return void
      * 
      */
-    public function __construct(AbstractAdapter $sql)
+    public function __construct(AbstractConnection $connection)
     {
-        $this->sql = $sql;
+        $this->connection = $connection;
     }
     
     /**
@@ -52,6 +61,18 @@ abstract class AbstractQuery
      * 
      */
     abstract public function __toString();
+    
+    /**
+     * 
+     * Gets the database connection for this query object.
+     * 
+     * @return AbstractConnection
+     * 
+     */
+    public function getConnection()
+    {
+        return $this->connection;
+    }
     
     /**
      * 
@@ -83,5 +104,46 @@ abstract class AbstractQuery
         return PHP_EOL
              . '    ' . implode(PHP_EOL . '    ', $list)
              . PHP_EOL;
+    }
+    
+    /**
+     * 
+     * Sets values to bind into the query; this overrides any previous
+     * bindings.
+     * 
+     * @param array $bind Values to bind to the query.
+     * 
+     * @return void
+     * 
+     */
+    public function setBind(array $bind)
+    {
+        $this->bind = $bind;
+    }
+    
+    /**
+     * 
+     * Adds values to bind into the query; merges with existing values.
+     * 
+     * @param array $bind Values to bind to the query.
+     * 
+     * @return void
+     * 
+     */
+    public function addBind(array $bind)
+    {
+        $this->bind = array_merge($this->bind, $bind);
+    }
+    
+    /**
+     * 
+     * Gets the values to bind into the query.
+     * 
+     * @return array
+     * 
+     */
+    public function getBind()
+    {
+        return $this->bind;
     }
 }

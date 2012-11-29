@@ -8,16 +8,16 @@
  * @license http://opensource.org/licenses/bsd-license.php BSD
  * 
  */
-namespace Aura\Sql\Adapter;
+namespace Aura\Sql\Connection;
 
 /**
  * 
- * MySql adapter.
+ * MySQL connection adapter.
  * 
  * @package Aura.Sql
  * 
  */
-class Mysql extends AbstractAdapter
+class Mysql extends AbstractConnection
 {
     /**
      * 
@@ -168,4 +168,3 @@ class Mysql extends AbstractAdapter
         return $pdo->lastInsertId();
     }
 }
- 

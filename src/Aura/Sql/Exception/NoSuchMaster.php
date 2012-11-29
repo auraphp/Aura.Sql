@@ -11,6 +11,7 @@
 namespace Aura\Sql\Exception;
 
 use Aura\Sql\Exception;
+
 /**
  * 
  * No such master exception
@@ -21,4 +22,3 @@ use Aura\Sql\Exception;
 class NoSuchMaster extends Exception
 {
 }
- 

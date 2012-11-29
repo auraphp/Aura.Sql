@@ -71,12 +71,12 @@ class Profiler implements ProfilerInterface
      * 
      * @param PDOStatement $stmt The PDOStatement to execute and profile.
      * 
-     * @param array $data The data that was bound into the statement.
+     * @param array $bind The data that was bound into the statement.
      * 
      * @return mixed
      * 
      */
-    public function exec(PDOStatement $stmt, array $data = [])
+    public function exec(PDOStatement $stmt, array $bind = [])
     {
         if (! $this->isActive()) {
             return $stmt->execute();
@@ -87,7 +87,7 @@ class Profiler implements ProfilerInterface
         $after  = microtime(true);
         $e      = new Exception;
         $trace  = $e->getTraceAsString();
-        $this->addProfile($stmt->queryString, $after - $before, $data, $trace);
+        $this->addProfile($stmt->queryString, $after - $before, $bind, $trace);
         return $result;
     }
 
@@ -99,12 +99,12 @@ class Profiler implements ProfilerInterface
      * 
      * @param string $text The text of the SQL query.
      * 
-     * @param array $data The data that was used by the function.
+     * @param array $bind The data that was used by the function.
      * 
      * @return mixed
      * 
      */
-    public function call($func, $text, array $data = [])
+    public function call($func, $text, array $bind = [])
     {
         if (! $this->isActive()) {
             return call_user_func($func);
@@ -115,7 +115,7 @@ class Profiler implements ProfilerInterface
         $after  = microtime(true);
         $e      = new Exception;
         $trace  = $e->getTraceAsString();
-        $this->addProfile($text, $after - $before, $data, $trace);
+        $this->addProfile($text, $after - $before, $bind, $trace);
         return $result;
     }
 
@@ -127,19 +127,19 @@ class Profiler implements ProfilerInterface
      * 
      * @param float $time The elapsed time in seconds.
      * 
-     * @param array $data The data that was used.
+     * @param array $bind The data that was used.
      * 
      * @param string $trace An exception backtrace as a string.
      * 
      * @return mixed
      * 
      */
-    public function addProfile($text, $time, array $data, $trace)
+    public function addProfile($text, $time, array $bind, $trace)
     {
         $this->profiles[] = (object) [
             'text' => $text,
             'time' => $time,
-            'data' => $data,
+            'data' => $bind,
             'trace' => $trace
         ];
     }
@@ -156,4 +156,3 @@ class Profiler implements ProfilerInterface
         return $this->profiles;
     }
 }
- 

@@ -8,15 +8,17 @@
  * @license http://opensource.org/licenses/bsd-license.php BSD
  * 
  */
-namespace Aura\Sql;
+namespace Aura\Sql\Exception;
+
+use Aura\Sql\Exception;
 
 /**
  * 
- * Base Exception class for Aura Sql
+ * No such slave exception
  * 
  * @package Aura.Sql
  * 
  */
-class Exception extends \Exception
+class NoSuchGateway extends Exception
 {
 }

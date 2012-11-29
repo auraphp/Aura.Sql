@@ -14,12 +14,12 @@ use Aura\Sql\Query\Factory as QueryFactory;
 
 /**
  * 
- * A factory for adapter objects.
+ * A factory for connection objects.
  * 
  * @package Aura.Sql
  * 
  */
-class AdapterFactory
+class ConnectionFactory
 {
     /**
      * 
@@ -29,16 +29,16 @@ class AdapterFactory
      * 
      */
     protected $map = [
-        'mysql'  => 'Aura\Sql\Adapter\Mysql',
-        'pgsql'  => 'Aura\Sql\Adapter\Pgsql',
-        'sqlite' => 'Aura\Sql\Adapter\Sqlite',
+        'mysql'  => 'Aura\Sql\Connection\Mysql',
+        'pgsql'  => 'Aura\Sql\Connection\Pgsql',
+        'sqlite' => 'Aura\Sql\Connection\Sqlite',
     ];
 
     /**
      * 
      * Constructor.
      * 
-     * @param array $map An override map of adapter names to classes.
+     * @param array $map An override map of connection names to classes.
      * 
      */
     public function __construct(array $map = [])
@@ -48,29 +48,29 @@ class AdapterFactory
 
     /**
      * 
-     * Returns a new adapter instance.
+     * Returns a new connection instance.
      * 
-     * @param string $name The name of the adapter.
+     * @param string $adapter The short adapter name.
      * 
-     * @param mixed $dsn The DSN for the adapter.
+     * @param mixed $dsn The DSN for the connection.
      * 
-     * @param string $username The username for the adapter.
+     * @param string $username The username for the connection.
      * 
-     * @param string $password The password for the adapter.
+     * @param string $password The password for the connection.
      * 
-     * @param array $options PDO options for the adapter.
+     * @param array $options PDO options for the connection.
      * 
-     * @return AbstractAdapter
+     * @return AbstractConnection
      * 
      */
     public function newInstance(
-        $name,
+        $adapter,
         $dsn,
         $username = null,
         $password = null,
         $options = []
     ) {
-        $class = $this->map[$name];
+        $class = $this->map[$adapter];
         $profiler = new Profiler;
         $column_factory = new ColumnFactory;
         $query_factory  = new QueryFactory;
@@ -85,4 +85,3 @@ class AdapterFactory
         );
     }
 }
- 

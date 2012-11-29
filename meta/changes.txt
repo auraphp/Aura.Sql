@@ -1,22 +1,25 @@
-- [NEW] Select object and SelectFactory.
+WARNING: This release has backwards compatiblity breaks.
 
-- [ADD] AbstractAdapter::newSelect() to return a new Select object.
+Breaks
+------
 
-- [CHG] AbstractAdapter::query() can now take a Select object directly.
+- [BRK] Rename "Adapter" to "Connection" throughout the package
 
-- [FIX] In ConnectionManager::getMaster() and getSlate(), use `=== null` when
-  comparing connection names; this allows integer zero keys in the pool
-  arrays.
+- [BRK] Rename "sql" to "connection" throughout the package
 
-- [FIX] Profiler output now numbers queries correctly.
 
-- [ADD] Method Column::__set_state() to make it easier to var_export() a
-  Column object.
+Other Changes
+-------------
 
-- [CHG] In tests, you can now specify your own globals.php file to set local
-  database connection params.
+- [ADD] Methods Query\AbstractQuery::setBind(), addBind(), and getBind() to
+  allow bind data to be carried along with the query object.
 
-- [CHG] AbstractAdapter::update() $data values can now be literals instead
-  of just key-value pairs.
+- [ADD] Method Query\AbstractQuery::getConnection() to get the injected
+  database connection.
 
-- [CHG] PSR-1 and 2 compliance.
+- [NEW] Classes Gateway, GatewayIterator, and GatewayLocator (table data
+  gateway implementation)
+
+- [NEW] Class AbstractMapper (mapper implementation)
+
+- [NEW] Class UnitOfWork (unit-of-work implemetation)

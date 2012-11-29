@@ -1,5 +1,5 @@
 <?php
-namespace Aura\Sql\Adapter;
+namespace Aura\Sql\Connection;
 use PDO;
 use Aura\Sql\Select;
 
@@ -11,7 +11,7 @@ class SqlsrvDenaliTest extends SqlsrvTest
 {
     protected $connect_type = 'sqlsrv_denali';
     
-    protected $adapter_class = 'Aura\Sql\Adapter\SqlsrvDenali';
+    protected $connection_class = 'Aura\Sql\Connection\SqlsrvDenali';
     
     public function testFetchTableList()
     {

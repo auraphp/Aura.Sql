@@ -47,12 +47,12 @@ interface ProfilerInterface
      * 
      * @param PDOStatement $stmt The PDOStatement to execute and profile.
      * 
-     * @param array $data The data that was bound into the statement.
+     * @param array $bind The data that was bound into the statement.
      * 
      * @return mixed
      * 
      */
-    public function exec(PDOStatement $stmt, array $data = []);
+    public function exec(PDOStatement $stmt, array $bind = []);
 
     /**
      * 
@@ -62,12 +62,12 @@ interface ProfilerInterface
      * 
      * @param string $text The text of the SQL query.
      * 
-     * @param array $data The data that was used by the function.
+     * @param array $bind The data that was used by the function.
      * 
      * @return mixed
      * 
      */
-    public function call($func, $text, array $data = []);
+    public function call($func, $text, array $bind = []);
 
     /**
      * 
@@ -77,14 +77,14 @@ interface ProfilerInterface
      * 
      * @param float $time The elapsed time in seconds.
      * 
-     * @param array $data The data that was used.
+     * @param array $bind The data that was used.
      * 
      * @param string $trace An exception backtrace as a string.
      * 
      * @return mixed
      * 
      */
-    public function addProfile($text, $time, array $data, $trace);
+    public function addProfile($text, $time, array $bind, $trace);
 
     /**
      * 
@@ -95,4 +95,3 @@ interface ProfilerInterface
      */
     public function getProfiles();
 }
- 
