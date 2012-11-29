@@ -1,20 +1,39 @@
 {
     "name": "aura/sql",
     "type": "aura-package",
-    "description": "A wrapper around PDO that provides connection adapters and convenience methods for MySQL, PostgreSQL, SQLite, and SQL Server.",
-    "keywords": [ "mysql", "pdo", "pgsql", "postgres", "postgresql", "sqlite", "sql server", "sqlserver" ],
+    "description": "The Aura Sql package is a wrapper around PDO that provides connection adapters and convenience methods for MySQL, PostgreSQL, SQLite, and SQL Server.",
+    "keywords": [
+        "mysql",
+        "pdo",
+        "pgsql",
+        "postgres",
+        "postgresql",
+        "sqlite",
+        "sql server"
+    ],
     "homepage": "http://auraphp.github.com/Aura.Sql",
-    "version": "1.0.0-dev",
+    "version": "1.0.0",
+    "time": "2012-11-29",
     "license": "BSD-2-Clause",
     "authors": [
         {
-            "name": "Aura Contributors",
+            "name": "Aura.Sql Contributors",
             "homepage": "https://github.com/auraphp/Aura.Sql/contributors"
+        },
+        {
+            "name": "Paul M. Jones",
+            "email": "pmjones88@gmail.com",
+            "homepage": "http://paul-m-jones.com"
+        },
+        {
+            "name": "Roy Gu",
+            "email": "cnwggu@gmail.com",
+            "homepage": null
         }
     ],
     "require": {
         "php": ">=5.4.0",
-        "aura/installer-default": "1.0.0"
+        "aura/installer-default": ">=1.0.0"
     },
     "autoload": {
         "psr-0": {
