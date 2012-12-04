@@ -70,11 +70,18 @@ class ConnectionFactory
         $password = null,
         $options = []
     ) {
+        if ($adapter instanceof \Pdo) {
+            $pdo = $adapter;
+            $adapter = $pdo->getAttribute(\Pdo::ATTR_DRIVER_NAME);
+        } else {
+            $pdo = false;
+        }
+
         $class = $this->map[$adapter];
         $profiler = new Profiler;
         $column_factory = new ColumnFactory;
         $query_factory  = new QueryFactory;
-        return new $class(
+        $conn = new $class(
             $profiler,
             $column_factory,
             $query_factory,
@@ -83,5 +90,10 @@ class ConnectionFactory
             $password,
             $options
         );
+        
+        if ($pdo) {
+            $conn->setPdo($pdo);
+        }
+        return $conn;
     }
 }
