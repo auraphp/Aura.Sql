@@ -123,18 +123,20 @@ abstract class AbstractConnectionTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('\Aura\Sql\Query\Factory', $actual);
     }
     
-    /**
-     * @todo Implement testGetDsnString().
-     */
     public function testGetDsnString()
     {
         $actual = $this->connection->getDsnString();
         $this->assertEquals($this->expect_dsn_string, $actual);
     }
     
-    /**
-     * @todo Implement testConnect().
-     */
+    public function testSetPdo()
+    {
+        $pdo = new PDO('sqlite::memory:');
+        $this->connection->setPdo($pdo);
+        $actual = $this->connection->getPdo();
+        $this->assertSame($pdo, $actual);
+    }
+    
     public function testGetPdo()
     {
         $actual = $this->connection->getPdo();
