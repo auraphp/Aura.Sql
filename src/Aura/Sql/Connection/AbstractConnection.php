@@ -244,6 +244,18 @@ abstract class AbstractConnection
 
     /**
      * 
+     * Set the PDO connection object, normally you don't need to
+     * 
+     * @return void
+     *
+     */
+    public function setPdo(PDO $pdo)
+    {
+        $this->pdo = $pdo;
+    }
+
+    /**
+     * 
      * Connects to the database by creating the PDO object.
      * 
      * @return void
@@ -256,7 +268,9 @@ abstract class AbstractConnection
         }
         
         $this->preConnect();
-        $this->pdo = $this->newPdo();
+        if (! $this->pdo) {
+            $this->pdo = $this->newPdo();
+        }
         $this->postConnect();
     }
 
