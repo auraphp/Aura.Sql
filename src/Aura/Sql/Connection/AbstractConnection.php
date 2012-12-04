@@ -72,6 +72,8 @@ abstract class AbstractConnection
      */
     protected $password;
 
+    protected $profiler;
+    
     /**
      * 
      * The PDO connection object.
@@ -81,6 +83,8 @@ abstract class AbstractConnection
      */
     protected $pdo;
 
+    protected $query_factory;
+    
     /**
      * 
      * The prefix to use when quoting identifier names.
@@ -131,7 +135,7 @@ abstract class AbstractConnection
         ProfilerInterface $profiler,
         ColumnFactory $column_factory,
         QueryFactory $query_factory,
-        $dsn,
+        $dsn = null,
         $username = null,
         $password = null,
         array $options = []
@@ -207,6 +211,25 @@ abstract class AbstractConnection
 
     /**
      * 
+     * Sets the PDO connection object; typically used when a shared PDO object
+     * already exists in a legacy context.
+     * 
+     * Note that if you use setPdo(), the pre- and post-connect method hooks
+     * will not be called.
+     * 
+     * @param PDO $pdo The PDO object.
+     * 
+     * @return void
+     * 
+     */
+    public function setPdo(PDO $pdo)
+    {
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $this->pdo = $pdo;
+    }
+    
+    /**
+     * 
      * Returns the PDO connection object; if it does not exist, creates it to
      * connect to the database.
      * 
@@ -215,9 +238,7 @@ abstract class AbstractConnection
      */
     public function getPdo()
     {
-        if (! $this->pdo) {
-            $this->connect();
-        }
+        $this->connect();
         return $this->pdo;
     }
 
@@ -230,6 +251,10 @@ abstract class AbstractConnection
      */
     public function connect()
     {
+        if ($this->pdo) {
+            return;
+        }
+        
         $this->preConnect();
         $this->pdo = $this->newPdo();
         $this->postConnect();
