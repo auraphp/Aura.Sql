@@ -135,7 +135,7 @@ class Sqlite extends AbstractConnection
 
         // loop through the result rows; each describes a column.
         foreach ($raw_cols as $val) {
-            
+
             $name = $val['name'];
             list($type, $size, $scale) = $this->getTypeSizeScope($val['type']);
 

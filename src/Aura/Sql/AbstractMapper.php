@@ -32,7 +32,7 @@ abstract class AbstractMapper
      * 
      */
     protected $table;
-    
+
     /**
      * 
      * A map of table columns to entity fields.
@@ -41,7 +41,7 @@ abstract class AbstractMapper
      * 
      */
     protected $cols_fields = [];
-    
+
     /**
      * 
      * The primary column in the table (maps to the identity field.)
@@ -50,7 +50,7 @@ abstract class AbstractMapper
      * 
      */
     protected $primary_col;
-    
+
     /**
      * 
      * The identity field in the entity (maps to the primary column).
@@ -59,7 +59,7 @@ abstract class AbstractMapper
      * 
      */
     protected $identity_field;
-    
+
     /**
      * 
      * Returns the list of table columns.
@@ -71,7 +71,7 @@ abstract class AbstractMapper
     {
         return array_keys($this->cols_fields);
     }
-    
+
     /**
      * 
      * Returns the table column name for a given entity field name.
@@ -85,7 +85,7 @@ abstract class AbstractMapper
     {
         return array_search($field, $this->cols_fields);
     }
-    
+
     /**
      * 
      * Returns the list of entity fields.
@@ -97,7 +97,7 @@ abstract class AbstractMapper
     {
         return array_values($this->cols_fields);
     }
-    
+
     /**
      * 
      * Returns the entity field name for a given table column name.
@@ -111,7 +111,7 @@ abstract class AbstractMapper
     {
         return $this->cols_fields[$col];
     }
-    
+
     /**
      * 
      * Returns the identity field name for mapped entities.
@@ -123,7 +123,7 @@ abstract class AbstractMapper
     {
         return $this->identity_field;
     }
-    
+
     /**
      * 
      * Given an entity object, returns the identity field value.
@@ -138,7 +138,7 @@ abstract class AbstractMapper
         $field = $this->identity_field;
         return $entity->$field;
     }
-    
+
     /**
      * 
      * Returns the primary column name on the table.
@@ -150,7 +150,7 @@ abstract class AbstractMapper
     {
         return $this->primary_col;
     }
-    
+
     /**
      * 
      * Returns the mapped SQL table name.
@@ -162,7 +162,7 @@ abstract class AbstractMapper
     {
         return $this->table;
     }
-    
+
     /**
      * 
      * Returns a column name, dot-prefixed with the table name.
@@ -176,7 +176,7 @@ abstract class AbstractMapper
     {
         return $this->table . '.' . $col;
     }
-    
+
     /**
      * 
      * Returns a column name, dot-prefixed with the table name, "AS" its
@@ -192,7 +192,7 @@ abstract class AbstractMapper
     {
         return $this->getTableCol($col) . ' AS ' . $this->getFieldForCol($col);
     }
-    
+
     /**
      * 
      * Returns the primary column name, dot-prefixed with the table name.
@@ -204,7 +204,7 @@ abstract class AbstractMapper
     {
         return $this->getTableCol($this->primary_col);
     }
-    
+
     /**
      * 
      * Returns an array of fully-qualified table columns names "AS" their
@@ -223,7 +223,7 @@ abstract class AbstractMapper
         }
         return $list;
     }
-    
+
     /**
      * 
      * Given a Select object and an array of column names, modifies the Select
@@ -244,7 +244,7 @@ abstract class AbstractMapper
             // by default, select all cols
             $cols = $this->getCols();
         }
-        
+
         $select->from($this->getTable());
         $select->cols($this->getTableColsAsFields($cols));
     }
@@ -269,7 +269,7 @@ abstract class AbstractMapper
         $insert->cols(array_keys($data));
         $insert->addBind($data);
     }
-    
+
     /**
      * 
      * Given an Update query object and an entity object, modifies the Update
@@ -300,7 +300,7 @@ abstract class AbstractMapper
             $this->getIdentityValue($entity)
         );
     }
-    
+
     /**
      * 
      * Given a Delete query object and an entity object, modify the Delete
@@ -322,7 +322,7 @@ abstract class AbstractMapper
             $this->getIdentityValue($entity)
         );
     }
-    
+
     /**
      * 
      * Given an entity object, creates an array of mapped table column names

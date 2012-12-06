@@ -31,7 +31,7 @@ class UnitOfWork
      * 
      */
     protected $gateways;
-    
+
     /**
      * 
      * A collection of database connections extracted from the gateways.
@@ -40,7 +40,7 @@ class UnitOfWork
      * 
      */
     protected $connections;
-    
+
     /**
      * 
      * A collection of all entity objects to be sent to the database.
@@ -49,7 +49,7 @@ class UnitOfWork
      * 
      */
     protected $entities;
-    
+
     /**
      * 
      * A collection of all entity objects that were successfully inserted.
@@ -58,7 +58,7 @@ class UnitOfWork
      * 
      */
     protected $inserted;
-    
+
     /**
      * 
      * A collection of all entity objects that were successfully updated.
@@ -66,8 +66,8 @@ class UnitOfWork
      * @var SplObjectStorage
      * 
      */
-    protected $udpates;
-    
+    protected $updates;
+
     /**
      * 
      * A collection of all entity objects that were successfully deleted.
@@ -76,7 +76,7 @@ class UnitOfWork
      * 
      */
     protected $deleted;
-    
+
     /**
      * 
      * The exception that occurred during exec(), causing a rollback.
@@ -85,7 +85,7 @@ class UnitOfWork
      * 
      */
     protected $exception;
-    
+
     /**
      * 
      * The entity object that caused the exception.
@@ -94,7 +94,7 @@ class UnitOfWork
      * 
      */
     protected $failed;
-    
+
     /**
      * 
      * Constructor.
@@ -107,7 +107,7 @@ class UnitOfWork
         $this->gateways = $gateways;
         $this->entities = new SplObjectStorage;
     }
-    
+
     /**
      * 
      * Attached an entity object for insertion.
@@ -127,7 +127,7 @@ class UnitOfWork
             'gateway_name' => $gateway_name,
         ]);
     }
-    
+
     /**
      * 
      * Attached an entity object for updating.
@@ -150,7 +150,7 @@ class UnitOfWork
             'initial_data' => $initial_data,
         ]);
     }
-    
+
     /**
      * 
      * Attached an entity object for deletion.
@@ -170,7 +170,7 @@ class UnitOfWork
             'gateway_name' => $gateway_name,
         ]);
     }
-    
+
     /**
      * 
      * Attaches an entity to this unit of work.
@@ -186,7 +186,7 @@ class UnitOfWork
     {
         $this->entities->attach($entity, $info);
     }
-    
+
     /**
      * 
      * Detaches an entity from this unit of work.
@@ -200,7 +200,7 @@ class UnitOfWork
     {
         $this->entities->detach($entity);
     }
-    
+
     /**
      * 
      * Loads all database connections from the gateways.
@@ -216,7 +216,7 @@ class UnitOfWork
             $this->connections->attach($connection);
         }
     }
-    
+
     /**
      * 
      * Gets the collection of database connections.
@@ -228,7 +228,7 @@ class UnitOfWork
     {
         return $this->connections;
     }
-    
+
     /**
      * 
      * Executes the unit of work.
@@ -247,34 +247,33 @@ class UnitOfWork
         $this->deleted   = new SplObjectStorage;
         $this->inserted  = new SplObjectStorage;
         $this->updated   = new SplObjectStorage;
-        
+
         // load the connections from the gateways for transaction management
         $this->loadConnections();
-        
+
         // perform the unit of work
         try {
-            
+
             $this->execBegin();
-            
+
             foreach ($this->entities as $entity) {
-                
+
                 // get the info for this entity
                 $info = $this->entities[$entity];
                 $method = $info['method'];
                 $gateway = $this->gateways->get($info['gateway_name']);
-                
+
                 // remove used info
                 unset($info['method']);
                 unset($info['gateway']);
-                
+
                 // execute the method
                 $this->$method($gateway, $entity, $info);
-                
             }
-            
+
             $this->execCommit();
             return true;
-            
+
         } catch (PhpException $e) {
             $this->failed = $entity; // from the loop above
             $this->exception = $e;
@@ -282,7 +281,7 @@ class UnitOfWork
             return false;
         }
     }
-    
+
     /**
      * 
      * Begins a transaction on all connections.
@@ -296,7 +295,7 @@ class UnitOfWork
             $connection->beginTransaction();
         }
     }
-    
+
     /**
      * 
      * Inserts an entity via a gateway.
@@ -317,7 +316,7 @@ class UnitOfWork
             'last_insert_id' => $last_insert_id,
         ]);
     }
-    
+
     /**
      * 
      * Updates an entity via a gateway.
@@ -337,7 +336,7 @@ class UnitOfWork
         $gateway->update($entity, $initial_data);
         $this->updated->attach($entity);
     }
-    
+
     /**
      * 
      * Deletes an entity via a gateway.
@@ -356,7 +355,7 @@ class UnitOfWork
         $gateway->delete($entity);
         $this->deleted->attach($entity);
     }
-    
+
     /**
      * 
      * Commits the transactions on all connections.
@@ -370,7 +369,7 @@ class UnitOfWork
             $connection->commit();
         }
     }
-    
+
     /**
      * 
      * Rolls back the transactions on all connections.
@@ -384,7 +383,7 @@ class UnitOfWork
             $connection->rollBack();
         }
     }
-    
+
     /**
      * 
      * Gets all the attached entities.
@@ -396,7 +395,7 @@ class UnitOfWork
     {
         return $this->entities;
     }
-    
+
     /**
      * 
      * Gets all the inserted entities.
@@ -408,7 +407,7 @@ class UnitOfWork
     {
         return $this->inserted;
     }
-    
+
     /**
      * 
      * Gets all the updated entities.
@@ -420,7 +419,7 @@ class UnitOfWork
     {
         return $this->updated;
     }
-    
+
     /**
      * 
      * Gets all the deleted entities.
@@ -432,7 +431,7 @@ class UnitOfWork
     {
         return $this->deleted;
     }
-    
+
     /**
      * 
      * Gets the exception that caused a rollback in exec().
@@ -444,7 +443,7 @@ class UnitOfWork
     {
         return $this->exception;
     }
-    
+
     /**
      * 
      * Gets the entity that caused the exception in exec().

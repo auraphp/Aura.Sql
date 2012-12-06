@@ -27,7 +27,7 @@ trait WhereTrait
      * 
      */
     protected $where = [];
-    
+
     /**
      * 
      * Adds a WHERE condition to the query by AND; if a value is passed as the
@@ -44,7 +44,7 @@ trait WhereTrait
     public function where($cond)
     {
         $cond = $this->connection->quoteNamesIn($cond);
-        
+
         if (func_num_args() > 1) {
             $cond = $this->connection->quoteInto($cond, func_get_arg(1));
         }
