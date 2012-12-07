@@ -52,7 +52,7 @@ abstract class AbstractQuery
     {
         $this->connection = $connection;
     }
-    
+
     /**
      * 
      * Converts this query object to a string.
@@ -61,7 +61,7 @@ abstract class AbstractQuery
      * 
      */
     abstract public function __toString();
-    
+
     /**
      * 
      * Gets the database connection for this query object.
@@ -73,7 +73,7 @@ abstract class AbstractQuery
     {
         return $this->connection;
     }
-    
+
     /**
      * 
      * Returns an array as an indented comma-separated values string.
@@ -89,7 +89,7 @@ abstract class AbstractQuery
              . '    ' . implode(',' . PHP_EOL . '    ', $list)
              . PHP_EOL;
     }
-    
+
     /**
      * 
      * Returns an array as an indented string.
@@ -105,7 +105,7 @@ abstract class AbstractQuery
              . '    ' . implode(PHP_EOL . '    ', $list)
              . PHP_EOL;
     }
-    
+
     /**
      * 
      * Sets values to bind into the query; this overrides any previous
@@ -120,7 +120,7 @@ abstract class AbstractQuery
     {
         $this->bind = $bind;
     }
-    
+
     /**
      * 
      * Adds values to bind into the query; merges with existing values.
@@ -134,7 +134,7 @@ abstract class AbstractQuery
     {
         $this->bind = array_merge($this->bind, $bind);
     }
-    
+
     /**
      * 
      * Gets the values to bind into the query.

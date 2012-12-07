@@ -32,7 +32,7 @@ class Gateway
      * 
      */
     protected $connections;
-    
+
     /**
      * 
      * A mapper between this table gateway and entities.
@@ -41,7 +41,7 @@ class Gateway
      * 
      */
     protected $mapper;
-    
+
     /**
      * 
      * Constructor.
@@ -59,7 +59,7 @@ class Gateway
         $this->connections = $connections;
         $this->mapper   = $mapper;
     }
-    
+
     /**
      * 
      * Gets the connection locator.
@@ -71,7 +71,7 @@ class Gateway
     {
         return $this->connections;
     }
-    
+
     /**
      * 
      * Gets the mapper.
@@ -83,7 +83,7 @@ class Gateway
     {
         return $this->mapper;
     }
-    
+
     /**
      * 
      * Inserts an entity into the mapped table using a write connection.
@@ -101,7 +101,7 @@ class Gateway
         $connection->query($insert, $insert->getBind());
         return $connection->lastInsertId();
     }
-    
+
     /**
      * 
      * Updates an entity in the mapped table using a write connection; if an
@@ -123,7 +123,7 @@ class Gateway
         $stmt = $connection->query($update, $update->getBind());
         return (bool) $stmt->rowCount();
     }
-    
+
     /**
      * 
      * Deletes an entity from the mapped table using a write connection.
@@ -161,7 +161,7 @@ class Gateway
         $this->mapper->modifySelect($select, $cols);
         return $select;
     }
-    
+
     /**
      * 
      * Selects one row from the mapped table for a given column and value(s).
@@ -179,7 +179,7 @@ class Gateway
         $select = $this->newSelectBy($col, $val);
         return $this->fetchOne($select);
     }
-    
+
     /**
      * 
      * Selects all rows from the mapped table for a given column and value.
@@ -197,7 +197,7 @@ class Gateway
         $select = $this->newSelectBy($col, $val);
         return $this->fetchAll($select);
     }
-    
+
     /**
      * 
      * Creates a Select object to match against a given column and value(s).
@@ -222,7 +222,7 @@ class Gateway
         $select->where($where, $val);
         return $select;
     }
-    
+
     /**
      * 
      * Given a Select, fetches all rows.
@@ -241,7 +241,7 @@ class Gateway
         $connection = $select->getConnection();
         return $connection->fetchAll($select, $bind);
     }
-    
+
     /**
      * 
      * Given a Select, fetches the first column of all rows.
@@ -260,7 +260,7 @@ class Gateway
         $connection = $select->getConnection();
         return $connection->fetchCol($select, $bind);
     }
-    
+
     /**
      * 
      * Given a Select, fetches the first row.
@@ -279,7 +279,7 @@ class Gateway
         $connection = $select->getConnection();
         return $connection->fetchOne($select, $bind);
     }
-    
+
     /**
      * 
      * Given a Select, fetches an array of key-value pairs where the first
@@ -299,7 +299,7 @@ class Gateway
         $connection = $select->getConnection();
         return $connection->fetchPairs($select, $bind);
     }
-    
+
     /**
      * 
      * Given a Select, fetches the first column of the first row.

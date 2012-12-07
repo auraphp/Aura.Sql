@@ -59,7 +59,7 @@ class GatewayLocator implements IteratorAggregate
     {
         return new GatewayIterator($this, array_keys($this->registry));
     }
-    
+
     /**
      * 
      * Sets a gateway into the registry by name.

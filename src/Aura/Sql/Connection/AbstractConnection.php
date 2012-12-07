@@ -73,7 +73,7 @@ abstract class AbstractConnection
     protected $password;
 
     protected $profiler;
-    
+
     /**
      * 
      * The PDO connection object.
@@ -84,7 +84,7 @@ abstract class AbstractConnection
     protected $pdo;
 
     protected $query_factory;
-    
+
     /**
      * 
      * The prefix to use when quoting identifier names.
@@ -227,7 +227,7 @@ abstract class AbstractConnection
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         $this->pdo = $pdo;
     }
-    
+
     /**
      * 
      * Returns the PDO connection object; if it does not exist, creates it to
@@ -254,7 +254,7 @@ abstract class AbstractConnection
         if ($this->pdo) {
             return;
         }
-        
+
         $this->preConnect();
         $this->pdo = $this->newPdo();
         $this->postConnect();
@@ -355,7 +355,7 @@ abstract class AbstractConnection
 
     /**
      * 
-     * Creates a prepared PDOStatment and binds data values to placeholders.
+     * Creates a prepared PDOStatement and binds data values to placeholders.
      * 
      * PDO itself is touchy about binding values.  If you attempt to bind a
      * value that does not have a corresponding placeholder, PDO will error.
@@ -612,7 +612,7 @@ abstract class AbstractConnection
      * @param mixed $bind The data value(s) to quote.
      * 
      * @return mixed An SQL-safe quoted value (or string of separated values)
-     * placed into the orignal text.
+     * placed into the original text.
      * 
      * @see quote()
      * 
@@ -867,7 +867,7 @@ abstract class AbstractConnection
      * 
      * Updates a table with specified data based on WHERE conditions.
      * 
-     * @param string $table The table to udpate.
+     * @param string $table The table to update.
      * 
      * @param array $cols An associative array where the key is the column
      * name and the value is the value to use for that column.
