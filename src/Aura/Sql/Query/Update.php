@@ -21,7 +21,7 @@ class Update extends AbstractQuery
 {
     use ValuesTrait;
     use WhereTrait;
-    
+
     /**
      * 
      * The table to update.
@@ -30,7 +30,7 @@ class Update extends AbstractQuery
      * 
      */
     protected $table;
-    
+
     /**
      * 
      * Returns this object as an SQL statement string.
@@ -44,17 +44,17 @@ class Update extends AbstractQuery
         foreach ($this->values as $col => $value) {
             $values[] = "{$col} = {$value}";
         }
-        
+
         $where = null;
         if ($this->where) {
             $where .= 'WHERE' . $this->indent($this->where);
         }
-        
+
         return 'UPDATE ' . $this->table . PHP_EOL
              . 'SET' . $this->indentCsv($values)
              . $where;
     }
-    
+
     /**
      * 
      * Sets the table to update.
