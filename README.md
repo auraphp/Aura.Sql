@@ -372,7 +372,7 @@ $select->cols(['*'])
        ->where('bar > :bar')
        ->orderBy('baz');
 
-$bind['bar' => '88'];
+$bind = ['bar' => '88'];
 
 $list = $connection->fetchAll($select, $bind);
 ```
@@ -424,7 +424,7 @@ $insert->into('foo')
        ->cols(['bar', 'baz'])
        ->set('date', 'NOW()');
 
-$bind[
+$bind = [
     'bar' => null,
     'baz' => 'zim',
 ];
@@ -450,7 +450,7 @@ $update->table('foo')
        ->where('zim = :zim')
        ->orWhere('gir = :gir');
 
-$bind[
+$bind = [
     'bar' => 'barbar',
     'baz' => 99,
     'zim' => 'dib',
@@ -476,7 +476,7 @@ $delete->from('foo')
        ->where('zim = :zim')
        ->orWhere('gir = :gir');
 
-$bind[
+$bind = [
     'zim' => 'dib',
     'gir' => 'doom',
 ];
