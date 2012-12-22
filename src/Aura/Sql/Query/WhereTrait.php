@@ -1,45 +1,45 @@
 <?php
 /**
- * 
+ *
  * This file is part of the Aura Project for PHP.
- * 
+ *
  * @package Aura.Sql
- * 
+ *
  * @license http://opensource.org/licenses/bsd-license.php BSD
- * 
+ *
  */
 namespace Aura\Sql\Query;
 
 /**
- * 
+ *
  * A trait for adding WHERE conditions.
- * 
+ *
  * @package Aura.Sql
- * 
+ *
  */
 trait WhereTrait
 {
     /**
-     * 
+     *
      * The list of WHERE conditions.
-     * 
+     *
      * @var array
-     * 
+     *
      */
     protected $where = [];
 
     /**
-     * 
+     *
      * Adds a WHERE condition to the query by AND; if a value is passed as the
-     * second param, it will be quoted and replaced into the condition 
+     * second param, it will be quoted and replaced into the condition
      * wherever a question-mark appears.
-     * 
+     *
      * Array values are quoted and comma-separated.
-     * 
+     *
      * @param string $cond The WHERE condition.
-     * 
+     *
      * @return $this
-     * 
+     *
      */
     public function where($cond)
     {
@@ -60,16 +60,16 @@ trait WhereTrait
     }
 
     /**
-     * 
-     * Adds a WHERE condition to the query by OR; otherwise identical to 
+     *
+     * Adds a WHERE condition to the query by OR; otherwise identical to
      * `where()`.
-     * 
+     *
      * @param string $cond The WHERE condition.
-     * 
+     *
      * @return $this
-     * 
+     *
      * @see where()
-     * 
+     *
      */
     public function orWhere($cond)
     {
@@ -83,6 +83,94 @@ trait WhereTrait
             $this->where[] = "OR $cond";
         } else {
             $this->where[] = $cond;
+        }
+
+        // done
+        return $this;
+    }
+
+    /**
+     *
+     * Adds a WHERE IN condition to the query by AND; if a array of values or a value is
+     * passed as the second param, a condition with a matching numbers of question-marks
+     * will be generated and the values will be quoted and replaced into the condition
+     * wherever a question-mark appears.
+     *
+     * Array values are quoted and comma-separated.
+     *
+     * @param string $cond The WHERE IN condition.
+     *
+     * @return $this
+     *
+     */
+    public function whereIn($cond)
+    {
+        $cond = $this->connection->quoteNamesIn($cond);
+
+        if (func_num_args() > 1) {
+            if (is_array(func_get_arg(1)) == true
+                && count(func_get_arg(1)) > 0) {
+                $len = count(func_get_arg(1));
+            } else {
+                $len = preg_match_all('/(,)/', func_get_arg(1)) + 1;
+            }
+
+            $in = $this->connection->quoteInto(implode(',', array_fill(0, $len, '?')), func_get_arg(1));
+            if ($this->where) {
+                $this->where[] = "AND $cond IN ($in)";
+            } else {
+                $this->where[] = "$cond IN ($in)";
+            }
+        } else {
+            if ($this->where) {
+                $this->where[] = "AND $cond";
+            } else {
+                $this->where[] = $cond;
+            }
+        }
+
+        // done
+        return $this;
+    }
+
+    /**
+     *
+     * Adds a WHERE IN condition to the query by OR; if a array of values or a value is
+     * passed as the second param, a condition with a matching numbers of question-marks
+     * will be generated and the values will be quoted and replaced into the condition
+     * wherever a question-mark appears.
+     *
+     * Array values are quoted and comma-separated.
+     *
+     * @param string $cond The WHERE IN condition.
+     *
+     * @return $this
+     *
+     */
+    public function orWhereIn($cond)
+    {
+        $cond = $this->connection->quoteNamesIn($cond);
+
+        if (func_num_args() > 1) {
+            if (is_array(func_get_arg(1)) == true
+                && count(func_get_arg(1)) > 0) {
+                $len = count(func_get_arg(1));
+            } else {
+                $len = preg_match_all('/(,)/', func_get_arg(1)) + 1;
+            }
+
+            $in = $this->connection->quoteInto(implode(',', array_fill(0, $len, '?')), func_get_arg(1));
+            if ($this->where) {
+                $this->where[] = "OR $cond IN ($in)";
+            } else {
+                $this->where[] = "$cond IN ($in)";
+            }
+        } else {
+            if ($this->where) {
+                $this->where[] = "OR $cond";
+            } else {
+                $this->where[] = $cond;
+            }
         }
 
         // done
