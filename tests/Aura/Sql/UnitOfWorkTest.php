@@ -49,7 +49,7 @@ class UnitOfWorkTest extends \PHPUnit_Framework_TestCase
         $this->gateway = new Gateway($this->connections, $this->mapper);
         
         $this->gateways = new GatewayLocator([
-            'mock' => $this->gateway,
+            'mock' => function () { return $this->gateway; },
         ]);
         
         $this->work = new UnitOfWork($this->gateways);

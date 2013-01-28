@@ -32,13 +32,20 @@ class GatewayLocator implements IteratorAggregate
 
     /**
      * 
+     * Tracks whether or not a registry entry has been converted from a 
+     * callable to a gateway object.
+     * 
+     * @var array
+     * 
+     */
+    protected $converted = [];
+    
+    /**
+     * 
      * Constructor.
      * 
      * @param array $registry An array of key-value pairs where the key is the
-     * recode name and the value is the gateway
-     * object. The value may also be a closure that returns a gateway object.
-     * Note that is has to be a closure, not just any callable, because the
-     * gateway object itself might be callable.
+     * gateway name and the value is a callable that returns a gateway object.
      * 
      */
     public function __construct(array $registry = [])
@@ -66,15 +73,15 @@ class GatewayLocator implements IteratorAggregate
      * 
      * @param string $name The gateway name.
      * 
-     * @param string $spec The gateway specification, typically a closure that
-     * builds and returns a gateway object.
+     * @param callable $spec A callable that returns a gateway object.
      * 
      * @return void
      * 
      */
-    public function set($name, $spec)
+    public function set($name, callable $spec)
     {
         $this->registry[$name] = $spec;
+        $this->converted[$name] = false;
     }
 
     /**
@@ -92,9 +99,10 @@ class GatewayLocator implements IteratorAggregate
             throw new Exception\NoSuchGateway($name);
         }
 
-        if ($this->registry[$name] instanceof \Closure) {
+        if (! $this->converted[$name]) {
             $func = $this->registry[$name];
             $this->registry[$name] = $func();
+            $this->converted[$name] = true;
         }
 
         return $this->registry[$name];
