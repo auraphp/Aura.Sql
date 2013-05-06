@@ -158,7 +158,7 @@ class Column
      */
     public function __isset($key)
     {
-        return isset($this->$key);
+        return property_exists($this, $key);
     }
     
     /**
