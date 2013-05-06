@@ -150,6 +150,18 @@ class Column
     }
 
     /**
+     * Check if the property is defined with any value
+     * 
+     * @param string $key The property name.
+     * 
+     * @return bool
+     */
+    public function __isset($key)
+    {
+        return property_exists($this, $key);
+    }
+    
+    /**
      *
      * Returns column object for var_export. If you use "var_export" here, 
      * there is another issue here. Saying that we're exporting an instance
