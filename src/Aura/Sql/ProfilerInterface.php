@@ -43,7 +43,7 @@ interface ProfilerInterface
 
     /**
      * 
-     * Executes a PDOStatment and profiles it.
+     * Executes a PDOStatement and profiles it.
      * 
      * @param PDOStatement $stmt The PDOStatement to execute and profile.
      * 

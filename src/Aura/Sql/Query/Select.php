@@ -22,7 +22,7 @@ use Aura\Sql\Connection\AbstractConnection;
 class Select extends AbstractQuery
 {
     use WhereTrait;
-    
+
     /**
      * 
      * An array of union SELECT statements.
@@ -40,7 +40,7 @@ class Select extends AbstractQuery
      * 
      */
     protected $distinct = false;
-    
+
     /**
      * 
      * Is this a SELECT FOR UPDATE?
@@ -58,7 +58,7 @@ class Select extends AbstractQuery
      * 
      */
     protected $cols = [];
-    
+
     /**
      * 
      * Select from these tables.
@@ -67,7 +67,7 @@ class Select extends AbstractQuery
      * 
      */
     protected $from = [];
-    
+
     /**
      * 
      * Use these joins.
@@ -76,7 +76,7 @@ class Select extends AbstractQuery
      * 
      */
     protected $join = [];
-    
+
     /**
      * 
      * GROUP BY these columns.
@@ -85,7 +85,7 @@ class Select extends AbstractQuery
      * 
      */
     protected $group_by = [];
-    
+
     /**
      * 
      * The list of HAVING conditions.
@@ -94,7 +94,7 @@ class Select extends AbstractQuery
      * 
      */
     protected $having = [];
-    
+
     /**
      * 
      * ORDER BY these columns.
@@ -103,7 +103,7 @@ class Select extends AbstractQuery
      * 
      */
     protected $order_by = [];
-    
+
     /**
      * 
      * The number of rows to return
@@ -112,7 +112,7 @@ class Select extends AbstractQuery
      * 
      */
     protected $limit = 0;
-    
+
     /**
      * 
      * Return rows after this offset.
@@ -121,7 +121,7 @@ class Select extends AbstractQuery
      * 
      */
     protected $offset = 0;
-    
+
     /**
      * 
      * The number of rows per page.
@@ -211,7 +211,7 @@ class Select extends AbstractQuery
         }
 
         // modify with a limit clause per the connection
-        $this->connection->limit($text, $this->limit, $this->offset) . PHP_EOL;
+        $this->connection->limit($text, $this->limit, $this->offset);
 
         // for update?
         if ($this->for_update) {
@@ -470,7 +470,7 @@ class Select extends AbstractQuery
         if (func_num_args() > 1) {
             $cond = $this->connection->quoteInto($cond, func_get_arg(1));
         }
-        
+
         if ($this->having) {
             $this->having[] = "OR $cond";
         } else {

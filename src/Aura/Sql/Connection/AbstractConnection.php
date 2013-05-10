@@ -74,12 +74,30 @@ abstract class AbstractConnection
 
     /**
      * 
+     * A query profiler.
+     * 
+     * @var ProfilerInterface
+     * 
+     */
+    protected $profiler;
+
+    /**
+     * 
      * The PDO connection object.
      * 
      * @var PDO
      * 
      */
     protected $pdo;
+
+    /**
+     * 
+     * A query factory
+     * 
+     * @var QueryFactory
+     * 
+     */
+    protected $query_factory;
 
     /**
      * 
@@ -131,7 +149,7 @@ abstract class AbstractConnection
         ProfilerInterface $profiler,
         ColumnFactory $column_factory,
         QueryFactory $query_factory,
-        $dsn,
+        $dsn = null,
         $username = null,
         $password = null,
         array $options = []
@@ -207,6 +225,25 @@ abstract class AbstractConnection
 
     /**
      * 
+     * Sets the PDO connection object; typically used when a shared PDO object
+     * already exists in a legacy context.
+     * 
+     * Note that if you use setPdo(), the pre- and post-connect method hooks
+     * will not be called.
+     * 
+     * @param PDO $pdo The PDO object.
+     * 
+     * @return void
+     * 
+     */
+    public function setPdo(PDO $pdo)
+    {
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $this->pdo = $pdo;
+    }
+
+    /**
+     * 
      * Returns the PDO connection object; if it does not exist, creates it to
      * connect to the database.
      * 
@@ -215,9 +252,7 @@ abstract class AbstractConnection
      */
     public function getPdo()
     {
-        if (! $this->pdo) {
-            $this->connect();
-        }
+        $this->connect();
         return $this->pdo;
     }
 
@@ -230,6 +265,10 @@ abstract class AbstractConnection
      */
     public function connect()
     {
+        if ($this->pdo) {
+            return;
+        }
+
         $this->preConnect();
         $this->pdo = $this->newPdo();
         $this->postConnect();
@@ -330,7 +369,7 @@ abstract class AbstractConnection
 
     /**
      * 
-     * Creates a prepared PDOStatment and binds data values to placeholders.
+     * Creates a prepared PDOStatement and binds data values to placeholders.
      * 
      * PDO itself is touchy about binding values.  If you attempt to bind a
      * value that does not have a corresponding placeholder, PDO will error.
@@ -587,7 +626,7 @@ abstract class AbstractConnection
      * @param mixed $bind The data value(s) to quote.
      * 
      * @return mixed An SQL-safe quoted value (or string of separated values)
-     * placed into the orignal text.
+     * placed into the original text.
      * 
      * @see quote()
      * 
@@ -842,7 +881,7 @@ abstract class AbstractConnection
      * 
      * Updates a table with specified data based on WHERE conditions.
      * 
-     * @param string $table The table to udpate.
+     * @param string $table The table to update.
      * 
      * @param array $cols An associative array where the key is the column
      * name and the value is the value to use for that column.

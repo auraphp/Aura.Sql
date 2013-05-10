@@ -65,7 +65,7 @@ class ConnectionFactory
      */
     public function newInstance(
         $adapter,
-        $dsn,
+        $dsn = null,
         $username = null,
         $password = null,
         $options = []

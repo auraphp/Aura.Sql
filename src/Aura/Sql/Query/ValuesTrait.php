@@ -12,7 +12,7 @@ namespace Aura\Sql\Query;
 
 /**
  * 
- * A trait for adding column value placeholders and setting valiues directly.
+ * A trait for adding column value placeholders and setting values directly.
  * 
  * @package Aura.Sql
  * 
@@ -28,7 +28,7 @@ trait ValuesTrait
      * 
      */
     protected $values;
-    
+
     /**
      * 
      * Sets one column value placeholder.
@@ -44,7 +44,7 @@ trait ValuesTrait
         $this->values[$key] = ":$col";
         return $this;
     }
-    
+
     /**
      * 
      * Sets multiple column value placeholders.
@@ -61,7 +61,7 @@ trait ValuesTrait
         }
         return $this;
     }
-    
+
     /**
      * 
      * Sets a column value directly; the value will not be escaped, although
@@ -79,7 +79,7 @@ trait ValuesTrait
         if ($value === null) {
             $value = 'NULL';
         }
-        
+
         $key = $this->connection->quoteName($col);
         $value = $this->connection->quoteNamesIn($value);
         $this->values[$key] = $value;

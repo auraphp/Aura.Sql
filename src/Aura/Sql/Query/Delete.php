@@ -20,7 +20,7 @@ namespace Aura\Sql\Query;
 class Delete extends AbstractQuery
 {
     use WhereTrait;
-    
+
     /**
      * 
      * The table to delete from.
@@ -29,7 +29,7 @@ class Delete extends AbstractQuery
      * 
      */
     protected $table;
-    
+
     /**
      * 
      * Returns this object as an SQL statement string.
@@ -43,10 +43,10 @@ class Delete extends AbstractQuery
         if ($this->where) {
             $where .= PHP_EOL . 'WHERE' . $this->indent($this->where);
         }
-        
+
         return 'DELETE FROM ' . $this->table . $where;
     }
-    
+
     /**
      * 
      * Sets the table to delete from.

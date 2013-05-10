@@ -20,7 +20,7 @@ namespace Aura\Sql\Query;
 class Insert extends AbstractQuery
 {
     use ValuesTrait;
-    
+
     /**
      * 
      * The table to insert into.
@@ -29,7 +29,7 @@ class Insert extends AbstractQuery
      * 
      */
     protected $table;
-    
+
     /**
      * 
      * Returns this object as an SQL statement string.
@@ -45,7 +45,7 @@ class Insert extends AbstractQuery
              . $this->indentCsv(array_values($this->values))
              . ')';
     }
-    
+
     /**
      * 
      * Sets the table to insert into.

@@ -1,25 +1,11 @@
-WARNING: This release has backwards compatiblity breaks.
+- [ADD] AbstractConnection::setPdo() to inject a pre-existing PDO connection.
+  Thanks, Stan Lemon, for the feature request.
 
-Breaks
-------
+- [ADD] Add missing properties AbstractConnection::$profiler and
+  AbstractConnection::$query_factory.
 
-- [BRK] Rename "Adapter" to "Connection" throughout the package
+- [CHG] Varios typo fixes by Pascal Borrelli and Henrique Moody.
 
-- [BRK] Rename "sql" to "connection" throughout the package
+- [CHG] Gateway registry entries *must* be wrapped in a callable from now on.
 
-
-Other Changes
--------------
-
-- [ADD] Methods Query\AbstractQuery::setBind(), addBind(), and getBind() to
-  allow bind data to be carried along with the query object.
-
-- [ADD] Method Query\AbstractQuery::getConnection() to get the injected
-  database connection.
-
-- [NEW] Classes Gateway, GatewayIterator, and GatewayLocator (table data
-  gateway implementation)
-
-- [NEW] Class AbstractMapper (mapper implementation)
-
-- [NEW] Class UnitOfWork (unit-of-work implemetation)
+- [ADD] Method Column::__isset()
