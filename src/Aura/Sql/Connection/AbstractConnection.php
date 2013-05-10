@@ -72,6 +72,13 @@ abstract class AbstractConnection
      */
     protected $password;
 
+    /**
+     * 
+     * A query profiler.
+     * 
+     * @var ProfilerInterface
+     * 
+     */
     protected $profiler;
 
     /**
@@ -83,6 +90,13 @@ abstract class AbstractConnection
      */
     protected $pdo;
 
+    /**
+     * 
+     * A query factory
+     * 
+     * @var QueryFactory
+     * 
+     */
     protected $query_factory;
 
     /**
