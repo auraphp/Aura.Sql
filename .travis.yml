@@ -5,6 +5,7 @@ env:
   - DB=postgres
 php:
   - 5.4
+  - 5.5
 before_script:
   - "mysql -e 'DROP DATABASE IF EXISTS test;'"
   - "mysql -e 'create database test;'"
