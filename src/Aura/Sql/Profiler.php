@@ -31,13 +31,22 @@ class Profiler implements ProfilerInterface
     protected $active = false;
 
     /**
-     * 
+     *
      * Retained profiles.
-     * 
+     *
      * @var array
-     * 
+     *
      */
     protected $profiles = [];
+
+    /**
+     *
+     * Holds the last query string
+     *
+     * @var string
+     *
+     */
+    protected $queryString = null;
 
     /**
      * 
@@ -54,7 +63,7 @@ class Profiler implements ProfilerInterface
     }
 
     /**
-     * 
+     *
      * Is the profiler active?
      * 
      * @return bool
@@ -68,7 +77,7 @@ class Profiler implements ProfilerInterface
     /**
      * 
      * Executes a PDOStatement and profiles it.
-     * 
+     *
      * @param PDOStatement $stmt The PDOStatement to execute and profile.
      * 
      * @param array $bind The data that was bound into the statement.
@@ -78,6 +87,8 @@ class Profiler implements ProfilerInterface
      */
     public function exec(PDOStatement $stmt, array $bind = [])
     {
+        $this->queryString = $stmt->queryString;
+
         if (! $this->isActive()) {
             return $stmt->execute();
         }
@@ -92,20 +103,22 @@ class Profiler implements ProfilerInterface
     }
 
     /**
-     * 
+     *
      * Calls a user function and and profile it.
-     * 
+     *
      * @param callable $func The user function to call.
-     * 
+     *
      * @param string $text The text of the SQL query.
-     * 
+     *
      * @param array $bind The data that was used by the function.
-     * 
+     *
      * @return mixed
-     * 
+     *
      */
     public function call($func, $text, array $bind = [])
     {
+        $this->queryString = $text;
+
         if (! $this->isActive()) {
             return call_user_func($func);
         }
@@ -145,14 +158,27 @@ class Profiler implements ProfilerInterface
     }
 
     /**
-     * 
+     *
      * Returns all the profiles.
-     * 
+     *
      * @return array
-     * 
+     *
      */
     public function getProfiles()
     {
         return $this->profiles;
     }
+
+    /**
+     *
+     * Get the last query string
+     *
+     * @return string
+     *
+     */
+    public function getQueryString()
+    {
+        return $this->queryString;
+    }
+
 }
