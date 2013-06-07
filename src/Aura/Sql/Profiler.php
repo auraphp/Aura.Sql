@@ -41,12 +41,12 @@ class Profiler implements ProfilerInterface
 
     /**
      *
-     * Holds the last query string
+     * Holds the text and data of the last query.
      *
      * @var string
      *
      */
-    protected $queryString = null;
+    protected $last_query = [];
 
     /**
      * 
@@ -80,14 +80,17 @@ class Profiler implements ProfilerInterface
      *
      * @param PDOStatement $stmt The PDOStatement to execute and profile.
      * 
-     * @param array $bind The data that was bound into the statement.
+     * @param array $data The data that was bound into the statement.
      * 
      * @return mixed
      * 
      */
-    public function exec(PDOStatement $stmt, array $bind = [])
+    public function exec(PDOStatement $stmt, array $data = [])
     {
-        $this->queryString = $stmt->queryString;
+        $this->last_query = [
+            'text' => $stmt->queryString,
+            'data' => $data,
+        ];
 
         if (! $this->isActive()) {
             return $stmt->execute();
@@ -98,7 +101,7 @@ class Profiler implements ProfilerInterface
         $after  = microtime(true);
         $e      = new Exception;
         $trace  = $e->getTraceAsString();
-        $this->addProfile($stmt->queryString, $after - $before, $bind, $trace);
+        $this->addProfile($stmt->queryString, $after - $before, $data, $trace);
         return $result;
     }
 
@@ -110,14 +113,17 @@ class Profiler implements ProfilerInterface
      *
      * @param string $text The text of the SQL query.
      *
-     * @param array $bind The data that was used by the function.
+     * @param array $data The data that was used by the function.
      *
      * @return mixed
      *
      */
-    public function call($func, $text, array $bind = [])
+    public function call($func, $text, array $data = [])
     {
-        $this->queryString = $text;
+        $this->last_query = [
+            'text' => $text,
+            'data' => $data,
+        ];
 
         if (! $this->isActive()) {
             return call_user_func($func);
@@ -128,7 +134,7 @@ class Profiler implements ProfilerInterface
         $after  = microtime(true);
         $e      = new Exception;
         $trace  = $e->getTraceAsString();
-        $this->addProfile($text, $after - $before, $bind, $trace);
+        $this->addProfile($text, $after - $before, $data, $trace);
         return $result;
     }
 
@@ -140,19 +146,19 @@ class Profiler implements ProfilerInterface
      * 
      * @param float $time The elapsed time in seconds.
      * 
-     * @param array $bind The data that was used.
+     * @param array $data The data that was used.
      * 
      * @param string $trace An exception backtrace as a string.
      * 
      * @return mixed
      * 
      */
-    public function addProfile($text, $time, array $bind, $trace)
+    public function addProfile($text, $time, array $data, $trace)
     {
         $this->profiles[] = (object) [
             'text' => $text,
             'time' => $time,
-            'data' => $bind,
+            'data' => $data,
             'trace' => $trace
         ];
     }
@@ -171,14 +177,13 @@ class Profiler implements ProfilerInterface
 
     /**
      *
-     * Get the last query string
+     * Get the last query information.
      *
-     * @return string
+     * @return array
      *
      */
-    public function getQueryString()
+    public function getLastQuery()
     {
-        return $this->queryString;
+        return $this->last_query;
     }
-
 }

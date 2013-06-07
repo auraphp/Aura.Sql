@@ -28,8 +28,14 @@ class ColumnTest extends \PHPUnit_Framework_TestCase
         );
         
         foreach ($info as $key => $expect) {
+            $this->assertTrue(isset($col->$key));
             $this->assertSame($expect, $col->$key);
         }
+    }
+    
+    public function test__isset()
+    {
+        
     }
     
     public function test__set_state()
