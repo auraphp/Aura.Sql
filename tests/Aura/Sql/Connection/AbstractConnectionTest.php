@@ -216,7 +216,26 @@ abstract class AbstractConnectionTest extends \PHPUnit_Framework_TestCase
         $actual = $stmt->queryString;
         $this->assertSame($expect, $actual);
     }
-    
+
+    public function testFetchEach()
+    {
+        $text = "SELECT * FROM {$this->table} ORDER BY id LIMIT 5";
+        $result = $this->connection->fetchEach($text, [], function($row, $index) {
+            return [strtolower($row['name']), $index];
+        });
+        $expect = 5;
+        $actual = count($result);
+        $this->assertEquals($expect, $actual);
+        $expect = [
+            ['anna', 0],
+            ['betty', 1],
+            ['clara', 2],
+            ['donna', 3],
+            ['fiona', 4]
+        ];
+        $this->assertEquals($expect, $result);
+    }
+
     public function testFetchAll()
     {
         $text = "SELECT * FROM {$this->table}";
