@@ -457,6 +457,35 @@ abstract class AbstractConnection
 
     /**
      * 
+     * Fetches a sequential array of all rows from the database and apply
+     * a callback to each found row
+     * 
+     * @param string|AbstractQuery $query The text of the SQL query; or, a
+     * query object.
+     * 
+     * @param array $bind An associative array of data to bind to the named
+     * placeholders.
+     * 
+     * @param callable $callback a callable applied to each row from the result set
+     * 
+     * 
+     * @return array
+     * 
+     */
+    public function fetchEach($query, array $data = [], callable $callback)
+    {
+        $stmt = $this->query($query, $data);
+        $res = [];
+        $index = 0;
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $res[] = call_user_func_array($callable, [$row, $index]);
+            $index++;
+        }
+        return $res;
+    }   
+
+    /**
+     * 
      * Fetches a sequential array of all rows from the database; the rows
      * are represented as associative arrays.
      * 
