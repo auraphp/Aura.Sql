@@ -1,142 +1,136 @@
 <?php
 /**
- * 
+ *
  * This file is part of the Aura Project for PHP.
- * 
+ *
  * @package Aura.Sql
- * 
+ *
  * @license http://opensource.org/licenses/bsd-license.php BSD
- * 
+ *
  */
 namespace Aura\Sql\Query;
 
 use Aura\Sql\Connection\AbstractConnection;
 
 /**
- * 
+ *
  * An object for SELECT queries.
- * 
+ *
  * @package Aura.Sql
- * 
+ *
  */
 class Select extends AbstractQuery
 {
     use WhereTrait;
+    use FlagsTrait;
+
+    const FLAG_DISTINCT = 'DISTINCT';
 
     /**
-     * 
+     *
      * An array of union SELECT statements.
-     * 
+     *
      * @var array
-     * 
+     *
      */
     protected $union = [];
 
     /**
-     * 
-     * Is this a SELECT DISTINCT ?
-     * 
-     * @var bool
-     * 
-     */
-    protected $distinct = false;
-
-    /**
-     * 
+     *
      * Is this a SELECT FOR UPDATE?
-     * 
-     * @var 
-     * 
+     *
+     * @var
+     *
      */
     protected $for_update = false;
 
     /**
-     * 
+     *
      * The columns to be selected.
-     * 
+     *
      * @var array
-     * 
+     *
      */
     protected $cols = [];
 
     /**
-     * 
+     *
      * Select from these tables.
-     * 
+     *
      * @var array
-     * 
+     *
      */
     protected $from = [];
 
     /**
-     * 
+     *
      * Use these joins.
-     * 
+     *
      * @var array
-     * 
+     *
      */
     protected $join = [];
 
     /**
-     * 
+     *
      * GROUP BY these columns.
-     * 
+     *
      * @var array
-     * 
+     *
      */
     protected $group_by = [];
 
     /**
-     * 
+     *
      * The list of HAVING conditions.
-     * 
+     *
      * @var array
-     * 
+     *
      */
     protected $having = [];
 
     /**
-     * 
+     *
      * ORDER BY these columns.
-     * 
+     *
      * @var array
-     * 
+     *
      */
     protected $order_by = [];
 
     /**
-     * 
+     *
      * The number of rows to return
-     * 
+     *
      * @var int
-     * 
+     *
      */
     protected $limit = 0;
 
     /**
-     * 
+     *
      * Return rows after this offset.
-     * 
+     *
      * @var int
-     * 
+     *
      */
     protected $offset = 0;
 
     /**
-     * 
+     *
      * The number of rows per page.
-     * 
+     *
      * @var int
-     * 
+     *
      */
     protected $paging = 10;
 
     /**
-     * 
+     *
      * Returns this object as an SQL statement string.
-     * 
+     *
      * @return string An SQL statement string.
-     * 
+     *
      */
     public function __toString()
     {
@@ -148,12 +142,12 @@ class Select extends AbstractQuery
     }
 
     /**
-     * 
+     *
      * Returns the SELECT parts composed as a string (does not include
      * the union selects).
-     * 
+     *
      * @return string A SELECT string.
-     * 
+     *
      */
     protected function toString()
     {
@@ -164,11 +158,7 @@ class Select extends AbstractQuery
         $csep = ',' . $line;
 
         // open the statement
-        if ($this->distinct) {
-            $text = 'SELECT DISTINCT' . PHP_EOL;
-        } else {
-            $text = 'SELECT' . PHP_EOL;
-        }
+        $text = 'SELECT' . $this->getFlagsString() . PHP_EOL;
 
         // add columns
         if ($this->cols) {
@@ -223,13 +213,13 @@ class Select extends AbstractQuery
     }
 
     /**
-     * 
+     *
      * Sets the number of rows per page.
-     * 
+     *
      * @param int $paging The number of rows to page at.
-     * 
+     *
      * @return $this
-     * 
+     *
      */
     public function setPaging($paging)
     {
@@ -238,11 +228,11 @@ class Select extends AbstractQuery
     }
 
     /**
-     * 
+     *
      * Gets the number of rows per page.
-     * 
+     *
      * @return int The number of rows per page.
-     * 
+     *
      */
     public function getPaging()
     {
@@ -250,14 +240,14 @@ class Select extends AbstractQuery
     }
 
     /**
-     * 
+     *
      * Makes the select FOR UPDATE (or not).
-     * 
+     *
      * @param bool $flag Whether or not the SELECT is FOR UPDATE (default
      * true).
-     * 
+     *
      * @return $this
-     * 
+     *
      */
     public function forUpdate($flag = true)
     {
@@ -265,32 +255,53 @@ class Select extends AbstractQuery
     }
 
     /**
-     * 
+     *
      * Makes the select DISTINCT (or not).
-     * 
+     *
      * @param bool $flag Whether or not the SELECT is DISTINCT (default
      * true).
-     * 
+     *
      * @return $this
-     * 
+     *
      */
     public function distinct($flag = true)
     {
-        $this->distinct = (bool) $flag;
+        $this->setFlag(self::FLAG_DISTINCT, $flag);
+
         return $this;
     }
 
     /**
-     * 
+     * sets or unsets specified flag
+     *
+     * @param string $flag Flag to set or unset
+     * @param bool $enable Flag status - enabled or not (default true)
+     */
+    protected function setFlag($flag, $enable = true)
+    {
+        $flagKey = array_search($flag, $this->flags);
+        $hasFlag = $flagKey !== false;
+
+        if ($enable) {
+            if (!$hasFlag) {
+                $this->flags[] = $flag;
+            }
+        } elseif ($hasFlag) {
+            unset($this->flags[$flagKey]);
+        }
+    }
+
+    /**
+     *
      * Adds columns to the query.
-     * 
+     *
      * Multiple calls to cols() will append to the list of columns, not
      * overwrite the previous columns.
-     * 
+     *
      * @param array $cols The column(s) to add to the query.
-     * 
+     *
      * @return $this
-     * 
+     *
      */
     public function cols(array $cols)
     {
@@ -301,13 +312,13 @@ class Select extends AbstractQuery
     }
 
     /**
-     * 
+     *
      * Adds a FROM table and columns to the query.
-     * 
+     *
      * @param string $spec The table specification; "foo" or "foo AS bar".
-     * 
+     *
      * @return $this
-     * 
+     *
      */
     public function from($spec)
     {
@@ -316,16 +327,16 @@ class Select extends AbstractQuery
     }
 
     /**
-     * 
+     *
      * Adds an aliased sub-select to the query.
-     * 
+     *
      * @param string|Select $spec If a Select object, use as the sub-select;
      * if a string, the sub-select string.
-     * 
+     *
      * @param string $name The alias name for the sub-select.
-     * 
+     *
      * @return $this
-     * 
+     *
      */
     public function fromSubSelect($spec, $name)
     {
@@ -335,17 +346,17 @@ class Select extends AbstractQuery
     }
 
     /**
-     * 
+     *
      * Adds a JOIN table and columns to the query.
-     * 
+     *
      * @param string $join The join type: inner, left, natural, etc.
-     * 
+     *
      * @param string $spec The table specification; "foo" or "foo AS bar".
-     * 
+     *
      * @param string $cond Join on this condition.
-     * 
+     *
      * @return $this
-     * 
+     *
      */
     public function join($join, $spec, $cond = null)
     {
@@ -361,21 +372,21 @@ class Select extends AbstractQuery
     }
 
     /**
-     * 
+     *
      * Adds a JOIN to an aliased subselect and columns to the query.
-     * 
+     *
      * @param string $join The join type: inner, left, natural, etc.
-     * 
+     *
      * @param string|Select $spec If a Select
      * object, use as the sub-select; if a string, the sub-select
      * command string.
-     * 
+     *
      * @param string $name The alias name for the sub-select.
-     * 
+     *
      * @param string $cond Join on this condition.
-     * 
+     *
      * @return $this
-     * 
+     *
      */
     public function joinSubSelect($join, $spec, $name, $cond = null)
     {
@@ -392,13 +403,13 @@ class Select extends AbstractQuery
     }
 
     /**
-     * 
+     *
      * Adds grouping to the query.
-     * 
+     *
      * @param array $spec The column(s) to group by.
-     * 
+     *
      * @return $this
-     * 
+     *
      */
     public function groupBy(array $spec)
     {
@@ -409,29 +420,29 @@ class Select extends AbstractQuery
     }
 
     /**
-     * 
-     * Adds a HAVING condition to the query by AND; if a value is passed as 
-     * the second param, it will be quoted and replaced into the condition 
+     *
+     * Adds a HAVING condition to the query by AND; if a value is passed as
+     * the second param, it will be quoted and replaced into the condition
      * wherever a question-mark appears.
-     * 
+     *
      * Array values are quoted and comma-separated.
-     * 
+     *
      * {{code: php
      *     // simplest but non-secure
      *     $select->having("COUNT(id) = $count");
-     *     
+     *
      *     // secure
      *     $select->having('COUNT(id) = ?', $count);
-     *     
+     *
      *     // equivalent security with named binding
      *     $select->having('COUNT(id) = :count');
      *     $select->bind('count', $count);
      * }}
-     * 
+     *
      * @param string $cond The HAVING condition.
-     * 
+     *
      * @return $this
-     * 
+     *
      */
     public function having($cond)
     {
@@ -452,16 +463,16 @@ class Select extends AbstractQuery
     }
 
     /**
-     * 
-     * Adds a HAVING condition to the query by AND; otherwise identical to 
+     *
+     * Adds a HAVING condition to the query by AND; otherwise identical to
      * `having()`.
-     * 
+     *
      * @param string $cond The HAVING condition.
-     * 
+     *
      * @return $this
-     * 
+     *
      * @see having()
-     * 
+     *
      */
     public function orHaving($cond)
     {
@@ -482,13 +493,13 @@ class Select extends AbstractQuery
     }
 
     /**
-     * 
+     *
      * Adds a row order to the query.
-     * 
+     *
      * @param array $spec The columns and direction to order by.
-     * 
+     *
      * @return $this
-     * 
+     *
      */
     public function orderBy(array $spec)
     {
@@ -499,13 +510,13 @@ class Select extends AbstractQuery
     }
 
     /**
-     * 
+     *
      * Sets a limit count on the query.
-     * 
+     *
      * @param int $limit The number of rows to return.
-     * 
+     *
      * @return $this
-     * 
+     *
      */
     public function limit($limit)
     {
@@ -514,13 +525,13 @@ class Select extends AbstractQuery
     }
 
     /**
-     * 
+     *
      * Sets a limit offset on the query.
-     * 
+     *
      * @param int $offset Start returning after this many rows.
-     * 
+     *
      * @return $this
-     * 
+     *
      */
     public function offset($offset)
     {
@@ -529,13 +540,13 @@ class Select extends AbstractQuery
     }
 
     /**
-     * 
+     *
      * Sets the limit and count by page number.
-     * 
+     *
      * @param int $page Limit results to this page number.
-     * 
+     *
      * @return $this
-     * 
+     *
      */
     public function page($page)
     {
@@ -555,12 +566,12 @@ class Select extends AbstractQuery
     }
 
     /**
-     * 
+     *
      * Takes the current select properties and retains them, then sets
      * UNION for the next set of properties.
-     * 
+     *
      * @return $this
-     * 
+     *
      */
     public function union()
     {
@@ -570,12 +581,12 @@ class Select extends AbstractQuery
     }
 
     /**
-     * 
+     *
      * Takes the current select properties and retains them, then sets
      * UNION ALL for the next set of properties.
-     * 
+     *
      * @return $this
-     * 
+     *
      */
     public function unionAll()
     {
@@ -585,16 +596,16 @@ class Select extends AbstractQuery
     }
 
     /**
-     * 
+     *
      * Clears the current select properties; generally used after adding a
      * union.
-     * 
+     *
      * @return void
-     * 
+     *
      */
     protected function reset()
     {
-        $this->distinct   = false;
+        $this->resetFlags();
         $this->cols       = [];
         $this->from       = [];
         $this->join       = [];
