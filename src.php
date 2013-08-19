@@ -22,6 +22,7 @@ require_once __DIR__ . '/src/Aura/Sql/Query/Factory.php';
 require_once __DIR__ . '/src/Aura/Sql/Query/Insert.php';
 require_once __DIR__ . '/src/Aura/Sql/Query/Select.php';
 require_once __DIR__ . '/src/Aura/Sql/Query/Update.php';
+require_once __DIR__ . '/src/Aura/Sql/Query/Mysql/Select.php';
 require_once __DIR__ . '/src/Aura/Sql/Query/Mysql/Update.php';
 require_once __DIR__ . '/src/Aura/Sql/AbstractMapper.php';
 require_once __DIR__ . '/src/Aura/Sql/Gateway.php';
