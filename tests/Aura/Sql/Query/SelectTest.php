@@ -4,7 +4,7 @@ namespace Aura\Sql\Query;
 class SelectTest extends AbstractQueryTest
 {
     protected $query_type = 'select';
-    
+
     public function testSetAndGetPaging()
     {
         $expect = 88;
@@ -18,9 +18,9 @@ class SelectTest extends AbstractQueryTest
         $this->query->distinct()
                      ->from('t1')
                      ->cols(['t1.c1', 't1.c2', 't1.c3']);
-        
+
         $actual = $this->query->__toString();
-        
+
         $expect = '
             SELECT DISTINCT
                 "t1"."c1",
@@ -31,7 +31,47 @@ class SelectTest extends AbstractQueryTest
         ';
         $this->assertSameSql($expect, $actual);
     }
-    
+
+    public function testDuplicateFlag()
+    {
+        $this->query->distinct()
+                    ->distinct()
+                    ->from('t1')
+                    ->cols(['t1.c1', 't1.c2', 't1.c3']);
+
+        $actual = $this->query->__toString();
+
+        $expect = $expect = '
+            SELECT DISTINCT
+                "t1"."c1",
+                "t1"."c2",
+                "t1"."c3"
+            FROM
+                "t1"
+        ';
+        $this->assertSameSql($expect, $actual);
+    }
+
+    public function testFlagUnset()
+    {
+        $this->query->distinct()
+                    ->distinct(false)
+                    ->from('t1')
+                    ->cols(['t1.c1', 't1.c2', 't1.c3']);
+
+        $actual = $this->query->__toString();
+
+        $expect = '
+            SELECT
+                "t1"."c1",
+                "t1"."c2",
+                "t1"."c3"
+            FROM
+                "t1"
+        ';
+        $this->assertSameSql($expect, $actual);
+    }
+
     public function testCols()
     {
         $this->query->cols(['t1.c1', 'c2', 'COUNT(t1.c3)']);
@@ -44,12 +84,12 @@ class SelectTest extends AbstractQueryTest
         ';
         $this->assertSameSql($expect, $actual);
     }
-    
+
     public function testFrom()
     {
         $this->query->from('t1')
                      ->from('t2');
-                     
+
         $actual = $this->query->__toString();
         $expect = '
             SELECT
@@ -59,7 +99,7 @@ class SelectTest extends AbstractQueryTest
         ';
         $this->assertSameSql($expect, $actual);
     }
-    
+
     public function testFromSubSelect()
     {
         $sub = "SELECT * FROM t2";
@@ -73,12 +113,12 @@ class SelectTest extends AbstractQueryTest
         $actual = $this->query->__toString();
         $this->assertSameSql($expect, $actual);
     }
-    
+
     public function testFromSubSelectObject()
     {
         $sub = $this->connection->newSelect();
         $sub->cols(['*'])->from('t2');
-        
+
         $this->query->cols(['*'])->fromSubSelect($sub, "a2");
         $expect = '
             SELECT
@@ -93,7 +133,7 @@ class SelectTest extends AbstractQueryTest
         $actual = $this->query->__toString();
         $this->assertSameSql($expect, $actual);
     }
-    
+
     public function testJoin()
     {
         $this->query->join("left", "t2", "t1.id = t2.id");
@@ -108,7 +148,7 @@ class SelectTest extends AbstractQueryTest
         $actual = $this->query->__toString();
         $this->assertSameSql($expect, $actual);
     }
-    
+
     public function testJoinSubSelect()
     {
         $sub1 = "SELECT * FROM t2";
@@ -123,12 +163,12 @@ class SelectTest extends AbstractQueryTest
         $actual = $this->query->__toString();
         $this->assertSameSql($expect, $actual);
     }
-    
+
     public function testJoinSubSelectObject()
     {
         $sub = $this->connection->newSelect();
         $sub->cols(['*'])->from('t2');
-        
+
         $this->query->joinSubSelect("left", $sub, "a3", "t2.c1 = a3.c1");
         $expect = '
             SELECT
@@ -141,7 +181,7 @@ class SelectTest extends AbstractQueryTest
         $actual = $this->query->__toString();
         $this->assertSameSql($expect, $actual);
     }
-    
+
     public function testWhere()
     {
         $this->query->where("c1 = c2")
@@ -152,27 +192,27 @@ class SelectTest extends AbstractQueryTest
                 c1 = c2
                 AND c3 = \'foo\'
         ';
-        
+
         $actual = $this->query->__toString();
         $this->assertSameSql($expect, $actual);
     }
-    
+
     public function testOrWhere()
     {
         $this->query->orWhere("c1 = c2")
                      ->orWhere("c3 = ?", 'foo');
-        
+
         $expect = '
             SELECT
             WHERE
                 c1 = c2
                 OR c3 = \'foo\'
         ';
-        
+
         $actual = $this->query->__toString();
         $this->assertSameSql($expect, $actual);
     }
-    
+
     public function testGroupBy()
     {
         $this->query->groupBy(['c1', 't2.c2']);
@@ -182,11 +222,11 @@ class SelectTest extends AbstractQueryTest
                 c1,
                 "t2"."c2"
         ';
-        
+
         $actual = $this->query->__toString();
         $this->assertSameSql($expect, $actual);
     }
-    
+
     public function testHaving()
     {
         $this->query->having("c1 = c2")
@@ -197,11 +237,11 @@ class SelectTest extends AbstractQueryTest
                 c1 = c2
                 AND c3 = \'foo\'
         ';
-        
+
         $actual = $this->query->__toString();
         $this->assertSameSql($expect, $actual);
     }
-    
+
     public function testOrHaving()
     {
         $this->query->orHaving("c1 = c2")
@@ -212,11 +252,11 @@ class SelectTest extends AbstractQueryTest
                 c1 = c2
                 OR c3 = \'foo\'
         ';
-        
+
         $actual = $this->query->__toString();
         $this->assertSameSql($expect, $actual);
     }
-    
+
     public function testOrderBy()
     {
         $this->query->orderBy(['c1', 'UPPER(t2.c2)', ]);
@@ -226,11 +266,11 @@ class SelectTest extends AbstractQueryTest
                 c1,
                 UPPER("t2"."c2")
         ';
-        
+
         $actual = $this->query->__toString();
         $this->assertSameSql($expect, $actual);
     }
-    
+
     public function testLimit()
     {
         $this->query->limit(10);
@@ -241,7 +281,7 @@ class SelectTest extends AbstractQueryTest
         $actual = $this->query->__toString();
         $this->assertSameSql($expect, $actual);
     }
-    
+
     public function testOffset()
     {
         $this->query->offset(40);
@@ -252,7 +292,7 @@ class SelectTest extends AbstractQueryTest
         $actual = $this->query->__toString();
         $this->assertSameSql($expect, $actual);
     }
-    
+
     public function testPage()
     {
         $this->query->page(5);
@@ -263,7 +303,7 @@ class SelectTest extends AbstractQueryTest
         $actual = $this->query->__toString();
         $this->assertSameSql($expect, $actual);
     }
-    
+
     public function testForUpdate()
     {
         $this->query->forUpdate();
@@ -274,7 +314,7 @@ class SelectTest extends AbstractQueryTest
         $actual = $this->query->__toString();
         $this->assertSameSql($expect, $actual);
     }
-    
+
     public function testUnion()
     {
         $this->query->cols(['c1'])
@@ -293,11 +333,11 @@ class SelectTest extends AbstractQueryTest
             FROM
                 "t2"
         ';
-        
+
         $actual = $this->query->__toString();
         $this->assertSameSql($expect, $actual);
     }
-    
+
     public function testUnionAll()
     {
         $this->query->cols(['c1'])
@@ -316,7 +356,7 @@ class SelectTest extends AbstractQueryTest
             FROM
                 "t2"
         ';
-        
+
         $actual = $this->query->__toString();
         $this->assertSameSql($expect, $actual);
     }
