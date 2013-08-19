@@ -234,18 +234,18 @@ abstract class AbstractConnectionTest extends \PHPUnit_Framework_TestCase
     public function testFetchAllWithCallback()
     {
         $text = "SELECT * FROM {$this->table} ORDER BY id LIMIT 5";
-        $result = $this->connection->fetchAll($text, [], function($row, $index) {
-            return [strtolower($row['name']), $index];
+        $result = $this->connection->fetchAll($text, [], function ($row) {
+            return [strtolower($row['name'])];
         });
         $expect = 5;
         $actual = count($result);
         $this->assertEquals($expect, $actual);
         $expect = [
-            ['anna', 0],
-            ['betty', 1],
-            ['clara', 2],
-            ['donna', 3],
-            ['fiona', 4]
+            ['anna'],
+            ['betty'],
+            ['clara'],
+            ['donna'],
+            ['fiona'],
         ];
         $this->assertEquals($expect, $result);
     }
@@ -267,8 +267,8 @@ abstract class AbstractConnectionTest extends \PHPUnit_Framework_TestCase
     public function testFetchAssocWithCallback()
     {
         $text = "SELECT * FROM {$this->table} ORDER BY id LIMIT 5";
-        $result = $this->connection->fetchAssoc($text, [], function($row, $index) {
-            return [strtolower($row['name']), $index];
+        $result = $this->connection->fetchAssoc($text, [], function ($row) {
+            return [strtolower($row['name'])];
         });
         $expect = 5;
         $actual = count($result);
@@ -280,11 +280,11 @@ abstract class AbstractConnectionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expect, $actual);        
         
         $expect = [
-            ['anna', '1'],
-            ['betty', '2'],
-            ['clara', '3'],
-            ['donna', '4'],
-            ['fiona', '5']
+            ['anna'],
+            ['betty'],
+            ['clara'],
+            ['donna'],
+            ['fiona'],
         ];
         $actual = array_values($result);
         $this->assertEquals($expect, $actual);
@@ -306,14 +306,14 @@ abstract class AbstractConnectionTest extends \PHPUnit_Framework_TestCase
     public function testFetchColWithCallback()
     {
         $text = "SELECT id FROM {$this->table} ORDER BY id LIMIT 5";
-        $result = $this->connection->fetchCol($text, [], function($row, $index) {
-            return [$row*2, $index];
+        $result = $this->connection->fetchCol($text, [], function ($val) {
+            return $val * 2;
         });
         $expect = 5;
         $actual = count($result);
         $this->assertEquals($expect, $actual);
 
-        $expect = [[2, 0], [4, 1], [6, 2], [8, 3], [10, 4]];
+        $expect = [2, 4, 6, 8, 10];
         $this->assertEquals($expect, $result);
     }
 
@@ -346,27 +346,23 @@ abstract class AbstractConnectionTest extends \PHPUnit_Framework_TestCase
 
     public function testFetchPairsWithCallback()
     {
-        $text = "SELECT id, name FROM {$this->table} ORDER BY id LIMIT 5";
-        $result = $this->connection->fetchPairs($text, [], function($row, $index) {
-            return [strtolower($row[1]), $index];
+        $text = "SELECT id, name FROM {$this->table} ORDER BY id";
+        $actual = $this->connection->fetchPairs($text, [], function ($row) {
+            return [(string) $row[0], strtolower($row[1])];
         });
-        $expect = 5;
-        $actual = count($result);
-        $this->assertEquals($expect, $actual);
-        
-        $expect = [1, 2, 3, 4, 5];
-        $actual = array_keys($result);
-        $this->assertEquals($expect, $actual);        
-        
         $expect = [
-            ['anna', '1'],
-            ['betty', '2'],
-            ['clara', '3'],
-            ['donna', '4'],
-            ['fiona', '5']
+          '1'  => 'anna',
+          '2'  => 'betty',
+          '3'  => 'clara',
+          '4'  => 'donna',
+          '5'  => 'fiona',
+          '6'  => 'gertrude',
+          '7'  => 'hanna',
+          '8'  => 'ione',
+          '9'  => 'julia',
+          '10' => 'kara',
         ];
-        $actual = array_values($result);
-        $this->assertEquals($expect, $actual);
+        $this->assertSame($expect, $actual);
     }
 
     public function testFetchOne()

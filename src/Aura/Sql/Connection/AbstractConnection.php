@@ -492,7 +492,7 @@ abstract class AbstractConnection
         $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
         if ($callable) {
             foreach ($data as $key => $row) {
-                $data[$key] = $callable($row, $key);
+                $data[$key] = $callable($row);
             }
         }
         return $data;
@@ -526,7 +526,7 @@ abstract class AbstractConnection
         if ($callable) {
             while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
                 $key = current($row); // value of the first element
-                $data[$key] = $callable($row, $key);
+                $data[$key] = $callable($row);
             }
         } else {
             while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
@@ -558,8 +558,8 @@ abstract class AbstractConnection
         $stmt = $this->query($query, $bind);
         $data = $stmt->fetchAll(PDO::FETCH_COLUMN, 0);
         if ($callable) {
-            foreach ($data as $key => $row) {
-                $data[$key] = $callable($row, $key);
+            foreach ($data as $key => $val) {
+                $data[$key] = $callable($val);
             }
         }
         return $data;
@@ -607,7 +607,10 @@ abstract class AbstractConnection
         $data = [];
         if ($callable) {
             while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
-                $data[$row[0]] = $callable($row, $row[0]);
+                // apply the callback first so the key can be modified
+                $row = $callable($row);
+                // now retain the data
+                $data[$row[0]] = $row[1];
             }
         } else {
             while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
