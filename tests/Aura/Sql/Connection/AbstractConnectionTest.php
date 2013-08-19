@@ -105,6 +105,11 @@ abstract class AbstractConnectionTest extends \PHPUnit_Framework_TestCase
         $this->db_setup->exec();
     }
     
+    public function tearDown()
+    {
+        $this->connection->disconnect();
+    }
+    
     public function testGetProfiler()
     {
         $actual = $this->connection->getProfiler();
@@ -275,11 +280,11 @@ abstract class AbstractConnectionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expect, $actual);        
         
         $expect = [
-            ['anna', 0],
-            ['betty', 1],
-            ['clara', 2],
-            ['donna', 3],
-            ['fiona', 4]
+            ['anna', '1'],
+            ['betty', '2'],
+            ['clara', '3'],
+            ['donna', '4'],
+            ['fiona', '5']
         ];
         $actual = array_values($result);
         $this->assertEquals($expect, $actual);
@@ -342,8 +347,8 @@ abstract class AbstractConnectionTest extends \PHPUnit_Framework_TestCase
     public function testFetchPairsWithCallback()
     {
         $text = "SELECT id, name FROM {$this->table} ORDER BY id LIMIT 5";
-        $result = $this->connection->fetchAll($text, [], function($row, $index) {
-            return [strtolower($row), $index];
+        $result = $this->connection->fetchPairs($text, [], function($row, $index) {
+            return [strtolower($row[1]), $index];
         });
         $expect = 5;
         $actual = count($result);
@@ -354,11 +359,11 @@ abstract class AbstractConnectionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expect, $actual);        
         
         $expect = [
-            ['anna', 0],
-            ['betty', 1],
-            ['clara', 2],
-            ['donna', 3],
-            ['fiona', 4]
+            ['anna', '1'],
+            ['betty', '2'],
+            ['clara', '3'],
+            ['donna', '4'],
+            ['fiona', '5']
         ];
         $actual = array_values($result);
         $this->assertEquals($expect, $actual);
