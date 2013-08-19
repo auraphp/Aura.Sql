@@ -457,35 +457,6 @@ abstract class AbstractConnection
 
     /**
      * 
-     * Fetches a sequential array of all rows from the database and apply
-     * a callback to each found row
-     * 
-     * @param string|AbstractQuery $query The text of the SQL query; or, a
-     * query object.
-     * 
-     * @param array $bind An associative array of data to bind to the named
-     * placeholders.
-     * 
-     * @param callable $callback a callable applied to each row from the result set
-     * 
-     * 
-     * @return array
-     * 
-     */
-    public function fetchEach($query, array $data = [], callable $callback)
-    {
-        $stmt = $this->query($query, $data);
-        $res = [];
-        $index = 0;
-        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $res[] = call_user_func_array($callable, [$row, $index]);
-            $index++;
-        }
-        return $res;
-    }   
-
-    /**
-     * 
      * Fetches a sequential array of all rows from the database; the rows
      * are represented as associative arrays.
      * 
@@ -495,13 +466,25 @@ abstract class AbstractConnection
      * @param array $bind An associative array of data to bind to the named
      * placeholders.
      * 
+     * @param callable $callback if present a function applied to each row from 
+     * the resultset
+     * 
      * @return array
      * 
      */
-    public function fetchAll($query, $bind = [])
+    public function fetchAll($query, $bind = [], callable $callback = null)
     {
         $stmt = $this->query($query, $bind);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        if (is_null($callback)) {
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        }
+        $index = 0;
+        $res = [];
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $res[] = $callable($row, $index);
+            $index++;
+        }
+        return $res;
     }
 
     /**
@@ -519,18 +502,29 @@ abstract class AbstractConnection
      * @param array $data An associative array of data to bind to the named
      * placeholders.
      * 
+     * @param callable $callback if present a function applied to each row from 
+     * the resultset
+     * 
      * @return array
      * 
      */
-    public function fetchAssoc($query, array $data = [])
+    public function fetchAssoc($query, array $data = [], callable $callback = null)
     {
         $stmt = $this->query($query, $data);
         $data = [];
-        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $key = current($row); // value of the first element
-            $data[$key] = $row;
+        if (is_null($callback)) {
+            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                $key = current($row); // value of the first element
+                $data[$key] = $row;
+            }
+            return $data;
         }
-        return $data;
+        $index = 0;
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $key = current($row);
+            $data[$key] = $callback($row, $index);
+            $index++;
+        }
     }
 
     /**
@@ -543,13 +537,25 @@ abstract class AbstractConnection
      * @param array $bind An associative array of data to bind to the named
      * placeholders.
      * 
+     * @param callable $callback if present a function applied to each row from 
+     * the resultset
+     * 
      * @return array
      * 
      */
-    public function fetchCol($query, array $bind = [])
+    public function fetchCol($query, array $data = [], callable $callback = null)
     {
-        $stmt = $this->query($query, $bind);
-        return $stmt->fetchAll(PDO::FETCH_COLUMN, 0);
+        $stmt = $this->query($query, $data);
+        if (is_null($callback)) {
+            return $stmt->fetchAll(PDO::FETCH_COLUMN, 0);
+        }
+        $data = [];
+        $index = 0;
+        while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $data[] = $callback($row[0], $index);
+            $index++;
+        }
+        return $data;
     }
 
     /**
@@ -582,17 +588,28 @@ abstract class AbstractConnection
      * @param array $bind An associative array of data to bind to the named
      * placeholders.
      * 
+     * @param callable $callback if present a function applied to each row from 
+     * the resultset
+     * 
      * @return array
      * 
      */
-    public function fetchPairs($query, array $bind = [])
+    public function fetchPairs($query, array $data = [], callable $callback = null)
     {
-        $stmt = $this->query($query, $bind);
-        $bind = [];
-        while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
-            $bind[$row[0]] = $row[1];
+        $stmt = $this->query($query, $data);
+        $data = [];
+        if (is_null($callback)) {
+            while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+                $data[$row[0]] = $row[1];
+            }
+            return $data;
         }
-        return $bind;
+        $index = 0;
+        while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $data[$row[0]] = $callback($row[1], $index);
+            $index++;
+        }
+        return $data;
     }
 
     /**
