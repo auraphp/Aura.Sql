@@ -216,7 +216,7 @@ abstract class AbstractConnectionTest extends \PHPUnit_Framework_TestCase
         $actual = $stmt->queryString;
         $this->assertSame($expect, $actual);
     }
-    
+
     public function testFetchAll()
     {
         $text = "SELECT * FROM {$this->table}";
@@ -226,6 +226,25 @@ abstract class AbstractConnectionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expect, $actual);
     }
     
+    public function testFetchAllWithCallback()
+    {
+        $text = "SELECT * FROM {$this->table} ORDER BY id LIMIT 5";
+        $result = $this->connection->fetchAll($text, [], function($row, $index) {
+            return [strtolower($row['name']), $index];
+        });
+        $expect = 5;
+        $actual = count($result);
+        $this->assertEquals($expect, $actual);
+        $expect = [
+            ['anna', 0],
+            ['betty', 1],
+            ['clara', 2],
+            ['donna', 3],
+            ['fiona', 4]
+        ];
+        $this->assertEquals($expect, $result);
+    }
+
     public function testFetchAssoc()
     {
         $text = "SELECT * FROM {$this->table} ORDER BY id";
@@ -240,6 +259,32 @@ abstract class AbstractConnectionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expect, $actual);
     }
     
+    public function testFetchAssocWithCallback()
+    {
+        $text = "SELECT * FROM {$this->table} ORDER BY id LIMIT 5";
+        $result = $this->connection->fetchAssoc($text, [], function($row, $index) {
+            return [strtolower($row['name']), $index];
+        });
+        $expect = 5;
+        $actual = count($result);
+        $this->assertEquals($expect, $actual);
+        
+        // 1-based IDs, not 0-based sequential values
+        $expect = [1, 2, 3, 4, 5];
+        $actual = array_keys($result);
+        $this->assertEquals($expect, $actual);        
+        
+        $expect = [
+            ['anna', 0],
+            ['betty', 1],
+            ['clara', 2],
+            ['donna', 3],
+            ['fiona', 4]
+        ];
+        $actual = array_values($result);
+        $this->assertEquals($expect, $actual);
+    }
+
     public function testFetchCol()
     {
         $text = "SELECT id FROM {$this->table} ORDER BY id";
@@ -252,7 +297,21 @@ abstract class AbstractConnectionTest extends \PHPUnit_Framework_TestCase
         $expect = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'];
         $this->assertEquals($expect, $result);
     }
-    
+
+    public function testFetchColWithCallback()
+    {
+        $text = "SELECT id FROM {$this->table} ORDER BY id LIMIT 5";
+        $result = $this->connection->fetchCol($text, [], function($row, $index) {
+            return [$row*2, $index];
+        });
+        $expect = 5;
+        $actual = count($result);
+        $this->assertEquals($expect, $actual);
+
+        $expect = [[2, 0], [4, 1], [6, 2], [8, 3], [10, 4]];
+        $this->assertEquals($expect, $result);
+    }
+
     public function testFetchValue()
     {
         $text = "SELECT id FROM {$this->table} WHERE id = 1";
@@ -279,7 +338,32 @@ abstract class AbstractConnectionTest extends \PHPUnit_Framework_TestCase
         ];
         $this->assertEquals($expect, $actual);
     }
-    
+
+    public function testFetchPairsWithCallback()
+    {
+        $text = "SELECT id, name FROM {$this->table} ORDER BY id LIMIT 5";
+        $result = $this->connection->fetchAll($text, [], function($row, $index) {
+            return [strtolower($row), $index];
+        });
+        $expect = 5;
+        $actual = count($result);
+        $this->assertEquals($expect, $actual);
+        
+        $expect = [1, 2, 3, 4, 5];
+        $actual = array_keys($result);
+        $this->assertEquals($expect, $actual);        
+        
+        $expect = [
+            ['anna', 0],
+            ['betty', 1],
+            ['clara', 2],
+            ['donna', 3],
+            ['fiona', 4]
+        ];
+        $actual = array_values($result);
+        $this->assertEquals($expect, $actual);
+    }
+
     public function testFetchOne()
     {
         $text = "SELECT id, name FROM {$this->table} WHERE id = 1";
