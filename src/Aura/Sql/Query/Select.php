@@ -22,6 +22,7 @@ use Aura\Sql\Connection\AbstractConnection;
 class Select extends AbstractQuery
 {
     use WhereTrait;
+    use FlagsTrait;
 
     const FLAG_DISTINCT = 'DISTINCT';
 
@@ -125,13 +126,6 @@ class Select extends AbstractQuery
     protected $paging = 10;
 
     /**
-     * select flags, such as DISTINCT
-     *
-     * @var array
-     */
-    protected $flags = [];
-
-    /**
      *
      * Returns this object as an SQL statement string.
      *
@@ -164,13 +158,7 @@ class Select extends AbstractQuery
         $csep = ',' . $line;
 
         // open the statement
-        if (count($this->flags) > 0) {
-            $flagsString = ' ' . implode(' ', $this->flags);
-        } else {
-            $flagsString = '';
-        }
-
-        $text = 'SELECT' . $flagsString . PHP_EOL;
+        $text = 'SELECT' . $this->getFlagsString() . PHP_EOL;
 
         // add columns
         if ($this->cols) {
@@ -617,7 +605,7 @@ class Select extends AbstractQuery
      */
     protected function reset()
     {
-        $this->flags      = [];
+        $this->resetFlags();
         $this->cols       = [];
         $this->from       = [];
         $this->join       = [];
