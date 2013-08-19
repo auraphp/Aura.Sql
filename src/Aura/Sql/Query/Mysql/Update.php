@@ -19,6 +19,9 @@ namespace Aura\Sql\Query\Mysql;
  */
 class Update extends \Aura\Sql\Query\Update
 {
+    const FLAG_IGNORE = 'IGNORE';
+    const FLAG_LOW_PRIORITY = 'LOW_PRIORITY';
+
     /**
      *
      * The number of rows to update
@@ -53,6 +56,38 @@ class Update extends \Aura\Sql\Query\Update
     public function limit($limit)
     {
         $this->limit = (int) $limit;
+        return $this;
+    }
+
+    /**
+     *
+     * Adds or removes LOW_PRIORITY flag.
+     *
+     * @param bool $flag Set or unset flag (default true).
+     *
+     * @return $this
+     *
+     */
+    public function lowPriority($flag = true)
+    {
+        $this->setFlag(self::FLAG_LOW_PRIORITY, $flag);
+
+        return $this;
+    }
+
+    /**
+     *
+     * Adds or removes IGNORE flag.
+     *
+     * @param bool $flag Set or unset flag (default true).
+     *
+     * @return $this
+     *
+     */
+    public function ignore($flag = true)
+    {
+        $this->setFlag(self::FLAG_IGNORE, $flag);
+
         return $this;
     }
 }
