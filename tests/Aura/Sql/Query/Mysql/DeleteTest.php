@@ -18,7 +18,8 @@ class DeleteTest extends \Aura\Sql\Query\AbstractQueryTest
         $this->query->from('t1')
                     ->where('foo = ?', 'bar')
                     ->where('baz = ?', 'dib')
-                    ->orWhere('zim = gir');
+                    ->orWhere('zim = gir')
+                    ->limit(5);
 
         $actual = $this->query->__toString();
         $expect = "
@@ -27,6 +28,7 @@ class DeleteTest extends \Aura\Sql\Query\AbstractQueryTest
                 foo = 'bar'
                 AND baz = 'dib'
                 OR zim = gir
+            LIMIT 5
         ";
 
         $this->assertSameSql($expect, $actual);
