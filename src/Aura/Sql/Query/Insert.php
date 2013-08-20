@@ -40,7 +40,7 @@ class Insert extends AbstractQuery
      */
     public function __toString()
     {
-        return 'INSERT' . $this->getFlagsString() . ' INTO ' . $this->table . ' ('
+        return 'INSERT' . $this->getFlagsAsString() . ' INTO ' . $this->table . ' ('
              . $this->indentCsv(array_keys($this->values))
              . ') VALUES ('
              . $this->indentCsv(array_values($this->values))

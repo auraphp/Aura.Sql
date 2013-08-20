@@ -38,10 +38,7 @@ class Delete extends \Aura\Sql\Query\Delete
     public function __toString()
     {
         $sql = parent::__toString();
-
-        // modify with a limit clause per the connection
         $this->connection->limit($sql, $this->limit);
-
         return $sql;
     }
 
@@ -72,7 +69,6 @@ class Delete extends \Aura\Sql\Query\Delete
     public function lowPriority($flag = true)
     {
         $this->setFlag(self::FLAG_LOW_PRIORITY, $flag);
-
         return $this;
     }
 
@@ -88,7 +84,6 @@ class Delete extends \Aura\Sql\Query\Delete
     public function ignore($flag = true)
     {
         $this->setFlag(self::FLAG_IGNORE, $flag);
-
         return $this;
     }
 
@@ -104,7 +99,6 @@ class Delete extends \Aura\Sql\Query\Delete
     public function quick($flag = true)
     {
         $this->setFlag(self::FLAG_QUICK, $flag);
-
         return $this;
     }
 }

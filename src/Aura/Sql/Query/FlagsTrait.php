@@ -29,41 +29,47 @@ trait FlagsTrait
     protected $flags = [];
 
     /**
-     * Returns flags string for query.
+     * 
+     * Returns the flags as a space-separated string.
      *
      * @return string
+     * 
      */
-    protected function getFlagsString()
+    protected function getFlagsAsString()
     {
-        if (count($this->flags) > 0) {
-            return ' ' . implode(' ', $this->flags);
+        if ($this->flags) {
+            return ' ' . implode(' ', array_keys($this->flags));
         } else {
             return '';
         }
     }
 
     /**
+     * 
      * Sets or unsets specified flag.
      *
      * @param string $flag Flag to set or unset
+     * 
      * @param bool $enable Flag status - enabled or not (default true)
+     * 
+     * @return void
+     * 
      */
     protected function setFlag($flag, $enable = true)
     {
-        $flagKey = array_search($flag, $this->flags);
-        $hasFlag = $flagKey !== false;
-
         if ($enable) {
-            if (!$hasFlag) {
-                $this->flags[] = $flag;
-            }
-        } elseif ($hasFlag) {
-            unset($this->flags[$flagKey]);
+            $this->flags[$flag] = true;
+        } else {
+            unset($this->flags[$flag]);
         }
     }
 
     /**
+     * 
      * Reset all query flags.
+     * 
+     * @return void
+     * 
      */
     protected function resetFlags()
     {

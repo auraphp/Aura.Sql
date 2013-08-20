@@ -158,7 +158,7 @@ class Select extends AbstractQuery
         $csep = ',' . $line;
 
         // open the statement
-        $text = 'SELECT' . $this->getFlagsString() . PHP_EOL;
+        $text = 'SELECT' . $this->getFlagsAsString() . PHP_EOL;
 
         // add columns
         if ($this->cols) {
@@ -267,28 +267,7 @@ class Select extends AbstractQuery
     public function distinct($flag = true)
     {
         $this->setFlag(self::FLAG_DISTINCT, $flag);
-
         return $this;
-    }
-
-    /**
-     * sets or unsets specified flag
-     *
-     * @param string $flag Flag to set or unset
-     * @param bool $enable Flag status - enabled or not (default true)
-     */
-    protected function setFlag($flag, $enable = true)
-    {
-        $flagKey = array_search($flag, $this->flags);
-        $hasFlag = $flagKey !== false;
-
-        if ($enable) {
-            if (!$hasFlag) {
-                $this->flags[] = $flag;
-            }
-        } elseif ($hasFlag) {
-            unset($this->flags[$flagKey]);
-        }
     }
 
     /**

@@ -36,7 +36,6 @@ class Insert extends \Aura\Sql\Query\Insert
     public function highPriority($flag = true)
     {
         $this->setFlag(self::FLAG_HIGH_PRIORITY, $flag);
-
         return $this;
     }
 
@@ -52,7 +51,6 @@ class Insert extends \Aura\Sql\Query\Insert
     public function lowPriority($flag = true)
     {
         $this->setFlag(self::FLAG_LOW_PRIORITY, $flag);
-
         return $this;
     }
 
@@ -68,7 +66,6 @@ class Insert extends \Aura\Sql\Query\Insert
     public function ignore($flag = true)
     {
         $this->setFlag(self::FLAG_IGNORE, $flag);
-
         return $this;
     }
 
@@ -84,7 +81,6 @@ class Insert extends \Aura\Sql\Query\Insert
     public function delayed($flag = true)
     {
         $this->setFlag(self::FLAG_DELAYED, $flag);
-
         return $this;
     }
 }

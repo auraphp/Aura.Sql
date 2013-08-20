@@ -88,7 +88,6 @@ class Select extends \Aura\Sql\Query\Select
     public function straightJoin($flag = true)
     {
         $this->setFlag(self::FLAG_STRAIGHT_JOIN, $flag);
-
         return $this;
     }
 
@@ -104,7 +103,6 @@ class Select extends \Aura\Sql\Query\Select
     public function highPriority($flag = true)
     {
         $this->setFlag(self::FLAG_HIGH_PRIORITY, $flag);
-
         return $this;
     }
 
@@ -120,7 +118,6 @@ class Select extends \Aura\Sql\Query\Select
     public function smallResult($flag = true)
     {
         $this->setFlag(self::FLAG_SQL_SMALL_RESULT, $flag);
-
         return $this;
     }
 
@@ -136,7 +133,6 @@ class Select extends \Aura\Sql\Query\Select
     public function bigResult($flag = true)
     {
         $this->setFlag(self::FLAG_SQL_BIG_RESULT, $flag);
-
         return $this;
     }
 
@@ -152,7 +148,6 @@ class Select extends \Aura\Sql\Query\Select
     public function bufferResult($flag = true)
     {
         $this->setFlag(self::FLAG_SQL_BUFFER_RESULT, $flag);
-
         return $this;
     }
 }

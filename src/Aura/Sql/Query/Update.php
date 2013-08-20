@@ -51,7 +51,7 @@ class Update extends AbstractQuery
             $where .= 'WHERE' . $this->indent($this->where);
         }
 
-        return 'UPDATE' . $this->getFlagsString() . ' ' . $this->table . PHP_EOL
+        return 'UPDATE' . $this->getFlagsAsString() . ' ' . $this->table . PHP_EOL
              . 'SET' . $this->indentCsv($values)
              . $where;
     }

@@ -45,7 +45,7 @@ class Delete extends AbstractQuery
             $where .= PHP_EOL . 'WHERE' . $this->indent($this->where);
         }
 
-        return 'DELETE' . $this->getFlagsString() . ' FROM ' . $this->table . $where;
+        return 'DELETE' . $this->getFlagsAsString() . ' FROM ' . $this->table . $where;
     }
 
     /**
