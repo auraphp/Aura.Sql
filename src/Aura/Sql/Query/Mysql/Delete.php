@@ -61,14 +61,14 @@ class Delete extends \Aura\Sql\Query\Delete
      *
      * Adds or removes LOW_PRIORITY flag.
      *
-     * @param bool $flag Set or unset flag (default true).
+     * @param bool $enable Set or unset flag (default true).
      *
      * @return $this
      *
      */
-    public function lowPriority($flag = true)
+    public function lowPriority($enable = true)
     {
-        $this->setFlag(self::FLAG_LOW_PRIORITY, $flag);
+        $this->setFlag(self::FLAG_LOW_PRIORITY, $enable);
         return $this;
     }
 
@@ -76,14 +76,14 @@ class Delete extends \Aura\Sql\Query\Delete
      *
      * Adds or removes IGNORE flag.
      *
-     * @param bool $flag Set or unset flag (default true).
+     * @param bool $enable Set or unset flag (default true).
      *
      * @return $this
      *
      */
-    public function ignore($flag = true)
+    public function ignore($enable = true)
     {
-        $this->setFlag(self::FLAG_IGNORE, $flag);
+        $this->setFlag(self::FLAG_IGNORE, $enable);
         return $this;
     }
 
@@ -91,14 +91,14 @@ class Delete extends \Aura\Sql\Query\Delete
      *
      * Adds or removes QUICK flag.
      *
-     * @param bool $flag Set or unset flag (default true).
+     * @param bool $enable Set or unset flag (default true).
      *
      * @return $this
      *
      */
-    public function quick($flag = true)
+    public function quick($enable = true)
     {
-        $this->setFlag(self::FLAG_QUICK, $flag);
+        $this->setFlag(self::FLAG_QUICK, $enable);
         return $this;
     }
 }

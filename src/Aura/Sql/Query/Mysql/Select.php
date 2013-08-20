@@ -32,14 +32,14 @@ class Select extends \Aura\Sql\Query\Select
      *
      * Adds or removes SQL_CALC_FOUND_ROWS flag.
      *
-     * @param bool $flag Set or unset flag (default true).
+     * @param bool $enable Set or unset flag (default true).
      *
      * @return $this
      *
      */
-    public function calcFoundRows($flag = true)
+    public function calcFoundRows($enable = true)
     {
-        $this->setFlag(self::FLAG_SQL_CALC_FOUND_ROWS, $flag);
+        $this->setFlag(self::FLAG_SQL_CALC_FOUND_ROWS, $enable);
 
         return $this;
     }
@@ -48,14 +48,14 @@ class Select extends \Aura\Sql\Query\Select
      *
      * Adds or removes SQL_CACHE flag.
      *
-     * @param bool $flag Set or unset flag (default true).
+     * @param bool $enable Set or unset flag (default true).
      *
      * @return $this
      *
      */
-    public function cache($flag = true)
+    public function cache($enable = true)
     {
-        $this->setFlag(self::FLAG_SQL_CACHE, $flag);
+        $this->setFlag(self::FLAG_SQL_CACHE, $enable);
 
         return $this;
     }
@@ -64,14 +64,14 @@ class Select extends \Aura\Sql\Query\Select
      *
      * Adds or removes SQL_NO_CACHE flag.
      *
-     * @param bool $flag Set or unset flag (default true).
+     * @param bool $enable Set or unset flag (default true).
      *
      * @return $this
      *
      */
-    public function noCache($flag = true)
+    public function noCache($enable = true)
     {
-        $this->setFlag(self::FLAG_SQL_NO_CACHE, $flag);
+        $this->setFlag(self::FLAG_SQL_NO_CACHE, $enable);
 
         return $this;
     }
@@ -80,14 +80,14 @@ class Select extends \Aura\Sql\Query\Select
      *
      * Adds or removes STRAIGHT_JOIN flag.
      *
-     * @param bool $flag Set or unset flag (default true).
+     * @param bool $enable Set or unset flag (default true).
      *
      * @return $this
      *
      */
-    public function straightJoin($flag = true)
+    public function straightJoin($enable = true)
     {
-        $this->setFlag(self::FLAG_STRAIGHT_JOIN, $flag);
+        $this->setFlag(self::FLAG_STRAIGHT_JOIN, $enable);
         return $this;
     }
 
@@ -95,14 +95,14 @@ class Select extends \Aura\Sql\Query\Select
      *
      * Adds or removes HIGH_PRIORITY flag.
      *
-     * @param bool $flag Set or unset flag (default true).
+     * @param bool $enable Set or unset flag (default true).
      *
      * @return $this
      *
      */
-    public function highPriority($flag = true)
+    public function highPriority($enable = true)
     {
-        $this->setFlag(self::FLAG_HIGH_PRIORITY, $flag);
+        $this->setFlag(self::FLAG_HIGH_PRIORITY, $enable);
         return $this;
     }
 
@@ -110,14 +110,14 @@ class Select extends \Aura\Sql\Query\Select
      *
      * Adds or removes SQL_SMALL_RESULT flag.
      *
-     * @param bool $flag Set or unset flag (default true).
+     * @param bool $enable Set or unset flag (default true).
      *
      * @return $this
      *
      */
-    public function smallResult($flag = true)
+    public function smallResult($enable = true)
     {
-        $this->setFlag(self::FLAG_SQL_SMALL_RESULT, $flag);
+        $this->setFlag(self::FLAG_SQL_SMALL_RESULT, $enable);
         return $this;
     }
 
@@ -125,14 +125,14 @@ class Select extends \Aura\Sql\Query\Select
      *
      * Adds or removes SQL_BIG_RESULT flag.
      *
-     * @param bool $flag Set or unset flag (default true).
+     * @param bool $enable Set or unset flag (default true).
      *
      * @return $this
      *
      */
-    public function bigResult($flag = true)
+    public function bigResult($enable = true)
     {
-        $this->setFlag(self::FLAG_SQL_BIG_RESULT, $flag);
+        $this->setFlag(self::FLAG_SQL_BIG_RESULT, $enable);
         return $this;
     }
 
@@ -140,14 +140,14 @@ class Select extends \Aura\Sql\Query\Select
      *
      * Adds or removes SQL_BUFFER_RESULT flag.
      *
-     * @param bool $flag Set or unset flag (default true).
+     * @param bool $enable Set or unset flag (default true).
      *
      * @return $this
      *
      */
-    public function bufferResult($flag = true)
+    public function bufferResult($enable = true)
     {
-        $this->setFlag(self::FLAG_SQL_BUFFER_RESULT, $flag);
+        $this->setFlag(self::FLAG_SQL_BUFFER_RESULT, $enable);
         return $this;
     }
 }

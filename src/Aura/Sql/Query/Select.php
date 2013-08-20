@@ -205,7 +205,7 @@ class Select extends AbstractQuery
 
         // for update?
         if ($this->for_update) {
-            $text .= "FOR UPDATE" . PHP_EOL;
+            $text .= 'FOR UPDATE' . PHP_EOL;
         }
 
         // done!
@@ -243,30 +243,30 @@ class Select extends AbstractQuery
      *
      * Makes the select FOR UPDATE (or not).
      *
-     * @param bool $flag Whether or not the SELECT is FOR UPDATE (default
+     * @param bool $enable Whether or not the SELECT is FOR UPDATE (default
      * true).
      *
      * @return $this
      *
      */
-    public function forUpdate($flag = true)
+    public function forUpdate($enable = true)
     {
-        $this->for_update = (bool) $flag;
+        $this->for_update = (bool) $enable;
     }
 
     /**
      *
      * Makes the select DISTINCT (or not).
      *
-     * @param bool $flag Whether or not the SELECT is DISTINCT (default
+     * @param bool $enable Whether or not the SELECT is DISTINCT (default
      * true).
      *
      * @return $this
      *
      */
-    public function distinct($flag = true)
+    public function distinct($enable = true)
     {
-        $this->setFlag(self::FLAG_DISTINCT, $flag);
+        $this->setFlag(self::FLAG_DISTINCT, $enable);
         return $this;
     }
 

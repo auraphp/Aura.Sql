@@ -28,14 +28,14 @@ class Insert extends \Aura\Sql\Query\Insert
      *
      * Adds or removes HIGH_PRIORITY flag.
      *
-     * @param bool $flag Set or unset flag (default true).
+     * @param bool $enable Set or unset flag (default true).
      *
      * @return $this
      *
      */
-    public function highPriority($flag = true)
+    public function highPriority($enable = true)
     {
-        $this->setFlag(self::FLAG_HIGH_PRIORITY, $flag);
+        $this->setFlag(self::FLAG_HIGH_PRIORITY, $enable);
         return $this;
     }
 
@@ -43,14 +43,14 @@ class Insert extends \Aura\Sql\Query\Insert
      *
      * Adds or removes LOW_PRIORITY flag.
      *
-     * @param bool $flag Set or unset flag (default true).
+     * @param bool $enable Set or unset flag (default true).
      *
      * @return $this
      *
      */
-    public function lowPriority($flag = true)
+    public function lowPriority($enable = true)
     {
-        $this->setFlag(self::FLAG_LOW_PRIORITY, $flag);
+        $this->setFlag(self::FLAG_LOW_PRIORITY, $enable);
         return $this;
     }
 
@@ -58,14 +58,14 @@ class Insert extends \Aura\Sql\Query\Insert
      *
      * Adds or removes IGNORE flag.
      *
-     * @param bool $flag Set or unset flag (default true).
+     * @param bool $enable Set or unset flag (default true).
      *
      * @return $this
      *
      */
-    public function ignore($flag = true)
+    public function ignore($enable = true)
     {
-        $this->setFlag(self::FLAG_IGNORE, $flag);
+        $this->setFlag(self::FLAG_IGNORE, $enable);
         return $this;
     }
 
@@ -73,14 +73,14 @@ class Insert extends \Aura\Sql\Query\Insert
      *
      * Adds or removes DELAYED flag.
      *
-     * @param bool $flag Set or unset flag (default true).
+     * @param bool $enable Set or unset flag (default true).
      *
      * @return $this
      *
      */
-    public function delayed($flag = true)
+    public function delayed($enable = true)
     {
-        $this->setFlag(self::FLAG_DELAYED, $flag);
+        $this->setFlag(self::FLAG_DELAYED, $enable);
         return $this;
     }
 }
