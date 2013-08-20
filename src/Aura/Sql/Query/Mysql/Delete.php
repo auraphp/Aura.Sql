@@ -17,14 +17,15 @@ namespace Aura\Sql\Query\Mysql;
  * @package Aura.Sql
  *
  */
-class Update extends \Aura\Sql\Query\Update
+class Delete extends \Aura\Sql\Query\Delete
 {
     const FLAG_IGNORE = 'IGNORE';
+    const FLAG_QUICK = 'QUICK';
     const FLAG_LOW_PRIORITY = 'LOW_PRIORITY';
 
     /**
      *
-     * The number of rows to update
+     * The number of rows to delete
      *
      * @var int
      *
@@ -87,6 +88,22 @@ class Update extends \Aura\Sql\Query\Update
     public function ignore($flag = true)
     {
         $this->setFlag(self::FLAG_IGNORE, $flag);
+
+        return $this;
+    }
+
+    /**
+     *
+     * Adds or removes QUICK flag.
+     *
+     * @param bool $flag Set or unset flag (default true).
+     *
+     * @return $this
+     *
+     */
+    public function quick($flag = true)
+    {
+        $this->setFlag(self::FLAG_QUICK, $flag);
 
         return $this;
     }
