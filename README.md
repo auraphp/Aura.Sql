@@ -366,15 +366,24 @@ You can then modify the `Select` object and pass it to the `query()` or
 // create a new Select object
 $select = $connection->newSelect();
 
-// SELECT * FROM foo WHERE bar > :bar ORDER BY baz
+// SELECT * FROM foo WHERE bar > :bar AND zim = 'gir' ORDER BY baz
 $select->cols(['*'])
        ->from('foo')
        ->where('bar > :bar')
-       ->orderBy('baz');
+       ->where('zim = ?', 'gir')
+       ->orderBy(['baz']);
 
 $bind = ['bar' => '88'];
 
 $list = $connection->fetchAll($select, $bind);
+
+// SELECT bar, COUNT(*) as cnt FROM foo GROUP BY bar HAVING bar > 5
+$select->cols(['bar', 'COUNT(*) as cnt'])
+       ->from('foo')
+       ->groupBy(['bar'])
+       ->having('bar > ?', 5);
+
+$list = $connection->fetchAll($select);
 ```
 
 The `Select` object has these methods and more; please read the source code
