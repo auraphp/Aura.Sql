@@ -276,6 +276,20 @@ abstract class AbstractConnection
 
     /**
      * 
+     * Disconnects from the database by unsetting the PDO object; if
+     * a custom PDO object was passed in via setPDO(), the same object will
+     * need to be passed in again to reconnect.
+     * 
+     * @return void
+     * 
+     */
+    public function disconnect()
+    {
+        unset($this->pdo);
+    }
+    
+    /**
+     * 
      * A hook that executes before the database connection is created.
      * 
      * @return void
@@ -466,13 +480,22 @@ abstract class AbstractConnection
      * @param array $bind An associative array of data to bind to the named
      * placeholders.
      * 
+     * @param callable $callable A callable to be applied to each of the rows
+     * to be returned.
+     * 
      * @return array
      * 
      */
-    public function fetchAll($query, $bind = [])
+    public function fetchAll($query, array $bind = [], callable $callable = null)
     {
         $stmt = $this->query($query, $bind);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        if ($callable) {
+            foreach ($data as $key => $row) {
+                $data[$key] = $callable($row);
+            }
+        }
+        return $data;
     }
 
     /**
@@ -487,19 +510,29 @@ abstract class AbstractConnection
      * @param string $query The text of the SQL statement, optionally with
      * named placeholders.
      * 
-     * @param array $data An associative array of data to bind to the named
+     * @param array $bind An associative array of data to bind to the named
      * placeholders.
+     * 
+     * @param callable $callable A callable to be applied to each of the rows
+     * to be returned.
      * 
      * @return array
      * 
      */
-    public function fetchAssoc($query, array $data = [])
+    public function fetchAssoc($query, array $bind = [], callable $callable = null)
     {
-        $stmt = $this->query($query, $data);
+        $stmt = $this->query($query, $bind);
         $data = [];
-        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $key = current($row); // value of the first element
-            $data[$key] = $row;
+        if ($callable) {
+            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                $key = current($row); // value of the first element
+                $data[$key] = $callable($row);
+            }
+        } else {
+            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                $key = current($row); // value of the first element
+                $data[$key] = $row;
+            }
         }
         return $data;
     }
@@ -514,13 +547,22 @@ abstract class AbstractConnection
      * @param array $bind An associative array of data to bind to the named
      * placeholders.
      * 
+     * @param callable $callable A callable to be applied to each of the rows
+     * to be returned.
+     * 
      * @return array
      * 
      */
-    public function fetchCol($query, array $bind = [])
+    public function fetchCol($query, array $bind = [], callable $callable = null)
     {
         $stmt = $this->query($query, $bind);
-        return $stmt->fetchAll(PDO::FETCH_COLUMN, 0);
+        $data = $stmt->fetchAll(PDO::FETCH_COLUMN, 0);
+        if ($callable) {
+            foreach ($data as $key => $val) {
+                $data[$key] = $callable($val);
+            }
+        }
+        return $data;
     }
 
     /**
@@ -553,17 +595,29 @@ abstract class AbstractConnection
      * @param array $bind An associative array of data to bind to the named
      * placeholders.
      * 
+     * @param callable $callable A callable to be applied to each of the rows
+     * to be returned.
+     * 
      * @return array
      * 
      */
-    public function fetchPairs($query, array $bind = [])
+    public function fetchPairs($query, array $bind = [], callable $callable = null)
     {
         $stmt = $this->query($query, $bind);
-        $bind = [];
-        while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
-            $bind[$row[0]] = $row[1];
+        $data = [];
+        if ($callable) {
+            while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+                // apply the callback first so the key can be modified
+                $row = $callable($row);
+                // now retain the data
+                $data[$row[0]] = $row[1];
+            }
+        } else {
+            while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+                $data[$row[0]] = $row[1];
+            }
         }
-        return $bind;
+        return $data;
     }
 
     /**

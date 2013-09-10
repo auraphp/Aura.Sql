@@ -37,8 +37,16 @@ class ProfilerTest extends \PHPUnit_Framework_TestCase
     {
         $text = 'SELECT * FROM test';
         $stmt = $this->pdo->prepare($text);
-        $bind = ['foo' => 'bar'];
-        $this->profiler->exec($stmt, $bind);
+        $data = ['foo' => 'bar'];
+        $this->profiler->exec($stmt, $data);
+        
+        // check the last query
+        $expect = [
+            'text' => $text,
+            'data' => $data,
+        ];
+        $actual = $this->profiler->getLastQuery();
+        $this->assertSame($expect, $actual);
         
         // should be nothing in the profile
         $expect = [];
@@ -47,11 +55,11 @@ class ProfilerTest extends \PHPUnit_Framework_TestCase
         
         // now make it active
         $this->profiler->setActive(true);
-        $this->profiler->exec($stmt, $bind);
+        $this->profiler->exec($stmt, $data);
         $actual = $this->profiler->getProfiles();
         $this->assertSame(1, count($actual));
         $this->assertSame($text, $actual[0]->text);
-        $this->assertSame($bind, $actual[0]->data);
+        $this->assertSame($data, $actual[0]->data);
     }
 
     public function testCall()
@@ -62,8 +70,17 @@ class ProfilerTest extends \PHPUnit_Framework_TestCase
         };
         
         $text = '__SELECT__';
+        $data = [];
         
-        $this->profiler->call($func, $text);
+        $this->profiler->call($func, $text, $data);
+        
+        // check the last query
+        $expect = [
+            'text' => $text,
+            'data' => $data,
+        ];
+        $actual = $this->profiler->getLastQuery();
+        $this->assertSame($expect, $actual);
         
         // should be nothing in the profile
         $expect = [];
