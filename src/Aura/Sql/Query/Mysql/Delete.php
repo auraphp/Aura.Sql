@@ -33,7 +33,11 @@ class Delete extends \Aura\Sql\Query\Delete
     protected $limit = 0;
 
     /**
+     * 
+     * Converts this query object to a string.
+     * 
      * @return string
+     * 
      */
     public function __toString()
     {
