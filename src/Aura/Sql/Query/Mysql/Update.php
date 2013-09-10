@@ -10,6 +10,8 @@
  */
 namespace Aura\Sql\Query\Mysql;
 
+use Aura\Sql\Query\LimitTrait;
+
 /**
  *
  * An object for MySQL UPDATE queries.
@@ -19,17 +21,10 @@ namespace Aura\Sql\Query\Mysql;
  */
 class Update extends \Aura\Sql\Query\Update
 {
+    use LimitTrait;
+    
     const FLAG_IGNORE = 'IGNORE';
     const FLAG_LOW_PRIORITY = 'LOW_PRIORITY';
-
-    /**
-     *
-     * The number of rows to update
-     *
-     * @var int
-     *
-     */
-    protected $limit = 0;
 
     /**
      * 
@@ -43,21 +38,6 @@ class Update extends \Aura\Sql\Query\Update
         $sql = parent::__toString();
         $this->connection->limit($sql, $this->limit);
         return $sql;
-    }
-
-    /**
-     *
-     * Sets a limit count on the query.
-     *
-     * @param int $limit The number of rows to update.
-     *
-     * @return $this
-     *
-     */
-    public function limit($limit)
-    {
-        $this->limit = (int) $limit;
-        return $this;
     }
 
     /**

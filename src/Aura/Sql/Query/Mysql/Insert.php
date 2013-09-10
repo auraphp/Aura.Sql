@@ -12,7 +12,7 @@ namespace Aura\Sql\Query\Mysql;
 
 /**
  *
- * An object for MySQL UPDATE queries.
+ * An object for MySQL INSERT queries.
  *
  * @package Aura.Sql
  *

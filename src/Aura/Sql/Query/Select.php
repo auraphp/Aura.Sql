@@ -23,6 +23,9 @@ class Select extends AbstractQuery
 {
     use WhereTrait;
     use FlagsTrait;
+    use LimitTrait;
+    use OffsetTrait;
+    use OrderByTrait;
 
     const FLAG_DISTINCT = 'DISTINCT';
 
@@ -88,33 +91,6 @@ class Select extends AbstractQuery
      *
      */
     protected $having = [];
-
-    /**
-     *
-     * ORDER BY these columns.
-     *
-     * @var array
-     *
-     */
-    protected $order_by = [];
-
-    /**
-     *
-     * The number of rows to return
-     *
-     * @var int
-     *
-     */
-    protected $limit = 0;
-
-    /**
-     *
-     * Return rows after this offset.
-     *
-     * @var int
-     *
-     */
-    protected $offset = 0;
 
     /**
      *
@@ -194,11 +170,7 @@ class Select extends AbstractQuery
             $text .= implode($line, $this->having) . PHP_EOL;
         }
 
-        // ordered by these columns
-        if ($this->order_by) {
-            $text .= 'ORDER BY' . $line;
-            $text .= implode($csep, $this->order_by) . PHP_EOL;
-        }
+        $text .= $this->getOrderByStatement();
 
         // modify with a limit clause per the connection
         $this->connection->limit($text, $this->limit, $this->offset);
@@ -468,53 +440,6 @@ class Select extends AbstractQuery
         }
 
         // done
-        return $this;
-    }
-
-    /**
-     *
-     * Adds a row order to the query.
-     *
-     * @param array $spec The columns and direction to order by.
-     *
-     * @return $this
-     *
-     */
-    public function orderBy(array $spec)
-    {
-        foreach ($spec as $col) {
-            $this->order_by[] = $this->connection->quoteNamesIn($col);
-        }
-        return $this;
-    }
-
-    /**
-     *
-     * Sets a limit count on the query.
-     *
-     * @param int $limit The number of rows to return.
-     *
-     * @return $this
-     *
-     */
-    public function limit($limit)
-    {
-        $this->limit = (int) $limit;
-        return $this;
-    }
-
-    /**
-     *
-     * Sets a limit offset on the query.
-     *
-     * @param int $offset Start returning after this many rows.
-     *
-     * @return $this
-     *
-     */
-    public function offset($offset)
-    {
-        $this->offset = (int) $offset;
         return $this;
     }
 

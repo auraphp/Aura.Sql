@@ -10,6 +10,8 @@
  */
 namespace Aura\Sql\Query\Mysql;
 
+use Aura\Sql\Query\LimitTrait;
+
 /**
  *
  * An object for MySQL UPDATE queries.
@@ -19,18 +21,11 @@ namespace Aura\Sql\Query\Mysql;
  */
 class Delete extends \Aura\Sql\Query\Delete
 {
+    use LimitTrait;
+    
     const FLAG_IGNORE = 'IGNORE';
     const FLAG_QUICK = 'QUICK';
     const FLAG_LOW_PRIORITY = 'LOW_PRIORITY';
-
-    /**
-     *
-     * The number of rows to delete
-     *
-     * @var int
-     *
-     */
-    protected $limit = 0;
 
     /**
      * 
@@ -44,21 +39,6 @@ class Delete extends \Aura\Sql\Query\Delete
         $sql = parent::__toString();
         $this->connection->limit($sql, $this->limit);
         return $sql;
-    }
-
-    /**
-     *
-     * Sets a limit count on the query.
-     *
-     * @param int $limit The number of rows to update.
-     *
-     * @return $this
-     *
-     */
-    public function limit($limit)
-    {
-        $this->limit = (int) $limit;
-        return $this;
     }
 
     /**
