@@ -1,11 +1,26 @@
-- [ADD] AbstractConnection::setPdo() to inject a pre-existing PDO connection.
-  Thanks, Stan Lemon, for the feature request.
+- [ADD] Profiler::getLastQuery() to get the last profiled query.
 
-- [ADD] Add missing properties AbstractConnection::$profiler and
-  AbstractConnection::$query_factory.
+- [CHG] AbstractConnection::fetchAll(), fetchAssoc(), fetchCol(), and
+  fetchPairs() all now take a third param: a callable to apply to each row in
+  the results.
 
-- [CHG] Varios typo fixes by Pascal Borrelli and Henrique Moody.
+- [ADD] AbstractConnection::disconnect(), mostly to help with testing.
 
-- [CHG] Gateway registry entries *must* be wrapped in a callable from now on.
+- [NEW] Query\Mysql classes to support MySQL-specific functionality:
 
-- [ADD] Method Column::__isset()
+    - [NEW] Query\Mysql\Select with SQL_CALC_FOUND_ROWS and other
+      mysql-specific flags.
+
+    - [NEW] Query\Mysql\Insert with IGNORE and other mysql-specific flags.
+
+    - [NEW] Query\Mysql\Update with IGNORE and other mysql-specific flags,
+      as well as LIMIT functionality.
+
+    - [NEW] Query\Mysql\Delete with LOW_PRIORITY and other mysql-specific
+      flags, as well as LIMIT functionality.
+
+- [LIC] Update license copyright dates.
+
+- [TST] Add PHP 5.5 to Travis build.
+
+- [DOC] Update README.
