@@ -127,24 +127,18 @@ class Select extends AbstractQuery
      */
     protected function toString()
     {
-        // newline and indent
-        $line = PHP_EOL . '    ';
-
-        // comma separator, newline, and indent
-        $csep = ',' . $line;
-
         // open the statement
         $text = 'SELECT' . $this->getFlagsAsString() . PHP_EOL;
 
         // add columns
         if ($this->cols) {
-            $text .= '    ' . implode($csep, $this->cols) . PHP_EOL;
+            $text .= $this->stringIndent . implode($this->stringCommaSeparator, $this->cols) . PHP_EOL;
         }
 
         // from these sources
         if ($this->from) {
-            $text .= 'FROM' . $line;
-            $text .= implode($csep, $this->from) . PHP_EOL;
+            $text .= 'FROM' . $this->stringNewLine;
+            $text .= implode($this->stringCommaSeparator, $this->from) . PHP_EOL;
         }
 
         // join these sources
@@ -154,20 +148,20 @@ class Select extends AbstractQuery
 
         // where these conditions
         if ($this->where) {
-            $text .= 'WHERE' . $line;
-            $text .= implode($line, $this->where) . PHP_EOL;
+            $text .= 'WHERE' . $this->stringNewLine;
+            $text .= implode($this->stringNewLine, $this->where) . PHP_EOL;
         }
 
         // grouped by these columns
         if ($this->group_by) {
-            $text .= 'GROUP BY' . $line;
-            $text .= implode($csep, $this->group_by) . PHP_EOL;
+            $text .= 'GROUP BY' . $this->stringNewLine;
+            $text .= implode($this->stringCommaSeparator, $this->group_by) . PHP_EOL;
         }
 
         // having these conditions
         if ($this->having) {
-            $text .= 'HAVING' . $line;
-            $text .= implode($line, $this->having) . PHP_EOL;
+            $text .= 'HAVING' . $this->stringNewLine;
+            $text .= implode($this->stringNewLine, $this->having) . PHP_EOL;
         }
 
         $text .= $this->getOrderByStatement();

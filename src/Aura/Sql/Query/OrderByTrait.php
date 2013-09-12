@@ -53,14 +53,8 @@ trait OrderByTrait
     protected function getOrderByStatement()
     {
         if ($this->order_by) {
-            // newline and indent
-            $line = PHP_EOL . '    ';
-    
-            // comma separator, newline, and indent
-            $csep = ',' . $line;
-            
-            $text = 'ORDER BY' . $line;
-            $text .= implode($csep, $this->order_by) . PHP_EOL;
+            $text = 'ORDER BY' . $this->stringNewLine;
+            $text .= implode($this->stringCommaSeparator, $this->order_by) . PHP_EOL;
         } else {
             $text = '';
         }
