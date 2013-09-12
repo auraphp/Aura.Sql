@@ -10,6 +10,8 @@
  */
 namespace Aura\Sql\Connection;
 
+use Aura\Sql\Query;
+
 /**
  * 
  * MySQL connection adapter.
@@ -166,5 +168,53 @@ class Mysql extends AbstractConnection
     {
         $pdo = $this->getPdo();
         return $pdo->lastInsertId();
+    }
+    
+    /**
+     * 
+     * Returns a new Select object.
+     * 
+     * @return Query\Mysql\Select
+     * 
+     */
+    public function newSelect()
+    {
+        return $this->query_factory->newInstance('Mysql\Select', $this);
+    }
+
+    /**
+     * 
+     * Returns a new Insert object.
+     * 
+     * @return Query\Mysql\Insert
+     * 
+     */
+    public function newInsert()
+    {
+        return $this->query_factory->newInstance('Mysql\Insert', $this);
+    }
+
+    /**
+     * 
+     * Returns a new Update object.
+     * 
+     * @return Query\Mysql\Update
+     * 
+     */
+    public function newUpdate()
+    {
+        return $this->query_factory->newInstance('Mysql\Update', $this);
+    }
+
+    /**
+     * 
+     * Returns a new Delete object.
+     * 
+     * @return Query\Mysql\Delete
+     * 
+     */
+    public function newDelete()
+    {
+        return $this->query_factory->newInstance('Mysql\Delete', $this);
     }
 }

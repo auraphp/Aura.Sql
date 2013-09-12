@@ -10,6 +10,8 @@
  */
 namespace Aura\Sql\Connection;
 
+use Aura\Sql\Query;
+
 /**
  * 
  * SQLite connection adapter.
@@ -238,5 +240,53 @@ class Sqlite extends AbstractConnection
     {
         $pdo = $this->getPdo();
         return $pdo->lastInsertId();
+    }
+    
+    /**
+     * 
+     * Returns a new Select object.
+     * 
+     * @return Query\Sqlite\Select
+     * 
+     */
+    public function newSelect()
+    {
+        return $this->query_factory->newInstance('Sqlite\Select', $this);
+    }
+
+    /**
+     * 
+     * Returns a new Insert object.
+     * 
+     * @return Query\Sqlite\Insert
+     * 
+     */
+    public function newInsert()
+    {
+        return $this->query_factory->newInstance('Sqlite\Insert', $this);
+    }
+
+    /**
+     * 
+     * Returns a new Update object.
+     * 
+     * @return Query\Sqlite\Update
+     * 
+     */
+    public function newUpdate()
+    {
+        return $this->query_factory->newInstance('Sqlite\Update', $this);
+    }
+
+    /**
+     * 
+     * Returns a new Delete object.
+     * 
+     * @return Query\Sqlite\Delete
+     * 
+     */
+    public function newDelete()
+    {
+        return $this->query_factory->newInstance('Sqlite\Delete', $this);
     }
 }

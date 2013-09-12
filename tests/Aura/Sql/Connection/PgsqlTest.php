@@ -113,6 +113,14 @@ class PgsqlTest extends AbstractConnectionTest
     
     protected $expect_quote_names_in = '*, *.*, "foo"."bar", CONCAT(\'foo.bar\', "baz.dib") AS "zim"';
     
+    protected $expect_select_query_class = 'Aura\Sql\Query\Pgsql\Select';
+    
+    protected $expect_delete_query_class = 'Aura\Sql\Query\Pgsql\Delete';
+    
+    protected $expect_insert_query_class = 'Aura\Sql\Query\Pgsql\Insert';
+    
+    protected $expect_update_query_class = 'Aura\Sql\Query\Pgsql\Update';
+    
     protected function fetchLastInsertId()
     {
         return $this->connection->lastInsertId($this->table, 'id');

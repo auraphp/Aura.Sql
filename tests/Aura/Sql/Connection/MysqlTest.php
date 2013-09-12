@@ -109,4 +109,12 @@ class MysqlTest extends AbstractConnectionTest
     protected $expect_quote_name_plain = '`table`';
     
     protected $expect_quote_names_in = "*, *.*, `foo`.`bar`, CONCAT('foo.bar', \"baz.dib\") AS `zim`";
+    
+    protected $expect_select_query_class = 'Aura\Sql\Query\Mysql\Select';
+    
+    protected $expect_delete_query_class = 'Aura\Sql\Query\Mysql\Delete';
+    
+    protected $expect_insert_query_class = 'Aura\Sql\Query\Mysql\Insert';
+    
+    protected $expect_update_query_class = 'Aura\Sql\Query\Mysql\Update';
 }

@@ -48,6 +48,14 @@ abstract class AbstractConnectionTest extends \PHPUnit_Framework_TestCase
     
     protected $expect_quote_multi;
     
+    protected $expect_select_query_class = 'Aura\Sql\Query\Select';
+    
+    protected $expect_delete_query_class = 'Aura\Sql\Query\Delete';
+    
+    protected $expect_insert_query_class = 'Aura\Sql\Query\Insert';
+    
+    protected $expect_update_query_class = 'Aura\Sql\Query\Update';
+    
     /**
      * Sets up the fixture, for example, opens a network connection.
      * This method is called before a test is executed.
@@ -593,27 +601,27 @@ abstract class AbstractConnectionTest extends \PHPUnit_Framework_TestCase
     {
         $query = $this->connection->newSelect();
         
-        $this->assertInstanceOf('Aura\Sql\Query\Select', $query);
+        $this->assertInstanceOf($this->expect_select_query_class, $query);
     }
     
     public function testNewDelete()
     {
         $query = $this->connection->newDelete();
         
-        $this->assertInstanceOf('Aura\Sql\Query\Delete', $query);
+        $this->assertInstanceOf($this->expect_delete_query_class, $query);
     }
     
     public function testNewUpdate()
     {
         $query = $this->connection->newUpdate();
         
-        $this->assertInstanceOf('Aura\Sql\Query\Update', $query);
+        $this->assertInstanceOf($this->expect_update_query_class, $query);
     }
     
     public function testNewInsert()
     {
         $query = $this->connection->newInsert();
         
-        $this->assertInstanceOf('Aura\Sql\Query\Insert', $query);
+        $this->assertInstanceOf($this->expect_insert_query_class, $query);
     }
 }
