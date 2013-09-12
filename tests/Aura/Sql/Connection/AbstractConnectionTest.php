@@ -588,4 +588,32 @@ abstract class AbstractConnectionTest extends \PHPUnit_Framework_TestCase
         $this->connection->commit();
         $this->assertSame(11, count($actual));
     }
+
+    public function testNewSelect()
+    {
+        $query = $this->connection->newSelect();
+        
+        $this->assertInstanceOf('Aura\Sql\Query\Select', $query);
+    }
+    
+    public function testNewDelete()
+    {
+        $query = $this->connection->newDelete();
+        
+        $this->assertInstanceOf('Aura\Sql\Query\Delete', $query);
+    }
+    
+    public function testNewUpdate()
+    {
+        $query = $this->connection->newUpdate();
+        
+        $this->assertInstanceOf('Aura\Sql\Query\Update', $query);
+    }
+    
+    public function testNewInsert()
+    {
+        $query = $this->connection->newInsert();
+        
+        $this->assertInstanceOf('Aura\Sql\Query\Insert', $query);
+    }
 }
