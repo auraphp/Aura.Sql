@@ -44,7 +44,7 @@ class Insert extends AbstractQuery
              . $this->indentCsv(array_keys($this->values))
              . ') VALUES ('
              . $this->indentCsv(array_values($this->values))
-             . ')';
+             . ')' . PHP_EOL;
     }
 
     /**

@@ -35,6 +35,7 @@ require_once __DIR__ . '/src/Aura/Sql/Query/Sqlite/Delete.php';
 require_once __DIR__ . '/src/Aura/Sql/Query/Sqlite/Insert.php';
 require_once __DIR__ . '/src/Aura/Sql/Query/Sqlite/Update.php';
 require_once __DIR__ . '/src/Aura/Sql/Query/Pgsql/Delete.php';
+require_once __DIR__ . '/src/Aura/Sql/Query/Pgsql/Insert.php';
 require_once __DIR__ . '/src/Aura/Sql/AbstractMapper.php';
 require_once __DIR__ . '/src/Aura/Sql/Gateway.php';
 require_once __DIR__ . '/src/Aura/Sql/GatewayLocator.php';
