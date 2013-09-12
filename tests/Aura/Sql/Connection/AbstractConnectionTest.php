@@ -601,27 +601,27 @@ abstract class AbstractConnectionTest extends \PHPUnit_Framework_TestCase
     {
         $query = $this->connection->newSelect();
         
-        $this->assertInstanceOf($this->expect_select_query_class, $query);
+        $this->assertEquals($this->expect_select_query_class, get_class($query));
     }
     
     public function testNewDelete()
     {
         $query = $this->connection->newDelete();
         
-        $this->assertInstanceOf($this->expect_delete_query_class, $query);
+        $this->assertEquals($this->expect_delete_query_class, get_class($query));
     }
     
     public function testNewUpdate()
     {
         $query = $this->connection->newUpdate();
         
-        $this->assertInstanceOf($this->expect_update_query_class, $query);
+        $this->assertEquals($this->expect_update_query_class, get_class($query));
     }
     
     public function testNewInsert()
     {
         $query = $this->connection->newInsert();
         
-        $this->assertInstanceOf($this->expect_insert_query_class, $query);
+        $this->assertEquals($this->expect_insert_query_class, get_class($query));
     }
 }
