@@ -40,16 +40,31 @@ abstract class AbstractQuery
     protected $bind = [];
 
     /**
-     * 
+     * @var string
+     */
+    protected $stringNewLine;
+
+    /**
+     * @var string
+     */
+    protected $stringCommaSeparator;
+    
+    /**
+     * @var string
+     */
+    protected $stringIndent;
+
+    /**
      * Constructor.
      * 
      * @param AbstractConnection $connection An SQL connection.
-     * 
-     * @return void
-     * 
      */
     public function __construct(AbstractConnection $connection)
     {
+        $this->stringIndent = '    ';
+        $this->stringNewLine = PHP_EOL . $this->stringIndent;
+        $this->stringCommaSeparator = ',' . $this->stringNewLine;
+        
         $this->connection = $connection;
     }
 
@@ -85,9 +100,7 @@ abstract class AbstractQuery
      */
     protected function indentCsv(array $list)
     {
-        return PHP_EOL
-             . '    ' . implode(',' . PHP_EOL . '    ', $list)
-             . PHP_EOL;
+        return $this->stringNewLine . implode($this->stringCommaSeparator, $list) . PHP_EOL;
     }
 
     /**
@@ -101,9 +114,7 @@ abstract class AbstractQuery
      */
     protected function indent($list)
     {
-        return PHP_EOL
-             . '    ' . implode(PHP_EOL . '    ', $list)
-             . PHP_EOL;
+        return $this->stringNewLine . implode($this->stringNewLine, $list) . PHP_EOL;
     }
 
     /**

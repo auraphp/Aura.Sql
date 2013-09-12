@@ -41,7 +41,7 @@ class SelectTest extends AbstractQueryTest
 
         $actual = $this->query->__toString();
 
-        $expect = $expect = '
+        $expect = '
             SELECT DISTINCT
                 "t1"."c1",
                 "t1"."c2",
