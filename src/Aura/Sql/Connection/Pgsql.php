@@ -220,48 +220,48 @@ class Pgsql extends AbstractConnection
     
     /**
      * 
-     * Returns a new Select object.
+     * Returns a new PostgreSQL Select object.
      * 
      * @return Query\Pgsql\Select
      * 
      */
-    public function newSelect()
+    public function newPgsqlSelect()
     {
         return $this->query_factory->newInstance('Pgsql\Select', $this);
     }
 
     /**
      * 
-     * Returns a new Insert object.
+     * Returns a new PostgreSQL Insert object.
      * 
      * @return Query\Pgsql\Insert
      * 
      */
-    public function newInsert()
+    public function newPgsqlInsert()
     {
         return $this->query_factory->newInstance('Pgsql\Insert', $this);
     }
 
     /**
      * 
-     * Returns a new Update object.
+     * Returns a new PostgreSQL Update object.
      * 
      * @return Query\Pgsql\Update
      * 
      */
-    public function newUpdate()
+    public function newPgsqlUpdate()
     {
         return $this->query_factory->newInstance('Pgsql\Update', $this);
     }
 
     /**
      * 
-     * Returns a new Delete object.
+     * Returns a new PostgreSQL Delete object.
      * 
      * @return Query\Pgsql\Delete
      * 
      */
-    public function newDelete()
+    public function newPgsqlDelete()
     {
         return $this->query_factory->newInstance('Pgsql\Delete', $this);
     }

@@ -172,48 +172,48 @@ class Mysql extends AbstractConnection
     
     /**
      * 
-     * Returns a new Select object.
+     * Returns a new MySQL Select object.
      * 
      * @return Query\Mysql\Select
      * 
      */
-    public function newSelect()
+    public function newMysqlSelect()
     {
         return $this->query_factory->newInstance('Mysql\Select', $this);
     }
 
     /**
      * 
-     * Returns a new Insert object.
+     * Returns a new MySQL Insert object.
      * 
      * @return Query\Mysql\Insert
      * 
      */
-    public function newInsert()
+    public function newMysqlInsert()
     {
         return $this->query_factory->newInstance('Mysql\Insert', $this);
     }
 
     /**
      * 
-     * Returns a new Update object.
+     * Returns a new MySQL Update object.
      * 
      * @return Query\Mysql\Update
      * 
      */
-    public function newUpdate()
+    public function newMysqlUpdate()
     {
         return $this->query_factory->newInstance('Mysql\Update', $this);
     }
 
     /**
      * 
-     * Returns a new Delete object.
+     * Returns a new MySQL Delete object.
      * 
      * @return Query\Mysql\Delete
      * 
      */
-    public function newDelete()
+    public function newMysqlDelete()
     {
         return $this->query_factory->newInstance('Mysql\Delete', $this);
     }

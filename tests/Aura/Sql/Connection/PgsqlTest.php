@@ -9,7 +9,7 @@ class PgsqlTest extends AbstractConnectionTest
 {
     protected $extension = 'pdo_pgsql';
     
-    protected $connection_type = 'pgsql';    
+    protected $connection_type = 'pgsql';
     
     protected $expect_fetch_table_list = [
         'aura_test_schema1.aura_test_table',
@@ -113,13 +113,33 @@ class PgsqlTest extends AbstractConnectionTest
     
     protected $expect_quote_names_in = '*, *.*, "foo"."bar", CONCAT(\'foo.bar\', "baz.dib") AS "zim"';
     
-    protected $expect_select_query_class = 'Aura\Sql\Query\Pgsql\Select';
+    public function testNewPgsqlSelect()
+    {
+        $query = $this->connection->newPgsqlSelect();
+        
+        $this->assertEquals('Aura\Sql\Query\Pgsql\Select', get_class($query));
+    }
     
-    protected $expect_delete_query_class = 'Aura\Sql\Query\Pgsql\Delete';
+    public function testNewPgsqlDelete()
+    {
+        $query = $this->connection->newPgsqlDelete();
+        
+        $this->assertEquals('Aura\Sql\Query\Pgsql\Delete', get_class($query));
+    }
     
-    protected $expect_insert_query_class = 'Aura\Sql\Query\Pgsql\Insert';
+    public function testNewPgsqlUpdate()
+    {
+        $query = $this->connection->newPgsqlUpdate();
+        
+        $this->assertEquals('Aura\Sql\Query\Pgsql\Update', get_class($query));
+    }
     
-    protected $expect_update_query_class = 'Aura\Sql\Query\Pgsql\Update';
+    public function testNewPgsqlInsert()
+    {
+        $query = $this->connection->newPgsqlInsert();
+        
+        $this->assertEquals('Aura\Sql\Query\Pgsql\Insert', get_class($query));
+    }
     
     protected function fetchLastInsertId()
     {

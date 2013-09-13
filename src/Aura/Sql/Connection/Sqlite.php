@@ -244,48 +244,48 @@ class Sqlite extends AbstractConnection
     
     /**
      * 
-     * Returns a new Select object.
+     * Returns a new Sqlite Select object.
      * 
      * @return Query\Sqlite\Select
      * 
      */
-    public function newSelect()
+    public function newSqliteSelect()
     {
         return $this->query_factory->newInstance('Sqlite\Select', $this);
     }
 
     /**
      * 
-     * Returns a new Insert object.
+     * Returns a new Sqlite Insert object.
      * 
      * @return Query\Sqlite\Insert
      * 
      */
-    public function newInsert()
+    public function newSqliteInsert()
     {
         return $this->query_factory->newInstance('Sqlite\Insert', $this);
     }
 
     /**
      * 
-     * Returns a new Update object.
+     * Returns a new Sqlite Update object.
      * 
      * @return Query\Sqlite\Update
      * 
      */
-    public function newUpdate()
+    public function newSqliteUpdate()
     {
         return $this->query_factory->newInstance('Sqlite\Update', $this);
     }
 
     /**
      * 
-     * Returns a new Delete object.
+     * Returns a new Sqlite Delete object.
      * 
      * @return Query\Sqlite\Delete
      * 
      */
-    public function newDelete()
+    public function newSqliteDelete()
     {
         return $this->query_factory->newInstance('Sqlite\Delete', $this);
     }

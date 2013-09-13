@@ -110,11 +110,31 @@ class SqliteTest extends AbstractConnectionTest
     
     protected $expect_quote_names_in = "*, *.*, \"foo\".\"bar\", CONCAT('foo.bar', \"baz.dib\") AS \"zim\"";
     
-    protected $expect_select_query_class = 'Aura\Sql\Query\Sqlite\Select';
+    public function testNewSqliteSelect()
+    {
+        $query = $this->connection->newSqliteSelect();
+        
+        $this->assertEquals('Aura\Sql\Query\Sqlite\Select', get_class($query));
+    }
     
-    protected $expect_delete_query_class = 'Aura\Sql\Query\Sqlite\Delete';
+    public function testNewSqliteDelete()
+    {
+        $query = $this->connection->newSqliteDelete();
+        
+        $this->assertEquals('Aura\Sql\Query\Sqlite\Delete', get_class($query));
+    }
     
-    protected $expect_insert_query_class = 'Aura\Sql\Query\Sqlite\Insert';
+    public function testNewSqliteUpdate()
+    {
+        $query = $this->connection->newSqliteUpdate();
+        
+        $this->assertEquals('Aura\Sql\Query\Sqlite\Update', get_class($query));
+    }
     
-    protected $expect_update_query_class = 'Aura\Sql\Query\Sqlite\Update';
+    public function testNewSqliteInsert()
+    {
+        $query = $this->connection->newSqliteInsert();
+        
+        $this->assertEquals('Aura\Sql\Query\Sqlite\Insert', get_class($query));
+    }
 }

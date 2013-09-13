@@ -9,7 +9,7 @@ class MysqlTest extends AbstractConnectionTest
 {
     protected $extension = 'pdo_mysql';
     
-    protected $connection_type = 'mysql';    
+    protected $connection_type = 'mysql';
     
     protected $expect_fetch_table_list = ['aura_test_table'];
     
@@ -110,11 +110,31 @@ class MysqlTest extends AbstractConnectionTest
     
     protected $expect_quote_names_in = "*, *.*, `foo`.`bar`, CONCAT('foo.bar', \"baz.dib\") AS `zim`";
     
-    protected $expect_select_query_class = 'Aura\Sql\Query\Mysql\Select';
+    public function testNewMysqlSelect()
+    {
+        $query = $this->connection->newMysqlSelect();
+        
+        $this->assertEquals('Aura\Sql\Query\Mysql\Select', get_class($query));
+    }
     
-    protected $expect_delete_query_class = 'Aura\Sql\Query\Mysql\Delete';
+    public function testNewMysqlDelete()
+    {
+        $query = $this->connection->newMysqlDelete();
+        
+        $this->assertEquals('Aura\Sql\Query\Mysql\Delete', get_class($query));
+    }
     
-    protected $expect_insert_query_class = 'Aura\Sql\Query\Mysql\Insert';
+    public function testNewMysqlUpdate()
+    {
+        $query = $this->connection->newMysqlUpdate();
+        
+        $this->assertEquals('Aura\Sql\Query\Mysql\Update', get_class($query));
+    }
     
-    protected $expect_update_query_class = 'Aura\Sql\Query\Mysql\Update';
+    public function testNewMysqlInsert()
+    {
+        $query = $this->connection->newMysqlInsert();
+        
+        $this->assertEquals('Aura\Sql\Query\Mysql\Insert', get_class($query));
+    }
 }
