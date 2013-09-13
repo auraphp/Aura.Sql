@@ -14,6 +14,7 @@ use Aura\Sql\ColumnFactory;
 use Aura\Sql\ProfilerInterface;
 use Aura\Sql\Query\AbstractQuery;
 use Aura\Sql\Query\Factory as QueryFactory;
+use Aura\Sql\Query;
 use PDO;
 use PDOStatement;
 
@@ -990,7 +991,7 @@ abstract class AbstractConnection
      * 
      * Returns a new Select object.
      * 
-     * @return Select
+     * @return Query\Select
      * 
      */
     public function newSelect()
@@ -1002,7 +1003,7 @@ abstract class AbstractConnection
      * 
      * Returns a new Insert object.
      * 
-     * @return Insert
+     * @return Query\Insert
      * 
      */
     public function newInsert()
@@ -1014,7 +1015,7 @@ abstract class AbstractConnection
      * 
      * Returns a new Update object.
      * 
-     * @return Update
+     * @return Query\Update
      * 
      */
     public function newUpdate()
@@ -1026,7 +1027,7 @@ abstract class AbstractConnection
      * 
      * Returns a new Delete object.
      * 
-     * @return Update
+     * @return Query\Delete
      * 
      */
     public function newDelete()
