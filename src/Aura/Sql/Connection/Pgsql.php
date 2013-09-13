@@ -10,6 +10,8 @@
  */
 namespace Aura\Sql\Connection;
 
+use Aura\Sql\Query;
+
 /**
  * 
  * PostgreSQL connection adapter.
@@ -214,5 +216,53 @@ class Pgsql extends AbstractConnection
         $name = $this->quoteName("{$table}_{$col}_seq");
         $pdo = $this->getPdo();
         return $pdo->lastInsertId($name);
+    }
+    
+    /**
+     * 
+     * Returns a new PostgreSQL Select object.
+     * 
+     * @return Query\Pgsql\Select
+     * 
+     */
+    public function newPgsqlSelect()
+    {
+        return $this->query_factory->newInstance('Pgsql\Select', $this);
+    }
+
+    /**
+     * 
+     * Returns a new PostgreSQL Insert object.
+     * 
+     * @return Query\Pgsql\Insert
+     * 
+     */
+    public function newPgsqlInsert()
+    {
+        return $this->query_factory->newInstance('Pgsql\Insert', $this);
+    }
+
+    /**
+     * 
+     * Returns a new PostgreSQL Update object.
+     * 
+     * @return Query\Pgsql\Update
+     * 
+     */
+    public function newPgsqlUpdate()
+    {
+        return $this->query_factory->newInstance('Pgsql\Update', $this);
+    }
+
+    /**
+     * 
+     * Returns a new PostgreSQL Delete object.
+     * 
+     * @return Query\Pgsql\Delete
+     * 
+     */
+    public function newPgsqlDelete()
+    {
+        return $this->query_factory->newInstance('Pgsql\Delete', $this);
     }
 }
