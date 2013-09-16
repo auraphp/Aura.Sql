@@ -57,7 +57,7 @@ trait ReturningTrait
      */
     protected function getReturningClause()
     {
-        if (count($this->returning)) {
+        if ($this->returning) {
             $text = 'RETURNING' . $this->indentCsv($this->returning);
         } else {
             $text = '';

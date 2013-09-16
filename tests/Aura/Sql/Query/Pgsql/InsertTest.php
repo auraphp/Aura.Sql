@@ -1,11 +1,11 @@
 <?php
 namespace Aura\Sql\Query\Pgsql;
 
-class InsertTest extends \Aura\Sql\Query\AbstractQueryTest
+class InsertTest extends \Aura\Sql\Query\InsertTest
 {
     protected $query_type = 'Pgsql\Insert';
 
-    public function test()
+    public function testReturning()
     {
         $this->query->into('t1')
                     ->cols(['c1', 'c2', 'c3'])
