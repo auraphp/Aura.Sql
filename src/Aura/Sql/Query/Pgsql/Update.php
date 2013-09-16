@@ -32,6 +32,6 @@ class Update extends \Aura\Sql\Query\Update
      */
     public function __toString()
     {
-        return parent::__toString() . $this->getReturningStatement();
+        return parent::__toString() . $this->getReturningClause();
     }
 }

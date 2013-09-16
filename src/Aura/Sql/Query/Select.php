@@ -132,13 +132,12 @@ class Select extends AbstractQuery
 
         // add columns
         if ($this->cols) {
-            $text .= $this->stringIndent . implode($this->stringCommaSeparator, $this->cols) . PHP_EOL;
+            $text .= $this->indentCsv($this->cols);
         }
 
         // from these sources
         if ($this->from) {
-            $text .= 'FROM' . $this->stringNewLine;
-            $text .= implode($this->stringCommaSeparator, $this->from) . PHP_EOL;
+            $text .= 'FROM' . $this->indentCsv($this->from);
         }
 
         // join these sources
@@ -148,23 +147,21 @@ class Select extends AbstractQuery
 
         // where these conditions
         if ($this->where) {
-            $text .= 'WHERE' . $this->stringNewLine;
-            $text .= implode($this->stringNewLine, $this->where) . PHP_EOL;
+            $text .= 'WHERE' . $this->indent($this->where);
         }
 
         // grouped by these columns
         if ($this->group_by) {
-            $text .= 'GROUP BY' . $this->stringNewLine;
-            $text .= implode($this->stringCommaSeparator, $this->group_by) . PHP_EOL;
+            $text .= 'GROUP BY' . $this->indentCsv($this->group_by);
         }
 
         // having these conditions
         if ($this->having) {
-            $text .= 'HAVING' . $this->stringNewLine;
-            $text .= implode($this->stringNewLine, $this->having) . PHP_EOL;
+            $text .= 'HAVING' . $this->indent($this->having);
         }
 
-        $text .= $this->getOrderByStatement();
+        // order by these columns
+        $text .= $this->getOrderByClause();
 
         // modify with a limit clause per the connection
         $this->connection->limit($text, $this->limit, $this->offset);

@@ -49,15 +49,16 @@ trait ReturningTrait
     }
     
     /**
-     * returns RETURNING query part as string
+     * 
+     * Returns the RETURNING query clause.
      * 
      * @return string
+     * 
      */
-    protected function getReturningStatement()
+    protected function getReturningClause()
     {
         if (count($this->returning)) {
-            $text = 'RETURNING' . $this->stringNewLine;
-            $text .= '    ' . implode($this->stringCommaSeparator, $this->returning) . PHP_EOL;
+            $text = 'RETURNING' . $this->indentCsv($this->returning);
         } else {
             $text = '';
         }

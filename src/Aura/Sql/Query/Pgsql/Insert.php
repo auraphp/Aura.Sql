@@ -32,6 +32,6 @@ class Insert extends \Aura\Sql\Query\Insert
      */
     public function __toString()
     {
-        return parent::__toString() . $this->getReturningStatement();
+        return parent::__toString() . $this->getReturningClause();
     }
 }

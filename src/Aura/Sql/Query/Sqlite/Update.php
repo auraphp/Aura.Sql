@@ -44,7 +44,7 @@ class Update extends \Aura\Sql\Query\Update
     {
         $sql = parent::__toString();
         
-        $sql .= $this->getOrderByStatement();
+        $sql .= $this->getOrderByClause();
         
         $this->connection->limit($sql, $this->limit, $this->offset);
         

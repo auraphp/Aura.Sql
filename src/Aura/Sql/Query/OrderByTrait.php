@@ -30,7 +30,7 @@ trait OrderByTrait
 
     /**
      *
-     * Adds a row order to the query.
+     * Adds a column order to the query.
      *
      * @param array $spec The columns and direction to order by.
      *
@@ -46,15 +46,16 @@ trait OrderByTrait
     }
 
     /**
-     * returns ORDER BY query part as string
+     * 
+     * Returns the ORDER BY query clause.
      * 
      * @return string
+     * 
      */
-    protected function getOrderByStatement()
+    protected function getOrderByClause()
     {
         if ($this->order_by) {
-            $text = 'ORDER BY' . $this->stringNewLine;
-            $text .= implode($this->stringCommaSeparator, $this->order_by) . PHP_EOL;
+            $text = 'ORDER BY' . $this->indentCsv($this->order_by);
         } else {
             $text = '';
         }
