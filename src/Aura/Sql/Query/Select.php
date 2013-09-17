@@ -23,6 +23,9 @@ class Select extends AbstractQuery
 {
     use WhereTrait;
     use FlagsTrait;
+    use LimitTrait;
+    use OffsetTrait;
+    use OrderByTrait;
 
     const FLAG_DISTINCT = 'DISTINCT';
 
@@ -91,33 +94,6 @@ class Select extends AbstractQuery
 
     /**
      *
-     * ORDER BY these columns.
-     *
-     * @var array
-     *
-     */
-    protected $order_by = [];
-
-    /**
-     *
-     * The number of rows to return
-     *
-     * @var int
-     *
-     */
-    protected $limit = 0;
-
-    /**
-     *
-     * Return rows after this offset.
-     *
-     * @var int
-     *
-     */
-    protected $offset = 0;
-
-    /**
-     *
      * The number of rows per page.
      *
      * @var int
@@ -151,24 +127,17 @@ class Select extends AbstractQuery
      */
     protected function toString()
     {
-        // newline and indent
-        $line = PHP_EOL . '    ';
-
-        // comma separator, newline, and indent
-        $csep = ',' . $line;
-
         // open the statement
         $text = 'SELECT' . $this->getFlagsAsString() . PHP_EOL;
 
         // add columns
         if ($this->cols) {
-            $text .= '    ' . implode($csep, $this->cols) . PHP_EOL;
+            $text .= $this->indentCsv($this->cols);
         }
 
         // from these sources
         if ($this->from) {
-            $text .= 'FROM' . $line;
-            $text .= implode($csep, $this->from) . PHP_EOL;
+            $text .= 'FROM' . $this->indentCsv($this->from);
         }
 
         // join these sources
@@ -178,27 +147,21 @@ class Select extends AbstractQuery
 
         // where these conditions
         if ($this->where) {
-            $text .= 'WHERE' . $line;
-            $text .= implode($line, $this->where) . PHP_EOL;
+            $text .= 'WHERE' . $this->indent($this->where);
         }
 
         // grouped by these columns
         if ($this->group_by) {
-            $text .= 'GROUP BY' . $line;
-            $text .= implode($csep, $this->group_by) . PHP_EOL;
+            $text .= 'GROUP BY' . $this->indentCsv($this->group_by);
         }
 
         // having these conditions
         if ($this->having) {
-            $text .= 'HAVING' . $line;
-            $text .= implode($line, $this->having) . PHP_EOL;
+            $text .= 'HAVING' . $this->indent($this->having);
         }
 
-        // ordered by these columns
-        if ($this->order_by) {
-            $text .= 'ORDER BY' . $line;
-            $text .= implode($csep, $this->order_by) . PHP_EOL;
-        }
+        // order by these columns
+        $text .= $this->getOrderByClause();
 
         // modify with a limit clause per the connection
         $this->connection->limit($text, $this->limit, $this->offset);
@@ -468,53 +431,6 @@ class Select extends AbstractQuery
         }
 
         // done
-        return $this;
-    }
-
-    /**
-     *
-     * Adds a row order to the query.
-     *
-     * @param array $spec The columns and direction to order by.
-     *
-     * @return $this
-     *
-     */
-    public function orderBy(array $spec)
-    {
-        foreach ($spec as $col) {
-            $this->order_by[] = $this->connection->quoteNamesIn($col);
-        }
-        return $this;
-    }
-
-    /**
-     *
-     * Sets a limit count on the query.
-     *
-     * @param int $limit The number of rows to return.
-     *
-     * @return $this
-     *
-     */
-    public function limit($limit)
-    {
-        $this->limit = (int) $limit;
-        return $this;
-    }
-
-    /**
-     *
-     * Sets a limit offset on the query.
-     *
-     * @param int $offset Start returning after this many rows.
-     *
-     * @return $this
-     *
-     */
-    public function offset($offset)
-    {
-        $this->offset = (int) $offset;
         return $this;
     }
 

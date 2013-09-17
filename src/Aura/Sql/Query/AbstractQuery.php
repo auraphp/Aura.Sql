@@ -45,8 +45,6 @@ abstract class AbstractQuery
      * 
      * @param AbstractConnection $connection An SQL connection.
      * 
-     * @return void
-     * 
      */
     public function __construct(AbstractConnection $connection)
     {
@@ -85,8 +83,8 @@ abstract class AbstractQuery
      */
     protected function indentCsv(array $list)
     {
-        return PHP_EOL
-             . '    ' . implode(',' . PHP_EOL . '    ', $list)
+        return PHP_EOL . '    '
+             . implode(',' . PHP_EOL . '    ', $list)
              . PHP_EOL;
     }
 
@@ -99,10 +97,10 @@ abstract class AbstractQuery
      * @return string
      * 
      */
-    protected function indent($list)
+    protected function indent(array $list)
     {
-        return PHP_EOL
-             . '    ' . implode(PHP_EOL . '    ', $list)
+        return PHP_EOL . '    '
+             . implode(PHP_EOL . '    ', $list)
              . PHP_EOL;
     }
 

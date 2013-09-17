@@ -1,7 +1,7 @@
 Aura SQL
 ========
 
-[![Build Status](https://travis-ci.org/auraphp/Aura.Sql.png)](https://travis-ci.org/auraphp/Aura.Sql)
+[![Build Status](https://travis-ci.org/auraphp/Aura.Sql.png?branch=develop)](https://travis-ci.org/auraphp/Aura.Sql)
 
 The Aura SQL package provides connections to connect to and query against SQL
 data sources such as MySQL, PostgreSQL, and Sqlite. The connections are mostly
