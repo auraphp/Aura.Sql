@@ -65,9 +65,17 @@ class Profiler implements ProfilerInterface
 
     /**
      * 
-     * Executes a PDOStatement and profiles it.
+     * Adds a profile entry.
      *
-     * @return mixed
+     * @param float $duration The query duration.
+     * 
+     * @param string $function The PDO method that made the entry.
+     * 
+     * @param string $statement The SQL query statement.
+     * 
+     * @param array $bind_values The values bound to the statement.
+     * 
+     * @return null
      * 
      */
     public function addProfile(
@@ -80,7 +88,7 @@ class Profiler implements ProfilerInterface
             return;
         }
 
-        $e = new Exception;
+        $e = new \Exception;
         $this->profiles[] = array(
             'duration'    => $duration,
             'function'    => $function,
@@ -92,7 +100,7 @@ class Profiler implements ProfilerInterface
 
     /**
      *
-     * Returns all the profiles.
+     * Returns all the profile entries.
      *
      * @return array
      *

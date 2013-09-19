@@ -41,6 +41,21 @@ interface ProfilerInterface
      */
     public function isActive();
 
+    /**
+     * 
+     * Adds a profile entry.
+     *
+     * @param float $duration The query duration.
+     * 
+     * @param string $function The PDO method that made the entry.
+     * 
+     * @param string $statement The SQL query statement.
+     * 
+     * @param array $bind_values The values bound to the statement.
+     * 
+     * @return null
+     * 
+     */
     public function addProfile(
         $duration,
         $function,
