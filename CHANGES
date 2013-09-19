@@ -1,1 +1,3 @@
-Version 2 of Aura.Sql
+Version 2 of Aura.Sql is greatly reduced from version 1, providing an extended
+PDO object, factory, profiler, and locator. No queries, mappers, or schema
+discovery; these will be available in separate "bundle" packages.

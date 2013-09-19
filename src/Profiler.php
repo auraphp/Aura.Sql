@@ -1,7 +1,7 @@
 <?php
 /**
  * 
- * This file is part of the Aura Project for PHP.
+ * This file is part of Aura for PHP.
  * 
  * @package Aura.Sql
  * 
@@ -9,8 +9,6 @@
  * 
  */
 namespace Aura\Sql;
-
-use PDOStatement;
 
 /**
  * 
@@ -37,16 +35,7 @@ class Profiler implements ProfilerInterface
      * @var array
      *
      */
-    protected $profiles = [];
-
-    /**
-     *
-     * Holds the text and data of the last query.
-     *
-     * @var string
-     *
-     */
-    protected $last_query = [];
+    protected $profiles = array();
 
     /**
      * 
@@ -78,89 +67,27 @@ class Profiler implements ProfilerInterface
      * 
      * Executes a PDOStatement and profiles it.
      *
-     * @param PDOStatement $stmt The PDOStatement to execute and profile.
-     * 
-     * @param array $data The data that was bound into the statement.
-     * 
      * @return mixed
      * 
      */
-    public function exec(PDOStatement $stmt, array $data = [])
-    {
-        $this->last_query = [
-            'text' => $stmt->queryString,
-            'data' => $data,
-        ];
-
+    public function addProfile(
+        $duration,
+        $function,
+        $statement,
+        array $bind_values = array()
+    ) {
         if (! $this->isActive()) {
-            return $stmt->execute();
+            return;
         }
 
-        $before = microtime(true);
-        $result = $stmt->execute();
-        $after  = microtime(true);
-        $e      = new Exception;
-        $trace  = $e->getTraceAsString();
-        $this->addProfile($stmt->queryString, $after - $before, $data, $trace);
-        return $result;
-    }
-
-    /**
-     *
-     * Calls a user function and and profile it.
-     *
-     * @param callable $func The user function to call.
-     *
-     * @param string $text The text of the SQL query.
-     *
-     * @param array $data The data that was used by the function.
-     *
-     * @return mixed
-     *
-     */
-    public function call($func, $text, array $data = [])
-    {
-        $this->last_query = [
-            'text' => $text,
-            'data' => $data,
-        ];
-
-        if (! $this->isActive()) {
-            return call_user_func($func);
-        }
-
-        $before = microtime(true);
-        $result = call_user_func($func);
-        $after  = microtime(true);
-        $e      = new Exception;
-        $trace  = $e->getTraceAsString();
-        $this->addProfile($text, $after - $before, $data, $trace);
-        return $result;
-    }
-
-    /**
-     * 
-     * Adds a profile to the profiler.
-     * 
-     * @param string $text The text (typically an SQL query) being profiled.
-     * 
-     * @param float $time The elapsed time in seconds.
-     * 
-     * @param array $data The data that was used.
-     * 
-     * @param string $trace An exception backtrace as a string.
-     * 
-     * @return mixed
-     * 
-     */
-    public function addProfile($text, $time, array $data, $trace)
-    {
-        $this->profiles[] = (object) [
-            'text' => $text,
-            'time' => $time,
-            'data' => $data,
-            'trace' => $trace
-        ];
+        $e = new Exception;
+        $this->profiles[] = array(
+            'duration'    => $duration,
+            'function'    => $function,
+            'statement'   => $statement,
+            'bind_values' => $bind_values,
+            'trace'       => $e->getTraceAsString(),
+        );
     }
 
     /**
@@ -173,17 +100,5 @@ class Profiler implements ProfilerInterface
     public function getProfiles()
     {
         return $this->profiles;
-    }
-
-    /**
-     *
-     * Get the last query information.
-     *
-     * @return array
-     *
-     */
-    public function getLastQuery()
-    {
-        return $this->last_query;
     }
 }

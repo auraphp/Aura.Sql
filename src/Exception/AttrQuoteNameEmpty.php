@@ -1,7 +1,7 @@
 <?php
 /**
  * 
- * This file is part of the Aura Project for PHP.
+ * This file is part of Aura for PHP.
  * 
  * @package Aura.Sql
  * 
@@ -14,11 +14,11 @@ use Aura\Sql\Exception;
 
 /**
  * 
- * No such slave exception
+ * Tried to set ATTR_QUOTE_NAME_* to an empty value.
  * 
  * @package Aura.Sql
  * 
  */
-class NoSuchSlave extends Exception
+class AttrQuoteNameEmpty extends Exception
 {
 }
