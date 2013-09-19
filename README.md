@@ -1,496 +1,293 @@
-Aura SQL
-========
+# Aura.Sql
 
-[![Build Status](https://travis-ci.org/auraphp/Aura.Sql.png?branch=develop)](https://travis-ci.org/auraphp/Aura.Sql)
+This library provides an extension to the PHP-native [PDO](http://php.net/PDO)
+along with a profiler and service locator. Becuase _Aura\Sql\Pdo_ is an
+extension of the native _PDO_, code already using the native _PDO_ or
+typehinted to the native _PDO_ can use _Aura\Sql\Pdo_ without any changes.
 
-The Aura SQL package provides connections to connect to and query against SQL
-data sources such as MySQL, PostgreSQL, and Sqlite. The connections are mostly
-wrappers around [PDO](http://php.net/PDO) connections.
+> N.b.: Unlike other Aura libraries, this package is compatible with PHP 5.3,
+> not just PHP 5.4.
 
-This package is compliant with [PSR-0][], [PSR-1][], and [PSR-2][]. If you
+Added functionality in _Aura.Sql_ includes:
+
+- **Lazy connection.** _Aura\Sql\Pdo_ connects to the database only on
+  method calls that require a connection. This means you can create an
+  instance and not incur the cost of a connection if you never make a query.
+
+- **Bind values.** You may provide values for binding to the next query using
+  `bindValues()`. Mulitple calls to `bindValues()` will merge, not reset, the
+  values. The values will be reset after calling `query()`, `exec()`,
+  `prepare()`, or any of the `fetch*()` methods.  In addition, binding values
+  that do not have any corresponding placeholders will not cause an error.
+
+- **Array quoting.** The `quote()` method will accept an array as input, and
+  return a string of comma-separated quoted values. In addition, named
+  placeholders in prepared statements that are bound to array values will
+  be replaced with comma-separated quoted values. This means you can bind
+  an array of values to a placeholder used with an `IN (...)` condition.
+
+- **Quoting into placeholders.**
+
+- **Quoting identifier names.**
+
+- **Fetch methods.** The class provides several `fetch*()` methods to reduce
+  boilerplate code elsewhere. For example, you can call `fetchAll()` directly
+  on the instance instead of having to prepare a statement, bind values,
+  execute, and then fetch from the prepared statement. All of the `fetch*()`
+  methods take an array of values to bind to to the query statement.
+
+- **Exceptions by default.** `ExendedPdo` starts in the `ERRMODE_EXCEPTION`
+  mode for error reporting instead of `ERRMODE_SILENT`.
+
+- **Profiler**.  An optional query profiler is provided.
+
+- **Service locator for PDO connections.**
+
+This library is compliant with [PSR-1][], [PSR-2][], and [PSR-4][]. If you
 notice compliance oversights, please send a patch via pull request.
 
-[PSR-0]: https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-0.md
 [PSR-1]: https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-1-basic-coding-standard.md
 [PSR-2]: https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-2-coding-style-guide.md
+[PSR-4]: https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-4-autoloader.md
 
-Getting Started
-===============
 
-Instantiation
--------------
+## Instantiation
 
-The easiest way to get started is to use the `scripts/instance.php` script to
-get a `ConnectionFactory` and create your connection through it:
+Instantiation is the same as with the native _PDO_ class: pass a data source
+name, username, password, and driver options. There is one additional
+parameter that allows you to pass attributes to be set after the connection is
+made.
 
 ```php
 <?php
-$connection_factory = include '/path/to/Aura.Sql/scripts/instance.php';
-$connection = $connection_factory->newInstance(
-    
-    // adapter name
-    'mysql',
-    
-    // DSN elements for PDO; this can also be
-    // an array of key-value pairs
-    'host=localhost;dbname=database_name',
-    
-    // username for the connection
+$pdo = new Aura\Sql\Pdo(
+    'mysql:host=localhost;dbname=test',
     'username',
-    
-    // password for the connection
+    'password',
+    array(), // driver options as key-value pairs
+    array()  // attributes as key-value pairs
+);
+?>
+```
+
+
+## Lazy Connection
+
+Whereas the native _PDO_ connects on instantiation, _Aura\Sql\Pdo_ does not
+connect immediately. Instead, it connects only when you call a method that
+actually needs the connection to the database; e.g., on `query()`.
+
+If you want to force a connection, call the `connect()` method.
+
+```php
+<?php
+// does not connect to the database
+$pdo = new Aura\Sql\Pdo(
+    'mysql:host=localhost;dbname=test',
+    'username',
     'password'
 );
+
+// automatically connects
+$pdo->exec('SELECT * FROM test');
+
+// explicitly forces a connection
+$pdo->connect();
+?>
 ```
 
-Alternatively, you can add `'/path/to/Aura.Sql/src'` to your autoloader and
-build an connection factory manually:
-    
-```php
-<?php
-use Aura\Sql\ConnectionFactory;
-$connection_factory = new ConnectionFactory;
-$connection = $connection_factory->newInstance(...);
-```
-    
-Aura SQL comes with four connection adapters: `'mysql'` for MySQL, `'pgsql'`
-for PostgreSQL, `'sqlite'` for SQLite3, and `'sqlsrv'` for Microsoft SQL
-Server.
+## Bind Values
 
-Connecting
-----------
-
-The connection will lazy-connect to the database the first time you issue a
-query of any sort. This means you can create the connection object, and if you
-never issue a query, it will never connect to the database.
-
-You can connect manually by issuing `connect()`:
+Instead of having to bind values to a prepared `PDOStatement`, you can call
+`bindValues()` directly on the _Aura\Sql\Pdo_ instance, and those values will
+be bound to named placeholders in the next query.
 
 ```php
 <?php
-$connection->connect();
+// the native PDO way
+$pdo = new PDO(...);
+$sth = $pdo->prepare('SELECT * FROM test WHERE foo = :foo AND bar = :bar');
+$sth->bindValue('foo', 'foo_value');
+$sth->bindValue('bar', 'bar_value');
+$sth->execute();
+
+// the Aura\Sql\Pdo way
+$pdo = new Aura\Sql\Pdo(...);
+$pdo->bindValues(array('foo' => 'foo_value', 'bar' => 'bar_value'));
+$sth = $pdo->query('SELECT * FROM test WHERE foo = :foo AND bar = :bar');
+?>
 ```
 
 
-Fetching Results
-----------------
+## Array Quoting
 
-Once you have a connection, you can begin to fetch results from the database.
+The native `PDO::quote()` method will not quote arrays. This makes it
+difficult to bind an array to something like an `IN (...)` condition in SQL.
+However, _Aura\Sql\Pdo_ recognizes arrays and converts them into
+comma-separated quoted strings.
 
 ```php
 <?php
-// returns all rows
-$result = $connection->fetchAll('SELECT * FROM foo');
+// the array to be quoted
+$array = array('foo', 'bar', 'baz');
+
+// the native PDO way:
+// "Warning:  PDO::quote() expects parameter 1 to be string, array given"
+$pdo = new PDO(...);
+$cond = 'IN (' . $pdo->quote($array) . ')';
+
+// the Aura\Sql\Pdo way:
+// "IN ('foo', 'bar', 'baz')"
+$pdo = new Aura\Sql\Pdo(...);
+$cond = 'IN (' . $pdo->quote($array) . ')'; 
+?>
 ```
 
-You can fetch results using these methods:
-
-- `fetchAll()` returns a sequential array of all rows. The rows themselves are
-  associative arrays where the keys are the column names.
-
-- `fetchAssoc()` returns an associative array of all rows where the key is the
-  first column.
-
-- `fetchCol()` returns a sequential array of all values in the first column.
-
-- `fetchOne()` returns the first row as an associative array where the keys
-  are the column names.
-
-- `fetchPairs()` returns an associative array where each key is the first
-  column and each value is the second column.
-
-- `fetchValue()` returns the value of the first row in the first column.
-
-
-Preventing SQL Injection
-------------------------
-
-Usually you will need to incorporate user-provided data into the query. This
-means you should quote all values interpolated into the query text as a
-security measure to [prevent SQL injection](http://bobby-tables.com/).
-
-Although Aura SQL provides quoting methods, you should instead use value
-binding into prepared statements. To do so, put named placeholders in the
-query text, then pass an array of values to bind to the placeholders:
+Whereas the native `PDO::prepare()` does not deal with bound array values,
+_Aura\Sql\Pdo_ modifies the query string to replace the named placeholder with
+the quoted array.  Note that this is *not* the same thing as binding proper;
+the query string itself is modified before passing to the database for value
+binding.
 
 ```php
 <?php
-// the text of the query
-$text = 'SELECT * FROM foo WHERE id = :id';
+// the array to be quoted
+$array = array('foo', 'bar', 'baz');
 
-// values to bind to query placeholders
-$bind = [
-    'id' => 1,
-];
+// the statement to prepare
+$stm = 'SELECT * FROM test WHERE foo IN (:foo) AND bar = :bar'
 
-// returns one row; the data has been parameterized
-// into a prepared statement for you
-$result = $connection->fetchOne($text, $bind);
+// the native PDO way does not work (PHP Notice:  Array to string conversion)
+$pdo = new Aura\Sql\Pdo(...);
+$sth = $pdo->prepare($stm);
+$sth->bindValue('foo', $array);
+
+// the Aura\Sql\Pdo way quotes the array and replaces the array placeholder
+// directly in the query string
+$pdo = new Aura\Sql\Pdo(...);
+$pdo->bindValues(array(
+    'foo' => array('foo', 'bar', 'baz'),
+    'bar' => 'qux',
+));
+$sth = $pdo->prepare($stm);
+echo $sth->queryString;
+// the query string has been modified by Pdo to become
+// "SELECT * FROM test WHERE foo IN ('foo', 'bar', 'baz') AND bar = :bar"
+?>
 ```
 
-Aura SQL recognizes array values and quotes them as comma-separated lists:
+Finally, note that array quoting works only on the _Aura\Sql\Pdo_ instance,
+not on returned _PDOStatement_ instances.
+
+
+## Fetch Methods
+
+_Aura\Sql\Pdo_ comes with `fetch*()` methods to help reduce boilerplate code.
+Instead of issuing `prepare()`, a series of `bindValue()` calls, `execute()`,
+and then `fetch*()` on a _PDOStatement_, you can bind values and fetch results
+in one call.
 
 ```php
 <?php
-// the text of the query
-$text = 'SELECT * FROM foo WHERE id = :id AND bar IN(:bar_list)';
+$stm  = 'SELECT * FROM test WHERE foo = :foo AND bar = :bar';
+$bind = array('foo' => 'bar', 'baz' => 'dib');
 
-// values to bind to query placeholders
-$bind = [
-    'id' => 1,
-    'bar_list' => ['a', 'b', 'c'],
-];
+// the native PDO way to "fetch all" where the result is a sequential array
+// of rows, and the row arrays are keyed on the column names
+$pdo = new PDO(...);
+$pdo->prepare($stm);
+$stm->bindValue('foo', $bind['foo']);
+$stm->bindValue('bar', $bind['bar']);
+$sth = $stm->execute();
+$result = $sth->fetchAll(PDO::FETCH_ASSOC);
 
-// returns all rows; the query ends up being
-// "SELECT * FROM foo WHERE id = 1 AND bar IN('a', 'b', 'c')"
-$result = $connection->fetchOne($text, $bind);
+// the Aura\Sql\Pdo way to do the same kind of "fetch all"
+$pdo = new Aura\Sql\Pdo(...);
+$result = $pdo->fetchAll($stm, $bind);
+
+// fetchAssoc() returns an associative array of all rows where the key is the
+// first column, and the row arrays are keyed on the column names
+$result = $pdo->fetchAssoc($stm, $bind);
+
+// fetchCol() returns a sequential array of all values in the first column
+$result = $pdo->fetchCol($stm, $bind);
+
+// fetchOne() returns the first row as an associative array where the keys
+// are the column names
+$result = $pdo->fetchOne($stm, $bind);
+
+// fetchPairs() returns an associative array where each key is the first
+// column and each value is the second column
+$result = $pdo->fetchPairs($stm, $bind);
+
+// fetchValue() returns the value of the first row in the first column
+$result = $pdo->fetchValue($stm, $bind);
+?>
 ```
 
 
-Modifying Rows
---------------
+## Profiler
 
-Aura SQL comes with three convenience methods for modifying data: `insert()`,
-`update()`, and `delete()`. You can also retrieve the last inserted ID using
-`lastInsertId()`.
-
-First, to insert a row:
+When debugging, it is often useful to see what queries have been executed,
+where they were issued from in the codebase, and how long they took to
+complete. _Aura\Sql\Pdo_ comes with an optional profiler that you can use to
+discover that information.
 
 ```php
 <?php
-// the table to insert into
-$table = 'foo';
+$pdo = new Aura\Sql\Pdo(...);
+$pdo->setProfiler(new Aura\Sql\Profiler);
 
-// the columns and values to insert
-$cols = [
-    'bar' => 'value for column bar',
-];
+// ...
+// query(), fetch(), beginTransaction()/commit()/rollback() etc.
+// ...
 
-// perform the insert; result is number of rows affected
-$result = $connection->insert($table, $cols);
-
-// now get the last inserted ID
-$id = $connection->lastInsertId();
+// now retrieve the profile information:
+$profiles = $pdo->getProfiler()->getProfiles();
+?>
 ```
 
-(N.b.: Because of the way PostgreSQL creates auto-incremented columns, the
-`pgsql` adapter needs to know the table and column name to get the last
-inserted ID; for example, `$id = $connection->lastInsertId($table, 'id');`.)
+Each profile entry will have these keys:
 
-Next, to update rows:
+- `function`: The method that was called on _Aura\Sql\Pdo_ that created the
+  profile entry.
+
+- `duration`: How long the query took to complete, in seconds.
+
+- `statement`: The query string that was issued, if any. (Methods like
+  `connect()` and `rollBack()` do not send query strings.)
+
+- `bind_values`: Any values that were bound to the query.
+
+- `trace`: An exception stack trace indicating where the query was issued from
+  in the codebase.
+
+Setting the _Profiler_ into the _Aura\Sql\Pdo_ instance is optional. Once it
+it set, you can activate and deactivate it as you wish using the
+`Profiler::setActive()` method. When not active, query profiles will not be
+retained.
 
 ```php
 <?php
-// the table to update
-$table = 'foo';
+$pdo = new Aura\Sql\Pdo(...);
+$pdo->setProfiler(new Profiler);
 
-// the new column values to set
-$cols = [
-    'bar' => 'a new value for column bar',
-];
-
-// a where condition to specify which rows to update
-$cond = 'id = :id';
-
-// additional data to bind to the query
-$bind = ['id' => 1];
-
-// perform the update; result is number of rows affected
-$result = $connection->update($table, $cols, $cond, $bind);
+// deactivate, issue a query, and reactivate;
+// the query will not show up in the profiles
+$pdo->getProfiler()->setActive(false);
+$pdo->fetchAll('SELECT * FROM foo');
+$pdo->getProfiler()->setActive(true);
+?>
 ```
 
-> (N.b.: Both `$cols` and `$bind` are bound into the update query, but `$cols`
-> takes precedence. Be sure that the keys in `$cols` and `$bind` do not
-> conflict.)
+## Quoting Identifiers
 
-Finally, to delete rows:
+(tbd)
 
-```php
-<?php
-// the table to delete from
-$table = 'foo';
+## Factory
 
-// a where condition to specify which rows to delete
-$cond = 'id = :id';
+(tbd)
 
-// data to bind to the query
-$bind = ['id' => 1];
+## Service Locator
 
-// perform the deletion; result is number of rows affected
-$result = $connection->delete($table, $cond, $bind);
-```
-
-
-Retrieving Table Information
-----------------------------
-
-To get a list of tables in the database, issue `fetchTableList()`:
-
-```php
-<?php
-// get the list of tables
-$list = $connection->fetchTableList();
-
-// show them
-foreach ($list as $table) {
-    echo $table . PHP_EOL;
-}
-```
-
-To get information about the columns in a table, issue `fetchTableCols()`:
-
-```php
-<?php
-// the table to get cols for
-$table = 'foo';
-
-// get the cols
-$cols = $connection->fetchTableCols($table);
-
-// show them
-foreach ($cols as $name => $col) {
-    echo "Column $name is of type "
-       . $col->type
-       . " with a size of "
-       . $col->size
-       . PHP_EOL;
-}
-```
-
-Each column description is a `Column` object with the following properties:
-
-- `name`: (string) The column name
-
-- `type`: (string) The column data type.  Data types are as reported by the database.
-
-- `size`: (int) The column size.
-
-- `scale`: (int) The number of decimal places for the column, if any.
-
-- `notnull`: (bool) Is the column marked as `NOT NULL`?
-
-- `default`: (mixed) The default value for the column. Note that sometimes this will be `null` if the underlying database is going to set a timestamp automatically.
-
-- `autoinc`: (bool) Is the column auto-incremented?
-
-- `primary`: (bool) Is the column part of the primary key?
-
-Transactions
-------------
-
-Aura SQL connections always start in autocommit mode (the same as PDO). However,
-you can turn off autocommit mode and start a transaction with
-`beginTransaction()`, then either `commit()` or `rollBack()` the transaction.
-Commits and rollbacks cause the connection to go back into autocommit mode.
-
-```php
-<?php
-// turn off autocommit and start a transaction
-$connection->beginTransaction();
-
-try {
-    // ... perform some queries ...
-    // now commit to the database:
-    $connection->commit();
-} catch (Exception $e) {
-    // there was an error, roll back the queries
-    $connection->rollBack();
-}
-
-// at this point we are back in autocommit mode
-```
-
-    
-Manual Queries
---------------
-
-You can, of course, build and issue your own queries by hand. Use the
-`query()` method to do so:
-
-```php
-<?php
-$text = "SELECT * FROM foo WHERE id = :id";
-$bind = ['id' => 1];
-$stmt = $connection->query($text, $bind)
-```
-
-The returned `$stmt` is a [PDOStatement](http://php.net/PDOStatement) that you
-may manipulate as you wish.
-
-Profiling
----------
-
-You can use profiling to see how well your queries are performing.
-
-```php
-<?php
-// turn on the profiler
-$connection->getProfiler()->setActive(true);
-
-// issue a query
-$result = $connection->fetchAll('SELECT * FROM foo');
-
-// now get the profiler information
-foreach ($connection->getProfiler()->getProfiles() as $i => $profile) {
-    echo 'Query #' . ($i + 1)
-       . ' took ' . $profile->time . ' seconds.'
-       . PHP_EOL;
-}
-```
-    
-Each profile object has these properties:
-
-- `text`: (string) The text of the query.
-
-- `time`: (float) The time, in seconds, for the query to finish.
-
-- `data`: (array) Any data bound to the query.
-
-- `trace`: (array) A [debug_backtrace](http://php.net/debug_backtrace) so
-  you can tell where the query came from.
-
-
-Query Objects
-=============
-
-Aura SQL provides four types of query objects so you can write your SQL
-queries in an object-oriented way.
-
-Select
-------
-
-To get a new `Select` object, invoke the `newSelect()` method on an connection.
-You can then modify the `Select` object and pass it to the `query()` or
-`fetch*()` method.
-
-```php
-<?php
-// create a new Select object
-$select = $connection->newSelect();
-
-// SELECT * FROM foo WHERE bar > :bar AND zim = 'gir' ORDER BY baz
-$select->cols(['*'])
-       ->from('foo')
-       ->where('bar > :bar')
-       ->where('zim = ?', 'gir')
-       ->orderBy(['baz']);
-
-$bind = ['bar' => '88'];
-
-$list = $connection->fetchAll($select, $bind);
-
-// SELECT bar, COUNT(*) as cnt FROM foo GROUP BY bar HAVING bar > 5
-$select->cols(['bar', 'COUNT(*) as cnt'])
-       ->from('foo')
-       ->groupBy(['bar'])
-       ->having('bar > ?', 5);
-
-$list = $connection->fetchAll($select);
-```
-
-The `Select` object has these methods and more; please read the source code
-for more information.
-
-- `distinct()`: Set to `true` for a `SELECT DISTINCT`.
-
-- `cols()`: Select these columns.
-
-- `from()`: Select from these tables.
-
-- `join()`: Join these tables on specified conditions.
-
-- `where()`: `WHERE` these conditions are met (using `AND`).
-
-- `orWhere()`: `WHERE` these conditions are met (using `OR`).
-
-- `groupBy()`: `GROUP BY` these columns.
-
-- `having()`: `HAVING` these conditions met (using `AND`).
-
-- `orHaving()`: `HAVING` these conditions met (using `OR`).
-
-- `orderBy()`: `ORDER BY` these columns.
-
-- `limit()`: `LIMIT` to this many rows.
-
-- `offset()`: `OFFSET` by this many rows.
-
-- `union()`: `UNION` with a followup `SELECT`.
-
-- `unionAll()`: `UNION ALL` with a followup `SELECT`.
-
-Insert
-------
-
-To get a new `Insert` object, invoke the `newInsert()` method on an connection.
-You can then modify the `Insert` object and pass it to the `query()` method.
-
-```php
-<?php
-// create a new Insert object
-$insert = $connection->newInsert();
-
-// INSERT INTO foo (bar, baz, date) VALUES (:bar, :baz, NOW());
-$insert->into('foo')
-       ->cols(['bar', 'baz'])
-       ->set('date', 'NOW()');
-
-$bind = [
-    'bar' => null,
-    'baz' => 'zim',
-];
-
-$stmt = $connection->query($insert, $bind);
-```
-
-Update
-------
-
-To get a new `Update` object, invoke the `newUpdate()` method on an connection.
-You can then modify the `Update` object and pass it to the `query()` method.
-
-```php
-<?php
-// create a new Update object
-$update = $connection->newUpdate();
-
-// UPDATE foo SET bar = :bar, baz = :baz, date = NOW() WHERE zim = :zim OR gir = :gir
-$update->table('foo')
-       ->cols(['bar', 'baz'])
-       ->set('date', 'NOW()')
-       ->where('zim = :zim')
-       ->orWhere('gir = :gir');
-
-$bind = [
-    'bar' => 'barbar',
-    'baz' => 99,
-    'zim' => 'dib',
-    'gir' => 'doom',
-];
-
-$stmt = $connection->query($update, $bind);
-```
-
-Delete
-------
-
-To get a new `Delete` object, invoke the `newDelete()` method on an connection.
-You can then modify the `Delete` object and pass it to the `query()` method.
-
-```php
-<?php
-// create a new Delete object
-$delete = $connection->newDelete();
-
-// DELETE FROM WHERE zim = :zim OR gir = :gir
-$delete->from('foo')
-       ->where('zim = :zim')
-       ->orWhere('gir = :gir');
-
-$bind = [
-    'zim' => 'dib',
-    'gir' => 'doom',
-];
-
-$stmt = $connection->query($delete, $bind);
-```
+(tbd)
