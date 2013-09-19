@@ -28,7 +28,7 @@ class PdoLocatorTest extends \PHPUnit_Framework_TestCase
             );
         };
         
-        $this->read = [
+        $this->read = array(
             'read1' => function () {
                 return new Pdo(
                     'mock:host=read1.example.com',
@@ -53,9 +53,9 @@ class PdoLocatorTest extends \PHPUnit_Framework_TestCase
                     array()
                 );
             },
-        ];
+        );
         
-        $this->write = [
+        $this->write = array(
             'write1' => function () {
                 return new Pdo(
                     'mock:host=write1.example.com',
@@ -80,7 +80,7 @@ class PdoLocatorTest extends \PHPUnit_Framework_TestCase
                     array()
                 );
             },
-        ];
+        );
     }
     
     protected function newLocator($read = array(), $write = array())
