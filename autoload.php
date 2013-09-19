@@ -17,10 +17,10 @@ spl_autoload_register(function ($class) {
     $part = str_replace('\\', DIRECTORY_SEPARATOR, $class) . '.php';
     
     // directories where we can find classes
-    $dirs = [
+    $dirs = array(
         __DIR__ . DIRECTORY_SEPARATOR . 'src',
         __DIR__ . DIRECTORY_SEPARATOR . 'tests' . DIRECTORY_SEPARATOR . 'src',
-    ];
+    );
     
     // go through the directories to find classes
     foreach ($dirs as $dir) {
