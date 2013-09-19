@@ -5,10 +5,10 @@ along with a profiler and service locator. Becuase _Aura\Sql\Pdo_ is an
 extension of the native _PDO_, code already using the native _PDO_ or
 typehinted to the native _PDO_ can use _Aura\Sql\Pdo_ without any changes.
 
-> N.b.: Unlike other Aura libraries, this package is compatible with PHP 5.3,
-> not just PHP 5.4.
+> N.b.: This package is compatible with PHP 5.3; most Aura libraries require
+> PHP 5.4.
 
-Added functionality in _Aura.Sql_ includes:
+Added functionality in _Aura.Sql_ over the native _PDO_ includes:
 
 - **Lazy connection.** _Aura\Sql\Pdo_ connects to the database only on
   method calls that require a connection. This means you can create an
@@ -26,24 +26,59 @@ Added functionality in _Aura.Sql_ includes:
   be replaced with comma-separated quoted values. This means you can bind
   an array of values to a placeholder used with an `IN (...)` condition.
 
-- **Quoting into placeholders.**
+- **Quoting into placeholders.** The `quoteInto()` method will take a string
+  with question-mark placeholders, and replace those placeholder with quoted
+  values.
 
-- **Quoting identifier names.**
+- **Quoting identifier names.** The `quoteName()` and `quoteNamesIn()` methods
+  will quote identifer names (e.g., table names, index names, and so on).
 
-- **Fetch methods.** The class provides several `fetch*()` methods to reduce
-  boilerplate code elsewhere. For example, you can call `fetchAll()` directly
+- **Fetch methods.** _Aura\Sql\Pdo_ provides several `fetch*()` methods for
+  commonly-used fetch styles. For example, you can call `fetchAll()` directly
   on the instance instead of having to prepare a statement, bind values,
   execute, and then fetch from the prepared statement. All of the `fetch*()`
   methods take an array of values to bind to to the query statement.
 
-- **Exceptions by default.** `ExendedPdo` starts in the `ERRMODE_EXCEPTION`
-  mode for error reporting instead of `ERRMODE_SILENT`.
+- **Exceptions by default.** _Aura\Sql\Pdo_ starts in the `ERRMODE_EXCEPTION`
+  mode for error reporting instead of the `ERRMODE_SILENT` mode.
 
-- **Profiler**.  An optional query profiler is provided.
+- **Profiler.** An optional query profiler is provided, along with an
+  interface for other implementations.
 
-- **Service locator for PDO connections.**
+- **Service locator.** A optional locator is available for picking different
+  PDO connection services (default, read, and write).
 
-This library is compliant with [PSR-1][], [PSR-2][], and [PSR-4][]. If you
+
+## Preliminaries
+
+### Installation and Autoloading
+
+This library is installable via Composer and is registered on Packagist at
+<https://packagist.org/packages/aura/autoload>. Installing via Composer will
+set up autoloading automatically.
+
+Alternatively, download or clone this repository, then require or include its
+_autoload.php_ file.
+
+### Dependencies and PHP Version
+
+As with all Aura libraries, this library has no external dependencies. It
+requires PHP version 5.3 or later (as opposed to most other Aura libraries,
+which require PHP 5.4 or later).
+
+### Tests
+
+[![Build Status](https://travis-ci.org/auraphp/Aura.Autoload.png?branch=develop-2)](https://travis-ci.org/auraphp/Aura.Autoload)
+
+This library has 100% code coverage. To run the library tests, first install
+[PHPUnit][], then go to the library _tests_ directory and issue `phpunit` at
+the command line.
+
+[PHPUnit]: http://phpunit.de/manual/
+
+### PSR Compliance
+
+This library attempts to comply to [PSR-1][], [PSR-2][], and [PSR-4][]. If you
 notice compliance oversights, please send a patch via pull request.
 
 [PSR-1]: https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-1-basic-coding-standard.md
@@ -51,7 +86,10 @@ notice compliance oversights, please send a patch via pull request.
 [PSR-4]: https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-4-autoloader.md
 
 
-## Instantiation
+## Getting Started
+
+
+### Instantiation
 
 Instantiation is the same as with the native _PDO_ class: pass a data source
 name, username, password, and driver options. There is one additional
@@ -71,7 +109,7 @@ $pdo = new Aura\Sql\Pdo(
 ```
 
 
-## Lazy Connection
+### Lazy Connection
 
 Whereas the native _PDO_ connects on instantiation, _Aura\Sql\Pdo_ does not
 connect immediately. Instead, it connects only when you call a method that
@@ -96,7 +134,7 @@ $pdo->connect();
 ?>
 ```
 
-## Bind Values
+### Bind Values
 
 Instead of having to bind values to a prepared `PDOStatement`, you can call
 `bindValues()` directly on the _Aura\Sql\Pdo_ instance, and those values will
@@ -119,7 +157,7 @@ $sth = $pdo->query('SELECT * FROM test WHERE foo = :foo AND bar = :bar');
 ```
 
 
-## Array Quoting
+### Array Quoting
 
 The native `PDO::quote()` method will not quote arrays. This makes it
 difficult to bind an array to something like an `IN (...)` condition in SQL.
@@ -180,7 +218,7 @@ Finally, note that array quoting works only on the _Aura\Sql\Pdo_ instance,
 not on returned _PDOStatement_ instances.
 
 
-## Fetch Methods
+### Fetch Methods
 
 _Aura\Sql\Pdo_ comes with `fetch*()` methods to help reduce boilerplate code.
 Instead of issuing `prepare()`, a series of `bindValue()` calls, `execute()`,
@@ -226,7 +264,7 @@ $result = $pdo->fetchValue($stm, $bind);
 ```
 
 
-## Profiler
+### Profiler
 
 When debugging, it is often useful to see what queries have been executed,
 where they were issued from in the codebase, and how long they took to
@@ -280,14 +318,14 @@ $pdo->getProfiler()->setActive(true);
 ?>
 ```
 
-## Quoting Identifiers
+### Quoting Identifiers
 
 (tbd)
 
-## Factory
+### Factory
 
 (tbd)
 
-## Service Locator
+### Service Locator
 
 (tbd)
