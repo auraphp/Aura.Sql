@@ -130,7 +130,7 @@ class Pdo extends \PDO implements PdoInterface
      * @var array
      * 
      */
-    protected $profile = [];
+    protected $profile = array();
     
     /**
      * 
