@@ -76,7 +76,7 @@ class PdoLocator implements PdoLocatorInterface
      * 
      * @param callable $callable The registry entry.
      * 
-     * @return void
+     * @return null
      * 
      */
     public function setDefault($callable)
@@ -111,7 +111,7 @@ class PdoLocator implements PdoLocatorInterface
      * 
      * @param callable $callable The registry entry.
      * 
-     * @return void
+     * @return null
      * 
      */
     public function setRead($name, $callable)
@@ -144,7 +144,7 @@ class PdoLocator implements PdoLocatorInterface
      * 
      * @param callable $callable The registry entry.
      * 
-     * @return void
+     * @return null
      * 
      */
     public function setWrite($name, $callable)

@@ -43,7 +43,7 @@ class Profiler implements ProfilerInterface
      * 
      * @param bool $active True to turn on, false to turn off.
      * 
-     * @return void
+     * @return null
      * 
      */
     public function setActive($active)

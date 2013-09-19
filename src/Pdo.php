@@ -164,18 +164,6 @@ class Pdo extends \PDO implements PdoInterface
     
     /**
      * 
-     * Returns the profiler object.
-     * 
-     * @return ProfilerInterface
-     * 
-     */
-    public function getProfiler()
-    {
-        return $this->profiler;
-    }
-    
-    /**
-     * 
      * Returns the DSN for the connection.
      * 
      * @return string
@@ -186,11 +174,107 @@ class Pdo extends \PDO implements PdoInterface
         return $this->dsn;
     }
     
+    public function setAttribute($attribute, $value)
+    {
+        $is_attr_quote_name = $attribute == self::ATTR_QUOTE_NAME_PREFIX
+                           || $attribute == self::ATTR_QUOTE_NAME_SUFFIX;
+        if ($is_attr_quote_name) {
+            return $this->setAttributeQuoteName($attribute, $value);
+        }
+        
+        if ($this->connected) {
+            return parent::setAttribute($attribute, $value);
+        }
+        
+        $this->attributes[$attribute] = $value;
+    }
+    
+    public function getAttribute($attribute)
+    {
+        if ($attribute == self::ATTR_QUOTE_NAME_PREFIX) {
+            return $this->quote_name_prefix;
+        }
+        
+        if ($attribute == self::ATTR_QUOTE_NAME_SUFFIX) {
+            return $this->quote_name_suffix;
+        }
+        
+        $this->connect();
+        return parent::getAttribute($attribute);
+    }
+    
+    /**
+     * 
+     * Sets the profiler object.
+     * 
+     * @param ProfilerInterface $profiler
+     * 
+     * @return null
+     * 
+     */
+    public function setProfiler(ProfilerInterface $profiler)
+    {
+        $this->profiler = $profiler;
+    }
+
+    /**
+     * 
+     * Returns the profiler object.
+     * 
+     * @return ProfilerInterface
+     * 
+     */
+    public function getProfiler()
+    {
+        return $this->profiler;
+    }
+    
+    public function errorCode()
+    {
+        $this->connect();
+        return parent::errorCode();
+    }
+    
+    public function errorInfo()
+    {
+        $this->connect();
+        return parent::errorInfo();
+    }
+    
+    /**
+     * 
+     * Retains several values to bind to the next query statement; these will
+     * be merges with existing bound values, and will be reset after the
+     * next query.
+     * 
+     * @param array $values An array where the key is the parameter name and
+     * the value is the parameter value.
+     * 
+     * @return null
+     * 
+     */
+    public function bindValues(array $bind_values)
+    {
+        $this->bind_values = array_merge($this->bind_values, $bind_values);
+    }
+    
+    /**
+     * 
+     * Returns the array of values to bind to the next query.
+     * 
+     * @return array
+     * 
+     */
+    public function getBindValues()
+    {
+        return $this->bind_values;
+    }
+    
     /**
      * 
      * Connects to the database and sets PDO attributes.
      * 
-     * @return void
+     * @return null
      * 
      * @throws PDOException if the connection fails.
      * 
@@ -221,106 +305,9 @@ class Pdo extends \PDO implements PdoInterface
         }
     }
     
-    /**
-     * 
-     * Connects to the database, prepares a statement using the bound values,
-     * executes the statement, and returns a PDOStatement result set.
-     * 
-     * @param string $statement The SQL statement to prepare and execute.
-     * 
-     * @param int $fetch_mode The `PDO::FETCH_*` type to set on the returned
-     * `PDOStatement::setFetchMode()`.
-     * 
-     * @param mixed $fetch_arg1 The first additional argument to send to
-     * `PDOStatement::setFetchMode()`.
-     * 
-     * @param mixed $fetch_arg2 The second additional argument to send to
-     * `PDOStatement::setFetchMode()`.
-     * 
-     * @return PDOStatement
-     * 
-     * @see http://php.net/manual/en/pdo.query.php
-     */
-    public function query(
-        $statement,
-        $fetch_mode = null,
-        $fetch_arg1 = null,
-        $fetch_arg2 = null
-    ) {
-        // prepare and execute
-        $sth = $this->prepare($statement);
-        $this->beginProfile(__FUNCTION__);
-        $sth->execute();
-        $this->endProfile($sth);
-        
-        // allow for optional fetch mode
-        if ($fetch_arg2 !== null) {
-            $sth->setFetchMode($fetch_mode, $fetch_arg1, $fetch_arg2);
-        } elseif ($fetch_arg1 !== null) {
-            $sth->setFetchMode($fetch_mode, $fetch_arg1);
-        } elseif ($fetch_mode !== null) {
-            $sth->setFetchMode($fetch_mode);
-        }
-        
-        // done
-        $this->bind_values = array();
-        return $sth;
-    }
-    
-    /**
-     * 
-     * Connects to the database, begins a transaction, and turns off
-     * autocommit mode.
-     * 
-     * @return bool True on success, false on failure.
-     * 
-     * @see http://php.net/manual/en/pdo.begintransaction.php
-     * 
-     */
-    public function beginTransaction()
+    public function isConnected()
     {
-        $this->connect();
-        $this->beginProfile(__FUNCTION__);
-        $result = parent::beginTransaction();
-        $this->endProfile();
-        return $result;
-    }
-    
-    /**
-     * 
-     * Connects to the database, commits the existing transaction, and
-     * restores autocommit mode.
-     * 
-     * @return bool True on success, false on failure.
-     * 
-     * @see http://php.net/manual/en/pdo.commit.php
-     * 
-     */
-    public function commit()
-    {
-        $this->connect();
-        $this->beginProfile(__FUNCTION__);
-        $result = parent::commit();
-        $this->endProfile();
-        return $result;
-    }
-    
-    /**
-     * 
-     * Connects to the database, rolls back the current transaction, and
-     * restores autocommit mode.
-     * 
-     * @return bool True on success, false on failure.
-     * 
-     * @see http://php.net/manual/en/pdo.rollback.php
-     * 
-     */
-    public function rollBack()
-    {
-        $this->connect();
-        $this->beginProfile(__FUNCTION__);
-        $result = parent::rollBack();
-        $this->endProfile();
+        return $this->connected;
     }
     
     /**
@@ -419,6 +406,97 @@ class Pdo extends \PDO implements PdoInterface
     
     /**
      * 
+     * Connects to the database, prepares a statement using the bound values,
+     * executes the statement, and returns the number of affected rows.
+     * 
+     * @param string $statement The SQL statement to prepare and execute.
+     * 
+     * @return null
+     * 
+     * @see http://php.net/manual/en/pdo.exec.php
+     * 
+     */
+    public function exec($statement)
+    {
+        $sth = $this->prepare($statement);
+        
+        $this->beginProfile(__FUNCTION__);
+        $sth->execute();
+        $this->endProfile($sth);
+        
+        $this->bind_values = array();
+        return $sth->rowCount();
+    }
+    
+    /**
+     * 
+     * Connects to the database, prepares a statement using the bound values,
+     * executes the statement, and returns a PDOStatement result set.
+     * 
+     * @param string $statement The SQL statement to prepare and execute.
+     * 
+     * @param int $fetch_mode The `PDO::FETCH_*` type to set on the returned
+     * `PDOStatement::setFetchMode()`.
+     * 
+     * @param mixed $fetch_arg1 The first additional argument to send to
+     * `PDOStatement::setFetchMode()`.
+     * 
+     * @param mixed $fetch_arg2 The second additional argument to send to
+     * `PDOStatement::setFetchMode()`.
+     * 
+     * @return PDOStatement
+     * 
+     * @see http://php.net/manual/en/pdo.query.php
+     */
+    public function query(
+        $statement,
+        $fetch_mode = null,
+        $fetch_arg1 = null,
+        $fetch_arg2 = null
+    ) {
+        // prepare and execute
+        $sth = $this->prepare($statement);
+        $this->beginProfile(__FUNCTION__);
+        $sth->execute();
+        $this->endProfile($sth);
+        
+        // allow for optional fetch mode
+        if ($fetch_arg2 !== null) {
+            $sth->setFetchMode($fetch_mode, $fetch_arg1, $fetch_arg2);
+        } elseif ($fetch_arg1 !== null) {
+            $sth->setFetchMode($fetch_mode, $fetch_arg1);
+        } elseif ($fetch_mode !== null) {
+            $sth->setFetchMode($fetch_mode);
+        }
+        
+        // done
+        $this->bind_values = array();
+        return $sth;
+    }
+    
+    /**
+     * 
+     * Returns the last inserted autoincrement sequence value.
+     * 
+     * @param string $name The name of the sequence to check; typically needed
+     * only for PostgreSQL, where it takes the form of `<table>_<column>_seq`.
+     * 
+     * @return int
+     * 
+     * @see http://php.net/manual/en/pdo.lastinsertid.php
+     * 
+     */
+    public function lastInsertId($name = null)
+    {
+        $this->connect();
+        $this->beginProfile(__FUNCTION__);
+        $result = parent::lastInsertId($name);
+        $this->endProfile();
+        return $result;
+    }
+    
+    /**
+     * 
      * Fetches a sequential array of rows from the database; the rows
      * are represented as associative arrays.
      * 
@@ -512,22 +590,22 @@ class Pdo extends \PDO implements PdoInterface
 
     /**
      * 
-     * Fetches the very first value (i.e., first column of the first row).
+     * Fetches one row from the database as an associative array.
      * 
      * @param string $statement The SQL statement to prepare and execute.
      * 
      * @param array $values Values to bind to the query.
      * 
-     * @return mixed
+     * @return array
      * 
      */
-    public function fetchValue($statement, array $values = array())
+    public function fetchOne($statement, array $values = array())
     {
         $this->bindValues($values);
         $sth = $this->query($statement);
-        return $sth->fetchColumn(0);
+        return $sth->fetch(PDO::FETCH_ASSOC);
     }
-
+    
     /**
      * 
      * Fetches an associative array of rows as key-value pairs (first 
@@ -563,20 +641,94 @@ class Pdo extends \PDO implements PdoInterface
 
     /**
      * 
-     * Fetches one row from the database as an associative array.
+     * Fetches the very first value (i.e., first column of the first row).
      * 
      * @param string $statement The SQL statement to prepare and execute.
      * 
      * @param array $values Values to bind to the query.
      * 
-     * @return array
+     * @return mixed
      * 
      */
-    public function fetchOne($statement, array $values = array())
+    public function fetchValue($statement, array $values = array())
     {
         $this->bindValues($values);
         $sth = $this->query($statement);
-        return $sth->fetch(PDO::FETCH_ASSOC);
+        return $sth->fetchColumn(0);
+    }
+
+    /**
+     * 
+     * Connects to the database, begins a transaction, and turns off
+     * autocommit mode.
+     * 
+     * @return bool True on success, false on failure.
+     * 
+     * @see http://php.net/manual/en/pdo.begintransaction.php
+     * 
+     */
+    public function beginTransaction()
+    {
+        $this->connect();
+        $this->beginProfile(__FUNCTION__);
+        $result = parent::beginTransaction();
+        $this->endProfile();
+        return $result;
+    }
+    
+    /**
+     * 
+     * Is a transaction currently active?
+     * 
+     * @return bool
+     * 
+     * @see http://php.net/manual/en/pdo.intransaction.php
+     * 
+     */
+    public function inTransaction()
+    {
+        $this->connect();
+        $this->beginProfile(__FUNCTION__);
+        $result = parent::inTransaction();
+        $this->endProfile();
+        return $result;
+    }
+    
+    /**
+     * 
+     * Connects to the database, commits the existing transaction, and
+     * restores autocommit mode.
+     * 
+     * @return bool True on success, false on failure.
+     * 
+     * @see http://php.net/manual/en/pdo.commit.php
+     * 
+     */
+    public function commit()
+    {
+        $this->connect();
+        $this->beginProfile(__FUNCTION__);
+        $result = parent::commit();
+        $this->endProfile();
+        return $result;
+    }
+    
+    /**
+     * 
+     * Connects to the database, rolls back the current transaction, and
+     * restores autocommit mode.
+     * 
+     * @return bool True on success, false on failure.
+     * 
+     * @see http://php.net/manual/en/pdo.rollback.php
+     * 
+     */
+    public function rollBack()
+    {
+        $this->connect();
+        $this->beginProfile(__FUNCTION__);
+        $result = parent::rollBack();
+        $this->endProfile();
     }
     
     /**
@@ -801,6 +953,16 @@ class Pdo extends \PDO implements PdoInterface
         return $text;
     }
 
+    protected function setAttributeQuoteName($attribute, $value)
+    {
+        $value = trim($value);
+        if (! $value) {
+            $message = "PDO::ATTR_QUOTE_NAME_PREFIX/SUFFIX may not be empty.";
+            throw new Exception\AttrQuoteNameEmpty($message);
+        }
+        $this->$attribute = $value;
+    }
+    
     /**
      * 
      * Quotes an identifier name (table, index, etc); ignores empty values and
@@ -859,159 +1021,6 @@ class Pdo extends \PDO implements PdoInterface
         return $text;
     }
     
-    public function isConnected()
-    {
-        return $this->connected;
-    }
-    
-    public function setAttribute($attribute, $value)
-    {
-        $is_attr_quote_name = $attribute == self::ATTR_QUOTE_NAME_PREFIX
-                           || $attribute == self::ATTR_QUOTE_NAME_SUFFIX;
-        if ($is_attr_quote_name) {
-            return $this->setAttributeQuoteName($attribute, $value);
-        }
-        
-        if ($this->connected) {
-            return parent::setAttribute($attribute, $value);
-        }
-        
-        $this->attributes[$attribute] = $value;
-    }
-    
-    protected function setAttributeQuoteName($attribute, $value)
-    {
-        $value = trim($value);
-        if (! $value) {
-            $message = "PDO::ATTR_QUOTE_NAME_PREFIX/SUFFIX may not be empty.";
-            throw new Exception\AttrQuoteNameEmpty($message);
-        }
-        $this->$attribute = $value;
-    }
-    
-    public function getAttribute($attribute)
-    {
-        if ($attribute == self::ATTR_QUOTE_NAME_PREFIX) {
-            return $this->quote_name_prefix;
-        }
-        
-        if ($attribute == self::ATTR_QUOTE_NAME_SUFFIX) {
-            return $this->quote_name_suffix;
-        }
-        
-        $this->connect();
-        return parent::getAttribute($attribute);
-    }
-    
-    public function errorCode()
-    {
-        $this->connect();
-        return parent::errorCode();
-    }
-    
-    public function errorInfo()
-    {
-        $this->connect();
-        return parent::errorInfo();
-    }
-    
-    /**
-     * 
-     * Retains several values to bind to the next query statement; these will
-     * be merges with existing bound values, and will be reset after the
-     * next query.
-     * 
-     * @param array $values An array where the key is the parameter name and
-     * the value is the parameter value.
-     * 
-     * @return void
-     * 
-     */
-    public function bindValues(array $bind_values)
-    {
-        $this->bind_values = array_merge($this->bind_values, $bind_values);
-    }
-    
-    /**
-     * 
-     * Returns the array of values to bind to the next query.
-     * 
-     * @return array
-     * 
-     */
-    public function getBindValues()
-    {
-        return $this->bind_values;
-    }
-    
-    /**
-     * 
-     * Is a transaction currently active?
-     * 
-     * @return bool
-     * 
-     * @see http://php.net/manual/en/pdo.intransaction.php
-     * 
-     */
-    public function inTransaction()
-    {
-        $this->connect();
-        $this->beginProfile(__FUNCTION__);
-        $result = parent::inTransaction();
-        $this->endProfile();
-        return $result;
-    }
-    
-    /**
-     * 
-     * Connects to the database, prepares a statement using the bound values,
-     * executes the statement, and returns the number of affected rows.
-     * 
-     * @param string $statement The SQL statement to prepare and execute.
-     * 
-     * @return void
-     * 
-     * @see http://php.net/manual/en/pdo.exec.php
-     * 
-     */
-    public function exec($statement)
-    {
-        $sth = $this->prepare($statement);
-        
-        $this->beginProfile(__FUNCTION__);
-        $sth->execute();
-        $this->endProfile($sth);
-        
-        $this->bind_values = array();
-        return $sth->rowCount();
-    }
-    
-    /**
-     * 
-     * Returns the last inserted autoincrement sequence value.
-     * 
-     * @param string $name The name of the sequence to check; typically needed
-     * only for PostgreSQL, where it takes the form of `<table>_<column>_seq`.
-     * 
-     * @return int
-     * 
-     * @see http://php.net/manual/en/pdo.lastinsertid.php
-     * 
-     */
-    public function lastInsertId($name = null)
-    {
-        $this->connect();
-        $this->beginProfile(__FUNCTION__);
-        $result = parent::lastInsertId($name);
-        $this->endProfile();
-        return $result;
-    }
-    
-    public function setProfiler(ProfilerInterface $profiler)
-    {
-        $this->profiler = $profiler;
-    }
-
     protected function beginProfile($function)
     {
         // if there's no profiler, can't profile
