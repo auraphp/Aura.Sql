@@ -13,9 +13,9 @@ class PdoLocatorTest extends \PHPUnit_Framework_TestCase
     
     protected $default;
     
-    protected $read = [];
+    protected $read = array();
     
-    protected $write = [];
+    protected $write = array();
     
     protected function setUp()
     {
@@ -24,7 +24,7 @@ class PdoLocatorTest extends \PHPUnit_Framework_TestCase
                 'mock:host=default.example.com',
                 'user_name',
                 'pass_word',
-                []
+                array()
             );
         };
         
@@ -34,7 +34,7 @@ class PdoLocatorTest extends \PHPUnit_Framework_TestCase
                     'mock:host=read1.example.com',
                     'user_name',
                     'pass_word',
-                    []
+                    array()
                 );
             },
             'read2' => function () {
@@ -42,7 +42,7 @@ class PdoLocatorTest extends \PHPUnit_Framework_TestCase
                     'mock:host=read2.example.com',
                     'user_name',
                     'pass_word',
-                    []
+                    array()
                 );
             },
             'read3' => function () {
@@ -50,7 +50,7 @@ class PdoLocatorTest extends \PHPUnit_Framework_TestCase
                     'mock:host=read3.example.com',
                     'user_name',
                     'pass_word',
-                    []
+                    array()
                 );
             },
         ];
@@ -61,7 +61,7 @@ class PdoLocatorTest extends \PHPUnit_Framework_TestCase
                     'mock:host=write1.example.com',
                     'user_name',
                     'pass_word',
-                    []
+                    array()
                 );
             },
             'write2' => function () {
@@ -69,7 +69,7 @@ class PdoLocatorTest extends \PHPUnit_Framework_TestCase
                     'mock:host=write2.example.com',
                     'user_name',
                     'pass_word',
-                    []
+                    array()
                 );
             },
             'write3' => function () {
@@ -77,13 +77,13 @@ class PdoLocatorTest extends \PHPUnit_Framework_TestCase
                     'mock:host=write3.example.com',
                     'user_name',
                     'pass_word',
-                    []
+                    array()
                 );
             },
         ];
     }
     
-    protected function newLocator($read = [], $write = [])
+    protected function newLocator($read = array(), $write = array())
     {
         return new PdoLocator($this->default, $read, $write);
     }
@@ -110,11 +110,11 @@ class PdoLocatorTest extends \PHPUnit_Framework_TestCase
     {
         $locator = $this->newLocator($this->read, $this->write);
         
-        $expect = [
+        $expect = array(
             'mock:host=read1.example.com',
             'mock:host=read2.example.com',
             'mock:host=read3.example.com',
-        ];
+        );
         
         // try 10 times to make sure we get lots of random responses
         for ($i = 1; $i <= 10; $i++) {
@@ -153,11 +153,11 @@ class PdoLocatorTest extends \PHPUnit_Framework_TestCase
     {
         $locator = $this->newLocator($this->write, $this->write);
         
-        $expect = [
+        $expect = array(
             'mock:host=write1.example.com',
             'mock:host=write2.example.com',
             'mock:host=write3.example.com',
-        ];
+        );
         
         // try 10 times to make sure we get lots of random responses
         for ($i = 1; $i <= 10; $i++) {
