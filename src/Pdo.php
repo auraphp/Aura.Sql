@@ -975,7 +975,7 @@ class Pdo extends \PDO implements PdoInterface
      * @param string $text The string in which to quote fully-qualified
      * identifier names to quote.
      * 
-     * @return string|array The string with names quoted in it.
+     * @return string The string with names quoted in it.
      * 
      * @see replaceNamesIn()
      * 
