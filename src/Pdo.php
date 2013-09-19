@@ -46,10 +46,31 @@ use PDOStatement;
  */
 class Pdo extends \PDO implements PdoInterface
 {
+    /**
+     * 
+     * A constant for the $quote_name_prefix attribute property.
+     * 
+     * @const string
+     * 
+     */
     const ATTR_QUOTE_NAME_PREFIX = 'quote_name_prefix';
     
+    /**
+     * 
+     * A constant for the $quote_name_suffix attribute property.
+     * 
+     * @const string
+     * 
+     */
     const ATTR_QUOTE_NAME_SUFFIX = 'quote_name_suffix';
     
+    /**
+     * 
+     * The PDO instance attributes.
+     * 
+     * @var array
+     * 
+     */
     protected $attributes = array(
         self::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
         self::ATTR_EMULATE_PREPARES => true,
@@ -57,8 +78,22 @@ class Pdo extends \PDO implements PdoInterface
         self::ATTR_QUOTE_NAME_SUFFIX => '"',
     );
     
+    /**
+     * 
+     * Values to be bound into the next query.
+     * 
+     * @var array
+     * 
+     */
     protected $bind_values = array();
     
+    /**
+     * 
+     * Is the instance connected to a database?
+     * 
+     * @var bool
+     * 
+     */
     protected $connected = false;
     
     /**
@@ -88,7 +123,14 @@ class Pdo extends \PDO implements PdoInterface
      */
     protected $password;
     
-    protected $profile;
+    /**
+     * 
+     * The current profile information.
+     * 
+     * @var array
+     * 
+     */
+    protected $profile = [];
     
     /**
      * 
@@ -174,10 +216,22 @@ class Pdo extends \PDO implements PdoInterface
         return $this->dsn;
     }
     
+    /**
+     * 
+     * Sets a PDO attribute value.
+     * 
+     * @param mixed $attribute The PDO::ATTR_* constant.
+     * 
+     * @param mixed $value The value for the attribute.
+     * 
+     * @return null
+     * 
+     */
     public function setAttribute($attribute, $value)
     {
         $is_attr_quote_name = $attribute == self::ATTR_QUOTE_NAME_PREFIX
                            || $attribute == self::ATTR_QUOTE_NAME_SUFFIX;
+        
         if ($is_attr_quote_name) {
             return $this->setAttributeQuoteName($attribute, $value);
         }
@@ -189,6 +243,15 @@ class Pdo extends \PDO implements PdoInterface
         $this->attributes[$attribute] = $value;
     }
     
+    /**
+     * 
+     * Gets a PDO attribute value.
+     * 
+     * @param mixed $attribute The PDO::ATTR_* constant.
+     * 
+     * @return mixed The value for the attribute.
+     * 
+     */
     public function getAttribute($attribute)
     {
         if ($attribute == self::ATTR_QUOTE_NAME_PREFIX) {
@@ -229,12 +292,26 @@ class Pdo extends \PDO implements PdoInterface
         return $this->profiler;
     }
     
+    /**
+     * 
+     * Gets the most recent error code.
+     * 
+     * @return mixed
+     * 
+     */
     public function errorCode()
     {
         $this->connect();
         return parent::errorCode();
     }
     
+    /**
+     * 
+     * Gets the most recent error info.
+     * 
+     * @return array
+     * 
+     */
     public function errorInfo()
     {
         $this->connect();
@@ -305,6 +382,13 @@ class Pdo extends \PDO implements PdoInterface
         }
     }
     
+    /**
+     * 
+     * Is the instance connected to a database?
+     * 
+     * @return bool
+     * 
+     */
     public function isConnected()
     {
         return $this->connected;
@@ -953,6 +1037,17 @@ class Pdo extends \PDO implements PdoInterface
         return $text;
     }
 
+    /**
+     * 
+     * Sets the value for an ATTR_QUOTE_NAME_* attribute property.
+     * 
+     * @param string $attribute The property to set.
+     * 
+     * @param string $value The value for the attribute.
+     * 
+     * @return null
+     * 
+     */
     protected function setAttributeQuoteName($attribute, $value)
     {
         $value = trim($value);
@@ -965,14 +1060,11 @@ class Pdo extends \PDO implements PdoInterface
     
     /**
      * 
-     * Quotes an identifier name (table, index, etc); ignores empty values and
-     * values of '*'.
+     * Quotes an identifier name (table, index, etc); ignores values of '*'.
      * 
      * @param string $name The identifier name to quote.
      * 
      * @return string The quoted identifier name.
-     * 
-     * @see quoteName()
      * 
      */
     protected function replaceName($name)
@@ -994,9 +1086,7 @@ class Pdo extends \PDO implements PdoInterface
      * @param string $text The string in which to quote fully-qualified
      * identifier names to quote.
      * 
-     * @return string|array The string with names quoted in it.
-     * 
-     * @see quoteNamesIn()
+     * @return string The string with names quoted in it.
      * 
      */
     protected function replaceNamesIn($text)
@@ -1021,6 +1111,15 @@ class Pdo extends \PDO implements PdoInterface
         return $text;
     }
     
+    /**
+     * 
+     * Begins a profile entry.
+     * 
+     * @param string $function The function starting the profile entry.
+     * 
+     * @return null
+     * 
+     */
     protected function beginProfile($function)
     {
         // if there's no profiler, can't profile
@@ -1034,6 +1133,15 @@ class Pdo extends \PDO implements PdoInterface
         $this->profile['bind_values'] = $this->bind_values;
     }
     
+    /**
+     * 
+     * Ends and records a profile entry.
+     * 
+     * @param PDOStatement $sth The statement being profiled, if any.
+     * 
+     * @return null
+     * 
+     */
     protected function endProfile(PDOStatement $sth = null)
     {
         // if there's no profiler, can't profile
@@ -1052,5 +1160,4 @@ class Pdo extends \PDO implements PdoInterface
         // clear the starting profile info
         $this->profile = array();
     }
-    
 }
