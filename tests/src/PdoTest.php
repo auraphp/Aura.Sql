@@ -70,6 +70,13 @@ class PdoTest extends \PHPUnit_Framework_TestCase
         $this->pdo->exec($stm);
     }
     
+    public function testGetDriver()
+    {
+        $actual = $this->pdo->getDriver();
+        $expect = 'sqlite';
+        $this->assertSame($expect, $actual);
+    }
+    
     public function testErrorCodeAndInfo()
     {
         $actual = $this->pdo->errorCode();

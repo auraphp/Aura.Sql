@@ -107,6 +107,15 @@ class Pdo extends \PDO implements PdoInterface
     
     /**
      * 
+     * The name of the driver from the DSN.
+     * 
+     * @var string
+     * 
+     */
+    protected $driver;
+    
+    /**
+     * 
      * PDO options for the connection.
      * 
      * @var array
@@ -202,6 +211,10 @@ class Pdo extends \PDO implements PdoInterface
         foreach ((array) $attributes as $attribute => $value) {
             $this->attributes[$attribute] = $value;
         }
+        
+        // set the driver name
+        $pos = strpos($this->dsn, ':');
+        $this->driver = substr($this->dsn, 0, $pos);
     }
     
     /**
@@ -214,6 +227,18 @@ class Pdo extends \PDO implements PdoInterface
     public function getDsn()
     {
         return $this->dsn;
+    }
+    
+    /**
+     * 
+     * Returns the name of the driver from the DSN.
+     * 
+     * @return string
+     * 
+     */
+    public function getDriver()
+    {
+        return $this->driver;
     }
     
     /**

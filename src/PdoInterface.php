@@ -362,6 +362,15 @@ interface PdoInterface
 
     /**
      * 
+     * Returns the name of the driver from the DSN.
+     * 
+     * @return string
+     * 
+     */
+    public function getDriver();
+    
+    /**
+     * 
      * Returns the profiler object.
      * 
      * @return ProfilerInterface
