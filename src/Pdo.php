@@ -72,7 +72,7 @@ class Pdo extends \PDO implements PdoInterface
      * 
      */
     protected $attributes = array(
-        self::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+        self::ATTR_ERRMODE => self::ERRMODE_EXCEPTION,
         self::ATTR_EMULATE_PREPARES => true,
         self::ATTR_QUOTE_NAME_PREFIX => '"',
         self::ATTR_QUOTE_NAME_SUFFIX => '"',
