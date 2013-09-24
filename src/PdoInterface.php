@@ -389,64 +389,6 @@ interface PdoInterface
     
     /**
      * 
-     * Given a string with question-mark placeholders, quotes the values into
-     * the string, replacing the placeholders sequentially.
-     * 
-     * @param string $string The string with placeholders.
-     * 
-     * @param mixed $values The values to quote into the placeholders.
-     * 
-     * @return mixed An SQL-safe quoted value (or string of separated values)
-     * placed into the original string.
-     * 
-     * @see quote()
-     * 
-     */
-    public function quoteInto($string, $values);
-    
-    /**
-     * 
-     * Quotes a single identifier name (table, table alias, table column, 
-     * index, sequence).
-     * 
-     * If the name contains `' AS '`, this method will separately quote the
-     * parts before and after the `' AS '`.
-     * 
-     * If the name contains a space, this method will separately quote the
-     * parts before and after the space.
-     * 
-     * If the name contains a dot, this method will separately quote the
-     * parts before and after the dot.
-     * 
-     * @param string $name The identifier name to quote.
-     * 
-     * @return string|array The quoted identifier name.
-     * 
-     */
-    public function quoteName($name);
-    
-    /**
-     * 
-     * Quotes all fully-qualified identifier names ("table.col") in a string,
-     * typically an SQL snippet for a SELECT clause.
-     * 
-     * Does not quote identifier names that are string literals (i.e., inside
-     * single or double quotes).
-     * 
-     * Looks for a trailing ' AS alias' and quotes the alias as well.
-     * 
-     * @param string $string The string in which to quote fully-qualified
-     * identifier names to quote.
-     * 
-     * @return string The string with names quoted in it.
-     * 
-     * @see replaceNamesIn()
-     * 
-     */
-    public function quoteNamesIn($string);
-    
-    /**
-     * 
      * Sets the profiler object.
      * 
      * @param ProfilerInterface $profiler

@@ -11,8 +11,6 @@ class PdoTest extends \PHPUnit_Framework_TestCase
             $this->markTestSkipped("Need 'pdo_sqlite' to test in memory.");
         }
 
-        $factory = new PdoFactory;
-        
         $dsn = 'sqlite::memory:';
         $username = null;
         $password = null;
@@ -21,7 +19,7 @@ class PdoTest extends \PHPUnit_Framework_TestCase
         // do this to test constructor array loop
         $attributes = array(PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION);
         
-        $this->pdo = $factory->newInstance(
+        $this->pdo = new Pdo(
             $dsn,
             $username,
             $password,
@@ -104,16 +102,6 @@ class PdoTest extends \PHPUnit_Framework_TestCase
         $pdo->setAttribute(Pdo::ATTR_ERRMODE, Pdo::ERRMODE_EXCEPTION);
         $actual = $pdo->getAttribute(Pdo::ATTR_ERRMODE);
         $this->assertSame(Pdo::ERRMODE_EXCEPTION, $actual);
-        
-        // set quote-name attr correctly, although the quote itself is wrong
-        $pdo->setAttribute(Pdo::ATTR_QUOTE_NAME_PREFIX, '{');
-        $pdo->setAttribute(Pdo::ATTR_QUOTE_NAME_SUFFIX, '}');
-        $this->assertSame('{', $pdo->getAttribute(Pdo::ATTR_QUOTE_NAME_PREFIX));
-        $this->assertSame('}', $pdo->getAttribute(Pdo::ATTR_QUOTE_NAME_SUFFIX));
-        
-        // set quote-name attr incorrectly
-        $this->setExpectedException('Aura\Sql\Exception\AttrQuoteNameEmpty');
-        $pdo->setAttribute(Pdo::ATTR_QUOTE_NAME_PREFIX, ' ');
     }
     
     public function testQuery()
@@ -570,71 +558,5 @@ class PdoTest extends \PHPUnit_Framework_TestCase
         );
         
         $this->assertSame($expect, $actual);
-    }
-
-    public function testQuoteValuesIn()
-    {
-        // no placeholders
-        $actual = $this->pdo->quoteInto('foo = bar', "'zim'");
-        $expect = 'foo = bar';
-        $this->assertEquals($expect, $actual);
-        
-        // one placeholder, one value
-        $actual = $this->pdo->quoteInto("foo = ?", "'bar'");
-        $expect = "foo = '''bar'''";
-        $this->assertEquals($expect, $actual);
-        
-        // many placeholders, many values
-        $actual = $this->pdo->quoteInto("foo = ? AND zim = ?", array("'bar'", "'baz'"));
-        $expect = "foo = '''bar''' AND zim = '''baz'''";
-        $this->assertEquals($expect, $actual);
-        
-        // many placeholders, too many values
-        $actual = $this->pdo->quoteInto("foo = ? AND zim = ?", array("'bar'", "'baz'", "'gir'"));
-        $this->assertEquals($expect, $actual);
-    }
-    
-    public function testQuoteName()
-    {
-        // table AS alias
-        $actual = $this->pdo->quoteName('table AS alias');
-        $expect = '"table" AS "alias"';
-        $this->assertEquals($expect, $actual);
-        
-        // table.col AS alias
-        $actual = $this->pdo->quoteName('table.col AS alias');
-        $expect = '"table"."col" AS "alias"';
-        $this->assertEquals($expect, $actual);
-        
-        // table alias
-        $actual = $this->pdo->quoteName('table alias');
-        $expect = '"table" "alias"';
-        $this->assertEquals($expect, $actual);
-        
-        // table.col alias
-        $actual = $this->pdo->quoteName('table.col alias');
-        $expect = '"table"."col" "alias"';
-        $this->assertEquals($expect, $actual);
-        
-        // plain old identifier
-        $actual = $this->pdo->quoteName('table');
-        $expect = '"table"';
-        $this->assertEquals($expect, $actual);
-        
-        // star
-        $actual = $this->pdo->quoteName('*');
-        $this->assertEquals('*', $actual);
-        
-        // star dot star
-        $actual = $this->pdo->quoteName('*.*');
-        $this->assertEquals('*.*', $actual);
-    }
-    
-    public function testQuoteNamesIn()
-    {
-        $stm = "*, *.*, foo.bar, CONCAT('foo.bar', \"baz.dib\") AS zim";
-        $actual = $this->pdo->quoteNamesIn($stm);
-        $expect = "*, *.*, \"foo\".\"bar\", CONCAT('foo.bar', \"baz.dib\") AS \"zim\"";
-        $this->assertEquals($expect, $actual);
     }
 }
