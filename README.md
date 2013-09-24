@@ -54,7 +54,7 @@ Added functionality in _Aura.Sql_ over the native _PDO_ includes:
 ### Installation and Autoloading
 
 This library is installable via Composer and is registered on Packagist at
-<https://packagist.org/packages/aura/autoload>. Installing via Composer will
+<https://packagist.org/packages/aura/sql>. Installing via Composer will
 set up autoloading automatically.
 
 Alternatively, download or clone this repository, then require or include its
@@ -68,7 +68,7 @@ which require PHP 5.4 or later).
 
 ### Tests
 
-[![Build Status](https://travis-ci.org/auraphp/Aura.Autoload.png?branch=develop-2)](https://travis-ci.org/auraphp/Aura.Autoload)
+[![Build Status](https://travis-ci.org/auraphp/Aura.Sql.png?branch=develop-2)](https://travis-ci.org/auraphp/Aura.Autoload)
 
 This library has 100% code coverage. To run the library tests, first install
 [PHPUnit][], then go to the library _tests_ directory and issue `phpunit` at
@@ -78,8 +78,8 @@ the command line.
 
 ### PSR Compliance
 
-This library attempts to comply to [PSR-1][], [PSR-2][], and [PSR-4][]. If you
-notice compliance oversights, please send a patch via pull request.
+This library attempts to comply with [PSR-1][], [PSR-2][], and [PSR-4][]. If
+you notice compliance oversights, please send a patch via pull request.
 
 [PSR-1]: https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-1-basic-coding-standard.md
 [PSR-2]: https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-2-coding-style-guide.md
@@ -87,7 +87,6 @@ notice compliance oversights, please send a patch via pull request.
 
 
 ## Getting Started
-
 
 ### Instantiation
 
