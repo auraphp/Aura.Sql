@@ -317,14 +317,6 @@ $pdo->getProfiler()->setActive(true);
 ?>
 ```
 
-### Quoting Identifiers
-
-(tbd)
-
-### Factory
-
-(tbd)
-
 ### Service Locator
 
 (tbd)
