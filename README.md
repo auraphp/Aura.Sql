@@ -68,7 +68,7 @@ which require PHP 5.4 or later).
 
 ### Tests
 
-[![Build Status](https://travis-ci.org/auraphp/Aura.Sql.png?branch=develop-2)](https://travis-ci.org/auraphp/Aura.Autoload)
+[![Build Status](https://api.travis-ci.org/auraphp/Aura.Sql.png?branch=aura.sql.pdo)](https://travis-ci.org/auraphp/Aura.Sql)
 
 This library has 100% code coverage. To run the library tests, first install
 [PHPUnit][], then go to the library _tests_ directory and issue `phpunit` at
