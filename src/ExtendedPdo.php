@@ -10,6 +10,7 @@
  */
 namespace Aura\Sql;
 
+use PDO;
 use PDOStatement;
 
 /**
@@ -40,7 +41,7 @@ use PDOStatement;
  * By defult, it starts in the ERRMODE_EXCEPTION instead of ERRMODE_SILENT.
  * 
  */
-class ExtendedPdo extends \PDO implements ExtendedPdoInterface
+class ExtendedPdo extends PDO implements ExtendedPdoInterface
 {
     /**
      * 
