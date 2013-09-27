@@ -26,13 +26,6 @@ Added functionality in _Aura.Sql_ over the native _PDO_ includes:
   be replaced with comma-separated quoted values. This means you can bind
   an array of values to a placeholder used with an `IN (...)` condition.
 
-- **Quoting into placeholders.** The `quoteInto()` method will take a string
-  with question-mark placeholders, and replace those placeholder with quoted
-  values.
-
-- **Quoting identifier names.** The `quoteName()` and `quoteNamesIn()` methods
-  will quote identifer names (e.g., table names, index names, and so on).
-
 - **Fetch methods.** _ExtendedPdo_ provides several `fetch*()` methods for
   commonly-used fetch styles. For example, you can call `fetchAll()` directly
   on the instance instead of having to prepare a statement, bind values,
