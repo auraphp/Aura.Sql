@@ -367,36 +367,36 @@ Next, add as many named read and write connections as you like:
 ```php
 <?php
 // the write (master) server
-$connections->addRead('write', function () {
+$connections->addWrite('master', function () {
     return new ExtendedPdo(
-        'mysql:host=write.db.localhost;dbname=database',
+        'mysql:host=master.db.localhost;dbname=database',
         'username',
         'password',
     );
 });
 
 // read (slave) #1
-$connections->addRead('read1', function () {
+$connections->addRead('slave1', function () {
     return new ExtendedPdo(
-        'mysql:host=read1.db.localhost;dbname=database',
+        'mysql:host=slave1.db.localhost;dbname=database',
         'username',
         'password',
     );
 });
 
 // read (slave) #2
-$connections->addRead('read2', function () {
+$connections->addRead('slave2', function () {
     return new ExtendedPdo(
-        'mysql:host=read2.db.localhost;dbname=database',
+        'mysql:host=slave2.db.localhost;dbname=database',
         'username',
         'password',
     );
 });
 
 // read (slave) #3
-$connections->addRead('read3', function () {
+$connections->addRead('slave3', function () {
     return new ExtendedPdo(
-        'mysql:host=read3.db.localhost;dbname=database',
+        'mysql:host=slave3.db.localhost;dbname=database',
         'username',
         'password',
     );
@@ -421,5 +421,65 @@ create the connection (if needed) and then return it.
 <?php
 $read = $connection->getRead();
 $results = $read->fetchAll('SELECT * FROM table_name LIMIT 10');
+?>
+```
+
+### Construction-Time Configuration
+
+The _ConnectionLocator_ can be configured with all its connections at 
+construction time; this is useful with dependency injection mechanisms.
+
+```php
+<?php
+use Aura\Sql\ConnectionLocator;
+use Aura\Sql\ExtendedPdo;
+
+// default connection
+$default = function () {
+    return new ExtendedPdo(
+        'mysql:host=default.db.localhost;dbname=database',
+        'username',
+        'password',
+    );
+};
+
+// read connections
+$read = array(
+    'slave1' => function () {
+        return new ExtendedPdo(
+            'mysql:host=slave1.db.localhost;dbname=database',
+            'username',
+            'password',
+        );
+    },
+    'slave2' => function () {
+        return new ExtendedPdo(
+            'mysql:host=slave2.db.localhost;dbname=database',
+            'username',
+            'password',
+        );
+    },
+    'slave3' => function () {
+        return new ExtendedPdo(
+            'mysql:host=slave3.db.localhost;dbname=database',
+            'username',
+            'password',
+        );
+    },
+);
+
+// write connection
+$write = array(
+    'master' => function () {
+        return new ExtendedPdo(
+            'mysql:host=master.db.localhost;dbname=database',
+            'username',
+            'password',
+        );
+    },
+);
+
+// configure locator at construction time
+$connections = new ConnectionLocator($default, $read, $write);
 ?>
 ```
