@@ -17,7 +17,7 @@ namespace Aura\Sql;
  * @package Aura.Sql
  * 
  */
-interface PdoInterface
+interface ExtendedPdoInterface
 {
     // =======================================================================
     // Native PDO methods (some with overrides)
@@ -179,7 +179,7 @@ interface PdoInterface
      * @see http://php.net/manual/en/pdo.quote.php
      * 
      */
-    public function quote($value, $parameter_type = Pdo::PARAM_STR);
+    public function quote($value, $parameter_type = ExtendedPdo::PARAM_STR);
     
     /**
      * 

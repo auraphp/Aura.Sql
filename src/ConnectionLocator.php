@@ -12,16 +12,16 @@ namespace Aura\Sql;
 
 /**
  * 
- * Manages PDO service objects for default, read, and write connections.
+ * Manages PDO connection objects for default, read, and write connections.
  * 
  * @package Aura.Sql
  * 
  */
-class PdoLocator implements PdoLocatorInterface
+class ConnectionLocator implements ConnectionLocatorInterface
 {
     /**
      * 
-     * A registry of PDO service entries.
+     * A registry of PDO connection entries.
      * 
      * @var array
      * 
@@ -49,11 +49,11 @@ class PdoLocator implements PdoLocatorInterface
      * 
      * Constructor.
      * 
-     * @param callable $default A callable to create a default service.
+     * @param callable $default A callable to create a default connection.
      * 
-     * @param array $read An array of callables to create read services.
+     * @param array $read An array of callables to create read connections.
      * 
-     * @param array $write An array of callables to create write services.
+     * @param array $write An array of callables to create write connections.
      * 
      */
     public function __construct(
@@ -72,7 +72,7 @@ class PdoLocator implements PdoLocatorInterface
 
     /**
      * 
-     * Sets the default service registry entry.
+     * Sets the default connection registry entry.
      * 
      * @param callable $callable The registry entry.
      * 
@@ -87,9 +87,9 @@ class PdoLocator implements PdoLocatorInterface
 
     /**
      * 
-     * Returns the default service object.
+     * Returns the default connection object.
      * 
-     * @return PdoInterface
+     * @return ExtendedPdoInterface
      * 
      */
     public function getDefault()
@@ -105,7 +105,7 @@ class PdoLocator implements PdoLocatorInterface
 
     /**
      * 
-     * Sets a read service registry entry by name.
+     * Sets a read connection registry entry by name.
      * 
      * @param string $name The name of the registry entry.
      * 
@@ -122,23 +122,23 @@ class PdoLocator implements PdoLocatorInterface
 
     /**
      * 
-     * Returns a read service by name; if no name is given, picks a
-     * random service; if no read services are present, returns the
-     * default service.
+     * Returns a read connection by name; if no name is given, picks a
+     * random connection; if no read connections are present, returns the
+     * default connection.
      * 
-     * @param string $name The read service name to return.
+     * @param string $name The read connection name to return.
      * 
-     * @return PdoInterface
+     * @return ExtendedPdoInterface
      * 
      */
     public function getRead($name = null)
     {
-        return $this->getService('read', $name);
+        return $this->getConnection('read', $name);
     }
 
     /**
      * 
-     * Sets a write service registry entry by name.
+     * Sets a write connection registry entry by name.
      * 
      * @param string $name The name of the registry entry.
      * 
@@ -155,32 +155,32 @@ class PdoLocator implements PdoLocatorInterface
 
     /**
      * 
-     * Returns a write service by name; if no name is given, picks a
-     * random service; if no write services are present, returns the
-     * default service.
+     * Returns a write connection by name; if no name is given, picks a
+     * random connection; if no write connections are present, returns the
+     * default connection.
      * 
-     * @param string $name The write service name to return.
+     * @param string $name The write connection name to return.
      * 
-     * @return PdoInterface
+     * @return ExtendedPdoInterface
      * 
      */
     public function getWrite($name = null)
     {
-        return $this->getService('write', $name);
+        return $this->getConnection('write', $name);
     }
     
     /**
      * 
-     * Returns a service by name.
+     * Returns a connection by name.
      * 
-     * @param string $type The service type ('read' or 'write').
+     * @param string $type The connection type ('read' or 'write').
      * 
-     * @param string $name The name of the service.
+     * @param string $name The name of the connection.
      * 
-     * @return PdoInterface
+     * @return ExtendedPdoInterface
      * 
      */
-    protected function getService($type, $name)
+    protected function getConnection($type, $name)
     {
         if (! $this->registry[$type]) {
             return $this->getDefault();
@@ -191,7 +191,7 @@ class PdoLocator implements PdoLocatorInterface
         }
         
         if (! isset($this->registry[$type][$name])) {
-            throw new Exception\ServiceNotFound("{$type}:{$name}");
+            throw new Exception\ConnectionNotFound("{$type}:{$name}");
         }
         
         if (! $this->converted[$type][$name]) {

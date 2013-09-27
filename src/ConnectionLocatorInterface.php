@@ -12,16 +12,16 @@ namespace Aura\Sql;
 
 /**
  * 
- * Locates PDO services for default, read, and write databases.
+ * Locates PDO connections for default, read, and write databases.
  * 
  * @package Aura.Sql
  * 
  */
-interface PdoLocatorInterface
+interface ConnectionLocatorInterface
 {
     /**
      * 
-     * Sets the default service registry entry.
+     * Sets the default connection registry entry.
      * 
      * @param callable $callable The registry entry.
      * 
@@ -32,16 +32,16 @@ interface PdoLocatorInterface
     
     /**
      * 
-     * Returns the default service object.
+     * Returns the default connection object.
      * 
-     * @return PdoInterface
+     * @return ExtendedPdoInterface
      * 
      */
     public function getDefault();
 
     /**
      * 
-     * Sets a read service registry entry by name.
+     * Sets a read connection registry entry by name.
      * 
      * @param string $name The name of the registry entry.
      * 
@@ -54,20 +54,20 @@ interface PdoLocatorInterface
 
     /**
      * 
-     * Returns a read service by name; if no name is given, picks a
-     * random service; if no read services are present, returns the
-     * default service.
+     * Returns a read connection by name; if no name is given, picks a
+     * random connection; if no read connections are present, returns the
+     * default connection.
      * 
-     * @param string $name The read service name to return.
+     * @param string $name The read connection name to return.
      * 
-     * @return PdoInterface
+     * @return ExtendedPdoInterface
      * 
      */
     public function getRead($name = null);
 
     /**
      * 
-     * Sets a write service registry entry by name.
+     * Sets a write connection registry entry by name.
      * 
      * @param string $name The name of the registry entry.
      * 
@@ -80,13 +80,13 @@ interface PdoLocatorInterface
 
     /**
      * 
-     * Returns a write service by name; if no name is given, picks a
-     * random service; if no write services are present, returns the
-     * default service.
+     * Returns a write connection by name; if no name is given, picks a
+     * random connection; if no write connections are present, returns the
+     * default connection.
      * 
-     * @param string $name The write service name to return.
+     * @param string $name The write connection name to return.
      * 
-     * @return PdoInterface
+     * @return ExtendedPdoInterface
      * 
      */
     public function getWrite($name = null);

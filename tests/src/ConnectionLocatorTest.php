@@ -4,10 +4,10 @@ namespace Aura\Sql;
 use Aura\Sql\Profiler;
 use Aura\Sql\Query\QueryFactory;
 
-class PdoLocatorTest extends \PHPUnit_Framework_TestCase
+class ConnectionLocatorTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var PdoLocator
+     * @var ConnectionLocator
      */
     protected $locator;
     
@@ -20,7 +20,7 @@ class PdoLocatorTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->default = function () {
-            return new Pdo(
+            return new ExtendedPdo(
                 'mock:host=default.example.com',
                 'user_name',
                 'pass_word',
@@ -30,7 +30,7 @@ class PdoLocatorTest extends \PHPUnit_Framework_TestCase
         
         $this->read = array(
             'read1' => function () {
-                return new Pdo(
+                return new ExtendedPdo(
                     'mock:host=read1.example.com',
                     'user_name',
                     'pass_word',
@@ -38,7 +38,7 @@ class PdoLocatorTest extends \PHPUnit_Framework_TestCase
                 );
             },
             'read2' => function () {
-                return new Pdo(
+                return new ExtendedPdo(
                     'mock:host=read2.example.com',
                     'user_name',
                     'pass_word',
@@ -46,7 +46,7 @@ class PdoLocatorTest extends \PHPUnit_Framework_TestCase
                 );
             },
             'read3' => function () {
-                return new Pdo(
+                return new ExtendedPdo(
                     'mock:host=read3.example.com',
                     'user_name',
                     'pass_word',
@@ -57,7 +57,7 @@ class PdoLocatorTest extends \PHPUnit_Framework_TestCase
         
         $this->write = array(
             'write1' => function () {
-                return new Pdo(
+                return new ExtendedPdo(
                     'mock:host=write1.example.com',
                     'user_name',
                     'pass_word',
@@ -65,7 +65,7 @@ class PdoLocatorTest extends \PHPUnit_Framework_TestCase
                 );
             },
             'write2' => function () {
-                return new Pdo(
+                return new ExtendedPdo(
                     'mock:host=write2.example.com',
                     'user_name',
                     'pass_word',
@@ -73,7 +73,7 @@ class PdoLocatorTest extends \PHPUnit_Framework_TestCase
                 );
             },
             'write3' => function () {
-                return new Pdo(
+                return new ExtendedPdo(
                     'mock:host=write3.example.com',
                     'user_name',
                     'pass_word',
@@ -85,7 +85,7 @@ class PdoLocatorTest extends \PHPUnit_Framework_TestCase
     
     protected function newLocator($read = array(), $write = array())
     {
-        return new PdoLocator($this->default, $read, $write);
+        return new ConnectionLocator($this->default, $read, $write);
     }
     
     public function testGetDefault()
@@ -136,7 +136,7 @@ class PdoLocatorTest extends \PHPUnit_Framework_TestCase
     public function testGetReadMissing()
     {
         $locator = $this->newLocator($this->read, $this->write);
-        $this->setExpectedException('Aura\Sql\Exception\ServiceNotFound');
+        $this->setExpectedException('Aura\Sql\Exception\ConnectionNotFound');
         $pdo = $locator->getRead('no-such-connection');
     }
     
@@ -179,7 +179,7 @@ class PdoLocatorTest extends \PHPUnit_Framework_TestCase
     public function testGetWriteMissing()
     {
         $locator = $this->newLocator($this->write, $this->write);
-        $this->setExpectedException('Aura\Sql\Exception\ServiceNotFound');
+        $this->setExpectedException('Aura\Sql\Exception\ConnectionNotFound');
         $pdo = $locator->getWrite('no-such-connection');
     }
 }

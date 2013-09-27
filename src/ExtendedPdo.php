@@ -40,7 +40,7 @@ use PDOStatement;
  * By defult, it starts in the ERRMODE_EXCEPTION instead of ERRMODE_SILENT.
  * 
  */
-class Pdo extends \PDO implements PdoInterface
+class ExtendedPdo extends \PDO implements ExtendedPdoInterface
 {
     /**
      * 
@@ -586,7 +586,7 @@ class Pdo extends \PDO implements PdoInterface
     {
         $this->bindValues($values);
         $sth = $this->query($statement);
-        $data = $sth->fetchAll(PDO::FETCH_ASSOC);
+        $data = $sth->fetchAll(self::FETCH_ASSOC);
         if ($callable) {
             foreach ($data as $key => $row) {
                 $data[$key] = call_user_func($callable, $row);
@@ -620,12 +620,12 @@ class Pdo extends \PDO implements PdoInterface
         $sth = $this->query($statement);
         $data = array();
         if ($callable) {
-            while ($row = $sth->fetch(PDO::FETCH_ASSOC)) {
+            while ($row = $sth->fetch(self::FETCH_ASSOC)) {
                 $key = current($row); // value of the first element
                 $data[$key] = call_user_func($callable, $row);
             }
         } else {
-            while ($row = $sth->fetch(PDO::FETCH_ASSOC)) {
+            while ($row = $sth->fetch(self::FETCH_ASSOC)) {
                 $key = current($row); // value of the first element
                 $data[$key] = $row;
             }
@@ -651,7 +651,7 @@ class Pdo extends \PDO implements PdoInterface
     {
         $this->bindValues($values);
         $sth = $this->query($statement);
-        $data = $sth->fetchAll(PDO::FETCH_COLUMN, 0);
+        $data = $sth->fetchAll(self::FETCH_COLUMN, 0);
         if ($callable) {
             foreach ($data as $key => $val) {
                 $data[$key] = call_user_func($callable, $val);
@@ -675,7 +675,7 @@ class Pdo extends \PDO implements PdoInterface
     {
         $this->bindValues($values);
         $sth = $this->query($statement);
-        return $sth->fetch(PDO::FETCH_ASSOC);
+        return $sth->fetch(self::FETCH_ASSOC);
     }
     
     /**
@@ -699,14 +699,14 @@ class Pdo extends \PDO implements PdoInterface
         $sth = $this->query($statement);
         if ($callable) {
             $data = array();
-            while ($row = $sth->fetch(PDO::FETCH_NUM)) {
+            while ($row = $sth->fetch(self::FETCH_NUM)) {
                 // apply the callback first so the key can be modified
                 $row = call_user_func($callable, $row);
                 // now retain the data
                 $data[$row[0]] = $row[1];
             }
         } else {
-            $data = $sth->fetchAll(PDO::FETCH_KEY_PAIR);
+            $data = $sth->fetchAll(self::FETCH_KEY_PAIR);
         }
         return $data;
     }
@@ -819,7 +819,7 @@ class Pdo extends \PDO implements PdoInterface
      * @see http://php.net/manual/en/pdo.quote.php
      * 
      */
-    public function quote($value, $parameter_type = PDO::PARAM_STR)
+    public function quote($value, $parameter_type = self::PARAM_STR)
     {
         $this->connect();
         

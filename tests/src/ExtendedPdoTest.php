@@ -1,7 +1,9 @@
 <?php
 namespace Aura\Sql;
 
-class PdoTest extends \PHPUnit_Framework_TestCase
+use PDO;
+
+class ExtendedPdoTest extends \PHPUnit_Framework_TestCase
 {
     protected $pdo;
     
@@ -19,7 +21,7 @@ class PdoTest extends \PHPUnit_Framework_TestCase
         // do this to test constructor array loop
         $attributes = array(PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION);
         
-        $this->pdo = new Pdo(
+        $this->pdo = new ExtendedPdo(
             $dsn,
             $username,
             $password,
@@ -88,10 +90,10 @@ class PdoTest extends \PHPUnit_Framework_TestCase
     
     public function testSetAndGetAttribute()
     {
-        $pdo = new Pdo('sqlite::memory:');
+        $pdo = new ExtendedPdo('sqlite::memory:');
         $this->assertFalse($pdo->isConnected());
         
-        $pdo->setAttribute(Pdo::ATTR_ERRMODE, Pdo::ERRMODE_WARNING);
+        $pdo->setAttribute(Pdo::ATTR_ERRMODE, ExtendedPdo::ERRMODE_WARNING);
         $this->assertFalse($pdo->isConnected());
         
         $actual = $pdo->getAttribute(Pdo::ATTR_ERRMODE);
@@ -99,7 +101,7 @@ class PdoTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($pdo->isConnected());
         
         // set again now that we're connected
-        $pdo->setAttribute(Pdo::ATTR_ERRMODE, Pdo::ERRMODE_EXCEPTION);
+        $pdo->setAttribute(Pdo::ATTR_ERRMODE, ExtendedPdo::ERRMODE_EXCEPTION);
         $actual = $pdo->getAttribute(Pdo::ATTR_ERRMODE);
         $this->assertSame(Pdo::ERRMODE_EXCEPTION, $actual);
     }
@@ -158,7 +160,7 @@ class PdoTest extends \PHPUnit_Framework_TestCase
         $stm = "SELECT id, name FROM pdotest";
         
         // mode and 2 args
-        $sth = $this->pdo->query($stm, Pdo::FETCH_CLASS, 'StdClass', array());
+        $sth = $this->pdo->query($stm, ExtendedPdo::FETCH_CLASS, 'StdClass', array());
         $actual = $sth->fetchAll();
         $expect = array(
             0 => (object) array(
@@ -205,7 +207,7 @@ class PdoTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expect, $actual);
         
         // mode and 1 arg
-        $sth = $this->pdo->query($stm, Pdo::FETCH_COLUMN, 1);
+        $sth = $this->pdo->query($stm, ExtendedPdo::FETCH_COLUMN, 1);
         $actual = $sth->fetchAll();
         $expect = array(
             0 => 'Anna',
@@ -222,7 +224,7 @@ class PdoTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($actual, $expect);
         
         // mode only
-        $sth = $this->pdo->query($stm, Pdo::FETCH_ASSOC);
+        $sth = $this->pdo->query($stm, ExtendedPdo::FETCH_ASSOC);
         $actual = $sth->fetchAll();
         $expect = array(
             0 => array(

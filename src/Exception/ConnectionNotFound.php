@@ -14,11 +14,11 @@ use Aura\Sql\Exception;
 
 /**
  * 
- * PDO locator could not find a named service.
+ * Locator could not find a named connection.
  * 
  * @package Aura.Sql
  * 
  */
-class ServiceNotFound extends Exception
+class ConnectionNotFound extends Exception
 {
 }
