@@ -26,10 +26,6 @@ use PDOStatement;
  *   be replaced with comma-separated quoted values. This means you can bind
  *   an array of values to a placeholder used with an `IN (...)` condition.
  * 
- * - Quoting values into placeholders.
- * 
- * - Quoting identifier names.
- * 
  * - Bind values. You may provide values for binding to the next query using
  *   bindValues(). Mulitple calls to bindValues() will merge, not reset, the
  *   values. The values will be reset after calling query(), exec(),
@@ -292,6 +288,24 @@ class Pdo extends \PDO implements PdoInterface
     
     /**
      * 
+     * Retains a single value to bind to the next query statement; it will
+     * be merged with existing bound values, and will be reset after the
+     * next query.
+     * 
+     * @param string $name The parameter name.
+     * 
+     * @param mixed $value The parameter value.
+     * 
+     * @return null
+     * 
+     */
+    public function bindValue($name, $value)
+    {
+        $this->bind_values[$name] = $value;
+    }
+    
+    /**
+     * 
      * Retains several values to bind to the next query statement; these will
      * be merges with existing bound values, and will be reset after the
      * next query.
@@ -304,7 +318,9 @@ class Pdo extends \PDO implements PdoInterface
      */
     public function bindValues(array $bind_values)
     {
-        $this->bind_values = array_merge($this->bind_values, $bind_values);
+        foreach ($bind_values as $name => $value) {
+            $this->bindValue($name, $value);
+        }
     }
     
     /**

@@ -222,8 +222,23 @@ interface PdoInterface
     
     /**
      * 
+     * Retains a single value to bind to the next query statement; it will
+     * be merged with existing bound values, and will be reset after the
+     * next query.
+     * 
+     * @param string $name The parameter name.
+     * 
+     * @param mixed $value The parameter value.
+     * 
+     * @return null
+     * 
+     */
+    public function bindValue($name, $value);
+    
+    /**
+     * 
      * Retains several values to bind to the next query statement; these will
-     * be merges with existing bound values, and will be reset after the
+     * be merged with existing bound values, and will be reset after the
      * next query.
      * 
      * @param array $values An array where the key is the parameter name and
@@ -232,7 +247,7 @@ interface PdoInterface
      * @return null
      * 
      */
-    public function bindValues(array $values);
+    public function bindValues(array $bind_values);
     
     /**
      * 
@@ -260,7 +275,7 @@ interface PdoInterface
      * @return array
      * 
      */
-    public function fetchAll($statement, array $values = array());
+    public function fetchAll($statement, array $values = array(), $callable = null);
 
     /**
      * 
@@ -281,7 +296,7 @@ interface PdoInterface
      * @return array
      * 
      */
-    public function fetchAssoc($statement, array $values = array());
+    public function fetchAssoc($statement, array $values = array(), $callable = null);
     
     /**
      * 
@@ -297,7 +312,7 @@ interface PdoInterface
      * @return array
      * 
      */
-    public function fetchCol($statement, array $values = array());
+    public function fetchCol($statement, array $values = array(), $callable = null);
     
     /**
      * 
@@ -327,7 +342,7 @@ interface PdoInterface
      * @return array
      * 
      */
-    public function fetchPairs($statement, array $values = array());
+    public function fetchPairs($statement, array $values = array(), $callable = null);
     
     /**
      * 
