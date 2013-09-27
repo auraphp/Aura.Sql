@@ -102,7 +102,7 @@ $pdo = new ExtendedPdo(
 ?>
 ```
 
-You can now use the _ExtendedPdo_ instance in exactly the same was as a native
+You can now use the _ExtendedPdo_ instance in exactly the same way as a native
 _PDO_ instance.
 
 ### Lazy Connection
@@ -310,7 +310,7 @@ Each profile entry will have these keys:
   in the codebase.
 
 Setting the _Profiler_ into the _ExtendedPdo_ instance is optional. Once it
-it set, you can activate and deactivate it as you wish using the
+is set, you can activate and deactivate it as you wish using the
 `Profiler::setActive()` method. When not active, query profiles will not be
 retained.
 
@@ -350,7 +350,7 @@ Now add a default connection; this will be used when a read or write
 connection is not defined. (This is also useful for setting up connection
 location in advance of actually having multiple database servers.)
 
-```
+```php
 <?php
 $connections->setDefault(function () {
     return new ExtendedPdo(
@@ -364,7 +364,7 @@ $connections->setDefault(function () {
 
 Next, add as many named read and write connections as you like:
 
-```
+```php
 <?php
 // the write (master) server
 $connections->addRead('write', function () {
