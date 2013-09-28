@@ -1,12 +1,9 @@
 # Aura.Sql
 
-This library provides an extension to the PHP-native [PDO](http://php.net/PDO)
-along with a profiler and connection locator. Becuase _ExtendedPdo_ is an
-extension of the native _PDO_, code already using the native _PDO_ or
-typehinted to the native _PDO_ can use _ExtendedPdo_ without any changes.
-
-> N.b.: This package is compatible with PHP 5.3; most Aura libraries require
-> PHP 5.4.
+Provides an extension to the native [PDO](http://php.net/PDO) along with a
+profiler and connection locator. Becuase _ExtendedPdo_ is an extension of the
+native _PDO_, code already using the native _PDO_ or typehinted to the native
+_PDO_ can use _ExtendedPdo_ without any changes.
 
 Added functionality in _Aura.Sql_ over the native _PDO_ includes:
 
@@ -42,32 +39,33 @@ Added functionality in _Aura.Sql_ over the native _PDO_ includes:
   for picking different database connections (default, read, and write).
 
 
-## Preliminaries
+## Foreword
 
 ### Installation and Autoloading
 
-This library is installable via Composer and is registered on Packagist at
-<https://packagist.org/packages/aura/sql>. Installing via Composer will
-set up autoloading automatically.
+This library is installable and autoloadable via Composer with the following
+`require` element in your `composer.json` file:
 
+    "require": {
+        "aura/sql": "dev-develop-2"
+    }
+    
 Alternatively, download or clone this repository, then require or include its
 _autoload.php_ file.
 
 ### Dependencies and PHP Version
 
-As with all Aura libraries, this library has no external dependencies. It
-requires PHP version 5.3 or later (as opposed to most other Aura libraries,
-which require PHP 5.4 or later).
+As with all Aura libraries, this library has no userland dependencies. It
+requires PHP version 5.3 or later.
 
 ### Tests
 
-[![Build Status](https://api.travis-ci.org/auraphp/Aura.Sql.png?branch=aura.sql.pdo)](https://travis-ci.org/auraphp/Aura.Sql)
+[![Build Status](https://api.travis-ci.org/auraphp/Aura.Sql.png?branch=develop-2)](https://travis-ci.org/auraphp/Aura.Sql)
 
-This library has 100% code coverage. To run the library tests, first install
-[PHPUnit][], then go to the library _tests_ directory and issue `phpunit` at
-the command line.
+This library has 100% code coverage with [PHPUnit][]. To run the tests at the
+command line, go to the _tests_ directory and issue `phpunit`.
 
-[PHPUnit]: http://phpunit.de/manual/
+[phpunit]: http://phpunit.de/manual/
 
 ### PSR Compliance
 
@@ -132,7 +130,7 @@ $pdo->connect();
 
 ### Bind Values
 
-Instead of having to bind values to a prepared `PDOStatement`, you can call
+Instead of having to bind values to a prepared _PDOStatement_, you can call
 `bindValues()` directly on the _ExtendedPdo_ instance, and those values will
 be bound to named placeholders in the next query.
 
@@ -154,7 +152,7 @@ $sth = $pdo->query('SELECT * FROM test WHERE foo = :foo AND bar = :bar');
 
 ### Array Quoting
 
-The native `PDO::quote()` method will not quote arrays. This makes it
+The native _PDO_ `quote()` method will not quote arrays. This makes it
 difficult to bind an array to something like an `IN (...)` condition in SQL.
 However, _ExtendedPdo_ recognizes arrays and converts them into
 comma-separated quoted strings.
@@ -176,7 +174,7 @@ $cond = 'IN (' . $pdo->quote($array) . ')';
 ?>
 ```
 
-Whereas the native `PDO::prepare()` does not deal with bound array values,
+Whereas the native _PDO_ `prepare()` does not deal with bound array values,
 _ExtendedPdo_ modifies the query string to replace the named placeholder with
 the quoted array.  Note that this is *not* the same thing as binding proper;
 the query string itself is modified before passing to the database for value
@@ -217,7 +215,7 @@ not on returned _PDOStatement_ instances.
 _ExtendedPdo_ comes with `fetch*()` methods to help reduce boilerplate code.
 Instead of issuing `prepare()`, a series of `bindValue()` calls, `execute()`,
 and then `fetch*()` on a _PDOStatement_, you can bind values and fetch results
-in one call.
+in one call on _ExtendedPdo_ directly.
 
 ```php
 <?php
@@ -257,9 +255,9 @@ $result = $pdo->fetchValue($stm, $bind);
 ?>
 ```
 
-In addition, the methods `fetchAll()`, `fetchAssoc()`, `fetchCol()`, and
-`fetchPairs()` take a third parameter, a callable, to apply to each row of
-the results before returning.
+The methods `fetchAll()`, `fetchAssoc()`, `fetchCol()`, and `fetchPairs()`
+take a third parameter, a callable, to apply to each row of the results before
+returning.
 
 ```php
 <?php
