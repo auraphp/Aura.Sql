@@ -146,11 +146,6 @@ class Select extends AbstractQuery
             }
         }
 
-        // join these sources
-        /*foreach ($this->join as $join) {
-            $text .= $join . PHP_EOL;
-        }*/
-
         // where these conditions
         if ($this->where) {
             $text .= 'WHERE' . $this->indent($this->where);
