@@ -62,7 +62,8 @@ class Select extends AbstractQuery
      *
      */
     protected $from = [];
-
+    protected $from_key = -1;
+    
     /**
      *
      * Use these joins.
@@ -265,9 +266,8 @@ class Select extends AbstractQuery
      */
     public function from($spec)
     {
-        $this->from[] = [
-            $this->connection->quoteName($spec)
-        ];
+        $this->from[] = [$this->connection->quoteName($spec)];
+        $this->from_key ++;
         return $this;
     }
 
@@ -286,9 +286,8 @@ class Select extends AbstractQuery
     public function fromSubSelect($spec, $name)
     {
         $spec = ltrim(preg_replace('/^/m', '    ', (string) $spec));
-        $this->from[] = [
-            "($spec) AS " . $this->connection->quoteName($name)
-        ];
+        $this->from[] = ["($spec) AS " . $this->connection->quoteName($name)];
+        $this->from_key ++;
         return $this;
     }
 
@@ -319,9 +318,8 @@ class Select extends AbstractQuery
         $this->join[] = $joinStatement;
 
         //connect to latest from statement
-        $fromCount = count($this->from);
-        if ($fromCount) {
-            $this->from[$fromCount - 1][] = $joinStatement;
+        if ($this->from) {
+            $this->from[$this->from_key][] = $joinStatement;
         }
 
         return $this;
@@ -359,9 +357,8 @@ class Select extends AbstractQuery
         $this->join[] = $joinStatement;
 
         //connect to latest from statement
-        $fromCount = count($this->from);
-        if ($fromCount) {
-            $this->from[$fromCount - 1][] = $joinStatement;
+        if ($this->from) {
+            $this->from[$this->from_key][] = $joinStatement;
         }
 
         return $this;
