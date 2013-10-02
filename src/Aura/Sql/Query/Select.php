@@ -317,7 +317,7 @@ class Select extends AbstractQuery
 
         $this->join[] = $joinStatement;
 
-        //connect to latest from statement
+        // connect to latest from statement
         if ($this->from) {
             $this->from[$this->from_key][] = $joinStatement;
         }
@@ -356,7 +356,7 @@ class Select extends AbstractQuery
 
         $this->join[] = $joinStatement;
 
-        //connect to latest from statement
+        // connect to latest from statement
         if ($this->from) {
             $this->from[$this->from_key][] = $joinStatement;
         }
