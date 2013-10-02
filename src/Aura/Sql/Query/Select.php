@@ -310,16 +310,16 @@ class Select extends AbstractQuery
         $spec = $this->connection->quoteName($spec);
         if ($cond) {
             $cond = $this->connection->quoteNamesIn($cond);
-            $joinStatement = "$join $spec ON $cond";
+            $clause = "$join $spec ON $cond";
         } else {
-            $joinStatement = "$join $spec";
+            $clause = "$join $spec";
         }
 
-        $this->join[] = $joinStatement;
+        $this->join[] = $clause;
 
         // connect to latest from statement
         if ($this->from) {
-            $this->from[$this->from_key][] = $joinStatement;
+            $this->from[$this->from_key][] = $clause;
         }
 
         return $this;
@@ -349,16 +349,16 @@ class Select extends AbstractQuery
         $name = $this->connection->quoteName($name);
         if ($cond) {
             $cond = $this->connection->quoteNamesIn($cond);
-            $joinStatement = "$join ($spec) AS $name ON $cond";
+            $clause = "$join ($spec) AS $name ON $cond";
         } else {
-            $joinStatement = "$join ($spec) AS $name";
+            $clause = "$join ($spec) AS $name";
         }
 
-        $this->join[] = $joinStatement;
+        $this->join[] = $clause;
 
         // connect to latest from statement
         if ($this->from) {
-            $this->from[$this->from_key][] = $joinStatement;
+            $this->from[$this->from_key][] = $clause;
         }
 
         return $this;
