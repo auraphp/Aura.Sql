@@ -62,7 +62,8 @@ class Select extends AbstractQuery
      *
      */
     protected $from = [];
-
+    protected $from_key = -1;
+    
     /**
      *
      * Use these joins.
@@ -265,9 +266,8 @@ class Select extends AbstractQuery
      */
     public function from($spec)
     {
-        $this->from[] = [
-            $this->connection->quoteName($spec)
-        ];
+        $this->from[] = [$this->connection->quoteName($spec)];
+        $this->from_key ++;
         return $this;
     }
 
@@ -286,9 +286,8 @@ class Select extends AbstractQuery
     public function fromSubSelect($spec, $name)
     {
         $spec = ltrim(preg_replace('/^/m', '    ', (string) $spec));
-        $this->from[] = [
-            "($spec) AS " . $this->connection->quoteName($name)
-        ];
+        $this->from[] = ["($spec) AS " . $this->connection->quoteName($name)];
+        $this->from_key ++;
         return $this;
     }
 
@@ -311,17 +310,16 @@ class Select extends AbstractQuery
         $spec = $this->connection->quoteName($spec);
         if ($cond) {
             $cond = $this->connection->quoteNamesIn($cond);
-            $joinStatement = "$join $spec ON $cond";
+            $clause = "$join $spec ON $cond";
         } else {
-            $joinStatement = "$join $spec";
+            $clause = "$join $spec";
         }
 
-        $this->join[] = $joinStatement;
+        $this->join[] = $clause;
 
-        //connect to latest from statement
-        $fromCount = count($this->from);
-        if ($fromCount) {
-            $this->from[$fromCount - 1][] = $joinStatement;
+        // connect to latest from statement
+        if ($this->from) {
+            $this->from[$this->from_key][] = $clause;
         }
 
         return $this;
@@ -351,17 +349,16 @@ class Select extends AbstractQuery
         $name = $this->connection->quoteName($name);
         if ($cond) {
             $cond = $this->connection->quoteNamesIn($cond);
-            $joinStatement = "$join ($spec) AS $name ON $cond";
+            $clause = "$join ($spec) AS $name ON $cond";
         } else {
-            $joinStatement = "$join ($spec) AS $name";
+            $clause = "$join ($spec) AS $name";
         }
 
-        $this->join[] = $joinStatement;
+        $this->join[] = $clause;
 
-        //connect to latest from statement
-        $fromCount = count($this->from);
-        if ($fromCount) {
-            $this->from[$fromCount - 1][] = $joinStatement;
+        // connect to latest from statement
+        if ($this->from) {
+            $this->from[$this->from_key][] = $clause;
         }
 
         return $this;
