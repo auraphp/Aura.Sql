@@ -182,6 +182,27 @@ class SelectTest extends AbstractQueryTest
         $this->assertSameSql($expect, $actual);
     }
 
+    public function testJoinOrder()
+    {
+        $this->query
+            ->from('t1')
+            ->join('inner', 't2', 't2.id = t1.id')
+            ->join('left', 't3', 't3.id = t2.id')
+            ->from('t4')
+            ->join('inner', 't5', 't5.id = t4.id');
+        $expect = '
+            SELECT
+            FROM
+                "t1"
+            INNER JOIN "t2" ON "t2"."id" = "t1"."id"
+            LEFT JOIN "t3" ON "t3"."id" = "t2"."id",
+                "t4"
+            INNER JOIN "t5" ON "t5"."id" = "t4"."id"
+        ';
+        $actual = $this->query->__toString();
+        $this->assertSameSql($expect, $actual);
+    }
+
     public function testWhere()
     {
         $this->query->where("c1 = c2")
