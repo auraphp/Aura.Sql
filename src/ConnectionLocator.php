@@ -57,7 +57,7 @@ class ConnectionLocator implements ConnectionLocatorInterface
      * 
      */
     public function __construct(
-        $default,
+        $default = null,
         array $read = array(),
         array $write = array()
     ) {
