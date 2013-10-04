@@ -364,7 +364,7 @@ Next, add as many named read and write connections as you like:
 ```php
 <?php
 // the write (master) server
-$connections->addWrite('master', function () {
+$connections->setWrite('master', function () {
     return new ExtendedPdo(
         'mysql:host=master.db.localhost;dbname=database',
         'username',
@@ -373,7 +373,7 @@ $connections->addWrite('master', function () {
 });
 
 // read (slave) #1
-$connections->addRead('slave1', function () {
+$connections->setRead('slave1', function () {
     return new ExtendedPdo(
         'mysql:host=slave1.db.localhost;dbname=database',
         'username',
@@ -382,7 +382,7 @@ $connections->addRead('slave1', function () {
 });
 
 // read (slave) #2
-$connections->addRead('slave2', function () {
+$connections->setRead('slave2', function () {
     return new ExtendedPdo(
         'mysql:host=slave2.db.localhost;dbname=database',
         'username',
@@ -391,7 +391,7 @@ $connections->addRead('slave2', function () {
 });
 
 // read (slave) #3
-$connections->addRead('slave3', function () {
+$connections->setRead('slave3', function () {
     return new ExtendedPdo(
         'mysql:host=slave3.db.localhost;dbname=database',
         'username',
