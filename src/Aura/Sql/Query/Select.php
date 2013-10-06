@@ -523,6 +523,7 @@ class Select extends AbstractQuery
         $this->resetFlags();
         $this->cols       = [];
         $this->from       = [];
+        $this->from_key   = -1;
         $this->join       = [];
         $this->where      = [];
         $this->group_by   = [];
