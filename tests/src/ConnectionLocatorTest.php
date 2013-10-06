@@ -182,4 +182,9 @@ class ConnectionLocatorTest extends \PHPUnit_Framework_TestCase
         $this->setExpectedException('Aura\Sql\Exception\ConnectionNotFound');
         $pdo = $locator->getWrite('no-such-connection');
     }
+    
+    public function testIsInstanceOfConnectionLocator()
+    {
+        $this->assertInstanceOf('\Aura\Sql\ConnectionLocator', new ConnectionLocator());
+    }
 }
