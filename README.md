@@ -144,8 +144,39 @@ $sth->execute();
 
 // the ExtendedPdo way
 $pdo = new ExtendedPdo(...);
-$pdo->bindValues(array('foo' => 'foo_value', 'bar' => 'bar_value'));
+$pdo->bindValues(array(
+    'foo' => 'foo_value',
+    'bar' => 'bar_value',
+));
 $sth = $pdo->query('SELECT * FROM test WHERE foo = :foo AND bar = :bar');
+?>
+```
+
+It also works with sequential question-mark placeholders; note that,
+question-mark placeholders are numbered starting from 1, and that the keys
+must be integers (not string numerics).
+
+```php
+<?php
+$pdo = new ExtendedPdo(...);
+$pdo->bindValues(array(
+    1 => 'foo_value',
+    2 => 'bar_value',
+));
+$sth = $pdo->query('SELECT * FROM test WHERE foo = ? AND bar = ?');
+?>
+```
+
+Mixing named placeholders and question-mark placeholders is allowed:
+
+```php
+<?php
+$pdo = new ExtendedPdo(...);
+$pdo->bindValues(array(
+    'foo' => 'foo_value',
+    1 => 'bar_value',
+));
+$sth = $pdo->query('SELECT * FROM test WHERE foo = :foo AND bar = ?');
 ?>
 ```
 
