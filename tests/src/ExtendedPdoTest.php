@@ -581,10 +581,10 @@ class ExtendedPdoTest extends \PHPUnit_Framework_TestCase
     public function testPlaceholders()
     {
         $stm = 'SELECT * FROM pdotest WHERE id > ? AND id < :max';
-        $val = [
+        $val = array(
             1 => '-1',
             'max' => '99',
-        ];
+        );
         $res = $this->pdo->fetchAll($stm, $val);
         $this->assertSame(10, count($res));
     }
