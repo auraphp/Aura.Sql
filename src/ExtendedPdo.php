@@ -388,9 +388,9 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      * Connects to the database and prepares an SQL statement to be executed,
      * using values that been bound for the next query.
      * 
-     * This override only binds values that have placeholders in the
+     * This override only binds values that have named placeholders in the
      * statement, thereby avoiding errors from PDO regarding too many bound
-     * values.
+     * values; it also binds all sequential (question-mark) placeholders.
      * 
      * If a placeholder value is an array, the array is converted to a string
      * of comma-separated quoted values; e.g., for an `IN (...)` condition.
@@ -416,7 +416,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
             return parent::prepare($statement, $options);
         }
 
-        // a list of placeholders to bind at the end of this method
+        // a list of named placeholders to bind at the end of this method
         $placeholders = array();
 
         // find all parts not inside quotes or backslashed-quotes
@@ -468,9 +468,12 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
         // prepare the statement
         $sth = parent::prepare($statement, $options);
 
-        // for the placeholders we found, bind the corresponding data values
-        foreach ($placeholders as $key) {
-            $sth->bindValue($key, $this->bind_values[$key]);
+        // for the placeholders we found, bind the corresponding data values,
+        // along with all sequential values for question marks
+        foreach ($this->bind_values as $key => $val) {
+            if (is_int($key) || in_array($key, $placeholders)) {
+                $sth->bindValue($key, $this->bind_values[$key]);
+            }
         }
 
         // done

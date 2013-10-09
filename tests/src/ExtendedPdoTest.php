@@ -565,4 +565,27 @@ class ExtendedPdoTest extends \PHPUnit_Framework_TestCase
         
         $this->assertSame($expect, $actual);
     }
+    
+    public function testPlaceholdersInPdo()
+    {
+        $stm = 'SELECT * FROM pdotest WHERE id > ? AND id < :max';
+        $sth = $this->pdo->prepare($stm);
+        $sth->bindValue(1, '-1');
+        $sth->bindValue(2, '-1'); // binding to nonexistent qmark should not cause errors
+        $sth->bindValue('max', '99');
+        $sth->execute();
+        $res = $sth->fetchAll();
+        $this->assertSame(10, count($res));
+    }
+    
+    public function testPlaceholders()
+    {
+        $stm = 'SELECT * FROM pdotest WHERE id > ? AND id < :max';
+        $val = [
+            1 => '-1',
+            'max' => '99',
+        ];
+        $res = $this->pdo->fetchAll($stm, $val);
+        $this->assertSame(10, count($res));
+    }
 }
