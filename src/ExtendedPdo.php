@@ -469,7 +469,9 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
         $sth = parent::prepare($statement, $options);
 
         // for the placeholders we found, bind the corresponding data values,
-        // along with all sequential values for question marks
+        // along with all sequential values for question marks.
+        // PROBLEM: THIS WILL NOT QUOTE ARRAYS INTO CSV STRINGS. HOW CAN WE
+        // DEAL WITH THIS?
         foreach ($this->bind_values as $key => $val) {
             if (is_int($key) || in_array($key, $placeholders)) {
                 $sth->bindValue($key, $this->bind_values[$key]);
