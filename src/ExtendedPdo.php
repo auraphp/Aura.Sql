@@ -416,9 +416,18 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
             return parent::prepare($statement, $options);
         }
 
-        // a list of named placeholders to bind at the end of this method
-        $placeholders = array();
-
+        // anonymous object to track preparation info
+        $prep = (object) array(
+            // how many numbered placeholders in the original statement
+            'num' => 0,
+            // how many numbered placeholders to actually be bound; this may
+            // differ from 'num' in that some numbered placeholders may get
+            // replaced with quoted CSV strings
+            'count' => 0,
+            // named and numbered placeholders to bind at the end
+            'bind_values' => array(),
+        );
+        
         // find all parts not inside quotes or backslashed-quotes
         $apos = "'";
         $quot = '"';
@@ -429,61 +438,23 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
             PREG_SPLIT_DELIM_CAPTURE
         );
 
-        // the placeholder number we should use for the value
-        $num = 0;
-        
-        // numbered placeholder count
-        $p = 0;
-        
         // loop through the non-quoted parts (0, 3, 6, 9, etc.)
         $k = count($parts);
         for ($i = 0; $i <= $k; $i += 3) {
 
-            // split the part by ":name" and "?"
-            $subparts = preg_split(
+            // split into subparts by ":name" and "?"
+            $subs = preg_split(
                 "/(:[a-zA-Z_][a-zA-Z0-9_]*)|(\?)/m",
                 $parts[$i],
                 -1,
                 PREG_SPLIT_DELIM_CAPTURE
             );
 
-            // note &$subpart reference so we can modify in place
-            foreach ($subparts as &$subpart) {
-                $char = substr($subpart, 0, 1);
-                if ($char == '?') {
-                    
-                    $num ++;
-                    
-                    // is the corresponding data element an array?
-                    $bind_array = isset($this->bind_values[$num])
-                               && is_array($this->bind_values[$num]);
-                    if ($bind_array) {
-                        // PDO won't bind an array; quote and replace directly
-                        $subpart = $this->quote($this->bind_values[$num]);
-                    } else {
-                        $p ++;
-                        $placeholders[$p] = $this->bind_values[$num];
-                    }
-                    
-                } elseif ($char == ':') {
-                    
-                    $name = substr($subpart, 1);
-                    
-                    // is the corresponding data element an array?
-                    $bind_array = isset($this->bind_values[$name])
-                               && is_array($this->bind_values[$name]);
-                    if ($bind_array) {
-                        // PDO won't bind an array; quote and replace directly
-                        $subpart = $this->quote($this->bind_values[$name]);
-                    } else {
-                        // not an array, retain the placeholder for later
-                        $placeholders[$name] = $this->bind_values[$name];
-                    }
-                }
-            }
+            // check subparts to convert bound arrays to quoted CSV strings
+            $subs = $this->prepareSubparts($subs, $prep);
             
             // reassemble
-            $parts[$i] = implode('', $subparts);
+            $parts[$i] = implode('', $subs);
         }
 
         // bring the parts back together in case they were modified
@@ -494,12 +465,68 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
 
         // for the placeholders we found, bind the corresponding data values,
         // along with all sequential values for question marks
-        foreach ($placeholders as $key => $val) {
-            $sth->bindValue($key, $placeholders[$key]);
+        foreach ($prep->bind_values as $key => $val) {
+            $sth->bindValue($key, $val);
         }
 
         // done
         return $sth;
+    }
+    
+    protected function prepareSubparts($subs, $prep)
+    {
+        foreach ($subs as $i => $sub) {
+            $char = substr($sub, 0, 1);
+            if ($char == '?') {
+                $subs[$i] = $this->prepareNumberedPlaceholder($sub, $prep);
+            }
+            
+            if ($char == ':') {
+                $subs[$i] = $this->prepareNamedPlaceholder($sub, $prep);
+            }
+        }
+        
+        return $subs;
+    }
+    
+    // bind or quote a numbered placeholder
+    protected function prepareNumberedPlaceholder($sub, $prep)
+    {
+        // what numbered placeholder is this in the original statement?
+        $prep->num ++;
+        
+        // is the corresponding data element an array?
+        $bind_array = isset($this->bind_values[$prep->num])
+                   && is_array($this->bind_values[$prep->num]);
+        if ($bind_array) {
+            // PDO won't bind an array; quote and replace directly
+            $sub = $this->quote($this->bind_values[$prep->num]);
+        } else {
+            // increase the count of numbered placeholders to be bound
+            $prep->count ++;
+            $prep->bind_values[$prep->count] = $this->bind_values[$prep->num];
+        }
+        
+        return $sub;
+    }
+    
+    // bind or quote a named placeholder
+    protected function prepareNamedPlaceholder($sub, $prep)
+    {
+        $name = substr($sub, 1);
+        
+        // is the corresponding data element an array?
+        $bind_array = isset($this->bind_values[$name])
+                   && is_array($this->bind_values[$name]);
+        if ($bind_array) {
+            // PDO won't bind an array; quote and replace directly
+            $sub = $this->quote($this->bind_values[$name]);
+        } else {
+            // not an array, retain the placeholder for later
+            $prep->bind_values[$name] = $this->bind_values[$name];
+        }
+        
+        return $sub;
     }
     
     /**
