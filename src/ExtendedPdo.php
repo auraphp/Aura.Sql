@@ -429,37 +429,61 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
             PREG_SPLIT_DELIM_CAPTURE
         );
 
+        // the placeholder number we should use for the value
+        $num = 0;
+        
+        // numbered placeholder count
+        $p = 0;
+        
         // loop through the non-quoted parts (0, 3, 6, 9, etc.)
         $k = count($parts);
         for ($i = 0; $i <= $k; $i += 3) {
 
-            // get the part as a reference so it can be modified in place
-            $part =& $parts[$i];
-
-            // find all :placeholder matches in the part
-            preg_match_all(
-                "/\W:([a-zA-Z_][a-zA-Z0-9_]*)/m",
-                $part . PHP_EOL,
-                $matches
+            // split the part by ":name" and "?"
+            $subparts = preg_split(
+                "/(:[a-zA-Z_][a-zA-Z0-9_]*)|(\?)/m",
+                $parts[$i],
+                -1,
+                PREG_SPLIT_DELIM_CAPTURE
             );
 
-            // for each of the :placeholder matches ...
-            foreach ($matches[1] as $key) {
-                // is the corresponding data element an array?
-                $bind_array = isset($this->bind_values[$key])
-                           && is_array($this->bind_values[$key]);
-                if ($bind_array) {
-                    // PDO won't bind an array; quote and replace directly
-                    $find = "/(\W)(:$key)(\W)/m";
-                    $repl = '${1}'
-                          . $this->quote($this->bind_values[$key])
-                          . '${3}';
-                    $part = preg_replace($find, $repl, $part);
-                } else {
-                    // not an array, retain the placeholder name for later
-                    $placeholders[] = $key;
+            // note &$subpart reference so we can modify in place
+            foreach ($subparts as &$subpart) {
+                $char = substr($subpart, 0, 1);
+                if ($char == '?') {
+                    
+                    $num ++;
+                    
+                    // is the corresponding data element an array?
+                    $bind_array = isset($this->bind_values[$num])
+                               && is_array($this->bind_values[$num]);
+                    if ($bind_array) {
+                        // PDO won't bind an array; quote and replace directly
+                        $subpart = $this->quote($this->bind_values[$num]);
+                    } else {
+                        $p ++;
+                        $placeholders[$p] = $this->bind_values[$num];
+                    }
+                    
+                } elseif ($char == ':') {
+                    
+                    $name = substr($subpart, 1);
+                    
+                    // is the corresponding data element an array?
+                    $bind_array = isset($this->bind_values[$name])
+                               && is_array($this->bind_values[$name]);
+                    if ($bind_array) {
+                        // PDO won't bind an array; quote and replace directly
+                        $subpart = $this->quote($this->bind_values[$name]);
+                    } else {
+                        // not an array, retain the placeholder for later
+                        $placeholders[$name] = $this->bind_values[$name];
+                    }
                 }
             }
+            
+            // reassemble
+            $parts[$i] = implode('', $subparts);
         }
 
         // bring the parts back together in case they were modified
@@ -470,10 +494,8 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
 
         // for the placeholders we found, bind the corresponding data values,
         // along with all sequential values for question marks
-        foreach ($this->bind_values as $key => $val) {
-            if (is_int($key) || in_array($key, $placeholders)) {
-                $sth->bindValue($key, $this->bind_values[$key]);
-            }
+        foreach ($placeholders as $key => $val) {
+            $sth->bindValue($key, $placeholders[$key]);
         }
 
         // done
