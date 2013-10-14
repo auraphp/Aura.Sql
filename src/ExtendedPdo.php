@@ -416,9 +416,18 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
             return parent::prepare($statement, $options);
         }
 
-        // a list of named placeholders to bind at the end of this method
-        $placeholders = array();
-
+        // anonymous object to track preparation info
+        $prep = (object) array(
+            // how many numbered placeholders in the original statement
+            'num' => 0,
+            // how many numbered placeholders to actually be bound; this may
+            // differ from 'num' in that some numbered placeholders may get
+            // replaced with quoted CSV strings
+            'count' => 0,
+            // named and numbered placeholders to bind at the end
+            'bind_values' => array(),
+        );
+        
         // find all parts not inside quotes or backslashed-quotes
         $apos = "'";
         $quot = '"';
@@ -433,33 +442,19 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
         $k = count($parts);
         for ($i = 0; $i <= $k; $i += 3) {
 
-            // get the part as a reference so it can be modified in place
-            $part =& $parts[$i];
-
-            // find all :placeholder matches in the part
-            preg_match_all(
-                "/\W:([a-zA-Z_][a-zA-Z0-9_]*)/m",
-                $part . PHP_EOL,
-                $matches
+            // split into subparts by ":name" and "?"
+            $subs = preg_split(
+                "/(:[a-zA-Z_][a-zA-Z0-9_]*)|(\?)/m",
+                $parts[$i],
+                -1,
+                PREG_SPLIT_DELIM_CAPTURE
             );
 
-            // for each of the :placeholder matches ...
-            foreach ($matches[1] as $key) {
-                // is the corresponding data element an array?
-                $bind_array = isset($this->bind_values[$key])
-                           && is_array($this->bind_values[$key]);
-                if ($bind_array) {
-                    // PDO won't bind an array; quote and replace directly
-                    $find = "/(\W)(:$key)(\W)/m";
-                    $repl = '${1}'
-                          . $this->quote($this->bind_values[$key])
-                          . '${3}';
-                    $part = preg_replace($find, $repl, $part);
-                } else {
-                    // not an array, retain the placeholder name for later
-                    $placeholders[] = $key;
-                }
-            }
+            // check subparts to convert bound arrays to quoted CSV strings
+            $subs = $this->prepareSubparts($subs, $prep);
+            
+            // reassemble
+            $parts[$i] = implode('', $subs);
         }
 
         // bring the parts back together in case they were modified
@@ -469,17 +464,69 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
         $sth = parent::prepare($statement, $options);
 
         // for the placeholders we found, bind the corresponding data values,
-        // along with all sequential values for question marks.
-        // PROBLEM: THIS WILL NOT QUOTE ARRAYS INTO CSV STRINGS. HOW CAN WE
-        // DEAL WITH THIS?
-        foreach ($this->bind_values as $key => $val) {
-            if (is_int($key) || in_array($key, $placeholders)) {
-                $sth->bindValue($key, $this->bind_values[$key]);
-            }
+        // along with all sequential values for question marks
+        foreach ($prep->bind_values as $key => $val) {
+            $sth->bindValue($key, $val);
         }
 
         // done
         return $sth;
+    }
+    
+    protected function prepareSubparts($subs, $prep)
+    {
+        foreach ($subs as $i => $sub) {
+            $char = substr($sub, 0, 1);
+            if ($char == '?') {
+                $subs[$i] = $this->prepareNumberedPlaceholder($sub, $prep);
+            }
+            
+            if ($char == ':') {
+                $subs[$i] = $this->prepareNamedPlaceholder($sub, $prep);
+            }
+        }
+        
+        return $subs;
+    }
+    
+    // bind or quote a numbered placeholder
+    protected function prepareNumberedPlaceholder($sub, $prep)
+    {
+        // what numbered placeholder is this in the original statement?
+        $prep->num ++;
+        
+        // is the corresponding data element an array?
+        $bind_array = isset($this->bind_values[$prep->num])
+                   && is_array($this->bind_values[$prep->num]);
+        if ($bind_array) {
+            // PDO won't bind an array; quote and replace directly
+            $sub = $this->quote($this->bind_values[$prep->num]);
+        } else {
+            // increase the count of numbered placeholders to be bound
+            $prep->count ++;
+            $prep->bind_values[$prep->count] = $this->bind_values[$prep->num];
+        }
+        
+        return $sub;
+    }
+    
+    // bind or quote a named placeholder
+    protected function prepareNamedPlaceholder($sub, $prep)
+    {
+        $name = substr($sub, 1);
+        
+        // is the corresponding data element an array?
+        $bind_array = isset($this->bind_values[$name])
+                   && is_array($this->bind_values[$name]);
+        if ($bind_array) {
+            // PDO won't bind an array; quote and replace directly
+            $sub = $this->quote($this->bind_values[$name]);
+        } else {
+            // not an array, retain the placeholder for later
+            $prep->bind_values[$name] = $this->bind_values[$name];
+        }
+        
+        return $sub;
     }
     
     /**
@@ -666,6 +713,74 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
         return $data;
     }
 
+    /**
+     * 
+     * Fetches one row from the database as an object, mapping column values
+     * to object properties.
+     * 
+     * Warning: PDO "injects property-values BEFORE invoking the constructor -
+     * in other words, if your class initializes property-values to defaults
+     * in the constructor, you will be overwriting the values injected by
+     * fetchObject() !"
+     * <http://www.php.net/manual/en/pdostatement.fetchobject.php#111744>
+     * 
+     * @param string $statement The SQL statement to prepare and execute.
+     * 
+     * @param array $values Values to bind to the query.
+     * 
+     * @param string $class_name The name of the class to create.
+     * 
+     * @param array $ctor_args Arguments to pass to the object constructor.
+     * 
+     * @return object
+     * 
+     */
+    public function fetchObject(
+        $statement,
+        array $values = array(),
+        $class_name = 'StdClass',
+        array $ctor_args = array()
+    ) {
+        $this->bindValues($values);
+        $sth = $this->query($statement);
+        return $sth->fetchObject($class_name, $ctor_args);
+    }
+
+    /**
+     * 
+     * Fetches a sequential array of rows from the database; the rows
+     * are represented as objects, where the column values are mapped to
+     * object properties.
+     * 
+     * Warning: PDO "injects property-values BEFORE invoking the constructor -
+     * in other words, if your class initializes property-values to defaults
+     * in the constructor, you will be overwriting the values injected by
+     * fetchObject() !"
+     * <http://www.php.net/manual/en/pdostatement.fetchobject.php#111744>
+     * 
+     * @param string $statement The SQL statement to prepare and execute.
+     * 
+     * @param array $values Values to bind to the query.
+     * 
+     * @param string $class_name The name of the class to create from each
+     * row.
+     * 
+     * @param array $ctor_args Arguments to pass to each object constructor.
+     * 
+     * @return array
+     * 
+     */
+    public function fetchObjects(
+        $statement,
+        array $values = array(),
+        $class_name = 'StdClass',
+        array $ctor_args = array()
+    ) {
+        $this->bindValues($values);
+        $sth = $this->query($statement);
+        return $sth->fetchAll(self::FETCH_CLASS, $class_name, $ctor_args);
+    }
+    
     /**
      * 
      * Fetches one row from the database as an associative array.

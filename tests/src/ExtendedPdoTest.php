@@ -7,6 +7,19 @@ class ExtendedPdoTest extends \PHPUnit_Framework_TestCase
 {
     protected $pdo;
     
+    protected $data = array(
+        1 => 'Anna',
+        2 => 'Betty',
+        3 => 'Clara',
+        4 => 'Donna',
+        5 => 'Fiona',
+        6 => 'Gertrude',
+        7 => 'Hanna',
+        8 => 'Ione',
+        9 => 'Julia',
+        10 => 'Kara',
+    );
+    
     public function setUp()
     {
         if (! extension_loaded('pdo_sqlite')) {
@@ -46,12 +59,7 @@ class ExtendedPdoTest extends \PHPUnit_Framework_TestCase
     // only fills in schema 1
     protected function fillTable()
     {
-        $names = array(
-            'Anna', 'Betty', 'Clara', 'Donna', 'Fiona',
-            'Gertrude', 'Hanna', 'Ione', 'Julia', 'Kara',
-        );
-        
-        foreach ($names as $name) {
+        foreach ($this->data as $id => $name) {
             $this->insert(array('name' => $name));
         }
     }
@@ -162,112 +170,31 @@ class ExtendedPdoTest extends \PHPUnit_Framework_TestCase
         // mode and 2 args
         $sth = $this->pdo->query($stm, ExtendedPdo::FETCH_CLASS, 'StdClass', array());
         $actual = $sth->fetchAll();
-        $expect = array(
-            0 => (object) array(
-               'id' => '1',
-               'name' => 'Anna',
-            ),
-            1 => (object) array(
-               'id' => '2',
-               'name' => 'Betty',
-            ),
-            2 => (object) array(
-               'id' => '3',
-               'name' => 'Clara',
-            ),
-            3 => (object) array(
-               'id' => '4',
-               'name' => 'Donna',
-            ),
-            4 => (object) array(
-               'id' => '5',
-               'name' => 'Fiona',
-            ),
-            5 => (object) array(
-               'id' => '6',
-               'name' => 'Gertrude',
-            ),
-            6 => (object) array(
-               'id' => '7',
-               'name' => 'Hanna',
-            ),
-            7 => (object) array(
-               'id' => '8',
-               'name' => 'Ione',
-            ),
-            8 => (object) array(
-               'id' => '9',
-               'name' => 'Julia',
-            ),
-            9 => (object) array(
-               'id' => '10',
-               'name' => 'Kara',
-            ),
-        );
+        $expect = array();
+        foreach ($this->data as $id => $name) {
+            $expect[] = (object) array(
+                'id' => $id,
+                'name' => $name
+            );
+        }
         $this->assertEquals($expect, $actual);
         
         // mode and 1 arg
         $sth = $this->pdo->query($stm, ExtendedPdo::FETCH_COLUMN, 1);
         $actual = $sth->fetchAll();
-        $expect = array(
-            0 => 'Anna',
-            1 => 'Betty',
-            2 => 'Clara',
-            3 => 'Donna',
-            4 => 'Fiona',
-            5 => 'Gertrude',
-            6 => 'Hanna',
-            7 => 'Ione',
-            8 => 'Julia',
-            9 => 'Kara',
-        );
+        $expect = array_values($this->data);
         $this->assertSame($actual, $expect);
         
         // mode only
         $sth = $this->pdo->query($stm, ExtendedPdo::FETCH_ASSOC);
         $actual = $sth->fetchAll();
-        $expect = array(
-            0 => array(
-               'id' => '1',
-               'name' => 'Anna',
-            ),
-            1 => array(
-               'id' => '2',
-               'name' => 'Betty',
-            ),
-            2 => array(
-               'id' => '3',
-               'name' => 'Clara',
-            ),
-            3 => array(
-               'id' => '4',
-               'name' => 'Donna',
-            ),
-            4 => array(
-               'id' => '5',
-               'name' => 'Fiona',
-            ),
-            5 => array(
-               'id' => '6',
-               'name' => 'Gertrude',
-            ),
-            6 => array(
-               'id' => '7',
-               'name' => 'Hanna',
-            ),
-            7 => array(
-               'id' => '8',
-               'name' => 'Ione',
-            ),
-            8 => array(
-               'id' => '9',
-               'name' => 'Julia',
-            ),
-            9 => array(
-               'id' => '10',
-               'name' => 'Kara',
-            ),
-        );
+        $expect = array();
+        foreach ($this->data as $id => $name) {
+            $expect[] = array(
+                'id' => $id,
+                'name' => $name
+            );
+        }
         $this->assertEquals($expect, $actual);
         
     }
@@ -295,9 +222,14 @@ class ExtendedPdoTest extends \PHPUnit_Framework_TestCase
     public function testFetchAll()
     {
         $stm = "SELECT * FROM pdotest";
-        $result = $this->pdo->fetchAll($stm);
-        $expect = 10;
-        $actual = count($result);
+        $actual = $this->pdo->fetchAll($stm);
+        $expect = array();
+        foreach ($this->data as $id => $name) {
+            $expect[] = array(
+                'id' => $id,
+                'name' => $name
+            );
+        }
         $this->assertEquals($expect, $actual);
     }
     
@@ -387,6 +319,28 @@ class ExtendedPdoTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expect, $result);
     }
 
+    public function testFetchObject()
+    {
+        $stm = "SELECT id, name FROM pdotest WHERE id = 1";
+        $actual = $this->pdo->fetchObject($stm);
+        $this->assertSame('1', $actual->id);
+        $this->assertSame('Anna', $actual->name);
+    }
+    
+    public function testFetchObjects()
+    {
+        $stm = "SELECT * FROM pdotest";
+        $actual = $this->pdo->fetchObjects($stm);
+        $expect = array();
+        foreach ($this->data as $id => $name) {
+            $expect[] = (object) array(
+                'id' => $id,
+                'name' => $name
+            );
+        }
+        $this->assertEquals($expect, $actual);
+    }
+    
     public function testFetchOne()
     {
         $stm = "SELECT id, name FROM pdotest WHERE id = 1";
@@ -587,5 +541,15 @@ class ExtendedPdoTest extends \PHPUnit_Framework_TestCase
         );
         $res = $this->pdo->fetchAll($stm, $val);
         $this->assertSame(10, count($res));
+    }
+    
+    public function testNumberedPlaceholderArray()
+    {
+        $stm = 'SELECT * FROM pdotest WHERE id IN (?)';
+        $val = array(
+            1 => array('1', '2', '3'),
+        );
+        $res = $this->pdo->fetchAll($stm, $val);
+        $this->assertSame(3, count($res));
     }
 }

@@ -152,7 +152,7 @@ $sth = $pdo->query('SELECT * FROM test WHERE foo = :foo AND bar = :bar');
 ?>
 ```
 
-It also works with sequential question-mark placeholders; note that,
+It also works with sequential question-mark placeholders; note that
 question-mark placeholders are numbered starting from 1, and that the keys
 must be integers (not string numerics).
 
