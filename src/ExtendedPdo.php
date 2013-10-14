@@ -715,6 +715,74 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
 
     /**
      * 
+     * Fetches one row from the database as an object, mapping column values
+     * to object properties.
+     * 
+     * Warning: PDO "injects property-values BEFORE invoking the constructor -
+     * in other words, if your class initializes property-values to defaults
+     * in the constructor, you will be overwriting the values injected by
+     * fetchObject() !"
+     * <http://www.php.net/manual/en/pdostatement.fetchobject.php#111744>
+     * 
+     * @param string $statement The SQL statement to prepare and execute.
+     * 
+     * @param array $values Values to bind to the query.
+     * 
+     * @param string $class_name The name of the class to create.
+     * 
+     * @param array $ctor_args Arguments to pass to the object constructor.
+     * 
+     * @return object
+     * 
+     */
+    public function fetchObject(
+        $statement,
+        array $values = array(),
+        $class_name = 'StdClass',
+        array $ctor_args = array()
+    ) {
+        $this->bindValues($values);
+        $sth = $this->query($statement);
+        return $sth->fetchObject($class_name, $ctor_args);
+    }
+
+    /**
+     * 
+     * Fetches a sequential array of rows from the database; the rows
+     * are represented as objects, where the column values are mapped to
+     * object properties.
+     * 
+     * Warning: PDO "injects property-values BEFORE invoking the constructor -
+     * in other words, if your class initializes property-values to defaults
+     * in the constructor, you will be overwriting the values injected by
+     * fetchObject() !"
+     * <http://www.php.net/manual/en/pdostatement.fetchobject.php#111744>
+     * 
+     * @param string $statement The SQL statement to prepare and execute.
+     * 
+     * @param array $values Values to bind to the query.
+     * 
+     * @param string $class_name The name of the class to create from each
+     * row.
+     * 
+     * @param array $ctor_args Arguments to pass to each object constructor.
+     * 
+     * @return array
+     * 
+     */
+    public function fetchObjects(
+        $statement,
+        array $values = array(),
+        $class_name = 'StdClass',
+        array $ctor_args = array()
+    ) {
+        $this->bindValues($values);
+        $sth = $this->query($statement);
+        return $sth->fetchAll(self::FETCH_CLASS, $class_name, $ctor_args);
+    }
+    
+    /**
+     * 
      * Fetches one row from the database as an associative array.
      * 
      * @param string $statement The SQL statement to prepare and execute.
