@@ -272,6 +272,16 @@ $result = $pdo->fetchAssoc($stm, $bind);
 // fetchCol() returns a sequential array of all values in the first column
 $result = $pdo->fetchCol($stm, $bind);
 
+// fetchObject() returns the first row as an object of your choosing; the
+// columns are mapped to object properties. an optional 4th parameter array
+// provides constructor arguments when instantiating the object.
+$result = $pdo->fetchObject($stm, $bind, 'ClassName', array('ctor_arg_1'));
+
+// fetchObjects() returns an array of objects of your choosing; the
+// columns are mapped to object properties. an optional 4th parameter array
+// provides constructor arguments when instantiating the object.
+$result = $pdo->fetchObjects($stm, $bind, 'ClassName', array('ctor_arg_1'));
+
 // fetchOne() returns the first row as an associative array where the keys
 // are the column names
 $result = $pdo->fetchOne($stm, $bind);
@@ -286,8 +296,8 @@ $result = $pdo->fetchValue($stm, $bind);
 ```
 
 The methods `fetchAll()`, `fetchAssoc()`, `fetchCol()`, and `fetchPairs()`
-take a third parameter, a callable, to apply to each row of the results before
-returning.
+take an optional third parameter, a callable, to apply to each row of the
+results before returning.
 
 ```php
 <?php
