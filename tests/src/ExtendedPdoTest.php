@@ -552,4 +552,19 @@ class ExtendedPdoTest extends \PHPUnit_Framework_TestCase
         $res = $this->pdo->fetchAll($stm, $val);
         $this->assertSame(3, count($res));
     }
+    
+    public function testPdoDependency()
+    {
+        // pass in ExtendedPdo to see if it can replace PDO
+        $depend = new PdoDependent($this->pdo);
+        $actual = $depend->fetchAll();
+        $expect = array();
+        foreach ($this->data as $id => $name) {
+            $expect[] = array(
+                'id' => $id,
+                'name' => $name
+            );
+        }
+        $this->assertEquals($expect, $actual);
+    }
 }
