@@ -473,7 +473,18 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
         return $sth;
     }
     
-    protected function prepareSubparts($subs, $prep)
+    /**
+     * 
+     * Prepares the sub-parts of a query with placeholders.
+     * 
+     * @param array $subs The query subparts.
+     * 
+     * @param object $prep The preparation info object.
+     * 
+     * @return array The prepared subparts.
+     * 
+     */
+    protected function prepareSubparts(array $subs, $prep)
     {
         foreach ($subs as $i => $sub) {
             $char = substr($sub, 0, 1);
@@ -489,7 +500,17 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
         return $subs;
     }
     
-    // bind or quote a numbered placeholder
+    /**
+     * 
+     * Bind or quote a numbered placeholder in a query subpart.
+     * 
+     * @param string $sub The query subpart.
+     * 
+     * @param object $prep The preparation info object.
+     * 
+     * @return string The prepared query subpart.
+     * 
+     */
     protected function prepareNumberedPlaceholder($sub, $prep)
     {
         // what numbered placeholder is this in the original statement?
@@ -510,7 +531,17 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
         return $sub;
     }
     
-    // bind or quote a named placeholder
+    /**
+     * 
+     * Bind or quote a named placeholder in a query subpart.
+     * 
+     * @param string $sub The query subpart.
+     * 
+     * @param object $prep The preparation info object.
+     * 
+     * @return string The prepared query subpart.
+     * 
+     */
     protected function prepareNamedPlaceholder($sub, $prep)
     {
         $name = substr($sub, 1);
