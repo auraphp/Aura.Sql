@@ -311,7 +311,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      * be merges with existing bound values, and will be reset after the
      * next query.
      * 
-     * @param array $values An array where the key is the parameter name and
+     * @param array $bind_values An array where the key is the parameter name and
      * the value is the parameter value.
      * 
      * @return null
