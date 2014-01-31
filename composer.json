@@ -25,9 +25,9 @@
         "php": ">=5.3.0"
     },
     "autoload": {
-        "files": [
-            "autoload.php"
-        ]
+        "psr-4": {
+            "Aura\\Sql\\": "src/"
+        }
     },
     "extra": {
         "aura": {
