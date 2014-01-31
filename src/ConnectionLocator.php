@@ -179,6 +179,7 @@ class ConnectionLocator implements ConnectionLocatorInterface
      * 
      * @return ExtendedPdoInterface
      * 
+     * @throws Exception\ConnectionNotFound
      */
     protected function getConnection($type, $name)
     {

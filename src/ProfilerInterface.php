@@ -10,8 +10,6 @@
  */
 namespace Aura\Sql;
 
-use PDOStatement;
-
 /**
  * 
  * Interface for query profilers.
