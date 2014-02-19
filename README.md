@@ -255,10 +255,8 @@ $bind = array('foo' => 'bar', 'baz' => 'dib');
 // the native PDO way to "fetch all" where the result is a sequential array
 // of rows, and the row arrays are keyed on the column names
 $pdo = new PDO(...);
-$pdo->prepare($stm);
-$stm->bindValue('foo', $bind['foo']);
-$stm->bindValue('bar', $bind['bar']);
-$sth = $stm->execute();
+$sth = $pdo->prepare($stm);
+$sth->execute($bind);
 $result = $sth->fetchAll(PDO::FETCH_ASSOC);
 
 // the ExtendedPdo way to do the same kind of "fetch all"
