@@ -420,7 +420,7 @@ class ExtendedPdoTest extends \PHPUnit_Framework_TestCase
         
         // quote a null
         $actual = $this->pdo->quote(null);
-        $this->assertSame('NULL', $actual);
+        $this->assertSame("''", $actual);
     }
     
     public function testLastInsertId()

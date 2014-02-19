@@ -962,8 +962,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      * Quotes a value for use in an SQL statement.
      * 
      * This differs from `PDO::quote()` in that it will convert an array into
-     * a string of comma-separated quoted values, and will convert a PHP null
-     * to an SQL "NULL".
+     * a string of comma-separated quoted values.
      * 
      * @param mixed $value The value to quote.
      * 
@@ -977,29 +976,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
     public function quote($value, $parameter_type = self::PARAM_STR)
     {
         $this->connect();
-        return $this->extQuote($value, $parameter_type);
-    }
-    
-    /**
-     * 
-     * Extended quoting implementation.
-     * 
-     * @param mixed $value The value to quote.
-     * 
-     * @param int $parameter_type A data type hint for the database driver.
-     * 
-     * @return mixed The quoted value.
-     * 
-     * @see http://php.net/manual/en/pdo.quote.php
-     * 
-     */
-    protected function extQuote($value, $parameter_type = self::PARAM_STR)
-    {
-        // NULL quoting
-        if ($value === null) {
-            return 'NULL';
-        }
-        
+
         // non-array quoting
         if (! is_array($value)) {
             return parent::quote($value, $parameter_type);
@@ -1007,7 +984,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
         
         // quote array values, not keys, then combine with commas
         foreach ($value as $k => $v) {
-            $value[$k] = $this->extQuote($v, $parameter_type);
+            $value[$k] = parent::quote($v, $parameter_type);
         }
         return implode(', ', $value);
     }
