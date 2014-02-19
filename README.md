@@ -450,7 +450,7 @@ create the connection (if needed) and then return it.
   will return the default connection.
 
 - `getWrite()` will return a named write connection; if no name is specified,
-  it will return a random read connection. If no write connections are
+  it will return a random write connection. If no write connections are
   defined, it will return the default connection.
 
 ```php
