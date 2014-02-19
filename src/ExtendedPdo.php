@@ -208,7 +208,8 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      * 
      * @param mixed $value The value for the attribute.
      * 
-     * @return null
+     * @return bool True on success, false on failure. Note that if PDO has not
+     * not connected, all calls will be treated as successful.
      * 
      */
     public function setAttribute($attribute, $value)
@@ -218,6 +219,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
         }
         
         $this->attributes[$attribute] = $value;
+        return true;
     }
     
     /**
