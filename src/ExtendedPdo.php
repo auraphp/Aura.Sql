@@ -28,7 +28,7 @@ use PDOStatement;
  *   an array of values to a placeholder used with an `IN (...)` condition.
  * 
  * - Bind values. You may provide values for binding to the next query using
- *   bindValues(). Mulitple calls to bindValues() will merge, not reset, the
+ *   bindValues(). Multiple calls to bindValues() will merge, not reset, the
  *   values. The values will be reset after calling query(), exec(),
  *   prepare(), or any of the fetch*() methods.
  * 
@@ -38,7 +38,7 @@ use PDOStatement;
  *   values, execute, and then fetch from the prepared statement. All of the
  *   fetch*() methods take an array of values to bind to to the query.
  * 
- * By defult, it starts in the ERRMODE_EXCEPTION instead of ERRMODE_SILENT.
+ * By default, it starts in the ERRMODE_EXCEPTION instead of ERRMODE_SILENT.
  * 
  */
 class ExtendedPdo extends PDO implements ExtendedPdoInterface
@@ -313,7 +313,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      * be merges with existing bound values, and will be reset after the
      * next query.
      * 
-     * @param array $values An array where the key is the parameter name and
+     * @param array $bind_values An array where the key is the parameter name and
      * the value is the parameter value.
      * 
      * @return null

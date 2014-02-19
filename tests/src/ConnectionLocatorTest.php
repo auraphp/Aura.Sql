@@ -1,7 +1,6 @@
 <?php
 namespace Aura\Sql;
 
-use Aura\Sql\Profiler;
 use Aura\Sql\Query\QueryFactory;
 
 class ConnectionLocatorTest extends \PHPUnit_Framework_TestCase

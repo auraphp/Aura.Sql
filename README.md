@@ -1,7 +1,7 @@
 # Aura.Sql
 
 Provides an extension to the native [PDO](http://php.net/PDO) along with a
-profiler and connection locator. Becuase _ExtendedPdo_ is an extension of the
+profiler and connection locator. Because _ExtendedPdo_ is an extension of the
 native _PDO_, code already using the native _PDO_ or typehinted to the native
 _PDO_ can use _ExtendedPdo_ without any changes.
 
@@ -12,7 +12,7 @@ Added functionality in _Aura.Sql_ over the native _PDO_ includes:
   instance and not incur the cost of a connection if you never make a query.
 
 - **Bind values.** You may provide values for binding to the next query using
-  `bindValues()`. Mulitple calls to `bindValues()` will merge, not reset, the
+  `bindValues()`. Multiple calls to `bindValues()` will merge, not reset, the
   values. The values will be reset after calling `query()`, `exec()`,
   `prepare()`, or any of the `fetch*()` methods.  In addition, binding values
   that do not have any corresponding placeholders will not cause an error.
