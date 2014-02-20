@@ -178,115 +178,40 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
     
     /**
      * 
-     * Returns the DSN for the connection.
+     * Connects to the database, begins a transaction, and turns off
+     * autocommit mode.
      * 
-     * @return string
+     * @return bool True on success, false on failure.
      * 
-     */
-    public function getDsn()
-    {
-        return $this->dsn;
-    }
-    
-    /**
-     * 
-     * Returns the name of the driver from the DSN.
-     * 
-     * @return string
+     * @see http://php.net/manual/en/pdo.begintransaction.php
      * 
      */
-    public function getDriver()
-    {
-        return $this->driver;
-    }
-    
-    /**
-     * 
-     * Sets a PDO attribute value.
-     * 
-     * @param mixed $attribute The PDO::ATTR_* constant.
-     * 
-     * @param mixed $value The value for the attribute.
-     * 
-     * @return bool True on success, false on failure. Note that if PDO has not
-     * not connected, all calls will be treated as successful.
-     * 
-     */
-    public function setAttribute($attribute, $value)
-    {
-        if ($this->connected) {
-            return parent::setAttribute($attribute, $value);
-        }
-        
-        $this->attributes[$attribute] = $value;
-        return true;
-    }
-    
-    /**
-     * 
-     * Gets a PDO attribute value.
-     * 
-     * @param mixed $attribute The PDO::ATTR_* constant.
-     * 
-     * @return mixed The value for the attribute.
-     * 
-     */
-    public function getAttribute($attribute)
+    public function beginTransaction()
     {
         $this->connect();
-        return parent::getAttribute($attribute);
+        $this->beginProfile(__FUNCTION__);
+        $result = parent::beginTransaction();
+        $this->endProfile();
+        return $result;
     }
     
     /**
      * 
-     * Sets the profiler object.
+     * Connects to the database, commits the existing transaction, and
+     * restores autocommit mode.
      * 
-     * @param ProfilerInterface $profiler
+     * @return bool True on success, false on failure.
      * 
-     * @return null
-     * 
-     */
-    public function setProfiler(ProfilerInterface $profiler)
-    {
-        $this->profiler = $profiler;
-    }
-
-    /**
-     * 
-     * Returns the profiler object.
-     * 
-     * @return ProfilerInterface
+     * @see http://php.net/manual/en/pdo.commit.php
      * 
      */
-    public function getProfiler()
-    {
-        return $this->profiler;
-    }
-    
-    /**
-     * 
-     * Gets the most recent error code.
-     * 
-     * @return mixed
-     * 
-     */
-    public function errorCode()
+    public function commit()
     {
         $this->connect();
-        return parent::errorCode();
-    }
-    
-    /**
-     * 
-     * Gets the most recent error info.
-     * 
-     * @return array
-     * 
-     */
-    public function errorInfo()
-    {
-        $this->connect();
-        return parent::errorInfo();
+        $this->beginProfile(__FUNCTION__);
+        $result = parent::commit();
+        $this->endProfile();
+        return $result;
     }
     
     /**
@@ -326,206 +251,28 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
     
     /**
      * 
-     * Is the instance connected to a database?
+     * Gets the most recent error code.
      * 
-     * @return bool
-     * 
-     */
-    public function isConnected()
-    {
-        return $this->connected;
-    }
-    
-    /**
-     * 
-     * Connects to the database and prepares an SQL statement for execution.
-     * 
-     * @param string $statement The SQL statement to prepare for execution.
-     * 
-     * @param array $options Set these attributes on the returned
-     * PDOStatement.
-     * 
-     * @return PDOStatement
-     * 
-     * @see http://php.net/manual/en/pdo.prepare.php
+     * @return mixed
      * 
      */
-    public function prepare($statement, $options = array())
+    public function errorCode()
     {
         $this->connect();
-        return parent::prepare($statement, $options);
-    }
-
-    /**
-     * 
-     * Connects to the database and prepares an SQL statement to be executed,
-     * using values that been bound for the next query.
-     * 
-     * This method only binds values that have named placeholders in the
-     * statement, thereby avoiding errors from PDO regarding too many bound
-     * values. It also binds all sequential (question-mark) placeholders.
-     * 
-     * If a placeholder value is an array, the array is converted to a string
-     * of comma-separated quoted values; e.g., for an `IN (...)` condition.
-     * The quoted string is replaced directly into the statement instead of
-     * using `PDOStatement::bindValue()` proper.
-     * 
-     * @param string $statement The SQL statement to prepare for execution.
-     * 
-     * @return PDOStatement
-     * 
-     * @see http://php.net/manual/en/pdo.prepare.php
-     * 
-     */
-    protected function performPrepare($statement)
-    {
-        // are there any bind values?
-        if (! $this->bind_values) {
-            return $this->prepare($statement);
-        }
-
-        // anonymous object to track preparation info
-        $prep = (object) array(
-            // how many numbered placeholders in the original statement
-            'num' => 0,
-            // how many numbered placeholders to actually be bound; this may
-            // differ from 'num' in that some numbered placeholders may get
-            // replaced with quoted CSV strings
-            'count' => 0,
-            // named and numbered placeholders to bind at the end
-            'bind_values' => array(),
-        );
-        
-        // find all parts not inside quotes or backslashed-quotes
-        $apos = "'";
-        $quot = '"';
-        $parts = preg_split(
-            "/(($apos+|$quot+|\\$apos+|\\$quot+).*?)\\2/m",
-            $statement,
-            -1,
-            PREG_SPLIT_DELIM_CAPTURE
-        );
-
-        // loop through the non-quoted parts (0, 3, 6, 9, etc.)
-        $k = count($parts);
-        for ($i = 0; $i <= $k; $i += 3) {
-
-            // split into subparts by ":name" and "?"
-            $subs = preg_split(
-                "/(:[a-zA-Z_][a-zA-Z0-9_]*)|(\?)/m",
-                $parts[$i],
-                -1,
-                PREG_SPLIT_DELIM_CAPTURE
-            );
-
-            // check subparts to convert bound arrays to quoted CSV strings
-            $subs = $this->prepareSubparts($subs, $prep);
-            
-            // reassemble
-            $parts[$i] = implode('', $subs);
-        }
-
-        // bring the parts back together in case they were modified
-        $statement = implode('', $parts);
-
-        // prepare the statement
-        $sth = $this->prepare($statement);
-
-        // for the placeholders we found, bind the corresponding data values,
-        // along with all sequential values for question marks
-        foreach ($prep->bind_values as $key => $val) {
-            $sth->bindValue($key, $val);
-        }
-
-        // done
-        return $sth;
+        return parent::errorCode();
     }
     
     /**
      * 
-     * Prepares the sub-parts of a query with placeholders.
+     * Gets the most recent error info.
      * 
-     * @param array $subs The query subparts.
-     * 
-     * @param object $prep The preparation info object.
-     * 
-     * @return array The prepared subparts.
+     * @return array
      * 
      */
-    protected function prepareSubparts(array $subs, $prep)
+    public function errorInfo()
     {
-        foreach ($subs as $i => $sub) {
-            $char = substr($sub, 0, 1);
-            if ($char == '?') {
-                $subs[$i] = $this->prepareNumberedPlaceholder($sub, $prep);
-            }
-            
-            if ($char == ':') {
-                $subs[$i] = $this->prepareNamedPlaceholder($sub, $prep);
-            }
-        }
-        
-        return $subs;
-    }
-    
-    /**
-     * 
-     * Bind or quote a numbered placeholder in a query subpart.
-     * 
-     * @param string $sub The query subpart.
-     * 
-     * @param object $prep The preparation info object.
-     * 
-     * @return string The prepared query subpart.
-     * 
-     */
-    protected function prepareNumberedPlaceholder($sub, $prep)
-    {
-        // what numbered placeholder is this in the original statement?
-        $prep->num ++;
-        
-        // is the corresponding data element an array?
-        $bind_array = isset($this->bind_values[$prep->num])
-                   && is_array($this->bind_values[$prep->num]);
-        if ($bind_array) {
-            // PDO won't bind an array; quote and replace directly
-            $sub = $this->quote($this->bind_values[$prep->num]);
-        } else {
-            // increase the count of numbered placeholders to be bound
-            $prep->count ++;
-            $prep->bind_values[$prep->count] = $this->bind_values[$prep->num];
-        }
-        
-        return $sub;
-    }
-    
-    /**
-     * 
-     * Bind or quote a named placeholder in a query subpart.
-     * 
-     * @param string $sub The query subpart.
-     * 
-     * @param object $prep The preparation info object.
-     * 
-     * @return string The prepared query subpart.
-     * 
-     */
-    protected function prepareNamedPlaceholder($sub, $prep)
-    {
-        $name = substr($sub, 1);
-        
-        // is the corresponding data element an array?
-        $bind_array = isset($this->bind_values[$name])
-                   && is_array($this->bind_values[$name]);
-        if ($bind_array) {
-            // PDO won't bind an array; quote and replace directly
-            $sub = $this->quote($this->bind_values[$name]);
-        } else {
-            // not an array, retain the placeholder for later
-            $prep->bind_values[$name] = $this->bind_values[$name];
-        }
-        
-        return $sub;
+        $this->connect();
+        return parent::errorInfo();
     }
     
     /**
@@ -546,67 +293,6 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
         $affected_rows = parent::exec($statement);
         $this->endProfile($statement);
         return $affected_rows;
-    }
-    
-    /**
-     * 
-     * Queries the database and returns a PDOStatement.
-     * 
-     * @param string $statement The SQL statement to prepare and execute.
-     * 
-     * @param int $fetch_mode The `PDO::FETCH_*` type to set on the returned
-     * `PDOStatement::setFetchMode()`.
-     * 
-     * @param mixed $fetch_arg1 The first additional argument to send to
-     * `PDOStatement::setFetchMode()`.
-     * 
-     * @param mixed $fetch_arg2 The second additional argument to send to
-     * `PDOStatement::setFetchMode()`.
-     * 
-     * @return PDOStatement
-     * 
-     * @see http://php.net/manual/en/pdo.query.php
-     */
-    public function query(
-        $statement,
-        $fetch_mode = null,
-        $fetch_arg1 = null,
-        $fetch_arg2 = null
-    ) {
-        $this->connect();
-        $this->beginProfile(__FUNCTION__);
-        if ($fetch_arg2 !== null) {
-            $sth = parent::query($statement, $fetch_mode, $fetch_arg1, $fetch_arg2);
-        } elseif ($fetch_arg1 !== null) {
-            $sth = parent::query($statement, $fetch_mode, $fetch_arg1);
-        } elseif ($fetch_mode !== null) {
-            $sth = parent::query($statement, $fetch_mode);
-        } else {
-            $sth = parent::query($statement);
-        }
-        $this->endProfile($sth->queryString);
-        return $sth;
-    }
-    
-    /**
-     * 
-     * Returns the last inserted autoincrement sequence value.
-     * 
-     * @param string $name The name of the sequence to check; typically needed
-     * only for PostgreSQL, where it takes the form of `<table>_<column>_seq`.
-     * 
-     * @return int
-     * 
-     * @see http://php.net/manual/en/pdo.lastinsertid.php
-     * 
-     */
-    public function lastInsertId($name = null)
-    {
-        $this->connect();
-        $this->beginProfile(__FUNCTION__);
-        $result = parent::lastInsertId($name);
-        $this->endProfile();
-        return $result;
     }
     
     /**
@@ -816,28 +502,6 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
 
     /**
      * 
-     * Performs a query and returns a PDOStatement.
-     * 
-     * @param string $statement The SQL statement to perform.
-     * 
-     * @param array $values Values to bind to the query.
-     * 
-     * @return PDOStatement
-     * 
-     */
-    public function perform($statement, array $values = array())
-    {
-        $this->bind_values = $values;
-        $sth = $this->performPrepare($statement);
-        $this->beginProfile(__FUNCTION__);
-        $sth->execute();
-        $this->endProfile($sth->queryString);
-        $this->bind_values = array();
-        return $sth;
-    }
-
-    /**
-     * 
      * Fetches the very first value (i.e., first column of the first row).
      * 
      * @param string $statement The SQL statement to prepare and execute.
@@ -855,21 +519,53 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
 
     /**
      * 
-     * Connects to the database, begins a transaction, and turns off
-     * autocommit mode.
+     * Gets a PDO attribute value.
      * 
-     * @return bool True on success, false on failure.
+     * @param mixed $attribute The PDO::ATTR_* constant.
      * 
-     * @see http://php.net/manual/en/pdo.begintransaction.php
+     * @return mixed The value for the attribute.
      * 
      */
-    public function beginTransaction()
+    public function getAttribute($attribute)
     {
         $this->connect();
-        $this->beginProfile(__FUNCTION__);
-        $result = parent::beginTransaction();
-        $this->endProfile();
-        return $result;
+        return parent::getAttribute($attribute);
+    }
+    
+    /**
+     * 
+     * Returns the name of the driver from the DSN.
+     * 
+     * @return string
+     * 
+     */
+    public function getDriver()
+    {
+        return $this->driver;
+    }
+    
+    /**
+     * 
+     * Returns the DSN for the connection.
+     * 
+     * @return string
+     * 
+     */
+    public function getDsn()
+    {
+        return $this->dsn;
+    }
+    
+    /**
+     * 
+     * Returns the profiler object.
+     * 
+     * @return ProfilerInterface
+     * 
+     */
+    public function getProfiler()
+    {
+        return $this->profiler;
     }
     
     /**
@@ -892,39 +588,117 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
     
     /**
      * 
-     * Connects to the database, commits the existing transaction, and
-     * restores autocommit mode.
+     * Is the instance connected to a database?
      * 
-     * @return bool True on success, false on failure.
-     * 
-     * @see http://php.net/manual/en/pdo.commit.php
+     * @return bool
      * 
      */
-    public function commit()
+    public function isConnected()
+    {
+        return $this->connected;
+    }
+    
+    /**
+     * 
+     * Returns the last inserted autoincrement sequence value.
+     * 
+     * @param string $name The name of the sequence to check; typically needed
+     * only for PostgreSQL, where it takes the form of `<table>_<column>_seq`.
+     * 
+     * @return int
+     * 
+     * @see http://php.net/manual/en/pdo.lastinsertid.php
+     * 
+     */
+    public function lastInsertId($name = null)
     {
         $this->connect();
         $this->beginProfile(__FUNCTION__);
-        $result = parent::commit();
+        $result = parent::lastInsertId($name);
         $this->endProfile();
         return $result;
     }
     
     /**
      * 
-     * Connects to the database, rolls back the current transaction, and
-     * restores autocommit mode.
+     * Performs a query and returns a PDOStatement.
      * 
-     * @return bool True on success, false on failure.
+     * @param string $statement The SQL statement to perform.
      * 
-     * @see http://php.net/manual/en/pdo.rollback.php
+     * @param array $values Values to bind to the query.
+     * 
+     * @return PDOStatement
      * 
      */
-    public function rollBack()
+    public function perform($statement, array $values = array())
+    {
+        $this->bind_values = $values;
+        $sth = $this->performPrepare($statement);
+        $this->beginProfile(__FUNCTION__);
+        $sth->execute();
+        $this->endProfile($sth->queryString);
+        $this->bind_values = array();
+        return $sth;
+    }
+
+    /**
+     * 
+     * Connects to the database and prepares an SQL statement for execution.
+     * 
+     * @param string $statement The SQL statement to prepare for execution.
+     * 
+     * @param array $options Set these attributes on the returned
+     * PDOStatement.
+     * 
+     * @return PDOStatement
+     * 
+     * @see http://php.net/manual/en/pdo.prepare.php
+     * 
+     */
+    public function prepare($statement, $options = array())
     {
         $this->connect();
+        return parent::prepare($statement, $options);
+    }
+
+    /**
+     * 
+     * Queries the database and returns a PDOStatement.
+     * 
+     * @param string $statement The SQL statement to prepare and execute.
+     * 
+     * @param int $fetch_mode The `PDO::FETCH_*` type to set on the returned
+     * `PDOStatement::setFetchMode()`.
+     * 
+     * @param mixed $fetch_arg1 The first additional argument to send to
+     * `PDOStatement::setFetchMode()`.
+     * 
+     * @param mixed $fetch_arg2 The second additional argument to send to
+     * `PDOStatement::setFetchMode()`.
+     * 
+     * @return PDOStatement
+     * 
+     * @see http://php.net/manual/en/pdo.query.php
+     */
+    public function query(
+        $statement,
+        $fetch_mode = null,
+        $fetch_arg1 = null,
+        $fetch_arg2 = null
+    ) {
+        $this->connect();
         $this->beginProfile(__FUNCTION__);
-        $result = parent::rollBack();
-        $this->endProfile();
+        if ($fetch_arg2 !== null) {
+            $sth = parent::query($statement, $fetch_mode, $fetch_arg1, $fetch_arg2);
+        } elseif ($fetch_arg1 !== null) {
+            $sth = parent::query($statement, $fetch_mode, $fetch_arg1);
+        } elseif ($fetch_mode !== null) {
+            $sth = parent::query($statement, $fetch_mode);
+        } else {
+            $sth = parent::query($statement);
+        }
+        $this->endProfile($sth->queryString);
+        return $sth;
     }
     
     /**
@@ -959,6 +733,60 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
         return implode(', ', $value);
     }
     
+    /**
+     * 
+     * Connects to the database, rolls back the current transaction, and
+     * restores autocommit mode.
+     * 
+     * @return bool True on success, false on failure.
+     * 
+     * @see http://php.net/manual/en/pdo.rollback.php
+     * 
+     */
+    public function rollBack()
+    {
+        $this->connect();
+        $this->beginProfile(__FUNCTION__);
+        $result = parent::rollBack();
+        $this->endProfile();
+    }
+    
+    /**
+     * 
+     * Sets a PDO attribute value.
+     * 
+     * @param mixed $attribute The PDO::ATTR_* constant.
+     * 
+     * @param mixed $value The value for the attribute.
+     * 
+     * @return bool True on success, false on failure. Note that if PDO has not
+     * not connected, all calls will be treated as successful.
+     * 
+     */
+    public function setAttribute($attribute, $value)
+    {
+        if ($this->connected) {
+            return parent::setAttribute($attribute, $value);
+        }
+        
+        $this->attributes[$attribute] = $value;
+        return true;
+    }
+    
+    /**
+     * 
+     * Sets the profiler object.
+     * 
+     * @param ProfilerInterface $profiler
+     * 
+     * @return null
+     * 
+     */
+    public function setProfiler(ProfilerInterface $profiler)
+    {
+        $this->profiler = $profiler;
+    }
+
     /**
      * 
      * Begins a profile entry.
@@ -1007,5 +835,177 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
         
         // clear the starting profile info
         $this->profile = array();
+    }
+    
+    /**
+     * 
+     * Connects to the database and prepares an SQL statement to be executed,
+     * using values that been bound for the next query.
+     * 
+     * This method only binds values that have named placeholders in the
+     * statement, thereby avoiding errors from PDO regarding too many bound
+     * values. It also binds all sequential (question-mark) placeholders.
+     * 
+     * If a placeholder value is an array, the array is converted to a string
+     * of comma-separated quoted values; e.g., for an `IN (...)` condition.
+     * The quoted string is replaced directly into the statement instead of
+     * using `PDOStatement::bindValue()` proper.
+     * 
+     * @param string $statement The SQL statement to prepare for execution.
+     * 
+     * @return PDOStatement
+     * 
+     * @see http://php.net/manual/en/pdo.prepare.php
+     * 
+     */
+    protected function performPrepare($statement)
+    {
+        // are there any bind values?
+        if (! $this->bind_values) {
+            return $this->prepare($statement);
+        }
+
+        // anonymous object to track preparation info
+        $prep = (object) array(
+            // how many numbered placeholders in the original statement
+            'num' => 0,
+            // how many numbered placeholders to actually be bound; this may
+            // differ from 'num' in that some numbered placeholders may get
+            // replaced with quoted CSV strings
+            'count' => 0,
+            // named and numbered placeholders to bind at the end
+            'bind_values' => array(),
+        );
+        
+        // find all parts not inside quotes or backslashed-quotes
+        $apos = "'";
+        $quot = '"';
+        $parts = preg_split(
+            "/(($apos+|$quot+|\\$apos+|\\$quot+).*?)\\2/m",
+            $statement,
+            -1,
+            PREG_SPLIT_DELIM_CAPTURE
+        );
+
+        // loop through the non-quoted parts (0, 3, 6, 9, etc.)
+        $k = count($parts);
+        for ($i = 0; $i <= $k; $i += 3) {
+
+            // split into subparts by ":name" and "?"
+            $subs = preg_split(
+                "/(:[a-zA-Z_][a-zA-Z0-9_]*)|(\?)/m",
+                $parts[$i],
+                -1,
+                PREG_SPLIT_DELIM_CAPTURE
+            );
+
+            // check subparts to convert bound arrays to quoted CSV strings
+            $subs = $this->prepareSubparts($subs, $prep);
+            
+            // reassemble
+            $parts[$i] = implode('', $subs);
+        }
+
+        // bring the parts back together in case they were modified
+        $statement = implode('', $parts);
+
+        // prepare the statement
+        $sth = $this->prepare($statement);
+
+        // for the placeholders we found, bind the corresponding data values,
+        // along with all sequential values for question marks
+        foreach ($prep->bind_values as $key => $val) {
+            $sth->bindValue($key, $val);
+        }
+
+        // done
+        return $sth;
+    }
+    
+    /**
+     * 
+     * Prepares the sub-parts of a query with placeholders.
+     * 
+     * @param array $subs The query subparts.
+     * 
+     * @param object $prep The preparation info object.
+     * 
+     * @return array The prepared subparts.
+     * 
+     */
+    protected function prepareSubparts(array $subs, $prep)
+    {
+        foreach ($subs as $i => $sub) {
+            $char = substr($sub, 0, 1);
+            if ($char == '?') {
+                $subs[$i] = $this->prepareNumberedPlaceholder($sub, $prep);
+            }
+            
+            if ($char == ':') {
+                $subs[$i] = $this->prepareNamedPlaceholder($sub, $prep);
+            }
+        }
+        
+        return $subs;
+    }
+    
+    /**
+     * 
+     * Bind or quote a numbered placeholder in a query subpart.
+     * 
+     * @param string $sub The query subpart.
+     * 
+     * @param object $prep The preparation info object.
+     * 
+     * @return string The prepared query subpart.
+     * 
+     */
+    protected function prepareNumberedPlaceholder($sub, $prep)
+    {
+        // what numbered placeholder is this in the original statement?
+        $prep->num ++;
+        
+        // is the corresponding data element an array?
+        $bind_array = isset($this->bind_values[$prep->num])
+                   && is_array($this->bind_values[$prep->num]);
+        if ($bind_array) {
+            // PDO won't bind an array; quote and replace directly
+            $sub = $this->quote($this->bind_values[$prep->num]);
+        } else {
+            // increase the count of numbered placeholders to be bound
+            $prep->count ++;
+            $prep->bind_values[$prep->count] = $this->bind_values[$prep->num];
+        }
+        
+        return $sub;
+    }
+    
+    /**
+     * 
+     * Bind or quote a named placeholder in a query subpart.
+     * 
+     * @param string $sub The query subpart.
+     * 
+     * @param object $prep The preparation info object.
+     * 
+     * @return string The prepared query subpart.
+     * 
+     */
+    protected function prepareNamedPlaceholder($sub, $prep)
+    {
+        $name = substr($sub, 1);
+        
+        // is the corresponding data element an array?
+        $bind_array = isset($this->bind_values[$name])
+                   && is_array($this->bind_values[$name]);
+        if ($bind_array) {
+            // PDO won't bind an array; quote and replace directly
+            $sub = $this->quote($this->bind_values[$name]);
+        } else {
+            // not an array, retain the placeholder for later
+            $prep->bind_values[$name] = $this->bind_values[$name];
+        }
+        
+        return $sub;
     }
 }
