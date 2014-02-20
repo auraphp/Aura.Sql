@@ -65,7 +65,7 @@ interface PdoInterface
      * 
      * @param string $statement The SQL statement to execute.
      * 
-     * @return null
+     * @return int
      * 
      * @see http://php.net/manual/en/pdo.exec.php
      * 

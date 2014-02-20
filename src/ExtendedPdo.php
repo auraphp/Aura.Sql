@@ -515,25 +515,22 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
     
     /**
      * 
-     * Connects to the database, prepares a statement using the bound values,
-     * executes the statement, and returns the number of affected rows.
+     * Executes an SQL statement and returns the number of affected rows.
      * 
      * @param string $statement The SQL statement to prepare and execute.
      * 
-     * @return null
+     * @return int
      * 
      * @see http://php.net/manual/en/pdo.exec.php
      * 
      */
     public function exec($statement)
     {
-        $sth = $this->prepare($statement);
-        
+        $this->connect();
         $this->beginProfile(__FUNCTION__);
-        $sth->execute();
-        $this->endProfile($sth->queryString);
-        
-        return $sth->rowCount();
+        $affected_rows = parent::exec($statement);
+        $this->endProfile($statement);
+        return $affected_rows;
     }
     
     /**
