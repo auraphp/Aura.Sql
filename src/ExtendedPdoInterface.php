@@ -185,7 +185,7 @@ interface ExtendedPdoInterface extends PdoInterface
      * @return PDOStatement
      * 
      */
-    public function fetchStatement($statement, array $values = array());
+    public function perform($statement, array $values = array());
 
     /**
      * 

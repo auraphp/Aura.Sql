@@ -361,9 +361,9 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      * Connects to the database and prepares an SQL statement to be executed,
      * using values that been bound for the next query.
      * 
-     * This override only binds values that have named placeholders in the
+     * This method only binds values that have named placeholders in the
      * statement, thereby avoiding errors from PDO regarding too many bound
-     * values; it also binds all sequential (question-mark) placeholders.
+     * values. It also binds all sequential (question-mark) placeholders.
      * 
      * If a placeholder value is an array, the array is converted to a string
      * of comma-separated quoted values; e.g., for an `IN (...)` condition.
@@ -377,7 +377,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      * @see http://php.net/manual/en/pdo.prepare.php
      * 
      */
-    protected function prepareFetch($statement)
+    protected function performPrepare($statement)
     {
         // are there any bind values?
         if (! $this->bind_values) {
@@ -626,7 +626,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      */
     public function fetchAll($statement, array $values = array(), $callable = null)
     {
-        $sth = $this->fetchStatement($statement, $values);
+        $sth = $this->perform($statement, $values);
         $data = $sth->fetchAll(self::FETCH_ASSOC);
         if ($callable) {
             foreach ($data as $key => $row) {
@@ -657,7 +657,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      */
     public function fetchAssoc($statement, array $values = array(), $callable = null)
     {
-        $sth = $this->fetchStatement($statement, $values);
+        $sth = $this->perform($statement, $values);
         $data = array();
         if ($callable) {
             while ($row = $sth->fetch(self::FETCH_ASSOC)) {
@@ -689,7 +689,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      */
     public function fetchCol($statement, array $values = array(), $callable = null)
     {
-        $sth = $this->fetchStatement($statement, $values);
+        $sth = $this->perform($statement, $values);
         $data = $sth->fetchAll(self::FETCH_COLUMN, 0);
         if ($callable) {
             foreach ($data as $key => $val) {
@@ -727,7 +727,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
         $class_name = 'StdClass',
         array $ctor_args = array()
     ) {
-        $sth = $this->fetchStatement($statement, $values);
+        $sth = $this->perform($statement, $values);
         return $sth->fetchObject($class_name, $ctor_args);
     }
 
@@ -761,7 +761,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
         $class_name = 'StdClass',
         array $ctor_args = array()
     ) {
-        $sth = $this->fetchStatement($statement, $values);
+        $sth = $this->perform($statement, $values);
         return $sth->fetchAll(self::FETCH_CLASS, $class_name, $ctor_args);
     }
     
@@ -778,7 +778,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      */
     public function fetchOne($statement, array $values = array())
     {
-        $sth = $this->fetchStatement($statement, $values);
+        $sth = $this->perform($statement, $values);
         return $sth->fetch(self::FETCH_ASSOC);
     }
     
@@ -799,7 +799,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      */
     public function fetchPairs($statement, array $values = array(), $callable = null)
     {
-        $sth = $this->fetchStatement($statement, $values);
+        $sth = $this->perform($statement, $values);
         if ($callable) {
             $data = array();
             while ($row = $sth->fetch(self::FETCH_NUM)) {
@@ -816,19 +816,19 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
 
     /**
      * 
-     * Fetches the result as a PDOStatement.
+     * Performs a query and returns a PDOStatement.
      * 
-     * @param string $statement The SQL statement to prepare and execute.
+     * @param string $statement The SQL statement to perform.
      * 
      * @param array $values Values to bind to the query.
      * 
      * @return PDOStatement
      * 
      */
-    public function fetchStatement($statement, array $values = array())
+    public function perform($statement, array $values = array())
     {
         $this->bind_values = $values;
-        $sth = $this->prepareFetch($statement);
+        $sth = $this->performPrepare($statement);
         $this->beginProfile(__FUNCTION__);
         $sth->execute();
         $this->endProfile($sth->queryString);
@@ -849,7 +849,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      */
     public function fetchValue($statement, array $values = array())
     {
-        $sth = $this->fetchStatement($statement, $values);
+        $sth = $this->perform($statement, $values);
         return $sth->fetchColumn(0);
     }
 

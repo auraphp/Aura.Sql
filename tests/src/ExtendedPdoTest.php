@@ -74,7 +74,7 @@ class ExtendedPdoTest extends \PHPUnit_Framework_TestCase
         $cols = implode(', ', $cols);
         $vals = implode(', ', $vals);
         $stm = "INSERT INTO pdotest ({$cols}) VALUES ({$vals})";
-        $this->pdo->fetchStatement($stm, $data);
+        $this->pdo->perform($stm, $data);
     }
     
     public function testGetDriver()
@@ -124,10 +124,10 @@ class ExtendedPdoTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expect, $actual);
     }
     
-    public function testFetchStatement()
+    public function testperform()
     {
         $stm = "SELECT * FROM pdotest WHERE id <= :val";
-        $sth = $this->pdo->fetchStatement($stm, array('val' => '5'));
+        $sth = $this->pdo->perform($stm, array('val' => '5'));
         $this->assertInstanceOf('PDOStatement', $sth);
         $result = $sth->fetchAll(Pdo::FETCH_ASSOC);
         $expect = 5;
@@ -139,7 +139,7 @@ class ExtendedPdoTest extends \PHPUnit_Framework_TestCase
     {
         $stm = "SELECT * FROM pdotest WHERE id IN (:list) OR id = :id";
         
-        $sth = $this->pdo->fetchStatement($stm, array(
+        $sth = $this->pdo->perform($stm, array(
             'list' => array(1, 2, 3, 4),
             'id' => 5
         ));
@@ -195,7 +195,7 @@ class ExtendedPdoTest extends \PHPUnit_Framework_TestCase
                  AND id IN (:list)
                  AND \"leave '':bar' alone\"";
         
-        $sth = $this->pdo->fetchStatement($stm, array(
+        $sth = $this->pdo->perform($stm, array(
             'list' => array('1', '2', '3', '4', '5'),
             'foo' => 'WRONG',
             'bar' => 'WRONG',
@@ -489,7 +489,7 @@ class ExtendedPdoTest extends \PHPUnit_Framework_TestCase
                 'bind_values' => array(),
             ),
             2 => array(
-                'function' => 'fetchStatement',
+                'function' => 'perform',
                 'statement' => 'SELECT 3 FROM pdotest',
                 'bind_values' => array(
                     'zim' => 'gir',
