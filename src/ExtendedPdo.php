@@ -670,8 +670,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      */
     public function fetchAll($statement, array $values = array(), $callable = null)
     {
-        $this->bindValues($values);
-        $sth = $this->query($statement);
+        $sth = $this->fetchStatement($statement, $values);
         $data = $sth->fetchAll(self::FETCH_ASSOC);
         if ($callable) {
             foreach ($data as $key => $row) {
@@ -702,8 +701,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      */
     public function fetchAssoc($statement, array $values = array(), $callable = null)
     {
-        $this->bindValues($values);
-        $sth = $this->query($statement);
+        $sth = $this->fetchStatement($statement, $values);
         $data = array();
         if ($callable) {
             while ($row = $sth->fetch(self::FETCH_ASSOC)) {
@@ -735,8 +733,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      */
     public function fetchCol($statement, array $values = array(), $callable = null)
     {
-        $this->bindValues($values);
-        $sth = $this->query($statement);
+        $sth = $this->fetchStatement($statement, $values);
         $data = $sth->fetchAll(self::FETCH_COLUMN, 0);
         if ($callable) {
             foreach ($data as $key => $val) {
@@ -774,8 +771,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
         $class_name = 'StdClass',
         array $ctor_args = array()
     ) {
-        $this->bindValues($values);
-        $sth = $this->query($statement);
+        $sth = $this->fetchStatement($statement, $values);
         return $sth->fetchObject($class_name, $ctor_args);
     }
 
@@ -809,8 +805,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
         $class_name = 'StdClass',
         array $ctor_args = array()
     ) {
-        $this->bindValues($values);
-        $sth = $this->query($statement);
+        $sth = $this->fetchStatement($statement, $values);
         return $sth->fetchAll(self::FETCH_CLASS, $class_name, $ctor_args);
     }
     
@@ -827,8 +822,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      */
     public function fetchOne($statement, array $values = array())
     {
-        $this->bindValues($values);
-        $sth = $this->query($statement);
+        $sth = $this->fetchStatement($statement, $values);
         return $sth->fetch(self::FETCH_ASSOC);
     }
     
@@ -849,8 +843,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      */
     public function fetchPairs($statement, array $values = array(), $callable = null)
     {
-        $this->bindValues($values);
-        $sth = $this->query($statement);
+        $sth = $this->fetchStatement($statement, $values);
         if ($callable) {
             $data = array();
             while ($row = $sth->fetch(self::FETCH_NUM)) {
@@ -867,6 +860,23 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
 
     /**
      * 
+     * Fetches the result as a PDOStatement.
+     * 
+     * @param string $statement The SQL statement to prepare and execute.
+     * 
+     * @param array $values Values to bind to the query.
+     * 
+     * @return PDOStatement
+     * 
+     */
+    public function fetchStatement($statement, array $values = array())
+    {
+        $this->bindValues($values);
+        return $this->query($statement);
+    }
+
+    /**
+     * 
      * Fetches the very first value (i.e., first column of the first row).
      * 
      * @param string $statement The SQL statement to prepare and execute.
@@ -878,8 +888,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      */
     public function fetchValue($statement, array $values = array())
     {
-        $this->bindValues($values);
-        $sth = $this->query($statement);
+        $sth = $this->fetchStatement($statement, $values);
         return $sth->fetchColumn(0);
     }
 

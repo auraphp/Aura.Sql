@@ -205,6 +205,19 @@ interface ExtendedPdoInterface extends PdoInterface
     
     /**
      * 
+     * Fetches the result as a PDOStatement.
+     * 
+     * @param string $statement The SQL statement to prepare and execute.
+     * 
+     * @param array $values Values to bind to the query.
+     * 
+     * @return PDOStatement
+     * 
+     */
+    public function fetchStatement($statement, array $values = array());
+    
+    /**
+     * 
      * Fetches the very first value (i.e., first column of the first row).
      * 
      * @param string $statement The SQL statement to prepare and execute.
