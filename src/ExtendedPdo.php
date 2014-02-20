@@ -338,17 +338,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
     
     /**
      * 
-     * Connects to the database and prepares an SQL statement to be executed,
-     * using values that been bound for the next query.
-     * 
-     * This override only binds values that have named placeholders in the
-     * statement, thereby avoiding errors from PDO regarding too many bound
-     * values; it also binds all sequential (question-mark) placeholders.
-     * 
-     * If a placeholder value is an array, the array is converted to a string
-     * of comma-separated quoted values; e.g., for an `IN (...)` condition.
-     * The quoted string is replaced directly into the statement instead of
-     * using `PDOStatement::bindValue()` proper.
+     * Connects to the database and prepares an SQL statement for execution.
      * 
      * @param string $statement The SQL statement to prepare for execution.
      * 
@@ -363,10 +353,35 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
     public function prepare($statement, $options = array())
     {
         $this->connect();
-        
+        return parent::prepare($statement, $options);
+    }
+
+    /**
+     * 
+     * Connects to the database and prepares an SQL statement to be executed,
+     * using values that been bound for the next query.
+     * 
+     * This override only binds values that have named placeholders in the
+     * statement, thereby avoiding errors from PDO regarding too many bound
+     * values; it also binds all sequential (question-mark) placeholders.
+     * 
+     * If a placeholder value is an array, the array is converted to a string
+     * of comma-separated quoted values; e.g., for an `IN (...)` condition.
+     * The quoted string is replaced directly into the statement instead of
+     * using `PDOStatement::bindValue()` proper.
+     * 
+     * @param string $statement The SQL statement to prepare for execution.
+     * 
+     * @return PDOStatement
+     * 
+     * @see http://php.net/manual/en/pdo.prepare.php
+     * 
+     */
+    protected function prepareFetch($statement)
+    {
         // are there any bind values?
         if (! $this->bind_values) {
-            return parent::prepare($statement, $options);
+            return $this->prepare($statement);
         }
 
         // anonymous object to track preparation info
@@ -414,7 +429,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
         $statement = implode('', $parts);
 
         // prepare the statement
-        $sth = parent::prepare($statement, $options);
+        $sth = $this->prepare($statement);
 
         // for the placeholders we found, bind the corresponding data values,
         // along with all sequential values for question marks
@@ -535,8 +550,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
     
     /**
      * 
-     * Connects to the database, prepares a statement using the bound values,
-     * executes the statement, and returns a PDOStatement result set.
+     * Queries the database and returns a PDOStatement.
      * 
      * @param string $statement The SQL statement to prepare and execute.
      * 
@@ -559,23 +573,18 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
         $fetch_arg1 = null,
         $fetch_arg2 = null
     ) {
-        // prepare and execute
-        $sth = $this->prepare($statement);
+        $this->connect();
         $this->beginProfile(__FUNCTION__);
-        $sth->execute();
-        $this->endProfile($sth->queryString);
-        
-        // allow for optional fetch mode
         if ($fetch_arg2 !== null) {
-            $sth->setFetchMode($fetch_mode, $fetch_arg1, $fetch_arg2);
+            $sth = parent::query($statement, $fetch_mode, $fetch_arg1, $fetch_arg2);
         } elseif ($fetch_arg1 !== null) {
-            $sth->setFetchMode($fetch_mode, $fetch_arg1);
+            $sth = parent::query($statement, $fetch_mode, $fetch_arg1);
         } elseif ($fetch_mode !== null) {
-            $sth->setFetchMode($fetch_mode);
+            $sth = parent::query($statement, $fetch_mode);
+        } else {
+            $sth = parent::query($statement);
         }
-        
-        // done
-        $this->bind_values = array();
+        $this->endProfile($sth->queryString);
         return $sth;
     }
     
@@ -819,7 +828,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
     public function fetchStatement($statement, array $values = array())
     {
         $this->bind_values = $values;
-        $sth = $this->prepare($statement);
+        $sth = $this->prepareFetch($statement);
         $this->beginProfile(__FUNCTION__);
         $sth->execute();
         $this->endProfile($sth->queryString);
