@@ -74,8 +74,7 @@ class ExtendedPdoTest extends \PHPUnit_Framework_TestCase
         $cols = implode(', ', $cols);
         $vals = implode(', ', $vals);
         $stm = "INSERT INTO pdotest ({$cols}) VALUES ({$vals})";
-        $this->pdo->bindValues($data);
-        $this->pdo->exec($stm);
+        $this->pdo->fetchStatement($stm, $data);
     }
     
     public function testGetDriver()
@@ -125,19 +124,10 @@ class ExtendedPdoTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expect, $actual);
     }
     
-    public function testBindValues()
-    {
-        $expect = array('foo' => 'bar', 'baz' => 'dib');
-        $this->pdo->bindValues($expect);
-        $actual = $this->pdo->getBindValues();
-        $this->assertSame($expect, $actual);
-    }
-    
-    public function testQueryWithBindValues()
+    public function testFetchStatement()
     {
         $stm = "SELECT * FROM pdotest WHERE id <= :val";
-        $this->pdo->bindValues(array('val' => '5'));
-        $sth = $this->pdo->query($stm);
+        $sth = $this->pdo->fetchStatement($stm, array('val' => '5'));
         $this->assertInstanceOf('PDOStatement', $sth);
         $result = $sth->fetchAll(Pdo::FETCH_ASSOC);
         $expect = 5;
@@ -149,12 +139,11 @@ class ExtendedPdoTest extends \PHPUnit_Framework_TestCase
     {
         $stm = "SELECT * FROM pdotest WHERE id IN (:list) OR id = :id";
         
-        $this->pdo->bindValues(array(
+        $sth = $this->pdo->fetchStatement($stm, array(
             'list' => array(1, 2, 3, 4),
             'id' => 5
         ));
-        
-        $sth = $this->pdo->query($stm);
+
         $this->assertInstanceOf('PDOStatement', $sth);
         
         $result = $sth->fetchAll(Pdo::FETCH_ASSOC);
@@ -206,13 +195,11 @@ class ExtendedPdoTest extends \PHPUnit_Framework_TestCase
                  AND id IN (:list)
                  AND \"leave '':bar' alone\"";
         
-        $this->pdo->bindValues(array(
+        $sth = $this->pdo->fetchStatement($stm, array(
             'list' => array('1', '2', '3', '4', '5'),
             'foo' => 'WRONG',
             'bar' => 'WRONG',
         ));
-        
-        $sth = $this->pdo->prepare($stm);
         
         $expect = str_replace(':list', "'1', '2', '3', '4', '5'", $stm);
         $actual = $sth->queryString;
@@ -474,14 +461,11 @@ class ExtendedPdoTest extends \PHPUnit_Framework_TestCase
         // activate
         $this->pdo->getProfiler()->setActive(true);
         
-        $this->pdo->bindValues(array('foo' => 'bar'));
         $this->pdo->query("SELECT 1 FROM pdotest");
         
-        $this->pdo->bindValues(array('baz' => 'dib'));
         $this->pdo->exec("SELECT 2 FROM pdotest");
         
-        $this->pdo->bindValues(array('zim' => 'gir'));
-        $this->pdo->fetchAll("SELECT 3 FROM pdotest");
+        $this->pdo->fetchAll("SELECT 3 FROM pdotest", array('zim' => 'gir'));
         
         $profiles = $this->pdo->getProfiler()->getProfiles();
         $this->assertEquals(3, count($profiles));
@@ -497,16 +481,12 @@ class ExtendedPdoTest extends \PHPUnit_Framework_TestCase
             0 => array(
                 'function' => 'query',
                 'statement' => 'SELECT 1 FROM pdotest',
-                'bind_values' => array(
-                    'foo' => 'bar',
-                ),
+                'bind_values' => array(),
             ),
             1 => array(
                 'function' => 'exec',
                 'statement' => 'SELECT 2 FROM pdotest',
-                'bind_values' => array(
-                    'baz' => 'dib',
-                ),
+                'bind_values' => array(),
             ),
             2 => array(
                 'function' => 'query',

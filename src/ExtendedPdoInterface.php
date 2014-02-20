@@ -21,35 +21,6 @@ interface ExtendedPdoInterface extends PdoInterface
 {
     /**
      * 
-     * Retains a single value to bind to the next query statement; it will
-     * be merged with existing bound values, and will be reset after the
-     * next query.
-     * 
-     * @param string $name The parameter name.
-     * 
-     * @param mixed $value The parameter value.
-     * 
-     * @return null
-     * 
-     */
-    public function bindValue($name, $value);
-    
-    /**
-     * 
-     * Retains several values to bind to the next query statement; these will
-     * be merged with existing bound values, and will be reset after the
-     * next query.
-     * 
-     * @param array $bind_values An array where the key is the parameter name and
-     * the value is the parameter value.
-     * 
-     * @return null
-     * 
-     */
-    public function bindValues(array $bind_values);
-    
-    /**
-     * 
      * Connects to the database and sets PDO attributes.
      * 
      * @return null
@@ -215,7 +186,7 @@ interface ExtendedPdoInterface extends PdoInterface
      * 
      */
     public function fetchStatement($statement, array $values = array());
-    
+
     /**
      * 
      * Fetches the very first value (i.e., first column of the first row).
@@ -229,15 +200,6 @@ interface ExtendedPdoInterface extends PdoInterface
      */
     public function fetchValue($statement, array $values = array());
     
-    /**
-     * 
-     * Returns the array of values to bind to the next query.
-     * 
-     * @return array
-     * 
-     */
-    public function getBindValues();
-
     /**
      * 
      * Returns the DSN for the connection.

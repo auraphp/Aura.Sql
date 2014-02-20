@@ -291,55 +291,6 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
     
     /**
      * 
-     * Retains a single value to bind to the next query statement; it will
-     * be merged with existing bound values, and will be reset after the
-     * next query.
-     * 
-     * @param string $name The parameter name.
-     * 
-     * @param mixed $value The parameter value.
-     * 
-     * @return null
-     * 
-     */
-    public function bindValue($name, $value)
-    {
-        $this->bind_values[$name] = $value;
-    }
-    
-    /**
-     * 
-     * Retains several values to bind to the next query statement; these will
-     * be merges with existing bound values, and will be reset after the
-     * next query.
-     * 
-     * @param array $bind_values An array where the key is the parameter name and
-     * the value is the parameter value.
-     * 
-     * @return null
-     * 
-     */
-    public function bindValues(array $bind_values)
-    {
-        foreach ($bind_values as $name => $value) {
-            $this->bindValue($name, $value);
-        }
-    }
-    
-    /**
-     * 
-     * Returns the array of values to bind to the next query.
-     * 
-     * @return array
-     * 
-     */
-    public function getBindValues()
-    {
-        return $this->bind_values;
-    }
-    
-    /**
-     * 
      * Connects to the database and sets PDO attributes.
      * 
      * @return null
@@ -871,8 +822,10 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      */
     public function fetchStatement($statement, array $values = array())
     {
-        $this->bindValues($values);
-        return $this->query($statement);
+        $this->bind_values = $values;
+        $sth = $this->query($statement);
+        $this->bind_values = array();
+        return $sth;
     }
 
     /**
