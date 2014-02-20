@@ -11,23 +11,19 @@ Added functionality in _Aura.Sql_ over the native _PDO_ includes:
   method calls that require a connection. This means you can create an
   instance and not incur the cost of a connection if you never make a query.
 
-- **Bind values.** You may provide values for binding to the next query using
-  `bindValues()`. Multiple calls to `bindValues()` will merge, not reset, the
-  values. The values will be reset after calling `query()`, `exec()`,
-  `prepare()`, or any of the `fetch*()` methods.  In addition, binding values
-  that do not have any corresponding placeholders will not cause an error.
-
 - **Array quoting.** The `quote()` method will accept an array as input, and
-  return a string of comma-separated quoted values. In addition, named
-  placeholders in prepared statements that are bound to array values will
-  be replaced with comma-separated quoted values. This means you can bind
-  an array of values to a placeholder used with an `IN (...)` condition.
+  return a string of comma-separated quoted values.
 
-- **Fetch methods.** _ExtendedPdo_ provides several `fetch*()` methods for
-  commonly-used fetch styles. For example, you can call `fetchAll()` directly
+- **New `perform()` method.** The `perform()` method acts just like `query()`,
+  but binds values to a prepared statement as part of the call.  In addition, placeholders that represent array values will be replaced with comma-
+  separated quoted values. This means you can bind an  array of values to a placeholder used with an `IN (...)`  condition when using `perform()`.
+
+- **New `fetch*()` methods.** The new `fetch*()` methods provide for
+  commonly-used fetch actions. For example, you can call `fetchAll()` directly
   on the instance instead of having to prepare a statement, bind values,
   execute, and then fetch from the prepared statement. All of the `fetch*()`
-  methods take an array of values to bind to to the query statement.
+  methods take an array of values to bind to to the query statement, and use 
+  the new `perform()` method internally.
 
 - **Exceptions by default.** _ExtendedPdo_ starts in the `ERRMODE_EXCEPTION`
   mode for error reporting instead of the `ERRMODE_SILENT` mode.
@@ -127,65 +123,12 @@ $pdo->connect();
 ?>
 ```
 
-### Bind Values
-
-Instead of having to bind values to a prepared _PDOStatement_, you can call
-`bindValues()` directly on the _ExtendedPdo_ instance, and those values will
-be bound to named placeholders in the next query.
-
-```php
-<?php
-// the native PDO way
-$pdo = new PDO(...);
-$sth = $pdo->prepare('SELECT * FROM test WHERE foo = :foo AND bar = :bar');
-$sth->bindValue('foo', 'foo_value');
-$sth->bindValue('bar', 'bar_value');
-$sth->execute();
-
-// the ExtendedPdo way
-$pdo = new ExtendedPdo(...);
-$pdo->bindValues(array(
-    'foo' => 'foo_value',
-    'bar' => 'bar_value',
-));
-$sth = $pdo->query('SELECT * FROM test WHERE foo = :foo AND bar = :bar');
-?>
-```
-
-It also works with sequential question-mark placeholders; note that
-question-mark placeholders are numbered starting from 1, and that the keys
-must be integers (not string numerics).
-
-```php
-<?php
-$pdo = new ExtendedPdo(...);
-$pdo->bindValues(array(
-    1 => 'foo_value',
-    2 => 'bar_value',
-));
-$sth = $pdo->query('SELECT * FROM test WHERE foo = ? AND bar = ?');
-?>
-```
-
-Mixing named placeholders and question-mark placeholders is allowed:
-
-```php
-<?php
-$pdo = new ExtendedPdo(...);
-$pdo->bindValues(array(
-    'foo' => 'foo_value',
-    1 => 'bar_value',
-));
-$sth = $pdo->query('SELECT * FROM test WHERE foo = :foo AND bar = ?');
-?>
-```
-
 ### Array Quoting
 
 The native _PDO_ `quote()` method will not quote arrays. This makes it
 difficult to bind an array to something like an `IN (...)` condition in SQL.
-However, _ExtendedPdo_ recognizes arrays and converts them into
-comma-separated quoted strings.
+However, _ExtendedPdo_ recognizes arrays and converts them into comma-
+separated quoted strings.
 
 ```php
 <?php
@@ -204,9 +147,12 @@ $cond = 'IN (' . $pdo->quote($array) . ')';
 ?>
 ```
 
-Whereas the native _PDO_ `prepare()` does not deal with bound array values,
-_ExtendedPdo_ modifies the query string to replace the named placeholder with
-the quoted array.  Note that this is *not* the same thing as binding proper;
+### The `perform()` Method
+
+The new `perform()` method will prepare a query with bound values in a single
+step.  Also, because the native _PDO_ does not deal with bound array values,
+`perform()` modifies the query string to replace array-bound placeholders with
+the quoted array.  Note that this is *not* the same thing as binding:
 the query string itself is modified before passing to the database for value
 binding.
 
@@ -216,36 +162,36 @@ binding.
 $array = array('foo', 'bar', 'baz');
 
 // the statement to prepare
-$stm = 'SELECT * FROM test WHERE foo IN (:foo) AND bar = :bar'
+$stm = 'SELECT * FROM test WHERE foo IN (:foo)'
 
 // the native PDO way does not work (PHP Notice:  Array to string conversion)
 $pdo = new ExtendedPdo(...);
 $sth = $pdo->prepare($stm);
 $sth->bindValue('foo', $array);
 
-// the ExtendedPdo way quotes the array and replaces the array placeholder
-// directly in the query string
+// the ExtendedPdo way allows a single call to prepare and execute the query.
+// it quotes the array and replaces the array placeholder directly in the 
+// query string
 $pdo = new ExtendedPdo(...);
-$pdo->bindValues(array(
-    'foo' => array('foo', 'bar', 'baz'),
-    'bar' => 'qux',
-));
-$sth = $pdo->prepare($stm);
+$bind_values = array('foo' => $array);
+$sth = $pdo->perform($stm, $bind_values);
 echo $sth->queryString;
 // the query string has been modified by ExtendedPdo to become
-// "SELECT * FROM test WHERE foo IN ('foo', 'bar', 'baz') AND bar = :bar"
+// "SELECT * FROM test WHERE foo IN ('foo', 'bar', 'baz')"
 ?>
 ```
 
-Finally, note that array quoting works only on the _ExtendedPdo_ instance,
+Finally, note that array quoting works only via the `perform()` method,
 not on returned _PDOStatement_ instances.
 
-### Fetch Methods
+
+### New `fetch*()` Methods
 
 _ExtendedPdo_ comes with `fetch*()` methods to help reduce boilerplate code.
 Instead of issuing `prepare()`, a series of `bindValue()` calls, `execute()`,
 and then `fetch*()` on a _PDOStatement_, you can bind values and fetch results
-in one call on _ExtendedPdo_ directly.
+in one call on _ExtendedPdo_ directly.  (The `fetch*()` methods use `perform()`
+internally, so quoting-and-replacement of array placeholders is supported.)
 
 ```php
 <?php
