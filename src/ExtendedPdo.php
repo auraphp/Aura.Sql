@@ -531,9 +531,8 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
         
         $this->beginProfile(__FUNCTION__);
         $sth->execute();
-        $this->endProfile($sth);
+        $this->endProfile($sth->queryString);
         
-        $this->bind_values = array();
         return $sth->rowCount();
     }
     
@@ -567,7 +566,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
         $sth = $this->prepare($statement);
         $this->beginProfile(__FUNCTION__);
         $sth->execute();
-        $this->endProfile($sth);
+        $this->endProfile($sth->queryString);
         
         // allow for optional fetch mode
         if ($fetch_arg2 !== null) {
@@ -982,7 +981,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      * @return null
      * 
      */
-    protected function endProfile(PDOStatement $sth = null)
+    protected function endProfile($statement = null)
     {
         // if there's no profiler, can't profile
         if (! $this->profiler) {
@@ -993,7 +992,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
         $this->profiler->addProfile(
             microtime(true) - $this->profile['time'],
             $this->profile['function'],
-            $sth ? $sth->queryString : null,
+            $statement,
             $this->profile['bind_values']
         );
         
