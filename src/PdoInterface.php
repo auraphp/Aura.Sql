@@ -21,8 +21,7 @@ interface PdoInterface
 {
     /**
      * 
-     * Connects to the database, begins a transaction, and turns off
-     * autocommit mode.
+     * Begins a transaction and turns off autocommit mode.
      * 
      * @return bool True on success, false on failure.
      * 
@@ -33,8 +32,7 @@ interface PdoInterface
     
     /**
      * 
-     * Connects to the database, commits the existing transaction, and
-     * restores autocommit mode.
+     * Commits the existing transaction and restores autocommit mode.
      * 
      * @return bool True on success, false on failure.
      * 
@@ -63,10 +61,9 @@ interface PdoInterface
     
     /**
      * 
-     * Connects to the database, prepares a statement using the bound values,
-     * executes the statement, and returns the number of affected rows.
+     * Executes an SQL statement and returns the number of affected rows.
      * 
-     * @param string $statement The SQL statement to prepare and execute.
+     * @param string $statement The SQL statement to execute.
      * 
      * @return null
      * 
@@ -113,17 +110,7 @@ interface PdoInterface
     
     /**
      * 
-     * Connects to the database and prepares an SQL statement to be executed,
-     * using values that been bound for the next query.
-     * 
-     * This override only binds values that have placeholders in the
-     * statement, thereby avoiding errors from PDO regarding too many bound
-     * values.
-     * 
-     * If a placeholder value is an array, the array is converted to a string
-     * of comma-separated quoted values; e.g., for an `IN (...)` condition.
-     * The quoted string is replaced directly into the statement instead of
-     * using `PDOStatement::bindValue()` proper.
+     * Prepares an SQL statement for execution.
      * 
      * @param string $statement The SQL statement to prepare for execution.
      * 
@@ -139,8 +126,7 @@ interface PdoInterface
     
     /**
      * 
-     * Connects to the database, prepares a statement using the bound values,
-     * executes the statement, and returns a PDOStatement result set.
+     * Queries the database and returns a PDOStatement.
      * 
      * @param string $statement The SQL statement to prepare and execute.
      * 
@@ -168,9 +154,6 @@ interface PdoInterface
      * 
      * Quotes a value for use in an SQL statement.
      * 
-     * This differs from `PDO::quote()` in that it will convert an array into
-     * a string of comma-separated quoted values.
-     * 
      * @param mixed $value The value to quote.
      * 
      * @param int $parameter_type A data type hint for the database driver.
@@ -184,8 +167,7 @@ interface PdoInterface
     
     /**
      * 
-     * Connects to the database, rolls back the current transaction, and
-     * restores autocommit mode.
+     * Rolls back the current transaction and restores autocommit mode.
      * 
      * @return bool True on success, false on failure.
      * 
@@ -202,7 +184,7 @@ interface PdoInterface
      * 
      * @param mixed $value The value for the attribute.
      * 
-     * @return null
+     * @return bool
      * 
      */
     public function setAttribute($attribute, $value);
