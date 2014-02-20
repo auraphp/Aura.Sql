@@ -976,7 +976,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      * 
      * Ends and records a profile entry.
      * 
-     * @param PDOStatement $sth The statement being profiled, if any.
+     * @param string $statement The statement being profiled, if any.
      * 
      * @return null
      * 
