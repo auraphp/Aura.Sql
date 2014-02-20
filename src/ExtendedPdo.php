@@ -819,7 +819,10 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
     public function fetchStatement($statement, array $values = array())
     {
         $this->bind_values = $values;
-        $sth = $this->query($statement);
+        $sth = $this->prepare($statement);
+        $this->beginProfile(__FUNCTION__);
+        $sth->execute();
+        $this->endProfile($sth->queryString);
         $this->bind_values = array();
         return $sth;
     }

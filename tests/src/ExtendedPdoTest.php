@@ -489,7 +489,7 @@ class ExtendedPdoTest extends \PHPUnit_Framework_TestCase
                 'bind_values' => array(),
             ),
             2 => array(
-                'function' => 'query',
+                'function' => 'fetchStatement',
                 'statement' => 'SELECT 3 FROM pdotest',
                 'bind_values' => array(
                     'zim' => 'gir',
