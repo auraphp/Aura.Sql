@@ -804,7 +804,6 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
         // retain starting profile info
         $this->profile['time'] = microtime(true);
         $this->profile['function'] = $function;
-        $this->profile['values'] = $this->values;
     }
     
     /**
