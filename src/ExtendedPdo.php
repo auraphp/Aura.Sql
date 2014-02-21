@@ -867,8 +867,25 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
         // retain the bind values
         $this->values = $values;
 
+        $prep = $this->newPrepObject();
+        $statement = $this->rebuildStatement($statement, $prep);
+
+        // prepare the statement
+        $sth = $this->prepare($statement);
+
+        // for the placeholders we found, bind the corresponding data values
+        foreach ($prep->values as $key => $val) {
+            $sth->bindValue($key, $val);
+        }
+
+        // done
+        return $sth;
+    }
+    
+    protected function newPrepObject()
+    {
         // anonymous object to track preparation info
-        $prep = (object) array(
+        return (object) array(
             // how many numbered placeholders in the original statement
             'num' => 0,
             // how many numbered placeholders to actually be bound; this may
@@ -878,7 +895,10 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
             // named and numbered placeholders to bind at the end
             'values' => array(),
         );
-        
+    }
+
+    protected function rebuildStatement($statement, $prep)
+    {
         // find all parts not inside quotes or backslashed-quotes
         $apos = "'";
         $quot = '"';
@@ -909,20 +929,9 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
         }
 
         // bring the parts back together in case they were modified
-        $statement = implode('', $parts);
-
-        // prepare the statement
-        $sth = $this->prepare($statement);
-
-        // for the placeholders we found, bind the corresponding data values
-        foreach ($prep->values as $key => $val) {
-            $sth->bindValue($key, $val);
-        }
-
-        // done
-        return $sth;
+        return implode('', $parts);
     }
-    
+
     /**
      * 
      * Prepares the sub-parts of a query with placeholders.
