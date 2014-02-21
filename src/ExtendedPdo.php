@@ -62,7 +62,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      * @var array
      * 
      */
-    protected $bind_values = array();
+    protected $values = array();
     
     /**
      * 
@@ -632,12 +632,12 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      */
     public function perform($statement, array $values = array())
     {
-        $this->bind_values = $values;
-        $sth = $this->performPrepare($statement);
+        $this->values = $values;
+        $sth = $this->prepareWithValues($statement);
         $this->beginProfile(__FUNCTION__);
         $sth->execute();
         $this->endProfile($sth->queryString);
-        $this->bind_values = array();
+        $this->values = array();
         return $sth;
     }
 
@@ -806,7 +806,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
         // retain starting profile info
         $this->profile['time'] = microtime(true);
         $this->profile['function'] = $function;
-        $this->profile['bind_values'] = $this->bind_values;
+        $this->profile['values'] = $this->values;
     }
     
     /**
@@ -830,19 +830,18 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
             microtime(true) - $this->profile['time'],
             $this->profile['function'],
             $statement,
-            $this->profile['bind_values']
+            $this->profile['values']
         );
         
         // clear the starting profile info
         $this->profile = array();
     }
-    
+
     /**
      * 
-     * Connects to the database and prepares an SQL statement to be executed,
-     * using values that been bound for the next query.
+     * Prepares an SQL statement with bound values.
      * 
-     * This method only binds values that have named placeholders in the
+     * This method only binds values that have placeholders in the
      * statement, thereby avoiding errors from PDO regarding too many bound
      * values. It also binds all sequential (question-mark) placeholders.
      * 
@@ -858,10 +857,10 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      * @see http://php.net/manual/en/pdo.prepare.php
      * 
      */
-    protected function performPrepare($statement)
+    protected function prepareWithValues($statement)
     {
         // are there any bind values?
-        if (! $this->bind_values) {
+        if (! $this->values) {
             return $this->prepare($statement);
         }
 
@@ -874,7 +873,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
             // replaced with quoted CSV strings
             'count' => 0,
             // named and numbered placeholders to bind at the end
-            'bind_values' => array(),
+            'values' => array(),
         );
         
         // find all parts not inside quotes or backslashed-quotes
@@ -900,7 +899,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
             );
 
             // check subparts to convert bound arrays to quoted CSV strings
-            $subs = $this->prepareSubparts($subs, $prep);
+            $subs = $this->prepareValuePlaceholders($subs, $prep);
             
             // reassemble
             $parts[$i] = implode('', $subs);
@@ -914,7 +913,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
 
         // for the placeholders we found, bind the corresponding data values,
         // along with all sequential values for question marks
-        foreach ($prep->bind_values as $key => $val) {
+        foreach ($prep->values as $key => $val) {
             $sth->bindValue($key, $val);
         }
 
@@ -933,7 +932,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      * @return array The prepared subparts.
      * 
      */
-    protected function prepareSubparts(array $subs, $prep)
+    protected function prepareValuePlaceholders(array $subs, $prep)
     {
         foreach ($subs as $i => $sub) {
             $char = substr($sub, 0, 1);
@@ -966,15 +965,15 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
         $prep->num ++;
         
         // is the corresponding data element an array?
-        $bind_array = isset($this->bind_values[$prep->num])
-                   && is_array($this->bind_values[$prep->num]);
+        $bind_array = isset($this->values[$prep->num])
+                   && is_array($this->values[$prep->num]);
         if ($bind_array) {
             // PDO won't bind an array; quote and replace directly
-            $sub = $this->quote($this->bind_values[$prep->num]);
+            $sub = $this->quote($this->values[$prep->num]);
         } else {
             // increase the count of numbered placeholders to be bound
             $prep->count ++;
-            $prep->bind_values[$prep->count] = $this->bind_values[$prep->num];
+            $prep->values[$prep->count] = $this->values[$prep->num];
         }
         
         return $sub;
@@ -996,14 +995,14 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
         $name = substr($sub, 1);
         
         // is the corresponding data element an array?
-        $bind_array = isset($this->bind_values[$name])
-                   && is_array($this->bind_values[$name]);
+        $bind_array = isset($this->values[$name])
+                   && is_array($this->values[$name]);
         if ($bind_array) {
             // PDO won't bind an array; quote and replace directly
-            $sub = $this->quote($this->bind_values[$name]);
+            $sub = $this->quote($this->values[$name]);
         } else {
             // not an array, retain the placeholder for later
-            $prep->bind_values[$name] = $this->bind_values[$name];
+            $prep->values[$name] = $this->values[$name];
         }
         
         return $sub;
