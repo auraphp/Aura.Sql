@@ -891,7 +891,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
             // replaced with quoted CSV strings
             'count' => 0,
             // named and numbered placeholders to bind at the end
-            'values' => array(),
+            'final_values' => array(),
         );
     }
 
@@ -932,7 +932,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
         $statement = implode('', $parts);
 
         // return
-        return array($statement, $prep->values);
+        return array($statement, $prep->final_values);
     }
 
     /**
@@ -987,7 +987,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
         } else {
             // increase the count of numbered placeholders to be bound
             $prep->count ++;
-            $prep->values[$prep->count] = $this->values[$prep->num];
+            $prep->final_values[$prep->count] = $this->values[$prep->num];
         }
         
         return $sub;
@@ -1016,7 +1016,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
             $sub = $this->quote($this->values[$name]);
         } else {
             // not an array, retain the placeholder for later
-            $prep->values[$name] = $this->values[$name];
+            $prep->final_values[$name] = $this->values[$name];
         }
         
         return $sub;
