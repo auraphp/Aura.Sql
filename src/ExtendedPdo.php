@@ -864,7 +864,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
         return $sth;
     }
     
-    protected function newPrepObject($values)
+    protected function newBindTracker($values)
     {
         // anonymous object to track preparation info
         return (object) array(
@@ -883,7 +883,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
 
     protected function rebuild($statement, $values)
     {
-        $prep = $this->newPrepObject($values);
+        $bind = $this->newBindTracker($values);
 
         // find all parts not inside quotes or backslashed-quotes
         $apos = "'";
@@ -908,7 +908,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
             );
 
             // check subparts to convert bound arrays to quoted CSV strings
-            $subs = $this->prepareValuePlaceholders($subs, $prep);
+            $subs = $this->prepareValuePlaceholders($subs, $bind);
             
             // reassemble
             $parts[$i] = implode('', $subs);
@@ -918,7 +918,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
         $statement = implode('', $parts);
 
         // return the rebuilt statement and final values
-        return array($statement, $prep->final_values);
+        return array($statement, $bind->final_values);
     }
 
     /**
@@ -927,21 +927,21 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      * 
      * @param array $subs The query subparts.
      * 
-     * @param object $prep The preparation info object.
+     * @param object $bind The preparation info object.
      * 
      * @return array The prepared subparts.
      * 
      */
-    protected function prepareValuePlaceholders(array $subs, $prep)
+    protected function prepareValuePlaceholders(array $subs, $bind)
     {
         foreach ($subs as $i => $sub) {
             $char = substr($sub, 0, 1);
             if ($char == '?') {
-                $subs[$i] = $this->prepareNumberedPlaceholder($sub, $prep);
+                $subs[$i] = $this->prepareNumberedPlaceholder($sub, $bind);
             }
             
             if ($char == ':') {
-                $subs[$i] = $this->prepareNamedPlaceholder($sub, $prep);
+                $subs[$i] = $this->prepareNamedPlaceholder($sub, $bind);
             }
         }
         
@@ -954,26 +954,26 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      * 
      * @param string $sub The query subpart.
      * 
-     * @param object $prep The preparation info object.
+     * @param object $bind The preparation info object.
      * 
      * @return string The prepared query subpart.
      * 
      */
-    protected function prepareNumberedPlaceholder($sub, $prep)
+    protected function prepareNumberedPlaceholder($sub, $bind)
     {
         // what numbered placeholder is this in the original statement?
-        $prep->num ++;
+        $bind->num ++;
         
         // is the corresponding data element an array?
-        $bind_array = isset($prep->values[$prep->num])
-                   && is_array($prep->values[$prep->num]);
+        $bind_array = isset($bind->values[$bind->num])
+                   && is_array($bind->values[$bind->num]);
         if ($bind_array) {
             // PDO won't bind an array; quote and replace directly
-            $sub = $this->quote($prep->values[$prep->num]);
+            $sub = $this->quote($bind->values[$bind->num]);
         } else {
             // increase the count of numbered placeholders to be bound
-            $prep->count ++;
-            $prep->final_values[$prep->count] = $prep->values[$prep->num];
+            $bind->count ++;
+            $bind->final_values[$bind->count] = $bind->values[$bind->num];
         }
         
         return $sub;
@@ -985,24 +985,24 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      * 
      * @param string $sub The query subpart.
      * 
-     * @param object $prep The preparation info object.
+     * @param object $bind The preparation info object.
      * 
      * @return string The prepared query subpart.
      * 
      */
-    protected function prepareNamedPlaceholder($sub, $prep)
+    protected function prepareNamedPlaceholder($sub, $bind)
     {
         $name = substr($sub, 1);
         
         // is the corresponding data element an array?
-        $bind_array = isset($prep->values[$name])
-                   && is_array($prep->values[$name]);
+        $bind_array = isset($bind->values[$name])
+                   && is_array($bind->values[$name]);
         if ($bind_array) {
             // PDO won't bind an array; quote and replace directly
-            $sub = $this->quote($prep->values[$name]);
+            $sub = $this->quote($bind->values[$name]);
         } else {
             // not an array, retain the placeholder for later
-            $prep->final_values[$name] = $prep->values[$name];
+            $bind->final_values[$name] = $bind->values[$name];
         }
         
         return $sub;
