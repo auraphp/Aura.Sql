@@ -864,6 +864,15 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
         return $sth;
     }
     
+    /**
+     * 
+     * Returns a new anonymous object to track bind values.
+     * 
+     * @param array $values The values to bind and/or replace into a statement.
+     * 
+     * @return object
+     * 
+     */
     protected function newBindTracker($values)
     {
         // anonymous object to track preparation info
@@ -881,6 +890,18 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
         );
     }
 
+    /**
+     * 
+     * Rebuilds a statement with array values replaced into placeholders.
+     * 
+     * @param string $statement The statement to rebuild.
+     * 
+     * @param array $values The values to bind and/or replace into a statement.
+     * 
+     * @return array An array where element 0 is the rebuilt statement and
+     * element 1 is the rebuilt array of values.
+     * 
+     */
     protected function rebuild($statement, $values)
     {
         $bind = $this->newBindTracker($values);
