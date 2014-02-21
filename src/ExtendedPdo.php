@@ -630,7 +630,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
         $sth = $this->prepareWithValues($statement, $values);
         $this->beginProfile(__FUNCTION__);
         $sth->execute();
-        $this->endProfile($sth->queryString);
+        $this->endProfile($sth->queryString, $values);
         return $sth;
     }
 
@@ -816,7 +816,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      * @return null
      * 
      */
-    protected function endProfile($statement = null)
+    protected function endProfile($statement = null, array $values = array())
     {
         // is there a profiler in place?
         if ($this->profiler) {
@@ -825,7 +825,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
                 microtime(true) - $this->profile['time'],
                 $this->profile['function'],
                 $statement,
-                $this->profile['values']
+                $values
             );
         }
         
