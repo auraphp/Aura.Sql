@@ -25,10 +25,23 @@ interface ExtendedPdoInterface extends PdoInterface
      * 
      * @return null
      * 
-     * @throws PDOException if the connection fails.
+     * @throws \PDOException if the connection fails.
      * 
      */
     public function connect();
+    
+    /**
+     * 
+     * Performs a statement and returns the number of affected rows.
+     * 
+     * @param string $statement The SQL statement to prepare and execute.
+     * 
+     * @param array $values Values to bind to the query.
+     * 
+     * @return array
+     * 
+     */
+    public function fetchAffected($statement, array $values = array());
     
     /**
      * 

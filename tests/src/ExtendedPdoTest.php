@@ -124,7 +124,7 @@ class ExtendedPdoTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expect, $actual);
     }
     
-    public function testperform()
+    public function testPerform()
     {
         $stm = "SELECT * FROM pdotest WHERE id <= :val";
         $sth = $this->pdo->perform($stm, array('val' => '5'));
@@ -188,14 +188,14 @@ class ExtendedPdoTest extends \PHPUnit_Framework_TestCase
         
     }
     
-    public function testPrepareWithQuotedStringsAndData()
+    public function testPrepareWithValues()
     {
         $stm = "SELECT * FROM pdotest
                  WHERE 'leave '':foo'' alone'
                  AND id IN (:list)
                  AND \"leave '':bar' alone\"";
         
-        $sth = $this->pdo->perform($stm, array(
+        $sth = $this->pdo->prepareWithValues($stm, array(
             'list' => array('1', '2', '3', '4', '5'),
             'foo' => 'WRONG',
             'bar' => 'WRONG',
@@ -206,6 +206,14 @@ class ExtendedPdoTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($expect, $actual);
     }
     
+    public function testFetchAffected()
+    {
+        $stm = "DELETE FROM pdotest";
+        $actual = $this->pdo->fetchAffected($stm);
+        $expect = 10;
+        $this->assertSame($expect, $actual);
+    }
+
     public function testFetchAll()
     {
         $stm = "SELECT * FROM pdotest";

@@ -65,7 +65,7 @@ interface PdoInterface
      * 
      * @param string $statement The SQL statement to execute.
      * 
-     * @return int
+     * @return int The number of rows affected.
      * 
      * @see http://php.net/manual/en/pdo.exec.php
      * 
@@ -117,7 +117,7 @@ interface PdoInterface
      * @param array $options Set these attributes on the returned
      * PDOStatement.
      * 
-     * @return PDOStatement
+     * @return \PDOStatement
      * 
      * @see http://php.net/manual/en/pdo.prepare.php
      * 
@@ -139,7 +139,7 @@ interface PdoInterface
      * @param mixed $fetch_arg2 The second additional argument to send to
      * `PDOStatement::setFetchMode()`.
      * 
-     * @return PDOStatement
+     * @return \PDOStatement
      * 
      * @see http://php.net/manual/en/pdo.query.php
      * 

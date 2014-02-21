@@ -265,6 +265,23 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
     
     /**
      * 
+     * Performs a statement and returns the number of affected rows.
+     * 
+     * @param string $statement The SQL statement to prepare and execute.
+     * 
+     * @param array $values Values to bind to the query.
+     * 
+     * @return int
+     * 
+     */
+    public function fetchAffected($statement, array $values = array())
+    {
+        $sth = $this->perform($statement, $values);
+        return $sth->rowCount();
+    }
+    
+    /**
+     * 
      * Fetches a sequential array of rows from the database; the rows
      * are returned as associative arrays.
      * 
@@ -310,6 +327,8 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      * to be returned.
      * 
      * @return array
+     * 
+     * @throws \PDOException if the connection fails.
      * 
      */
     public function fetchAssoc(
