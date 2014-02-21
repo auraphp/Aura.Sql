@@ -867,14 +867,13 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
         // retain the bind values
         $this->values = $values;
 
-        $prep = $this->newPrepObject();
-        $statement = $this->rebuildStatement($statement, $prep);
+        list($statement, $values) = $this->rebuild($statement);
 
         // prepare the statement
         $sth = $this->prepare($statement);
 
         // for the placeholders we found, bind the corresponding data values
-        foreach ($prep->values as $key => $val) {
+        foreach ($values as $key => $val) {
             $sth->bindValue($key, $val);
         }
 
@@ -897,8 +896,10 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
         );
     }
 
-    protected function rebuildStatement($statement, $prep)
+    protected function rebuild($statement)
     {
+        $prep = $this->newPrepObject();
+
         // find all parts not inside quotes or backslashed-quotes
         $apos = "'";
         $quot = '"';
@@ -929,7 +930,10 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
         }
 
         // bring the parts back together in case they were modified
-        return implode('', $parts);
+        $statement = implode('', $parts);
+
+        // return
+        return array($statement, $prep->values);
     }
 
     /**
