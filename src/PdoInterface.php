@@ -164,7 +164,7 @@ interface PdoInterface
      * @see http://php.net/manual/en/pdo.quote.php
      * 
      */
-    public function quote($value, $parameter_type = ExtendedPdo::PARAM_STR);
+    public function quote($value, $parameter_type = PDO::PARAM_STR);
     
     /**
      * 
