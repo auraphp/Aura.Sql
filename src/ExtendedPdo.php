@@ -344,7 +344,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      * 
      * @return null
      * 
-     * @throws PDOException if the connection fails.
+     * @throws \PDOException if the connection fails.
      * 
      */
     public function connect()
@@ -569,7 +569,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      * 
      * @param string $statement The SQL statement to prepare and execute.
      * 
-     * @return null
+     * @return int The number of rows affected.
      * 
      * @see http://php.net/manual/en/pdo.exec.php
      * 
