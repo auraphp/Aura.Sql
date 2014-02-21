@@ -15,37 +15,16 @@ use PDOStatement;
 
 /**
  * 
- * This extended version of PDO provides:
- * 
- * - Lazy connection. The instance connects to the database only on method
- *   calls that require a connection. This means you can create an instance
- *   and not incur the cost of a connection if you never make a query.
- * 
- * - Array quoting. The quote() method will accept an array as input, and
- *   return a string of comma-separated quoted values. In addition, named
- *   placeholders in prepared statements that are bound to array values will
- *   be replaced with comma-separated quoted values. This means you can bind
- *   an array of values to a placeholder used with an `IN (...)` condition.
- * 
- * - Bind values. You may provide values for binding to the next query using
- *   bindValues(). Multiple calls to bindValues() will merge, not reset, the
- *   values. The values will be reset after calling query(), exec(),
- *   prepare(), or any of the fetch*() methods.
- * 
- * - Fetch methods. The class provides several fetch*() methods to reduce
- *   boilerplate code elsewhere. This means you can call, e.g., fetchAll()
- *   directly on the instance instead of having to prepare a statement, bind
- *   values, execute, and then fetch from the prepared statement. All of the
- *   fetch*() methods take an array of values to bind to to the query.
- * 
- * By default, it starts in the ERRMODE_EXCEPTION instead of ERRMODE_SILENT.
+ * This extended version of PDO provides lazy connection, array quoting, a new
+ * `perform()` method, and new `fetch*()` methods. By default, it starts in the
+ * ERRMODE_EXCEPTION error mode instead of ERRMODE_SILENT.
  * 
  */
 class ExtendedPdo extends PDO implements ExtendedPdoInterface
 {
     /**
      * 
-     * The PDO instance attributes.
+     * The PDO connection attributes.
      * 
      * @var array
      * 
@@ -57,16 +36,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
     
     /**
      * 
-     * Values to be bound into the next query.
-     * 
-     * @var array
-     * 
-     */
-    protected $values = array();
-    
-    /**
-     * 
-     * Is the instance connected to a database?
+     * Is this instance connected to a database yet?
      * 
      * @var bool
      * 
@@ -138,6 +108,17 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
     
     /**
      * 
+     * Values to be bound at `perform()` time.
+     * 
+     * @var array
+     * 
+     * @see perform()
+     * 
+     */
+    protected $values = array();
+    
+    /**
+     * 
      * Constructor; retains connection information but does not make a
      * connection.
      * 
@@ -178,8 +159,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
     
     /**
      * 
-     * Connects to the database, begins a transaction, and turns off
-     * autocommit mode.
+     * Begins a transaction and turns off autocommit mode.
      * 
      * @return bool True on success, false on failure.
      * 
@@ -197,8 +177,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
     
     /**
      * 
-     * Connects to the database, commits the existing transaction, and
-     * restores autocommit mode.
+     * Commits the existing transaction and restores autocommit mode.
      * 
      * @return bool True on success, false on failure.
      * 
@@ -281,7 +260,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      * 
      * @param string $statement The SQL statement to prepare and execute.
      * 
-     * @return int
+     * @return int The number of affected rows.
      * 
      * @see http://php.net/manual/en/pdo.exec.php
      * 
@@ -298,7 +277,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
     /**
      * 
      * Fetches a sequential array of rows from the database; the rows
-     * are represented as associative arrays.
+     * are returned as associative arrays.
      * 
      * @param string $statement The SQL statement to prepare and execute.
      * 
@@ -310,8 +289,11 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      * @return array
      * 
      */
-    public function fetchAll($statement, array $values = array(), $callable = null)
-    {
+    public function fetchAll(
+        $statement,
+        array $values = array(),
+        $callable = null
+    ) {
         $sth = $this->perform($statement, $values);
         $data = $sth->fetchAll(self::FETCH_ASSOC);
         if ($callable) {
@@ -325,10 +307,10 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
     /**
      * 
      * Fetches an associative array of rows from the database; the rows
-     * are represented as associative arrays. The array of rows is keyed
+     * are returned as associative arrays, and the array of rows is keyed
      * on the first column of each row.
      * 
-     * N.b.: if multiple rows have the same first column value, the last
+     * N.b.: If multiple rows have the same first column value, the last
      * row with that value will override earlier rows.
      * 
      * @param string $statement The SQL statement to prepare and execute.
@@ -341,8 +323,11 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      * @return array
      * 
      */
-    public function fetchAssoc($statement, array $values = array(), $callable = null)
-    {
+    public function fetchAssoc(
+        $statement,
+        array $values = array(),
+        $callable = null
+    ) {
         $sth = $this->perform($statement, $values);
         $data = array();
         if ($callable) {
@@ -373,8 +358,11 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      * @return array
      * 
      */
-    public function fetchCol($statement, array $values = array(), $callable = null)
-    {
+    public function fetchCol(
+        $statement,
+        array $values = array(),
+        $callable = null
+    ) {
         $sth = $this->perform($statement, $values);
         $data = $sth->fetchAll(self::FETCH_COLUMN, 0);
         if ($callable) {
@@ -387,8 +375,8 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
 
     /**
      * 
-     * Fetches one row from the database as an object, mapping column values
-     * to object properties.
+     * Fetches one row from the database as an object where the column values
+     * are mapped to object properties.
      * 
      * Warning: PDO "injects property-values BEFORE invoking the constructor -
      * in other words, if your class initializes property-values to defaults
@@ -420,7 +408,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
     /**
      * 
      * Fetches a sequential array of rows from the database; the rows
-     * are represented as objects, where the column values are mapped to
+     * are returned as objects where the column values are mapped to
      * object properties.
      * 
      * Warning: PDO "injects property-values BEFORE invoking the constructor -
@@ -483,8 +471,11 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      * @return array
      * 
      */
-    public function fetchPairs($statement, array $values = array(), $callable = null)
-    {
+    public function fetchPairs(
+        $statement,
+        array $values = array(),
+        $callable = null
+    ) {
         $sth = $this->perform($statement, $values);
         if ($callable) {
             $data = array();
@@ -534,7 +525,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
     
     /**
      * 
-     * Returns the name of the driver from the DSN.
+     * Returns the driver name from the DSN.
      * 
      * @return string
      * 
@@ -588,7 +579,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
     
     /**
      * 
-     * Is the instance connected to a database?
+     * Is this instance connected to a database?
      * 
      * @return bool
      * 
@@ -621,13 +612,17 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
     
     /**
      * 
-     * Performs a query and returns a PDOStatement.
+     * Performs a query with bound values and returns the resulting
+     * PDOStatement; array values will be passed through `quote()` and their
+     * respective placeholders will be replaced in the query string.
      * 
      * @param string $statement The SQL statement to perform.
      * 
-     * @param array $values Values to bind to the query.
+     * @param array $values Values to bind to the query
      * 
      * @return PDOStatement
+     * 
+     * @see quote()
      * 
      */
     public function perform($statement, array $values = array())
@@ -641,7 +636,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
 
     /**
      * 
-     * Connects to the database and prepares an SQL statement for execution.
+     * Prepares an SQL statement for execution.
      * 
      * @param string $statement The SQL statement to prepare for execution.
      * 
@@ -677,6 +672,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      * @return PDOStatement
      * 
      * @see http://php.net/manual/en/pdo.query.php
+     * 
      */
     public function query(
         $statement,
@@ -687,7 +683,12 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
         $this->connect();
         $this->beginProfile(__FUNCTION__);
         if ($fetch_arg2 !== null) {
-            $sth = parent::query($statement, $fetch_mode, $fetch_arg1, $fetch_arg2);
+            $sth = parent::query(
+                $statement,
+                $fetch_mode,
+                $fetch_arg1,
+                $fetch_arg2
+            );
         } elseif ($fetch_arg1 !== null) {
             $sth = parent::query($statement, $fetch_mode, $fetch_arg1);
         } elseif ($fetch_mode !== null) {
@@ -733,8 +734,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
     
     /**
      * 
-     * Connects to the database, rolls back the current transaction, and
-     * restores autocommit mode.
+     * Rolls back the current transaction, and restores autocommit mode.
      * 
      * @return bool True on success, false on failure.
      * 
@@ -914,8 +914,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
         // prepare the statement
         $sth = $this->prepare($statement);
 
-        // for the placeholders we found, bind the corresponding data values,
-        // along with all sequential values for question marks
+        // for the placeholders we found, bind the corresponding data values
         foreach ($prep->values as $key => $val) {
             $sth->bindValue($key, $val);
         }
