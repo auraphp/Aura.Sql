@@ -632,12 +632,10 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      */
     public function perform($statement, array $values = array())
     {
-        $this->values = $values;
-        $sth = $this->prepareWithValues($statement);
+        $sth = $this->prepareWithValues($statement, $values);
         $this->beginProfile(__FUNCTION__);
         $sth->execute();
         $this->endProfile($sth->queryString);
-        $this->values = array();
         return $sth;
     }
 
@@ -820,21 +818,22 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      */
     protected function endProfile($statement = null)
     {
-        // if there's no profiler, can't profile
-        if (! $this->profiler) {
-            return;
+        // is there a profiler in place?
+        if ($this->profiler) {
+            // add an entry to the profiler
+            $this->profiler->addProfile(
+                microtime(true) - $this->profile['time'],
+                $this->profile['function'],
+                $statement,
+                $this->profile['values']
+            );
         }
-        
-        // add an entry to the profiler
-        $this->profiler->addProfile(
-            microtime(true) - $this->profile['time'],
-            $this->profile['function'],
-            $statement,
-            $this->profile['values']
-        );
         
         // clear the starting profile info
         $this->profile = array();
+
+        // clear the bound values
+        $this->values = array();
     }
 
     /**
@@ -857,12 +856,16 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      * @see http://php.net/manual/en/pdo.prepare.php
      * 
      */
-    protected function prepareWithValues($statement)
+    protected function prepareWithValues($statement, array $values = array())
     {
-        // are there any bind values?
-        if (! $this->values) {
+        // if there are no values to bind ...
+        if (! $values) {
+            // ... use the normal preparation
             return $this->prepare($statement);
         }
+
+        // retain the bind values
+        $this->values = $values;
 
         // anonymous object to track preparation info
         $prep = (object) array(
