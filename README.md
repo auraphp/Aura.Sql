@@ -236,6 +236,10 @@ $result = $pdo->fetchPairs($stm, $bind);
 
 // fetchValue() returns the value of the first row in the first column
 $result = $pdo->fetchValue($stm, $bind);
+
+// fetchAffected() returns the number of affected rows
+$stm = "UPDATE test SET incr = incr + 1 WHERE foo = :foo AND bar = :bar";
+$row_count = $pdo->fetchAffected($stm, $bind);
 ?>
 ```
 
@@ -278,10 +282,10 @@ $profiles = $pdo->getProfiler()->getProfiles();
 
 Each profile entry will have these keys:
 
+- `duration`: How long the query took to complete, in seconds.
+
 - `function`: The method that was called on _ExtendedPdo_ that created the
   profile entry.
-
-- `duration`: How long the query took to complete, in seconds.
 
 - `statement`: The query string that was issued, if any. (Methods like
   `connect()` and `rollBack()` do not send query strings.)
