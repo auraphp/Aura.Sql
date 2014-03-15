@@ -73,7 +73,7 @@ you notice compliance oversights, please send a patch via pull request.
 
 ### Community
 
-To ask questions, provide feedback, or otherwise communicate with other Aura users, please join our [Google Group](http://groups.google.com/group/auraphp), follow [@auraphp on Twitter](http://twitter.com/auraphp), or chat with us on #auraphp on Freenode.
+To ask questions, provide feedback, or otherwise communicate with the Aura community, please join our [Google Group](http://groups.google.com/group/auraphp), follow [@auraphp on Twitter](http://twitter.com/auraphp), or chat with us on #auraphp on Freenode.
 
 ## Getting Started
 
