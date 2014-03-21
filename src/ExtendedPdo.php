@@ -138,7 +138,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
         }
         
         if (reset($args) instanceof PDO) {
-            $this->pdo = array_pop($args);
+            $this->pdo = array_shift($args);
             $this->driver = $this->pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
             $this->connected = true;
 
