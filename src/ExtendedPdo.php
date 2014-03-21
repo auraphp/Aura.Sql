@@ -128,33 +128,47 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      * @see http://php.net/manual/en/pdo.construct.php
      * 
      */
-    public function __construct(
-        $dsn,
-        $username = null,
-        $password = null,
-        array $options = null,
-        array $attributes = null
-    ) {
-        $this->dsn      = $dsn;
-        $this->username = $username;
-        $this->password = $password;
-        $this->options  = $options;
-        
-        // can't use array_merge, as it will renumber keys
-        foreach ((array) $attributes as $attribute => $value) {
-            $this->attributes[$attribute] = $value;
+    public function __construct() 
+    {
+        if (func_num_args() == 5) {
+            $args = func_get_args();
+        } else {
+            // Make sure we always have five arguments
+            $args = func_get_args() + array_fill(func_num_args(), 5 - func_num_args(), null);
         }
         
-        // set the driver name
-        $pos = strpos($this->dsn, ':');
-        $this->driver = substr($this->dsn, 0, $pos);
+        if (reset($args) instanceof PDO) {
+            $this->pdo = array_pop($args);
+            $this->driver = $this->pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
+            $this->connected = true;
 
-        $this->pdo = new PDO(
-            $this->dsn,
-            $this->username,
-            $this->password,
-            $this->options
-        );
+            foreach ($this->attributes as $attribute => $value) {
+                $this->setAttribute($attribute, $value);
+            }
+        } else {
+            list($dsn, $username, $password, $options, $attributes) = $args;
+
+            $this->dsn      = $dsn;
+            $this->username = $username;
+            $this->password = $password;
+            $this->options  = $options;
+        
+            // can't use array_merge, as it will renumber keys
+            foreach ((array) $attributes as $attribute => $value) {
+                $this->attributes[$attribute] = $value;
+            }
+        
+            // set the driver name
+            $pos = strpos($this->dsn, ':');
+            $this->driver = substr($this->dsn, 0, $pos);
+
+            $this->pdo = new PDO(
+                $this->dsn,
+                $this->username,
+                $this->password,
+                $this->options
+            );
+        }
     }
     
     /**
