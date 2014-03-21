@@ -23,6 +23,11 @@ use PDOStatement;
 class ExtendedPdo extends PDO implements ExtendedPdoInterface
 {
     /**
+     *
+     * Instance of PDO being extended
+     *
+     * @var PDO
+     *
      */
     protected $pdo;
 
@@ -115,7 +120,8 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      * Constructor; retains connection information but does not make a
      * connection.
      * 
-     * @param string $dsn The data source name for the connection.
+     * @param string|PDO $dsn The data source name for the connection, or optionally an 
+     *   existing PDO instance.
      * 
      * @param string $username The username for the connection.
      * 
