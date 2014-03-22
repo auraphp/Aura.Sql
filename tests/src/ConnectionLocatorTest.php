@@ -10,8 +10,6 @@ class ConnectionLocatorTest extends \PHPUnit_Framework_TestCase
      */
     protected $locator;
     
-    protected $tmp;
-    
     protected $default;
     
     protected $read = array();
@@ -20,11 +18,9 @@ class ConnectionLocatorTest extends \PHPUnit_Framework_TestCase
     
     protected function setUp()
     {
-        $this->tmp = $tmp = sys_get_temp_dir();
-
-        $this->default = function () use ($tmp) {
+        $this->default = function () {
             return new ExtendedPdo(
-                sprintf('sqlite:%sdefault_example.sqlite', $tmp),
+                'mock:host=default.example.com',
                 'user_name',
                 'pass_word',
                 array()
@@ -32,25 +28,25 @@ class ConnectionLocatorTest extends \PHPUnit_Framework_TestCase
         };
         
         $this->read = array(
-            'read1' => function () use ($tmp) {
+            'read1' => function () {
                 return new ExtendedPdo(
-                    sprintf('sqlite:%sread1_example.sqlite', $tmp),
+                    'mock:host=read1.example.com',
                     'user_name',
                     'pass_word',
                     array()
                 );
             },
-            'read2' => function () use ($tmp) {
+            'read2' => function () {
                 return new ExtendedPdo(
-                    sprintf('sqlite:%sread2_example.sqlite', $tmp),
+                    'mock:host=read2.example.com',
                     'user_name',
                     'pass_word',
                     array()
                 );
             },
-            'read3' => function () use ($tmp) {
+            'read3' => function () {
                 return new ExtendedPdo(
-                    sprintf('sqlite:%sread3_example.sqlite', $tmp),
+                    'mock:host=read3.example.com',
                     'user_name',
                     'pass_word',
                     array()
@@ -59,53 +55,31 @@ class ConnectionLocatorTest extends \PHPUnit_Framework_TestCase
         );
         
         $this->write = array(
-            'write1' => function () use ($tmp) {
+            'write1' => function () {
                 return new ExtendedPdo(
-                    sprintf('sqlite:%swrite1_example.sqlite', $tmp),
+                    'mock:host=write1.example.com',
                     'user_name',
                     'pass_word',
                     array()
                 );
             },
-            'write2' => function () use ($tmp) {
+            'write2' => function () {
                 return new ExtendedPdo(
-                    sprintf('sqlite:%swrite2_example.sqlite', $tmp),
+                    'mock:host=write2.example.com',
                     'user_name',
                     'pass_word',
                     array()
                 );
             },
-            'write3' => function () use ($tmp) {
+            'write3' => function () {
                 return new ExtendedPdo(
-                    sprintf('sqlite:%swrite3_example.sqlite', $tmp),
+                    'mock:host=write3.example.com',
                     'user_name',
                     'pass_word',
                     array()
                 );
             },
         );
-    }
-
-    /**
-     * Cleanup any leftover db files after the test has been run
-     */
-    protected function tearDown()
-    {
-        $dbs = array(
-            sprintf('%sdefault_example.sqlite', $this->tmp),
-            sprintf('%sread1_example.sqlite', $this->tmp),
-            sprintf('%sread2_example.sqlite', $this->tmp),
-            sprintf('%sread3_example.sqlite', $this->tmp),
-            sprintf('%swrite1_example.sqlite', $this->tmp),
-            sprintf('%swrite2_example.sqlite', $this->tmp),
-            sprintf('%swrite3_example.sqlite', $this->tmp),
-        );
-        
-        foreach ($dbs as $db) {
-            if (file_exists($db)) {
-                unlink($db);
-            }
-        }
     }
     
     protected function newLocator($read = array(), $write = array())
@@ -117,7 +91,7 @@ class ConnectionLocatorTest extends \PHPUnit_Framework_TestCase
     {
         $locator = $this->newLocator();
         $pdo = $locator->getDefault();
-        $expect = sprintf('sqlite:%sdefault_example.sqlite', $this->tmp);
+        $expect = 'mock:host=default.example.com';
         $actual = $pdo->getDsn();
         $this->assertSame($expect, $actual);
     }
@@ -126,7 +100,7 @@ class ConnectionLocatorTest extends \PHPUnit_Framework_TestCase
     {
         $locator = $this->newLocator();
         $pdo = $locator->getRead();
-        $expect = sprintf('sqlite:%sdefault_example.sqlite', $this->tmp);
+        $expect = 'mock:host=default.example.com';
         $actual = $pdo->getDsn();
         $this->assertSame($expect, $actual);
     }
@@ -136,9 +110,9 @@ class ConnectionLocatorTest extends \PHPUnit_Framework_TestCase
         $locator = $this->newLocator($this->read, $this->write);
         
         $expect = array(
-            sprintf('sqlite:%sread1_example.sqlite', $this->tmp),
-            sprintf('sqlite:%sread2_example.sqlite', $this->tmp),
-            sprintf('sqlite:%sread3_example.sqlite', $this->tmp),
+            'mock:host=read1.example.com',
+            'mock:host=read2.example.com',
+            'mock:host=read3.example.com',
         );
         
         // try 10 times to make sure we get lots of random responses
@@ -153,7 +127,7 @@ class ConnectionLocatorTest extends \PHPUnit_Framework_TestCase
     {
         $locator = $this->newLocator($this->read, $this->write);
         $pdo = $locator->getRead('read2');
-        $expect = sprintf('sqlite:%sread2_example.sqlite', $this->tmp);
+        $expect = 'mock:host=read2.example.com';
         $actual = $pdo->getDsn();
         $this->assertSame($expect, $actual);
     }
@@ -169,7 +143,7 @@ class ConnectionLocatorTest extends \PHPUnit_Framework_TestCase
     {
         $locator = $this->newLocator();
         $pdo = $locator->getWrite();
-        $expect = sprintf('sqlite:%sdefault_example.sqlite', $this->tmp);
+        $expect = 'mock:host=default.example.com';
         $actual = $pdo->getDsn();
         $this->assertSame($expect, $actual);
     }
@@ -179,9 +153,9 @@ class ConnectionLocatorTest extends \PHPUnit_Framework_TestCase
         $locator = $this->newLocator($this->write, $this->write);
         
         $expect = array(
-            sprintf('sqlite:%swrite1_example.sqlite', $this->tmp),
-            sprintf('sqlite:%swrite2_example.sqlite', $this->tmp),
-            sprintf('sqlite:%swrite3_example.sqlite', $this->tmp),
+            'mock:host=write1.example.com',
+            'mock:host=write2.example.com',
+            'mock:host=write3.example.com',
         );
         
         // try 10 times to make sure we get lots of random responses
@@ -196,7 +170,7 @@ class ConnectionLocatorTest extends \PHPUnit_Framework_TestCase
     {
         $locator = $this->newLocator($this->write, $this->write);
         $pdo = $locator->getWrite('write2');
-        $expect = sprintf('sqlite:%swrite2_example.sqlite', $this->tmp);
+        $expect = 'mock:host=write2.example.com';
         $actual = $pdo->getDsn();
         $this->assertSame($expect, $actual);
     }
