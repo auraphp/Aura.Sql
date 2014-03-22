@@ -167,13 +167,6 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
             // set the driver name
             $pos = strpos($this->dsn, ':');
             $this->driver = substr($this->dsn, 0, $pos);
-
-            $this->pdo = new PDO(
-                $this->dsn,
-                $this->username,
-                $this->password,
-                $this->options
-            );
         }
     }
     
@@ -231,7 +224,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
         
         // connect to the database
         $this->beginProfile(__FUNCTION__);
-        $this->pdo->__construct(
+        $this->pdo = new PDO(
             $this->dsn,
             $this->username,
             $this->password,
