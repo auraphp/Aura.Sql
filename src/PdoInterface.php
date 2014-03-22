@@ -10,6 +10,8 @@
  */
 namespace Aura\Sql;
 
+use PDO;
+
 /**
  * 
  * An interface to the native PDO object.
