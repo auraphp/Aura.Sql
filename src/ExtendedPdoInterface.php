@@ -202,22 +202,14 @@ interface ExtendedPdoInterface extends PdoInterface
     
     /**
      * 
-     * Returns the DSN for the connection.
+     * Returns the DSN for a lazy connection; if the underlying PDO instance
+     * was injected at construction time, this will be null.
      * 
-     * @return string
+     * @return string|null
      * 
      */
     public function getDsn();
 
-    /**
-     * 
-     * Returns the name of the driver from the DSN.
-     * 
-     * @return string
-     * 
-     */
-    public function getDriver();
-    
     /**
      * 
      * Returns the profiler object.

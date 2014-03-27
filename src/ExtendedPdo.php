@@ -53,15 +53,6 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
     
     /**
      * 
-     * The name of the driver for the PDO instance.
-     * 
-     * @var string
-     * 
-     */
-    protected $driver;
-    
-    /**
-     * 
      * PDO options for a lazy connection.
      * 
      * @var array
@@ -148,7 +139,6 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
     protected function __constructDecorator(PDO $pdo)
     {
         $this->pdo = $pdo;
-        $this->driver = $this->pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
     }
 
     /**
@@ -186,10 +176,6 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
         foreach ((array) $attributes as $attribute => $value) {
             $this->attributes[$attribute] = $value;
         }
-    
-        // set the driver name
-        $pos = strpos($this->dsn, ':');
-        $this->driver = substr($this->dsn, 0, $pos);
     }
 
     /**
@@ -576,21 +562,10 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
     
     /**
      * 
-     * Returns the driver name from the PDO connection.
+     * Returns the DSN for a lazy connection; if the underlying PDO instance
+     * was injected at construction time, this will be null.
      * 
-     * @return string
-     * 
-     */
-    public function getDriver()
-    {
-        return $this->driver;
-    }
-    
-    /**
-     * 
-     * Returns the DSN for the connection.
-     * 
-     * @return string
+     * @return string|null
      * 
      */
     public function getDsn()
