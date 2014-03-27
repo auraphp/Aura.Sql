@@ -5,9 +5,16 @@ use PDO;
 
 class DecoratedPdoTest extends AbstractExtendedPdoTest
 {
+    protected $decorated_pdo;
+
     protected function newExtendedPdo()
     {
-        $pdo = new PDO('sqlite::memory:');
-        return new ExtendedPdo($pdo);
+        $this->decorated_pdo = new PDO('sqlite::memory:');
+        return new ExtendedPdo($this->decorated_pdo);
+    }
+
+    public function testGetPdo()
+    {
+        $this->assertSame($this->decorated_pdo, $this->pdo->getPdo());
     }
 }

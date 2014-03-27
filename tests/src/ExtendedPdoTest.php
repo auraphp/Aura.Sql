@@ -23,4 +23,11 @@ class ExtendedPdoTest extends AbstractExtendedPdoTest
             $attributes
         );
     }
+
+    public function testGetPdo()
+    {
+        $lazy_pdo = $this->pdo->getPdo();
+        $this->assertInstanceOf('PDO', $lazy_pdo);
+        $this->assertNotSame($this->pdo, $lazy_pdo);
+    }
 }

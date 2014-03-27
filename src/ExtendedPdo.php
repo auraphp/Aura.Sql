@@ -575,6 +575,19 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
     
     /**
      * 
+     * Returns the underlying PDO connection object.
+     * 
+     * @return PDO
+     * 
+     */
+    public function getPdo()
+    {
+        $this->connect();
+        return $this->pdo;
+    }
+
+    /**
+     * 
      * Returns the profiler object.
      * 
      * @return ProfilerInterface

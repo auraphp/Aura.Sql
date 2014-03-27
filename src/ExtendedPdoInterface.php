@@ -212,6 +212,15 @@ interface ExtendedPdoInterface extends PdoInterface
 
     /**
      * 
+     * Returns the underlying PDO connection object.
+     * 
+     * @return PDO
+     * 
+     */
+    public function getPdo();
+
+    /**
+     * 
      * Returns the profiler object.
      * 
      * @return ProfilerInterface
