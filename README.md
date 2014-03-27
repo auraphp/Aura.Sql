@@ -137,7 +137,7 @@ The _ExtendedPdo_ class can be used to decorate an existing PDO connection as we
 <?php
 use Aura\Sql\ExtendedPdo;
 
-$pdo = new Pdo(...);
+$pdo = new PDO(...);
 $extended_pdo = new ExtendedPdo($pdo);
 ?>
 ```
