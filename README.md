@@ -11,6 +11,12 @@ Added functionality in _Aura.Sql_ over the native _PDO_ includes:
   method calls that require a connection. This means you can create an
   instance and not incur the cost of a connection if you never make a query.
 
+- **Decoration.** _ExtendedPdo_ can be used to decorate an existing PDO
+  instance. This means that a PDO instance can be "extended" **at runtime** to 
+  provide the _ExtendedPdo_ behaviors. (Note that lazy connection is not
+  possible in this case, as the PDO instance being decorated has already
+  connected.)
+
 - **Array quoting.** The `quote()` method will accept an array as input, and
   return a string of comma-separated quoted values.
 
@@ -79,6 +85,10 @@ To ask questions, provide feedback, or otherwise communicate with the Aura commu
 
 ### Instantiation
 
+You can instantiate _ExtendedPdo_ so that it uses lazy connection, or you can use it to decorate an existing _PDO_ instance.
+
+#### Lazy Connection Instance
+
 Instantiation is the same as with the native _PDO_ class: pass a data source
 name, username, password, and driver options. There is one additional
 parameter that allows you to pass attributes to be set after the connection is
@@ -98,14 +108,7 @@ $pdo = new ExtendedPdo(
 ?>
 ```
 
-You can now use the _ExtendedPdo_ instance in exactly the same way as a native
-_PDO_ instance.
-
-### Lazy Connection
-
-Whereas the native _PDO_ connects on instantiation, _ExtendedPdo_ does not
-connect immediately. Instead, it connects only when you call a method that
-actually needs the connection to the database; e.g., on `query()`.
+Whereas the native _PDO_ connects on instantiation, _ExtendedPdo_ does not connect immediately. Instead, it connects only when you call a method that actually needs the connection to the database; e.g., on `query()`.
 
 If you want to force a connection, call the `connect()` method.
 
@@ -125,6 +128,24 @@ $pdo->exec('SELECT * FROM test');
 $pdo->connect();
 ?>
 ```
+
+#### Decorator Instance
+
+The _ExtendedPdo_ class can be used to decorate an existing PDO connection as well. To do so, instantiate _ExtendedPdo_ by passing an existing PDO connection:
+
+```php
+<?php
+use Aura\Sql\ExtendedPdo;
+
+$pdo = new Pdo(...);
+$extended_pdo = new ExtendedPdo($pdo);
+?>
+```
+
+The decorated _PDO_ instance now provides all the _ExtendedPdo_ functionality (aside from lazy connection, which is not possible since the _PDO_ instance by definition has already connected).
+
+Decoration of this kind can be useful when you have access to an existing _PDO_ connection managed elsewhere in your application.
+
 
 ### Array Quoting
 
