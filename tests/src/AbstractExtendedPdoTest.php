@@ -26,25 +26,13 @@ abstract class AbstractExtendedPdoTest extends \PHPUnit_Framework_TestCase
             $this->markTestSkipped("Need 'pdo_sqlite' to test in memory.");
         }
 
-        $dsn = 'sqlite::memory:';
-        $username = null;
-        $password = null;
-        $driver_options = array();
-        
-        // do this to test constructor array loop
-        $attributes = array(PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION);
-        
-        $this->pdo = new ExtendedPdo(
-            $dsn,
-            $username,
-            $password,
-            $driver_options,
-            $attributes
-        );
+        $this->pdo = $this->newExtendedPdo();
 
         $this->createTable();
         $this->fillTable();
     }
+    
+    abstract protected function newExtendedPdo();
     
     protected function createTable()
     {
