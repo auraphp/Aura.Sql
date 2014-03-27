@@ -15,16 +15,15 @@ use PDOStatement;
 
 /**
  * 
- * This extended version of PDO provides lazy connection, array quoting, a new
- * `perform()` method, and new `fetch*()` methods. By default, it starts in the
- * ERRMODE_EXCEPTION error mode instead of ERRMODE_SILENT.
+ * This extended decorator for PDO provides lazy connection, array quoting, a
+ * new `perform()` method, and new `fetch*()` methods.
  * 
  */
 class ExtendedPdo extends PDO implements ExtendedPdoInterface
 {
     /**
      *
-     * Instance of PDO being extended
+     * The instance of PDO being decorated.
      *
      * @var PDO
      *
@@ -33,7 +32,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
 
     /**
      * 
-     * The PDO connection attributes.
+     * The attributes for a lazy connection.
      * 
      * @var array
      * 
@@ -45,16 +44,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
     
     /**
      * 
-     * Is this instance connected to a database yet?
-     * 
-     * @var bool
-     * 
-     */
-    protected $connected = false;
-    
-    /**
-     * 
-     * The DSN for the connection.
+     * The DSN for a lazy connection.
      * 
      * @var string
      * 
@@ -63,7 +53,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
     
     /**
      * 
-     * The name of the driver from the DSN.
+     * The name of the driver for the PDO instance.
      * 
      * @var string
      * 
@@ -72,7 +62,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
     
     /**
      * 
-     * PDO options for the connection.
+     * PDO options for a lazy connection.
      * 
      * @var array
      * 
@@ -81,7 +71,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
     
     /**
      * 
-     * The password for the connection.
+     * The password for a lazy connection.
      * 
      * @var string
      * 
@@ -108,7 +98,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
     
     /**
      * 
-     * The username for the connection.
+     * The username for a lazy connection.
      * 
      * @var string
      * 
@@ -117,59 +107,91 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
     
     /**
      * 
-     * Constructor; retains connection information but does not make a
-     * connection.
+     * This constructor is polymorphic. You may pass a single parameter, an
+     * existing PDO instance, to decorate that instance with ExtendedPdo.
+     * Alternatively, you may pass a set of PDO constructor parameters, and
+     * ExtendedPdo will use them for a lazy connection.
      * 
-     * @param string|PDO $dsn The data source name for the connection, or optionally an 
-     *   existing PDO instance.
+     * @param PDO|string $spec Either an existing instance of PDO, or the data
+     * source name for a lazy PDO connection.
      * 
-     * @param string $username The username for the connection.
+     * @param string $username The username for a lazy connection.
      * 
-     * @param string $password The password for the connection.
+     * @param string $password The password for a lazy connection.
      * 
-     * @param array $options Driver-specific options.
+     * @param array $options Driver-specific options for a lazy connection.
      * 
-     * @param array $attributes Attributes to set after connection.
+     * @param array $attributes Attributes to set after a lazy connection.
      * 
      * @see http://php.net/manual/en/pdo.construct.php
      * 
      */
-    public function __construct() 
+    public function __construct($spec) 
     {
-        if (func_num_args() == 5) {
-            $args = func_get_args();
+        $args = func_get_args();
+        if (count($args) == 1 && $spec instanceof PDO) {
+            $this->__constructDecorator($spec);
         } else {
-            // Make sure we always have five arguments
-            $args = func_get_args() + array_fill(func_num_args(), 5 - func_num_args(), null);
-        }
-        
-        if (reset($args) instanceof PDO) {
-            $this->pdo = array_shift($args);
-            $this->driver = $this->pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
-            $this->connected = true;
-
-            foreach ($this->attributes as $attribute => $value) {
-                $this->setAttribute($attribute, $value);
-            }
-        } else {
-            list($dsn, $username, $password, $options, $attributes) = $args;
-
-            $this->dsn      = $dsn;
-            $this->username = $username;
-            $this->password = $password;
-            $this->options  = $options;
-        
-            // can't use array_merge, as it will renumber keys
-            foreach ((array) $attributes as $attribute => $value) {
-                $this->attributes[$attribute] = $value;
-            }
-        
-            // set the driver name
-            $pos = strpos($this->dsn, ':');
-            $this->driver = substr($this->dsn, 0, $pos);
+            call_user_func_array(array($this, '__constructLazy'), $args);
         }
     }
     
+    /**
+     * 
+     * Constructor to decorate an existing PDO instance.
+     * 
+     * @param PDO $pdo The PDO instance to decorate.
+     *
+     * @return null
+     *
+     */
+    protected function __constructDecorator(PDO $pdo)
+    {
+        $this->pdo = $pdo;
+        $this->driver = $this->pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
+    }
+
+    /**
+     * 
+     * Constructor for a lazy connection.
+     * 
+     * @param string $dsn The data source name for a lazy PDO connection.
+     * 
+     * @param string $username The username for a lazy connection.
+     * 
+     * @param string $password The password for a lazy connection.
+     * 
+     * @param array $options Driver-specific options for a lazy connection.
+     * 
+     * @param array $attributes Attributes to set after a lazy connection.
+     * 
+     * @see http://php.net/manual/en/pdo.construct.php
+     *
+     * @return null
+     *
+     */
+    protected function __constructLazy(
+        $dsn,
+        $username = null,
+        $password = null,
+        array $options = null,
+        array $attributes = null
+    ) {
+        $this->dsn      = $dsn;
+        $this->username = $username;
+        $this->password = $password;
+        $this->options  = $options;
+    
+        // can't use array_merge, as it will renumber keys
+        foreach ((array) $attributes as $attribute => $value) {
+            $this->attributes[$attribute] = $value;
+        }
+    
+        // set the driver name
+        $pos = strpos($this->dsn, ':');
+        $this->driver = substr($this->dsn, 0, $pos);
+    }
+
     /**
      * 
      * Begins a transaction and turns off autocommit mode.
@@ -218,7 +240,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
     public function connect()
     {
         // don't connect twice
-        if ($this->connected) {
+        if ($this->pdo) {
             return;
         }
         
@@ -231,9 +253,6 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
             $this->options
         );
         $this->endProfile();
-        
-        // remember that we have connected
-        $this->connected = true;
         
         // set attributes
         foreach ($this->attributes as $attribute => $value) {
@@ -557,7 +576,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
     
     /**
      * 
-     * Returns the driver name from the DSN.
+     * Returns the driver name from the PDO connection.
      * 
      * @return string
      * 
@@ -618,7 +637,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      */
     public function isConnected()
     {
-        return $this->connected;
+        return isset($this->pdo);
     }
     
     /**
@@ -795,7 +814,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      */
     public function setAttribute($attribute, $value)
     {
-        if ($this->connected) {
+        if ($this->pdo) {
             return $this->pdo->setAttribute($attribute, $value);
         }
         
