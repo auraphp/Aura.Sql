@@ -422,7 +422,7 @@ abstract class AbstractExtendedPdoTest extends \PHPUnit_Framework_TestCase
         $this->insert($cols);
         $actual = $this->pdo->fetchAll("SELECT * FROM pdotest");
         $this->assertSame(11, count($actual));
-        $this->pdo->rollback();
+        $rollBackResult = $this->pdo->rollback();
         $this->assertFalse($this->pdo->inTransaction());
         
         $actual = $this->pdo->fetchAll("SELECT * FROM pdotest");
@@ -438,6 +438,16 @@ abstract class AbstractExtendedPdoTest extends \PHPUnit_Framework_TestCase
         
         $actual = $this->pdo->fetchAll("SELECT * FROM pdotest");
         $this->assertSame(11, count($actual));
+
+        return $rollBackResult;
+    }
+
+    /**
+     * @depends testTransactions
+     */
+    public function testRollBack($rollBackResult)
+    {
+        $this->assertTrue($rollBackResult);
     }
     
     public function testProfiling()
