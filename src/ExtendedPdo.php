@@ -170,12 +170,8 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
         $this->dsn      = $dsn;
         $this->username = $username;
         $this->password = $password;
-        $this->options  = $options;
-    
-        // can't use array_merge, as it will renumber keys
-        foreach ((array) $attributes as $attribute => $value) {
-            $this->attributes[$attribute] = $value;
-        }
+        $this->options  = (array) $options;
+        $this->attributes = array_replace($this->attributes, (array) $attributes);
     }
 
     /**
