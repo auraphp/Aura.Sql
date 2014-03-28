@@ -782,6 +782,8 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
         $this->beginProfile(__FUNCTION__);
         $result = $this->pdo->rollBack();
         $this->endProfile();
+
+        return $result;
     }
     
     /**
