@@ -167,10 +167,10 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
         array $options = array(),
         array $attributes = array()
     ) {
-        $this->dsn      = $dsn;
+        $this->dsn = $dsn;
         $this->username = $username;
         $this->password = $password;
-        $this->options  = $options;
+        $this->options = $options;
         $this->attributes = array_replace($this->attributes, $attributes);
     }
 
