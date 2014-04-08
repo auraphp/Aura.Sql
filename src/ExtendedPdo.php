@@ -98,54 +98,15 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
     
     /**
      * 
-     * This constructor is polymorphic. You may pass a single parameter, an
-     * existing PDO instance, to decorate that instance with ExtendedPdo.
-     * Alternatively, you may pass a set of PDO constructor parameters, and
-     * ExtendedPdo will use them for a lazy connection.
+     * This constructor is pseudo-polymorphic. You may pass a normal set of PDO
+     * constructor parameters, and ExtendedPdo will use them for a lazy
+     * connection. Alternatively, if the `$dsn` parameter is an existing PDO 
+     * instance, that instance will be decorated by ExtendedPdo; the remaining
+     * parameters will be ignored.
      * 
-     * @param PDO|string $spec Either an existing instance of PDO, or the data
-     * source name for a lazy PDO connection.
-     * 
-     * @param string $username The username for a lazy connection.
-     * 
-     * @param string $password The password for a lazy connection.
-     * 
-     * @param array $options Driver-specific options for a lazy connection.
-     * 
-     * @param array $attributes Attributes to set after a lazy connection.
-     * 
-     * @see http://php.net/manual/en/pdo.construct.php
-     * 
-     */
-    public function __construct($spec) 
-    {
-        $args = func_get_args();
-        if (count($args) == 1 && $spec instanceof PDO) {
-            $this->__constructDecorator($spec);
-        } else {
-            call_user_func_array(array($this, '__constructLazy'), $args);
-        }
-    }
-    
-    /**
-     * 
-     * Constructor to decorate an existing PDO instance.
-     * 
-     * @param PDO $pdo The PDO instance to decorate.
-     *
-     * @return null
-     *
-     */
-    protected function __constructDecorator(PDO $pdo)
-    {
-        $this->pdo = $pdo;
-    }
-
-    /**
-     * 
-     * Constructor for a lazy connection.
-     * 
-     * @param string $dsn The data source name for a lazy PDO connection.
+     * @param PDO|string $dsn The data source name for a lazy PDO connection, 
+     * or an existing instance of PDO. If the latter, the remaining params are
+     * ignored.
      * 
      * @param string $username The username for a lazy connection.
      * 
@@ -156,24 +117,26 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      * @param array $attributes Attributes to set after a lazy connection.
      * 
      * @see http://php.net/manual/en/pdo.construct.php
-     *
-     * @return null
-     *
+     * 
      */
-    protected function __constructLazy(
+    public function __construct(
         $dsn,
         $username = null,
         $password = null,
         array $options = array(),
         array $attributes = array()
     ) {
-        $this->dsn = $dsn;
-        $this->username = $username;
-        $this->password = $password;
-        $this->options = $options;
-        $this->attributes = array_replace($this->attributes, $attributes);
+        if ($dsn instanceof PDO) {
+            $this->pdo = $dsn;
+        } else {
+            $this->dsn = $dsn;
+            $this->username = $username;
+            $this->password = $password;
+            $this->options = $options;
+            $this->attributes = array_replace($this->attributes, $attributes);
+        }
     }
-
+    
     /**
      * 
      * Begins a transaction and turns off autocommit mode.
