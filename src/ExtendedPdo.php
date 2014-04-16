@@ -290,6 +290,11 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
     ) {
         $sth = $this->perform($statement, $values);
         $data = $sth->fetchAll(self::FETCH_ASSOC);
+        return $this->applyCallableToFetchAll($callable, $data);
+    }
+
+    protected function applyCallableToFetchAll($callable, $data)
+    {
         if ($callable) {
             foreach ($data as $key => $row) {
                 $data[$key] = call_user_func($callable, $row);
@@ -297,7 +302,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
         }
         return $data;
     }
-
+    
     /**
      * 
      * Fetches an associative array of rows from the database; the rows
@@ -361,12 +366,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
     ) {
         $sth = $this->perform($statement, $values);
         $data = $sth->fetchAll(self::FETCH_COLUMN, 0);
-        if ($callable) {
-            foreach ($data as $key => $val) {
-                $data[$key] = call_user_func($callable, $val);
-            }
-        }
-        return $data;
+        return $this->applyCallableToFetchAll($callable, $data);
     }
 
     /**
