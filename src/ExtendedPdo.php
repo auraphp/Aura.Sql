@@ -321,8 +321,6 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      * 
      * @return array
      * 
-     * @throws \PDOException if the connection fails.
-     * 
      */
     public function fetchAssoc(
         $statement,
@@ -330,18 +328,17 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
         $callable = null
     ) {
         $sth = $this->perform($statement, $values);
-        $data = array();
-        if ($callable) {
-            while ($row = $sth->fetch(self::FETCH_ASSOC)) {
-                $key = current($row); // value of the first element
-                $data[$key] = call_user_func($callable, $row);
-            }
-        } else {
-            while ($row = $sth->fetch(self::FETCH_ASSOC)) {
-                $key = current($row); // value of the first element
-                $data[$key] = $row;
-            }
+
+        if (! $callable) {
+            $callable = function ($row) { return $row; };
         }
+
+        $data = array();
+        while ($row = $sth->fetch(self::FETCH_ASSOC)) {
+            $key = current($row);
+            $data[$key] = call_user_func($callable, $row);
+        }
+
         return $data;
     }
 
