@@ -61,7 +61,9 @@ class ConnectionLocator implements ConnectionLocatorInterface
         array $read = array(),
         array $write = array()
     ) {
-        $this->setDefault($default);
+        if ($default) {
+            $this->setDefault($default);
+        }
         foreach ($read as $name => $callable) {
             $this->setRead($name, $callable);
         }
