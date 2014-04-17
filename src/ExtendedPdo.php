@@ -920,7 +920,12 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
     protected function rebuild($statement, $values)
     {
         $bind = $this->newBindTracker($values);
+        $statement = $this->rebuildStatement($statement, $bind);
+        return array($statement, $bind->final_values);
+    }
 
+    protected function rebuildStatement($statement, $bind)
+    {
         // find all parts not inside quotes or backslashed-quotes
         $apos = "'";
         $quot = '"';
@@ -930,33 +935,36 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
             -1,
             PREG_SPLIT_DELIM_CAPTURE
         );
+        return $this->rebuildParts($parts, $bind);
+    }
 
+    protected function rebuildParts($parts, $bind)
+    {
         // loop through the non-quoted parts (0, 3, 6, 9, etc.)
         $k = count($parts);
         for ($i = 0; $i <= $k; $i += 3) {
-
-            // split into subparts by ":name" and "?"
-            $subs = preg_split(
-                "/(:[a-zA-Z_][a-zA-Z0-9_]*)|(\?)/m",
-                $parts[$i],
-                -1,
-                PREG_SPLIT_DELIM_CAPTURE
-            );
-
-            // check subparts to convert bound arrays to quoted CSV strings
-            $subs = $this->prepareValuePlaceholders($subs, $bind);
-            
-            // reassemble
-            $parts[$i] = implode('', $subs);
+            $parts[$i] = $this->rebuildPart($parts[$i], $bind);
         }
-
-        // bring the parts back together in case they were modified
-        $statement = implode('', $parts);
-
-        // return the rebuilt statement and final values
-        return array($statement, $bind->final_values);
+        return implode('', $parts);
     }
 
+    protected function rebuildPart($part, $bind)
+    {
+        // split into subparts by ":name" and "?"
+        $subs = preg_split(
+            "/(:[a-zA-Z_][a-zA-Z0-9_]*)|(\?)/m",
+            $part,
+            -1,
+            PREG_SPLIT_DELIM_CAPTURE
+        );
+
+        // check subparts to convert bound arrays to quoted CSV strings
+        $subs = $this->prepareValuePlaceholders($subs, $bind);
+        
+        // reassemble
+        return implode('', $subs);
+    }
+    
     /**
      * 
      * Prepares the sub-parts of a query with placeholders.
