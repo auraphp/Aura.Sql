@@ -288,8 +288,26 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
         array $values = array(),
         $callable = null
     ) {
+        return $this->fetchAllWithCallable(
+            self::FETCH_ASSOC,
+            $statement,
+            $values,
+            $callable
+        );
+    }
+
+    protected function fetchAllWithCallable(
+        $fetch_type,
+        $statement,
+        array $values = array(),
+        $callable = null
+    ) {
         $sth = $this->perform($statement, $values);
-        $data = $sth->fetchAll(self::FETCH_ASSOC);
+        if ($fetch_type == self::FETCH_COLUMN) {
+            $data = $sth->fetchAll($fetch_type, 0);
+        } else {
+            $data = $sth->fetchAll($fetch_type);
+        }
         return $this->applyCallableToFetchAll($callable, $data);
     }
 
@@ -361,9 +379,12 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
         array $values = array(),
         $callable = null
     ) {
-        $sth = $this->perform($statement, $values);
-        $data = $sth->fetchAll(self::FETCH_COLUMN, 0);
-        return $this->applyCallableToFetchAll($callable, $data);
+        return $this->fetchAllWithCallable(
+            self::FETCH_COLUMN,
+            $statement,
+            $values,
+            $callable
+        );
     }
 
     /**
