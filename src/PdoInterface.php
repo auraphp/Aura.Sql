@@ -146,12 +146,7 @@ interface PdoInterface
      * @see http://php.net/manual/en/pdo.query.php
      * 
      */
-    public function query(
-        $statement,
-        $fetch_mode = null,
-        $fetch_arg1 = null,
-        $fetch_arg2 = null
-    );
+    public function query($statement);
     
     /**
      * 

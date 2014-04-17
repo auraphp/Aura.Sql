@@ -690,28 +690,14 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      * @see http://php.net/manual/en/pdo.query.php
      * 
      */
-    public function query(
-        $statement,
-        $fetch_mode = null,
-        $fetch_arg1 = null,
-        $fetch_arg2 = null
-    ) {
+    public function query($statement)
+    {
         $this->connect();
         $this->beginProfile(__FUNCTION__);
-        if ($fetch_arg2 !== null) {
-            $sth = $this->pdo->query(
-                $statement,
-                $fetch_mode,
-                $fetch_arg1,
-                $fetch_arg2
-            );
-        } elseif ($fetch_arg1 !== null) {
-            $sth = $this->pdo->query($statement, $fetch_mode, $fetch_arg1);
-        } elseif ($fetch_mode !== null) {
-            $sth = $this->pdo->query($statement, $fetch_mode);
-        } else {
-            $sth = $this->pdo->query($statement);
-        }
+        $sth = call_user_func_array(
+            array($this->pdo, 'query'),
+            func_get_args()
+        );
         $this->endProfile($sth->queryString);
         return $sth;
     }
