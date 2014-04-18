@@ -43,36 +43,26 @@ Added functionality in _Aura.Sql_ over the native _PDO_ includes:
 
 ## Foreword
 
-### Requirements
+### Installation
 
 This library requires PHP 5.3 or later, and has no userland dependencies.
 
-### Installation
+It is installable and autoloadable via Composer as [aura/sql](https://packagist.org/packages/aura/sql).
 
-This library is installable and autoloadable via Composer with the following
-`require` element in your `composer.json` file:
+Alternatively, [download a release](https://github.com/auraphp/Aura.Sql/releases) or clone this repository, then require or include its _autoload.php_ file.
 
-    "require": {
-        "aura/sql": "2.*"
-    }
-    
-Alternatively, download or clone this repository, then require or include its
-_autoload.php_ file.
+### Quality
 
-### Tests
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/auraphp/Aura.Sql/badges/quality-score.png?s=cf727c038332c1b621d765daf6d94dd505aa7ef1)](https://scrutinizer-ci.com/g/auraphp/Aura.Sql/)
+[![Code Coverage](https://scrutinizer-ci.com/g/auraphp/Aura.Sql/badges/coverage.png?s=82a4c62b45aa8ae3d0c77c19bf7ed2773dd4d7b6)](https://scrutinizer-ci.com/g/auraphp/Aura.Sql/)
+[![Build Status](https://travis-ci.org/auraphp/Aura.Sql.png?branch=develop-2)](https://travis-ci.org/auraphp/Aura.Sql)
 
-[![Build Status](https://api.travis-ci.org/auraphp/Aura.Sql.png?branch=develop-2)](https://travis-ci.org/auraphp/Aura.Sql)
-
-This library has 100% code coverage with [PHPUnit][]. To run the tests at the
-command line, go to the _tests_ directory and issue `phpunit`.
-
-[phpunit]: http://phpunit.de/manual/
-
-### PSR Compliance
+To run the [PHPUnit][] tests at the command line, go to the _tests_ directory and issue `phpunit`.
 
 This library attempts to comply with [PSR-1][], [PSR-2][], and [PSR-4][]. If
 you notice compliance oversights, please send a patch via pull request.
 
+[PHPUnit]: http://phpunit.de/manual/
 [PSR-1]: https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-1-basic-coding-standard.md
 [PSR-2]: https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-2-coding-style-guide.md
 [PSR-4]: https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-4-autoloader.md
