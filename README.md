@@ -356,7 +356,7 @@ $connections->setDefault(function () {
     return new ExtendedPdo(
         'mysql:host=default.db.localhost;dbname=database',
         'username',
-        'password',
+        'password'
     );
 });
 ?>
@@ -371,7 +371,7 @@ $connections->setWrite('master', function () {
     return new ExtendedPdo(
         'mysql:host=master.db.localhost;dbname=database',
         'username',
-        'password',
+        'password'
     );
 });
 
@@ -380,7 +380,7 @@ $connections->setRead('slave1', function () {
     return new ExtendedPdo(
         'mysql:host=slave1.db.localhost;dbname=database',
         'username',
-        'password',
+        'password'
     );
 });
 
@@ -389,7 +389,7 @@ $connections->setRead('slave2', function () {
     return new ExtendedPdo(
         'mysql:host=slave2.db.localhost;dbname=database',
         'username',
-        'password',
+        'password'
     );
 });
 
@@ -398,7 +398,7 @@ $connections->setRead('slave3', function () {
     return new ExtendedPdo(
         'mysql:host=slave3.db.localhost;dbname=database',
         'username',
-        'password',
+        'password'
     );
 });
 ?>
@@ -419,7 +419,7 @@ create the connection (if needed) and then return it.
 
 ```php
 <?php
-$read = $connection->getRead();
+$read = $connections->getRead();
 $results = $read->fetchAll('SELECT * FROM table_name LIMIT 10');
 ?>
 ```
@@ -439,7 +439,7 @@ $default = function () {
     return new ExtendedPdo(
         'mysql:host=default.db.localhost;dbname=database',
         'username',
-        'password',
+        'password'
     );
 };
 
@@ -449,21 +449,21 @@ $read = array(
         return new ExtendedPdo(
             'mysql:host=slave1.db.localhost;dbname=database',
             'username',
-            'password',
+            'password'
         );
     },
     'slave2' => function () {
         return new ExtendedPdo(
             'mysql:host=slave2.db.localhost;dbname=database',
             'username',
-            'password',
+            'password'
         );
     },
     'slave3' => function () {
         return new ExtendedPdo(
             'mysql:host=slave3.db.localhost;dbname=database',
             'username',
-            'password',
+            'password'
         );
     },
 );
@@ -474,7 +474,7 @@ $write = array(
         return new ExtendedPdo(
             'mysql:host=master.db.localhost;dbname=database',
             'username',
-            'password',
+            'password'
         );
     },
 );
