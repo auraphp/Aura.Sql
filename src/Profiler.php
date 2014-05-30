@@ -1,30 +1,30 @@
 <?php
 /**
- * 
+ *
  * This file is part of Aura for PHP.
- * 
+ *
  * @package Aura.Sql
- * 
+ *
  * @license http://opensource.org/licenses/bsd-license.php BSD
- * 
+ *
  */
 namespace Aura\Sql;
 
 /**
- * 
+ *
  * Retains query profiles.
- * 
+ *
  * @package Aura.Sql
- * 
+ *
  */
 class Profiler implements ProfilerInterface
 {
     /**
-     * 
+     *
      * Is the profiler active?
-     * 
+     *
      * @var bool
-     * 
+     *
      */
     protected $active = false;
 
@@ -38,13 +38,13 @@ class Profiler implements ProfilerInterface
     protected $profiles = array();
 
     /**
-     * 
+     *
      * Turns the profiler on and off.
-     * 
+     *
      * @param bool $active True to turn on, false to turn off.
-     * 
+     *
      * @return null
-     * 
+     *
      */
     public function setActive($active)
     {
@@ -54,9 +54,9 @@ class Profiler implements ProfilerInterface
     /**
      *
      * Is the profiler active?
-     * 
+     *
      * @return bool
-     * 
+     *
      */
     public function isActive()
     {
@@ -64,19 +64,19 @@ class Profiler implements ProfilerInterface
     }
 
     /**
-     * 
+     *
      * Adds a profile entry.
      *
      * @param float $duration The query duration.
-     * 
+     *
      * @param string $function The PDO method that made the entry.
-     * 
+     *
      * @param string $statement The SQL query statement.
-     * 
+     *
      * @param array $bind_values The values bound to the statement.
-     * 
+     *
      * @return null
-     * 
+     *
      */
     public function addProfile(
         $duration,

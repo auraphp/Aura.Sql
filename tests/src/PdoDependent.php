@@ -9,7 +9,7 @@ class PdoDependent
     {
         $this->pdo = $pdo;
     }
-    
+
     public function fetchAll()
     {
         $stm = 'SELECT * FROM pdotest';
