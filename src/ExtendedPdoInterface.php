@@ -246,7 +246,7 @@ interface ExtendedPdoInterface extends PdoInterface
      *
      * @param array $values Values to bind to the query.
      *
-     * @return PDOStatement
+     * @return \PDOStatement
      *
      */
     public function perform($statement, array $values = array());
