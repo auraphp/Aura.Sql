@@ -8,4 +8,4 @@ Hygiene release.
 
 - Keep a running count of FROM keys in Select, instead of counting each time
 
-- Remove commented-out code
+- Remove commented-out code and update docblocks
