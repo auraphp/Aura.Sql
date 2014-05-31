@@ -62,6 +62,14 @@ class Select extends AbstractQuery
      *
      */
     protected $from = [];
+
+    /**
+     *
+     * A running count of the current $from key.
+     *
+     * @var int
+     *
+     */
     protected $from_key = -1;
 
     /**
