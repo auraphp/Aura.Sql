@@ -1,19 +1,64 @@
 {
     "name": "aura/sql",
+    "version": "1.3.1",
     "type": "aura-package",
-    "description": "A wrapper around PDO that provides connection adapters and convenience methods for MySQL, PostgreSQL, SQLite, and SQL Server.",
-    "keywords": [ "mysql", "pdo", "pgsql", "postgres", "postgresql", "sqlite", "sql server", "sqlserver" ],
-    "homepage": "http://auraphp.github.com/Aura.Sql",
+    "description": "The Aura Sql package is a wrapper around PDO that provides connection adapters and convenience methods for MySQL, PostgreSQL, SQLite, and SQL Server.",
+    "keywords": [
+        "mysql",
+        "pdo",
+        "pgsql",
+        "postgres",
+        "postgresql",
+        "sqlite",
+        "sql server"
+    ],
+    "homepage": "http://auraphp.com/Aura.Sql",
+    "time": "2014-05-31",
     "license": "BSD-2-Clause",
     "authors": [
         {
-            "name": "Aura Contributors",
+            "name": "Aura.Sql Contributors",
             "homepage": "https://github.com/auraphp/Aura.Sql/contributors"
+        },
+        {
+            "name": "Paul M. Jones",
+            "email": "pmjones88@gmail.com",
+            "homepage": "http://paul-m-jones.com"
+        },
+        {
+            "name": "Roy Gu",
+            "email": "cnwggu@gmail.com"
+        },
+        {
+            "name": "Pascal Borrelli",
+            "email": "pascal@borreli.com"
+        },
+        {
+            "name": "Ramiro Varandas Jr",
+            "email": "ramirovjnr@gmail.com"
+        },
+        {
+            "name": "Abdul.Mohsen B. A. A",
+            "email": "admin@arabcoders.org",
+            "homepage": "http://arabcoders.org"
+        },
+        {
+            "name": "nyamsprod",
+            "email": "nyamsprod@gmail.com"
+        },
+        {
+            "name": "MAXakaWIZARD",
+            "email": "maxakawizard@gmail.com"
+        },
+        {
+            "name": "Hari K T",
+            "email": "kthari85@gmail.com",
+            "homepage": "http://harikt.com"
         }
     ],
     "require": {
         "php": ">=5.4.0",
-        "aura/installer-default": "1.0.0"
+        "aura/installer-default": ">=1.0.0"
     },
     "autoload": {
         "psr-0": {
