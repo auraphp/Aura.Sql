@@ -1,8 +1,4 @@
 language: php
-env:
-  - DB=sqlite
-  - DB=mysql
-  - DB=postgres
 php:
   - 5.4
   - 5.5

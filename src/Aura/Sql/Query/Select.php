@@ -10,8 +10,6 @@
  */
 namespace Aura\Sql\Query;
 
-use Aura\Sql\Connection\AbstractConnection;
-
 /**
  *
  * An object for SELECT queries.
@@ -64,6 +62,15 @@ class Select extends AbstractQuery
      *
      */
     protected $from = [];
+
+    /**
+     *
+     * A running count of the current $from key.
+     *
+     * @var int
+     *
+     */
+    protected $from_key = -1;
 
     /**
      *
@@ -135,14 +142,17 @@ class Select extends AbstractQuery
             $text .= $this->indentCsv($this->cols);
         }
 
-        // from these sources
-        if ($this->from) {
-            $text .= 'FROM' . $this->indentCsv($this->from);
-        }
-
-        // join these sources
-        foreach ($this->join as $join) {
-            $text .= $join . PHP_EOL;
+        // from and join these sources
+        if (count($this->from)) {
+            $preparedFrom = [];
+            foreach ($this->from as $from) {
+                $preparedFrom[] = implode(PHP_EOL, $from);
+            }
+            $text .= 'FROM' . $this->indentCsv($preparedFrom);
+        } else {
+            foreach ($this->join as $join) {
+                $text .= $join . PHP_EOL;
+            }
         }
 
         // where these conditions
@@ -264,7 +274,8 @@ class Select extends AbstractQuery
      */
     public function from($spec)
     {
-        $this->from[] = $this->connection->quoteName($spec);
+        $this->from[] = [$this->connection->quoteName($spec)];
+        $this->from_key ++;
         return $this;
     }
 
@@ -283,7 +294,8 @@ class Select extends AbstractQuery
     public function fromSubSelect($spec, $name)
     {
         $spec = ltrim(preg_replace('/^/m', '    ', (string) $spec));
-        $this->from[] = "($spec) AS " . $this->connection->quoteName($name);
+        $this->from[] = ["($spec) AS " . $this->connection->quoteName($name)];
+        $this->from_key ++;
         return $this;
     }
 
@@ -306,10 +318,18 @@ class Select extends AbstractQuery
         $spec = $this->connection->quoteName($spec);
         if ($cond) {
             $cond = $this->connection->quoteNamesIn($cond);
-            $this->join[] = "$join $spec ON $cond";
+            $clause = "$join $spec ON $cond";
         } else {
-            $this->join[] = "$join $spec";
+            $clause = "$join $spec";
         }
+
+        $this->join[] = $clause;
+
+        // connect to latest from statement
+        if ($this->from) {
+            $this->from[$this->from_key][] = $clause;
+        }
+
         return $this;
     }
 
@@ -337,10 +357,18 @@ class Select extends AbstractQuery
         $name = $this->connection->quoteName($name);
         if ($cond) {
             $cond = $this->connection->quoteNamesIn($cond);
-            $this->join[] = "$join ($spec) AS $name ON $cond";
+            $clause = "$join ($spec) AS $name ON $cond";
         } else {
-            $this->join[] = "$join ($spec) AS $name";
+            $clause = "$join ($spec) AS $name";
         }
+
+        $this->join[] = $clause;
+
+        // connect to latest from statement
+        if ($this->from) {
+            $this->from[$this->from_key][] = $clause;
+        }
+
         return $this;
     }
 
@@ -503,6 +531,7 @@ class Select extends AbstractQuery
         $this->resetFlags();
         $this->cols       = [];
         $this->from       = [];
+        $this->from_key   = -1;
         $this->join       = [];
         $this->where      = [];
         $this->group_by   = [];
