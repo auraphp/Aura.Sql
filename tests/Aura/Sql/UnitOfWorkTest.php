@@ -11,22 +11,22 @@ class UnitOfWorkTest extends \PHPUnit_Framework_TestCase
      * @var UnitOfWork
      */
     protected $work;
-    
+
     protected $factory;
-    
+
     protected $connections;
-    
+
     protected $mapper;
-    
+
     protected $gateway;
-    
+
     protected $gateways;
-    
+
     protected $default = [
         'adapter' => 'sqlite',
         'dsn'        => ':memory:',
     ];
-    
+
     /**
      * Sets up the fixture, for example, opens a network connection.
      * This method is called before a test is executed.
@@ -34,26 +34,26 @@ class UnitOfWorkTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         parent::setUp();
-        
+
         $this->factory = new ConnectionFactory;
-        
+
         $this->connections = new ConnectionLocator(
             $this->factory,
             $this->default,
             [],
             []
         );
-        
+
         $this->mapper = new MockMapper;
-        
+
         $this->gateway = new Gateway($this->connections, $this->mapper);
-        
+
         $this->gateways = new GatewayLocator([
             'mock' => function () { return $this->gateway; },
         ]);
-        
+
         $this->work = new UnitOfWork($this->gateways);
-        
+
         $db_setup_class = 'Aura\Sql\DbSetup\Sqlite';
         $db_setup = new DbSetup\Sqlite(
             $this->connections->getWrite(),
@@ -79,11 +79,11 @@ class UnitOfWorkTest extends \PHPUnit_Framework_TestCase
         $entity->firstName = 'Laura';
         $entity->sizeScope = 10;
         $this->work->insert('mock', $entity);
-        
+
         $storage = $this->work->getEntities();
         $this->assertSame(1, count($storage));
         $this->assertTrue($storage->contains($entity));
-        
+
         $expect = ['method' => 'execInsert', 'gateway_name' => 'mock'];
         $actual = $storage[$entity];
         $this->assertSame($expect, $actual);
@@ -95,16 +95,16 @@ class UnitOfWorkTest extends \PHPUnit_Framework_TestCase
         $select = $this->gateway->newSelect();
         $select->where('name = ?', 'Anna');
         $entity = new MockEntity($this->gateway->fetchOne($select));
-        
+
         // modify it and attach for update
         $entity->firstName = 'Annabelle';
         $this->work->update('mock', $entity);
-        
+
         // get it and see if it's set up right
         $storage = $this->work->getEntities();
         $this->assertSame(1, count($storage));
         $this->assertTrue($storage->contains($entity));
-        
+
         $expect = [
             'method' => 'execUpdate',
             'gateway_name' => 'mock',
@@ -120,15 +120,15 @@ class UnitOfWorkTest extends \PHPUnit_Framework_TestCase
         $select = $this->gateway->newSelect();
         $select->where('name = ?', 'Anna');
         $entity = new MockEntity($this->gateway->fetchOne($select));
-        
+
         // attach for delete
         $this->work->delete('mock', $entity);
-        
+
         // get it and see if it's set up right
         $storage = $this->work->getEntities();
         $this->assertSame(1, count($storage));
         $this->assertTrue($storage->contains($entity));
-        
+
         $expect = ['method' => 'execDelete', 'gateway_name' => 'mock'];
         $actual = $storage[$entity];
         $this->assertSame($expect, $actual);
@@ -140,10 +140,10 @@ class UnitOfWorkTest extends \PHPUnit_Framework_TestCase
         $entity = new MockEntity;
         $entity->firstName = 'Laura';
         $entity->sizeScope = 10;
-        
+
         // attach it
         $this->work->insert('mock', $entity);
-        
+
         // make sure it's attached
         $storage = $this->work->getEntities();
         $this->assertSame(1, count($storage));
@@ -151,10 +151,10 @@ class UnitOfWorkTest extends \PHPUnit_Framework_TestCase
         $expect = ['method' => 'execInsert', 'gateway_name' => 'mock'];
         $actual = $storage[$entity];
         $this->assertSame($expect, $actual);
-        
+
         // detach it
         $this->work->detach($entity);
-        
+
         // make sure it's detached
         $storage = $this->work->getEntities();
         $this->assertSame(0, count($storage));
@@ -171,40 +171,40 @@ class UnitOfWorkTest extends \PHPUnit_Framework_TestCase
     {
         // entity collection
         $coll = [];
-        
+
         // insert
         $coll[0] = new MockEntity;
         $coll[0]->firstName = 'Laura';
         $coll[0]->sizeScope = 10;
         $this->work->insert('mock', $coll[0]);
-        
+
         // update
         $select = $this->gateway->newSelect();
         $select->where('name = ?', 'Anna');
         $coll[1] = new MockEntity($this->gateway->fetchOne($select));
         $coll[1]->firstName = 'Annabelle';
         $this->work->update('mock', $coll[1]);
-        
+
         // delete
         $select = $this->gateway->newSelect();
         $select->where('name = ?', 'Betty');
         $coll[2] = new MockEntity($this->gateway->fetchOne($select));
         $this->work->delete('mock', $coll[2]);
-        
+
         // execute
         $result = $this->work->exec();
         $this->assertTrue($result);
-        
+
         // check inserted
         $inserted = $this->work->getInserted();
         $this->assertTrue($inserted->contains($coll[0]));
         $expect = ['last_insert_id' => 11];
         $this->assertEquals($expect, $inserted[$coll[0]]);
-        
+
         // check updated
         $updated = $this->work->getUpdated();
         $this->assertTrue($updated->contains($coll[1]));
-        
+
         // check deleted
         $deleted = $this->work->getDeleted();
         $this->assertTrue($deleted->contains($coll[2]));
@@ -215,18 +215,20 @@ class UnitOfWorkTest extends \PHPUnit_Framework_TestCase
         // insert without name; this should cause an exception and failure
         $entity = new MockEntity;
         $this->work->insert('mock', $entity);
-        
+
         // execute
         $result = $this->work->exec();
         $this->assertFalse($result);
-        
+
         // get the failed object
         $failed = $this->work->getFailed();
         $this->assertSame($entity, $failed);
-        
-        // get the exception
-        $expect = 'SQLSTATE[23000]: Integrity constraint violation: 19 aura_test_table.name may not be NULL';
+
+        // get the exception; different in different PHP versions
         $actual = $this->work->getException()->getMessage();
-        $this->assertSame($expect, $actual);
+        $expect = $actual == 'SQLSTATE[23000]: Integrity constraint violation: 19 aura_test_table.name may not be NULL'
+               || $actual == 'SQLSTATE[23000]: Integrity constraint violation: 19 NOT NULL constraint failed: aura_test_table.name';
+
+        $this->assertTrue($expect);
     }
 }
