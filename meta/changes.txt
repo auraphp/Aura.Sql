@@ -1,18 +1,11 @@
-- [NEW] Query\Sqlite\(Select|Insert|Update|Delete) classes to support
-  SQLite-specific behaviors
+Hygiene release.
 
-- [NEW] Query\Pgsql\(Select|Insert|Update|Delete) classes to support
-  PostgreSQL-specific behaviors
+- Fix UnitOfWork test for PHP 5.5
 
-- [REF] Refactor existing limit/offset behaviors to Query\LimitTrait and Query\OffsetTrait
+- Merge pull request #58 from MAXakaWIZARD/pr-select-query-reset-fix, fixes $from_key count when resetting select statement.
 
-- [REF] Refactor existing order-by behaviors to Query\OrderByTrait
+- Merge pull request #56 from MAXakaWIZARD/pr-correct-join-order, implements correct join order for Query\Select
 
-- [REF] Refactor query-string indenting and comma-separation behaviors to new
-  methods 
+- Keep a running count of FROM keys in Select, instead of counting each time
 
-- [ADD] Methods on each db-specific connection object to return db-specific
-  query objects; e.g., Connection\Mysql::newMysqlSelect(),
-  Connection\Pgsql::newPgsqlInsert(), etc.
-
-Many thanks to @MAXakaWIZARD for his work on the features in this release.
+- Remove commented-out code
