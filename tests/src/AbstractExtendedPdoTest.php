@@ -534,6 +534,14 @@ abstract class AbstractExtendedPdoTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(3, count($res));
     }
 
+    public function testZeroIndexedPlaceholders()
+    {
+        $stm = 'SELECT * FROM pdotest WHERE id IN (?, ?, ?)';
+        $val = array(1, 2, 3);
+        $res = $this->pdo->fetchAll($stm, $val);
+        $this->assertSame(3, count($res));
+    }
+
     public function testPdoDependency()
     {
         // pass in ExtendedPdo to see if it can replace PDO
