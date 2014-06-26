@@ -870,6 +870,11 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
         // prepare the statement
         $sth = $this->prepare($statement);
 
+        // match standard PDO execute() behavior of zero-indexed arrays
+        if (isset($values[0])) {
+            array_unshift($values, null);
+        }
+
         // for the placeholders we found, bind the corresponding data values
         foreach ($values as $key => $val) {
             $sth->bindValue($key, $val);
