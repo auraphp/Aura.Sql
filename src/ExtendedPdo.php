@@ -416,6 +416,11 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
         array $ctor_args = array()
     ) {
         $sth = $this->perform($statement, $values);
+
+        if (!count($ctor_args)) {
+            return $sth->fetchObject($class_name);
+        }
+
         return $sth->fetchObject($class_name, $ctor_args);
     }
 
@@ -450,6 +455,11 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
         array $ctor_args = array()
     ) {
         $sth = $this->perform($statement, $values);
+
+        if (!count($ctor_args)) {
+            return $sth->fetchAll(self::FETCH_CLASS, $class_name);
+        }
+
         return $sth->fetchAll(self::FETCH_CLASS, $class_name, $ctor_args);
     }
 
@@ -694,10 +704,15 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
     {
         $this->connect();
         $this->beginProfile(__FUNCTION__);
-        $sth = call_user_func_array(
-            array($this->pdo, 'query'),
-            func_get_args()
-        );
+
+        // remove empty constructor params list if it exists
+        $args = func_get_args();
+        if (count($args) === 4 && $args[3] === array()) {
+            unset($args[3]);
+        }
+
+        $sth = call_user_func_array(array($this->pdo, 'query'), $args);
+
         $this->endProfile($sth->queryString);
         return $sth;
     }
