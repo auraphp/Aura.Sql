@@ -119,6 +119,6 @@ class Profiler implements ProfilerInterface
      */
     public function resetProfiles()
     {
-        $this->profiles = [];
+        $this->profiles = array();
     }
 }
