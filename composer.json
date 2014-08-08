@@ -19,5 +19,10 @@
         "psr-0": {
             "Aura\\Sql": "src/"
         }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-develop": "1.3.x-dev"
+        }
     }
 }
