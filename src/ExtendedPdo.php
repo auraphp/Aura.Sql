@@ -417,11 +417,11 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
     ) {
         $sth = $this->perform($statement, $values);
 
-        if (!count($ctor_args)) {
-            return $sth->fetchObject($class_name);
+        if ($ctor_args) {
+            return $sth->fetchObject($class_name, $ctor_args);
         }
 
-        return $sth->fetchObject($class_name, $ctor_args);
+        return $sth->fetchObject($class_name);
     }
 
     /**
@@ -456,11 +456,11 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
     ) {
         $sth = $this->perform($statement, $values);
 
-        if (!count($ctor_args)) {
-            return $sth->fetchAll(self::FETCH_CLASS, $class_name);
+        if ($ctor_args) {
+            return $sth->fetchAll(self::FETCH_CLASS, $class_name, $ctor_args);
         }
 
-        return $sth->fetchAll(self::FETCH_CLASS, $class_name, $ctor_args);
+        return $sth->fetchAll(self::FETCH_CLASS, $class_name);
     }
 
     /**

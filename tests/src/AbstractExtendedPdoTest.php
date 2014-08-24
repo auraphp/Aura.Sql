@@ -299,10 +299,24 @@ abstract class AbstractExtendedPdoTest extends \PHPUnit_Framework_TestCase
 
     public function testFetchObject()
     {
-        $stm = "SELECT id, name FROM pdotest WHERE id = 1";
-        $actual = $this->pdo->fetchObject($stm);
+        $stm = "SELECT id, name FROM pdotest WHERE id = ?";
+        $actual = $this->pdo->fetchObject($stm, array(1));
         $this->assertSame('1', $actual->id);
         $this->assertSame('Anna', $actual->name);
+    }
+
+    public function testFetchObject_withCtorArgs()
+    {
+        $stm = "SELECT id, name FROM pdotest WHERE id = ?";
+        $actual = $this->pdo->fetchObject(
+            $stm,
+            array(1),
+            'Aura\Sql\FakeObject',
+            array('bar')
+        );
+        $this->assertSame('1', $actual->id);
+        $this->assertSame('Anna', $actual->name);
+        $this->assertSame('bar', $actual->foo);
     }
 
     public function testFetchObjects()
@@ -315,6 +329,25 @@ abstract class AbstractExtendedPdoTest extends \PHPUnit_Framework_TestCase
                 'id' => $id,
                 'name' => $name
             );
+        }
+        $this->assertEquals($expect, $actual);
+    }
+
+    public function testFetchObjects_withCtorArgs()
+    {
+        $stm = "SELECT * FROM pdotest";
+        $actual = $this->pdo->fetchObjects(
+            $stm,
+            array(),
+            'Aura\Sql\FakeObject',
+            array('bar')
+        );
+        $expect = array();
+        foreach ($this->data as $id => $name) {
+            $object = new FakeObject('bar');
+            $object->id = $id;
+            $object->name = $name;
+            $expect[] = $object;
         }
         $this->assertEquals($expect, $actual);
     }
