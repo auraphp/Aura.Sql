@@ -1,2 +1,9 @@
-Release 2.0.1 includes a fix that moves PDO parameters explicitly back into the
-constructor. This restores named parameter matching for DI containers.
+- NEW: Method Profiler::resetProfiles() allows you to clear existing profiles.
+
+- FIX: Correctly handles zero-indexed placeholder arrays on execute.
+
+- FIX: Passes all tests on HHVM.
+
+- REF: Added Scrutinizer-CI checks, along with code modifications to improve Scrutinizer score without changing functionality.
+
+- DOC: Updates to the README and docblocks.
