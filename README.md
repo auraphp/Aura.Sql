@@ -12,7 +12,7 @@ Added functionality in _Aura.Sql_ over the native _PDO_ includes:
   instance and not incur the cost of a connection if you never make a query.
 
 - **Decoration.** _ExtendedPdo_ can be used to decorate an existing PDO
-  instance. This means that a PDO instance can be "extended" **at runtime** to 
+  instance. This means that a PDO instance can be "extended" **at runtime** to
   provide the _ExtendedPdo_ behaviors. (Note that lazy connection is not
   possible in this case, as the PDO instance being decorated has already
   connected.)
@@ -28,7 +28,7 @@ Added functionality in _Aura.Sql_ over the native _PDO_ includes:
   commonly-used fetch actions. For example, you can call `fetchAll()` directly
   on the instance instead of having to prepare a statement, bind values,
   execute, and then fetch from the prepared statement. All of the `fetch*()`
-  methods take an array of values to bind to to the query statement, and use 
+  methods take an array of values to bind to to the query statement, and use
   the new `perform()` method internally.
 
 - **Exceptions by default.** _ExtendedPdo_ starts in the `ERRMODE_EXCEPTION`
@@ -53,8 +53,8 @@ Alternatively, [download a release](https://github.com/auraphp/Aura.Sql/releases
 
 ### Quality
 
-[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/auraphp/Aura.Sql/badges/quality-score.png?s=cf727c038332c1b621d765daf6d94dd505aa7ef1)](https://scrutinizer-ci.com/g/auraphp/Aura.Sql/)
-[![Code Coverage](https://scrutinizer-ci.com/g/auraphp/Aura.Sql/badges/coverage.png?s=82a4c62b45aa8ae3d0c77c19bf7ed2773dd4d7b6)](https://scrutinizer-ci.com/g/auraphp/Aura.Sql/)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/auraphp/Aura.Sql/badges/quality-score.png?branch=develop-2)](https://scrutinizer-ci.com/g/auraphp/Aura.Sql/)
+[![Code Coverage](https://scrutinizer-ci.com/g/auraphp/Aura.Sql/badges/coverage.png?branch=develop-2)](https://scrutinizer-ci.com/g/auraphp/Aura.Sql/)
 [![Build Status](https://travis-ci.org/auraphp/Aura.Sql.png?branch=develop-2)](https://travis-ci.org/auraphp/Aura.Sql)
 
 To run the [PHPUnit][] tests at the command line, go to the _tests_ directory and issue `phpunit`.
@@ -157,7 +157,7 @@ $cond = 'IN (' . $pdo->quote($array) . ')';
 // the ExtendedPdo way:
 // "IN ('foo', 'bar', 'baz')"
 $pdo = new ExtendedPdo(...);
-$cond = 'IN (' . $pdo->quote($array) . ')'; 
+$cond = 'IN (' . $pdo->quote($array) . ')';
 ?>
 ```
 
@@ -184,7 +184,7 @@ $sth = $pdo->prepare($stm);
 $sth->bindValue('foo', $array);
 
 // the ExtendedPdo way allows a single call to prepare and execute the query.
-// it quotes the array and replaces the array placeholder directly in the 
+// it quotes the array and replaces the array placeholder directly in the
 // query string
 $pdo = new ExtendedPdo(...);
 $bind_values = array('foo' => $array);
@@ -426,7 +426,7 @@ $results = $read->fetchAll('SELECT * FROM table_name LIMIT 10');
 
 ### Construction-Time Configuration
 
-The _ConnectionLocator_ can be configured with all its connections at 
+The _ConnectionLocator_ can be configured with all its connections at
 construction time; this is useful with dependency injection mechanisms.
 
 ```php
