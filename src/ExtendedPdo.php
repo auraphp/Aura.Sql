@@ -296,6 +296,22 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
         );
     }
 
+    /**
+     *
+     * Support for fetchAll() and fetchCol().
+     *
+     * @param string $fetch_type A PDO FETCH_* constant.
+     *
+     * @param string $statement The SQL statement to prepare and execute.
+     *
+     * @param array $values Values to bind to the query.
+     *
+     * @param callable $callable A callable to be applied to each of the rows
+     * to be returned.
+     *
+     * @return array
+     *
+     */
     protected function fetchAllWithCallable(
         $fetch_type,
         $statement,
@@ -311,6 +327,17 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
         return $this->applyCallableToFetchAll($callable, $data);
     }
 
+    /**
+     *
+     * Applies a callable to a data set.
+     *
+     * @param callable $callable The callable to apply.
+     *
+     * @param array $data The data set.
+     *
+     * @return array
+     *
+     */
     protected function applyCallableToFetchAll($callable, $data)
     {
         if ($callable) {
@@ -944,6 +971,17 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
         return array($statement, $bind->final_values);
     }
 
+    /**
+     *
+     * Given a statement, rebuilds it with array values embedded.
+     *
+     * @param string $statement The SQL statement.
+     *
+     * @param object $bind The bind-values tracker.
+     *
+     * @return string The rebuilt statement.
+     *
+     */
     protected function rebuildStatement($statement, $bind)
     {
         // find all parts not inside quotes or backslashed-quotes
@@ -958,6 +996,17 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
         return $this->rebuildParts($parts, $bind);
     }
 
+    /**
+     *
+     * Given an array of statement parts, rebuilds each part.
+     *
+     * @param array $parts The statement parts.
+     *
+     * @param object $bind The bind-values tracker.
+     *
+     * @return string The rebuilt statement.
+     *
+     */
     protected function rebuildParts($parts, $bind)
     {
         // loop through the non-quoted parts (0, 3, 6, 9, etc.)
@@ -968,6 +1017,17 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
         return implode('', $parts);
     }
 
+    /**
+     *
+     * Rebuilds a single statement part.
+     *
+     * @param string $part The statement part.
+     *
+     * @param object $bind The bind-values tracker.
+     *
+     * @return string The rebuilt statement.
+     *
+     */
     protected function rebuildPart($part, $bind)
     {
         // split into subparts by ":name" and "?"
