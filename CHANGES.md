@@ -6,4 +6,4 @@
 
 - REF: Added Scrutinizer-CI checks, along with code modifications to improve Scrutinizer score without changing functionality.
 
-- DOC: Updates to the README and docblocks.
+- DOC: Update the README and various docblocks.
