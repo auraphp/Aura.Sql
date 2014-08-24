@@ -69,4 +69,14 @@ interface ProfilerInterface
      *
      */
     public function getProfiles();
+
+
+    /**
+     *
+     * Reset all the profiles
+     *
+     * @return null
+     *
+     */
+    public function resetProfiles();
 }
