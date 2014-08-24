@@ -331,7 +331,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      *
      * Applies a callable to a data set.
      *
-     * @param callable $callable The callable to apply.
+     * @param callable|null $callable The callable to apply, if any.
      *
      * @param array $data The data set.
      *
