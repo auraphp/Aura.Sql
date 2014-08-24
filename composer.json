@@ -13,7 +13,7 @@
         "sqlserver",
         "sqlsrv"
     ],
-    "homepage": "https://github.com/auraphp/Aura.Sql/releases",
+    "homepage": "https://github.com/auraphp/Aura.Sql",
     "license": "BSD-2-Clause",
     "authors": [
         {
