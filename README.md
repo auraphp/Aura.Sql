@@ -53,8 +53,8 @@ Alternatively, [download a release](https://github.com/auraphp/Aura.Sql/releases
 
 ### Quality
 
-[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/auraphp/Aura.Sql/badges/quality-score.png?branch=develop-2)](https://scrutinizer-ci.com/g/auraphp/Aura.Sql/)
-[![Code Coverage](https://scrutinizer-ci.com/g/auraphp/Aura.Sql/badges/coverage.png?branch=develop-2)](https://scrutinizer-ci.com/g/auraphp/Aura.Sql/)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/auraphp/Aura.Sql/badges/quality-score.png?b=develop-2)](https://scrutinizer-ci.com/g/auraphp/Aura.Sql/)
+[![Code Coverage](https://scrutinizer-ci.com/g/auraphp/Aura.Sql/badges/coverage.png?b=develop-2)](https://scrutinizer-ci.com/g/auraphp/Aura.Sql/)
 [![Build Status](https://travis-ci.org/auraphp/Aura.Sql.png?branch=develop-2)](https://travis-ci.org/auraphp/Aura.Sql)
 
 To run the [PHPUnit][] tests at the command line, go to the _tests_ directory and issue `phpunit`.
