@@ -1,14 +1,14 @@
 language: php
-env:
-  - DB=sqlite
 php:
   - 5.3
   - 5.4
   - 5.5
   - 5.6
   - hhvm
+before_script:
+  - cd tests/unit
 script:
-  - phpunit -c tests/ --coverage-clover=coverage.clover
+  - ./phpunit.sh --coverage-clover=coverage.clover
 after_script:
   - wget https://scrutinizer-ci.com/ocular.phar
   - php ocular.phar code-coverage:upload --format=php-clover coverage.clover
