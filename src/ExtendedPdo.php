@@ -39,7 +39,6 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      */
     protected $attributes = array(
         self::ATTR_ERRMODE => self::ERRMODE_EXCEPTION,
-        self::ATTR_EMULATE_PREPARES => true,
     );
 
     /**
