@@ -471,6 +471,8 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      *
      * @param array $ctor_args Arguments to pass to each object constructor.
      *
+     * @param bool $unique Use PDO::FETCH_UNIQUE when building results array
+     *
      * @return array
      *
      */
@@ -478,15 +480,21 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
         $statement,
         array $values = array(),
         $class_name = 'StdClass',
-        array $ctor_args = array()
+        array $ctor_args = array(),
+        $unique = false
     ) {
         $sth = $this->perform($statement, $values);
+        $pdoOpts = self::FETCH_CLASS;
 
-        if ($ctor_args) {
-            return $sth->fetchAll(self::FETCH_CLASS, $class_name, $ctor_args);
+        if ($unique) {
+            $pdoOpts = $pdoOpts | self::FETCH_UNIQUE;
         }
 
-        return $sth->fetchAll(self::FETCH_CLASS, $class_name);
+        if ($ctor_args) {
+            return $sth->fetchAll($pdoOpts, $class_name, $ctor_args);
+        }
+
+        return $sth->fetchAll($pdoOpts, $class_name);
     }
 
     /**
