@@ -1,12 +1,81 @@
 <?php
+/**
+ *
+ * This file is part of Aura for PHP.
+ *
+ * @package Aura.Sql
+ *
+ * @license http://opensource.org/licenses/bsd-license.php BSD
+ *
+ */
 namespace Aura\Sql;
 
+/**
+ *
+ * This support class for ExtendedPdo rebuilds an SQL statement for automatic
+ * binding of values.
+ *
+ */
 class Rebuilder
 {
-	public function __construct(ExtendedPdo $pdo)
-	{
-		$this->pdo = $pdo;
-	}
+    /**
+     *
+     * The calling ExtendedPdo object.
+     *
+     * @var ExtendedPdo
+     *
+     */
+    protected $xpdo;
+
+    /**
+     *
+     * How many numbered placeholders in the original statement.
+     *
+     * @var int
+     *
+     */
+    protected $num = 0;
+
+    /**
+     *
+     * How many numbered placeholders to actually be bound; this may
+     * differ from 'num' in that some numbered placeholders may get
+     * replaced with quoted CSV strings
+     *
+     * @var int
+     *
+     */
+    protected $count = 0;
+
+    /**
+     *
+     * The initial values to be bound.
+     *
+     * @var array
+     *
+     */
+    protected $values = array();
+
+    /**
+     *
+     * Named and numbered placeholders to bind at the end.
+     *
+     * @var array
+     *
+     */
+    protected $final_values = array();
+
+    /**
+     *
+     * Constructor.
+     *
+     * @param ExtendedPdo $xpdo The calling ExtendedPdo object.
+     *
+     */
+    public function __construct(ExtendedPdo $xpdo)
+    {
+        $this->xpdo = $xpdo;
+    }
 
     /**
      *
@@ -22,35 +91,14 @@ class Rebuilder
      */
     public function __invoke($statement, $values)
     {
-        $bind = $this->newBindTracker($values);
-        $statement = $this->rebuildStatement($statement, $bind);
-        return array($statement, $bind->final_values);
-    }
+        // match standard PDO execute() behavior of zero-indexed arrays
+        if (isset($values[0])) {
+            array_unshift($values, null);
+        }
 
-    /**
-     *
-     * Returns a new anonymous object to track bind values.
-     *
-     * @param array $values The values to bind and/or replace into a statement.
-     *
-     * @return object
-     *
-     */
-    protected function newBindTracker($values)
-    {
-        // anonymous object to track preparation info
-        return (object) array(
-            // how many numbered placeholders in the original statement
-            'num' => 0,
-            // how many numbered placeholders to actually be bound; this may
-            // differ from 'num' in that some numbered placeholders may get
-            // replaced with quoted CSV strings
-            'count' => 0,
-            // initial values to be bound
-            'values' => $values,
-            // named and numbered placeholders to bind at the end
-            'final_values' => array(),
-        );
+        $this->values = $values;
+        $statement = $this->rebuildStatement($statement);
+        return array($statement, $this->final_values);
     }
 
     /**
@@ -59,12 +107,10 @@ class Rebuilder
      *
      * @param string $statement The SQL statement.
      *
-     * @param object $bind The bind-values tracker.
-     *
      * @return string The rebuilt statement.
      *
      */
-    protected function rebuildStatement($statement, $bind)
+    protected function rebuildStatement($statement)
     {
         // find all parts not inside quotes or backslashed-quotes
         $apos = "'";
@@ -75,7 +121,7 @@ class Rebuilder
             -1,
             PREG_SPLIT_DELIM_CAPTURE
         );
-        return $this->rebuildParts($parts, $bind);
+        return $this->rebuildParts($parts);
     }
 
     /**
@@ -84,17 +130,15 @@ class Rebuilder
      *
      * @param array $parts The statement parts.
      *
-     * @param object $bind The bind-values tracker.
-     *
      * @return string The rebuilt statement.
      *
      */
-    protected function rebuildParts($parts, $bind)
+    protected function rebuildParts($parts)
     {
         // loop through the non-quoted parts (0, 3, 6, 9, etc.)
         $k = count($parts);
         for ($i = 0; $i <= $k; $i += 3) {
-            $parts[$i] = $this->rebuildPart($parts[$i], $bind);
+            $parts[$i] = $this->rebuildPart($parts[$i]);
         }
         return implode('', $parts);
     }
@@ -105,12 +149,10 @@ class Rebuilder
      *
      * @param string $part The statement part.
      *
-     * @param object $bind The bind-values tracker.
-     *
      * @return string The rebuilt statement.
      *
      */
-    protected function rebuildPart($part, $bind)
+    protected function rebuildPart($part)
     {
         // split into subparts by ":name" and "?"
         $subs = preg_split(
@@ -121,7 +163,7 @@ class Rebuilder
         );
 
         // check subparts to convert bound arrays to quoted CSV strings
-        $subs = $this->prepareValuePlaceholders($subs, $bind);
+        $subs = $this->prepareValuePlaceholders($subs);
 
         // reassemble
         return implode('', $subs);
@@ -133,21 +175,19 @@ class Rebuilder
      *
      * @param array $subs The query subparts.
      *
-     * @param object $bind The preparation info object.
-     *
      * @return array The prepared subparts.
      *
      */
-    protected function prepareValuePlaceholders(array $subs, $bind)
+    protected function prepareValuePlaceholders(array $subs)
     {
         foreach ($subs as $i => $sub) {
             $char = substr($sub, 0, 1);
             if ($char == '?') {
-                $subs[$i] = $this->prepareNumberedPlaceholder($sub, $bind);
+                $subs[$i] = $this->prepareNumberedPlaceholder($sub);
             }
 
             if ($char == ':') {
-                $subs[$i] = $this->prepareNamedPlaceholder($sub, $bind);
+                $subs[$i] = $this->prepareNamedPlaceholder($sub);
             }
         }
 
@@ -160,26 +200,24 @@ class Rebuilder
      *
      * @param string $sub The query subpart.
      *
-     * @param object $bind The preparation info object.
-     *
      * @return string The prepared query subpart.
      *
      */
-    protected function prepareNumberedPlaceholder($sub, $bind)
+    protected function prepareNumberedPlaceholder($sub)
     {
         // what numbered placeholder is this in the original statement?
-        $bind->num ++;
+        $this->num ++;
 
         // is the corresponding data element an array?
-        $bind_array = isset($bind->values[$bind->num])
-                   && is_array($bind->values[$bind->num]);
+        $bind_array = isset($this->values[$this->num])
+                   && is_array($this->values[$this->num]);
         if ($bind_array) {
             // PDO won't bind an array; quote and replace directly
-            $sub = $this->pdo->quote($bind->values[$bind->num]);
+            $sub = $this->xpdo->quote($this->values[$this->num]);
         } else {
             // increase the count of numbered placeholders to be bound
-            $bind->count ++;
-            $bind->final_values[$bind->count] = $bind->values[$bind->num];
+            $this->count ++;
+            $this->final_values[$this->count] = $this->values[$this->num];
         }
 
         return $sub;
@@ -191,24 +229,22 @@ class Rebuilder
      *
      * @param string $sub The query subpart.
      *
-     * @param object $bind The preparation info object.
-     *
      * @return string The prepared query subpart.
      *
      */
-    protected function prepareNamedPlaceholder($sub, $bind)
+    protected function prepareNamedPlaceholder($sub)
     {
         $name = substr($sub, 1);
 
         // is the corresponding data element an array?
-        $bind_array = isset($bind->values[$name])
-                   && is_array($bind->values[$name]);
+        $bind_array = isset($this->values[$name])
+                   && is_array($this->values[$name]);
         if ($bind_array) {
             // PDO won't bind an array; quote and replace directly
-            $sub = $this->pdo->quote($bind->values[$name]);
+            $sub = $this->xpdo->quote($this->values[$name]);
         } else {
             // not an array, retain the placeholder for later
-            $bind->final_values[$name] = $bind->values[$name];
+            $this->final_values[$name] = $this->values[$name];
         }
 
         return $sub;
