@@ -712,7 +712,10 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
     public function prepare($statement, $options = array())
     {
         $this->connect();
-        return $this->pdo->prepare($statement, $options);
+        $this->beginProfile(__FUNCTION__);
+        $sth = $this->pdo->prepare($statement, $options);
+        $this->endProfile($statement, $options);
+        return $sth;
     }
 
     /**
