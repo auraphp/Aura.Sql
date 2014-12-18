@@ -363,6 +363,32 @@ abstract class AbstractExtendedPdoTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expect, $actual);
     }
 
+    public function testGroupSingleColumn()
+    {
+        $stm = "SELECT id, name FROM pdotest WHERE id = 1";
+        $actual = $this->pdo->fetchGroup($stm);
+        $expect = array(
+            '1' => array(
+                'Anna'
+            )
+        );
+        $this->assertEquals($expect, $actual);
+    }
+
+    public function testGroupArray()
+    {
+        $stm = "SELECT id, name FROM pdotest WHERE id = 1";
+        $actual = $this->pdo->fetchGroup($stm, array(), false);
+        $expect = array(
+            '1' => array(
+                array(
+                    'name' => 'Anna'
+                )
+            )
+        );
+        $this->assertEquals($expect, $actual);
+    }
+
     public function testFetchPairs()
     {
         $stm = "SELECT id, name FROM pdotest ORDER BY id";
