@@ -569,6 +569,30 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
 
     /**
      *
+     * Fetches multiple from the database as an associative array.
+     * The first column will be the index
+     *
+     * @param string $statement The SQL statement to prepare and execute.
+     *
+     * @param array $values Values to bind to the query.
+     *
+     * @param int $style a fetch style defaults to PDO::FETCH_COLUMN for single 
+     *      values, use PDO::FETCH_NAMED when fetching a multiple columns
+     *
+     * @return array
+     *
+     */
+    public function fetchGroup(
+        $statement,
+        array $values = array(),
+        $style = self::FETCH_COLUMN
+    ) {
+        $sth = $this->perform($statement, $values);
+        return $sth->fetchAll(self::FETCH_GROUP | $style);
+    }
+
+    /**
+     *
      * Gets a PDO attribute value.
      *
      * @param mixed $attribute The PDO::ATTR_* constant.
