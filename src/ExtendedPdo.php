@@ -575,11 +575,11 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
     public function fetchGroup(
         $statement,
         array $values = array(),
-        $singleColoumn = true
+        $singleColumn = true
     ) {
         $args = self::FETCH_GROUP;
 
-        if ($singleColoumn) {
+        if ($singleColumn) {
             $args = $args | self::FETCH_COLUMN;
         } else {
             $args = $args | self::FETCH_NAMED;
