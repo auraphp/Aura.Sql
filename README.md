@@ -231,9 +231,9 @@ $result = $pdo->fetchAssoc($stm, $bind);
 // fetchGroup() is like fetchAssoc() except that the values aren't wrapped in 
 // arrays. Instead, single column values are returned as a single dimensional
 // array and multiple columns are returned as an array of arrays
-// Third column specifies if more than a single column is to be returned
+// Set style to PDO::FETCH_NAMED when values are an array
 // (i.e. there are more than two columns in the select)
-$result = $pdo->fetchGroup($stm, $bind, $singleColumn = true)
+$result = $pdo->fetchGroup($stm, $bind, $style = PDO::FETCH_COLUMN)
 
 // fetchObject() returns the first row as an object of your choosing; the
 // columns are mapped to object properties. an optional 4th parameter array

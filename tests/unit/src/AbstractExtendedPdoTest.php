@@ -378,7 +378,7 @@ abstract class AbstractExtendedPdoTest extends \PHPUnit_Framework_TestCase
     public function testGroupArray()
     {
         $stm = "SELECT id, name FROM pdotest WHERE id = 1";
-        $actual = $this->pdo->fetchGroup($stm, array(), false);
+        $actual = $this->pdo->fetchGroup($stm, array(), PDO::FETCH_NAMED);
         $expect = array(
             '1' => array(
                 array(

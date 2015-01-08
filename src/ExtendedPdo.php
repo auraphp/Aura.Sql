@@ -567,7 +567,8 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      *
      * @param array $values Values to bind to the query.
      *
-     * @param bool $singleColoumn If the array value should also be an array
+     * @param int $style a fetch style defaults to PDO::FETCH_COLUMN for single 
+     *      values, use PDO::FETCH_NAMED when fetching a multiple columns
      *
      * @return array
      *
@@ -575,18 +576,10 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
     public function fetchGroup(
         $statement,
         array $values = array(),
-        $singleColumn = true
+        $style = self::FETCH_COLUMN
     ) {
-        $args = self::FETCH_GROUP;
-
-        if ($singleColumn) {
-            $args = $args | self::FETCH_COLUMN;
-        } else {
-            $args = $args | self::FETCH_NAMED;
-        }
-
         $sth = $this->perform($statement, $values);
-        return $sth->fetchAll($args);
+        return $sth->fetchAll(self::FETCH_GROUP | $style);
     }
 
     /**
