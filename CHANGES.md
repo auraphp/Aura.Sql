@@ -1,9 +1,9 @@
-- NEW: Method Profiler::resetProfiles() allows you to clear existing profiles.
+- SEC: ExtendedPdo no longer enables self::ATTR_EMULATE_PREPARES by default; this is to avoid security holes when using emulation.
 
-- FIX: Correctly handles zero-indexed placeholder arrays on execute.
+- REF: Extract the statement-rebuilding logic to its own Rebuilder class
 
-- FIX: Passes all tests on HHVM.
+- ADD: ExtendedPdo::fetchGroup() functionality.
 
-- REF: Added Scrutinizer-CI checks, along with code modifications to improve Scrutinizer score without changing functionality.
+- ADD: When binding values via perform(), add the self::PARAM_* type based on the value being bound.
 
-- DOC: Updates to the README and various docblocks.
+- TST: Update testing structure
