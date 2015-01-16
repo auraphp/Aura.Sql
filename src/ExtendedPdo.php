@@ -951,7 +951,18 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
 
         // for the placeholders we found, bind the corresponding data values
         foreach ($values as $key => $val) {
-            $sth->bindValue($key, $val);
+            if (is_int($val)) {
+                $param = self::PARAM_INT;
+            } else if (is_bool($val)) {
+                $param = self::PARAM_BOOL;
+            } else if (is_null($val)) {
+                $param = self::PARAM_NULL;
+            } else if (is_string($val)) {
+                $param = self::PARAM_STR;
+            } else {
+                $param = false;
+            }
+            $sth->bindValue($key, $val, $param);
         }
 
         // done
