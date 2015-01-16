@@ -3,8 +3,6 @@
  *
  * This file is part of Aura for PHP.
  *
- * @package Aura.Sql
- *
  * @license http://opensource.org/licenses/bsd-license.php BSD
  *
  */
@@ -14,6 +12,8 @@ namespace Aura\Sql;
  *
  * This support class for ExtendedPdo rebuilds an SQL statement for automatic
  * binding of values.
+ *
+ * @package Aura.Sql
  *
  */
 class Rebuilder

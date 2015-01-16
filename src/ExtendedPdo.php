@@ -3,8 +3,6 @@
  *
  * This file is part of Aura for PHP.
  *
- * @package Aura.Sql
- *
  * @license http://opensource.org/licenses/bsd-license.php BSD
  *
  */
@@ -17,6 +15,8 @@ use PDOStatement;
  *
  * This extended decorator for PDO provides lazy connection, array quoting, a
  * new `perform()` method, and new `fetch*()` methods.
+ *
+ * @package Aura.Sql
  *
  */
 class ExtendedPdo extends PDO implements ExtendedPdoInterface
@@ -576,7 +576,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      *
      * @param array $values Values to bind to the query.
      *
-     * @param int $style a fetch style defaults to PDO::FETCH_COLUMN for single 
+     * @param int $style a fetch style defaults to PDO::FETCH_COLUMN for single
      *      values, use PDO::FETCH_NAMED when fetching a multiple columns
      *
      * @return array
@@ -890,6 +890,8 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      *
      * @param string $statement The statement being profiled, if any.
      *
+     * @param array $values The values bound to the statement, if any.
+     *
      * @return null
      *
      */
@@ -924,6 +926,8 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      * using `PDOStatement::bindValue()` proper.
      *
      * @param string $statement The SQL statement to prepare for execution.
+     *
+     * @param array $values The values to bind to the statement, if any.
      *
      * @return PDOStatement
      *
