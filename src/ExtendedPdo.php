@@ -951,21 +951,40 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
 
         // for the placeholders we found, bind the corresponding data values
         foreach ($values as $key => $val) {
-            if (is_int($val)) {
-                $param = self::PARAM_INT;
-            } else if (is_bool($val)) {
-                $param = self::PARAM_BOOL;
-            } else if (is_null($val)) {
-                $param = self::PARAM_NULL;
-            } else if (is_string($val)) {
-                $param = self::PARAM_STR;
-            } else {
-                $param = false;
-            }
-            $sth->bindValue($key, $val, $param);
+            $this->bindValue($sth, $key, $val);
         }
 
         // done
         return $sth;
+    }
+
+    /**
+     *
+     * Bind a value using the proper PDO::PARAM_* type.
+     *
+     * @param PDOStatement $sth The statement to bind to.
+     *
+     * @param mixed $key The placeholder key.
+     *
+     * @param mixed $val The value to bind to the statement.
+     *
+     * @return null
+     *
+     */
+    protected function bindValue(PDOStatement $sth, $key, $val)
+    {
+        if (is_int($val)) {
+            return $sth->bindValue($key, $val, self::PARAM_INT);
+        }
+
+        if (is_bool($val)) {
+            return $sth->bindValue($key, $val, self::PARAM_BOOL);
+        }
+
+        if (is_null($val)) {
+            return $sth->bindValue($key, $val, self::PARAM_NULL);
+        }
+
+        $sth->bindValue($key, $val);
     }
 }
