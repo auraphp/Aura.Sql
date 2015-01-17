@@ -99,6 +99,8 @@ $pdo = new ExtendedPdo(
 ?>
 ```
 
+> N.b.: The `sqlsrv` extension will fail to connect when using error mode `PDO::ERRMODE_EXCEPTION`. To connect, you will need to explicitly pass `array(PDO::ATTR_ERRMODE => PDO::ERRMODE_WARNING)` (or `PDO::ERRMODE_SILENT`) when using `sqlsrv`.
+
 Whereas the native _PDO_ connects on instantiation, _ExtendedPdo_ does not connect immediately. Instead, it connects only when you call a method that actually needs the connection to the database; e.g., on `query()`.
 
 If you want to force a connection, call the `connect()` method.
@@ -228,7 +230,7 @@ $result = $pdo->fetchAll($stm, $bind);
 // first column, and the row arrays are keyed on the column names
 $result = $pdo->fetchAssoc($stm, $bind);
 
-// fetchGroup() is like fetchAssoc() except that the values aren't wrapped in 
+// fetchGroup() is like fetchAssoc() except that the values aren't wrapped in
 // arrays. Instead, single column values are returned as a single dimensional
 // array and multiple columns are returned as an array of arrays
 // Set style to PDO::FETCH_NAMED when values are an array
