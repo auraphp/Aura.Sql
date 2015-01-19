@@ -15,7 +15,7 @@ class ProfilerTest extends AbstractExtendedPdoTest
         $lazy_pdo = $this->pdo->getPdo();
         $this->assertInstanceOf('PDO', $lazy_pdo);
     }
-    
+
     public function testProfiling()
     {
         $this->pdo->setProfiler(new Profiler);
@@ -35,7 +35,8 @@ class ProfilerTest extends AbstractExtendedPdoTest
         $this->pdo->fetchAll("SELECT 3 FROM pdotest", array('zim' => 'gir'));
 
         $profiles = $this->pdo->getProfiler()->getProfiles();
-        $this->assertEquals(3, count($profiles));
+        // 1 x query(), 1 x exec(), and 2 x fetchAll() which is executed as prepare() and perform()
+        $this->assertEquals(4, count($profiles));
 
         // get the profiles, remove stuff that's variable
         $actual = $this->pdo->getProfiler()->getProfiles();
@@ -56,6 +57,11 @@ class ProfilerTest extends AbstractExtendedPdoTest
                 'bind_values' => array(),
             ),
             2 => array(
+                'function' => 'prepare',
+                'statement' => 'SELECT 3 FROM pdotest',
+                'bind_values' => array(),
+            ),
+            3 => array(
                 'function' => 'perform',
                 'statement' => 'SELECT 3 FROM pdotest',
                 'bind_values' => array(
@@ -79,7 +85,7 @@ class ProfilerTest extends AbstractExtendedPdoTest
         // activate
         $this->pdo->getProfiler()->setActive(true);
 
-        $this->pdo->query("SELECT 1 FROM pdotest");        
+        $this->pdo->query("SELECT 1 FROM pdotest");
 
         $profiles = $this->pdo->getProfiler()->getProfiles();
         $this->assertEquals(1, count($profiles));
@@ -108,7 +114,8 @@ class ProfilerTest extends AbstractExtendedPdoTest
         $this->pdo->fetchAll("SELECT 3 FROM pdotest", array('zim' => 'gir'));
 
         $profiles = $this->pdo->getProfiler()->getProfiles();
-        $this->assertEquals(2, count($profiles));
+        // fetchAll() is executed as prepare() and perform()
+        $this->assertEquals(3, count($profiles));
 
         // get the profiles, remove stuff that's variable
         $actual = $this->pdo->getProfiler()->getProfiles();
@@ -117,13 +124,18 @@ class ProfilerTest extends AbstractExtendedPdoTest
             unset($actual[$key]['trace']);
         }
 
-        $expect = array(            
+        $expect = array(
             0 => array(
                 'function' => 'exec',
                 'statement' => 'SELECT 2 FROM pdotest',
                 'bind_values' => array(),
             ),
             1 => array(
+                'function' => 'prepare',
+                'statement' => 'SELECT 3 FROM pdotest',
+                'bind_values' => array(),
+            ),
+            2 => array(
                 'function' => 'perform',
                 'statement' => 'SELECT 3 FROM pdotest',
                 'bind_values' => array(
