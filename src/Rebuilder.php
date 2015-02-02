@@ -67,6 +67,15 @@ class Rebuilder
 
     /**
      *
+     * Change it for rebuild multiline insert pattern.
+     *
+     * @var int
+     *
+     */
+    protected $rebuild_mode = 0;
+    
+    /**
+     *
      * Constructor.
      *
      * @param ExtendedPdo $xpdo The calling ExtendedPdo object.
@@ -103,6 +112,24 @@ class Rebuilder
 
     /**
      *
+     * Get/set mode of rebuild procedure
+     *
+     * @param int $mode Mode of rebuild procedure: 
+     * 0|1 == normal (placeholder->array only) | static (replace all placeholders to values)
+     *  
+     * @return int Mode of rebuild procedure
+     * 
+     */
+    public function rebuildMode($mode = null)
+    {
+        if(isset($mode))
+            $this->rebuild_mode = $mode;
+            
+        return $this->rebuild_mode;
+    }
+    
+    /**
+     *
      * Given a statement, rebuilds it with array values embedded.
      *
      * @param string $statement The SQL statement.
@@ -121,6 +148,7 @@ class Rebuilder
             -1,
             PREG_SPLIT_DELIM_CAPTURE
         );
+        
         return $this->rebuildParts($parts);
     }
 
@@ -210,7 +238,7 @@ class Rebuilder
 
         // is the corresponding data element an array?
         $bind_array = isset($this->values[$this->num])
-                   && is_array($this->values[$this->num]);
+                   && (is_array($this->values[$this->num]) || $this->rebuild_mode);
         if ($bind_array) {
             // PDO won't bind an array; quote and replace directly
             $sub = $this->xpdo->quote($this->values[$this->num]);
@@ -238,7 +266,7 @@ class Rebuilder
 
         // is the corresponding data element an array?
         $bind_array = isset($this->values[$name])
-                   && is_array($this->values[$name]);
+                   && (is_array($this->values[$name]) || $this->rebuild_mode);
         if ($bind_array) {
             // PDO won't bind an array; quote and replace directly
             $sub = $this->xpdo->quote($this->values[$name]);
