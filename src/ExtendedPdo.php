@@ -1004,6 +1004,9 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      *
      * @return null
      *
+     * @throws Exception\CannotBindValue when the value to be bound is not
+     * bindable (e.g., array, object, or resource).
+     *
      */
     protected function bindValue(PDOStatement $sth, $key, $val)
     {
@@ -1017,6 +1020,13 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
 
         if (is_null($val)) {
             return $sth->bindValue($key, $val, self::PARAM_NULL);
+        }
+
+        if (! is_scalar($val)) {
+            $type = gettype($val);
+            throw new Exception\CannotBindValue(
+                "Cannot bind value of type '{$type}' to placeholder '{$key}'"
+            );
         }
 
         $sth->bindValue($key, $val);

@@ -2,6 +2,7 @@
 namespace Aura\Sql;
 
 use PDO;
+use StdClass;
 
 abstract class AbstractExtendedPdoTest extends \PHPUnit_Framework_TestCase
 {
@@ -563,5 +564,37 @@ abstract class AbstractExtendedPdoTest extends \PHPUnit_Framework_TestCase
             );
         }
         $this->assertEquals($expect, $actual);
+    }
+
+    public function testBindValues()
+    {
+        $stm = 'SELECT * FROM pdotest WHERE id = :id';
+
+        // PDO::PARAM_INT
+        $sth = $this->pdo->prepareWithValues($stm, array('id' => 1));
+        $this->assertInstanceOf('PDOStatement', $sth);
+
+        // PDO::PARAM_BOOL
+        $sth = $this->pdo->prepareWithValues($stm, array('id' => true));
+        $this->assertInstanceOf('PDOStatement', $sth);
+
+        // PDO::PARAM_NULL
+        $sth = $this->pdo->prepareWithValues($stm, array('id' => null));
+        $this->assertInstanceOf('PDOStatement', $sth);
+
+        // string (not a special type)
+        $sth = $this->pdo->prepareWithValues($stm, array('id' => 'xyz'));
+        $this->assertInstanceOf('PDOStatement', $sth);
+
+        // float (also not a special type)
+        $sth = $this->pdo->prepareWithValues($stm, array('id' => 1.23));
+        $this->assertInstanceOf('PDOStatement', $sth);
+
+        // non-bindable
+        $this->setExpectedException(
+            'Aura\Sql\Exception\CannotBindValue',
+            "Cannot bind value of type 'object' to placeholder 'id'"
+        );
+        $sth = $this->pdo->prepareWithValues($stm, array('id' => new StdClass));
     }
 }
