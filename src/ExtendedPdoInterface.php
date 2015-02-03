@@ -219,6 +219,16 @@ interface ExtendedPdoInterface extends PdoInterface
 
     /**
      *
+     * Closes the current connection by null-ing out the underlying PDO
+     * instance. Useful for long-running scripts to avoid connection timeouts.
+     *
+     * @return null
+     *
+     */
+    public function close();
+
+    /**
+     *
      * Returns the profiler object.
      *
      * @return ProfilerInterface
