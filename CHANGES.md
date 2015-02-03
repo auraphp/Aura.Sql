@@ -1,1 +1,2 @@
+- CHG: ExtendedPdo::disconnect() added to allow manual disconnection of a connection
 - CHG: ExtendedPdo::prepare() now profiles the query-preparation time

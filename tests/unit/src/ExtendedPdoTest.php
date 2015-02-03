@@ -16,4 +16,13 @@ class ExtendedPdoTest extends AbstractExtendedPdoTest
         $this->assertInstanceOf('PDO', $lazy_pdo);
         $this->assertNotSame($this->pdo, $lazy_pdo);
     }
+
+    public function testDisconnect()
+    {
+        $lazy_pdo = $this->pdo;
+        $connected_pdo = $lazy_pdo->getPdo();
+        $this->assertNotEquals(null, $connected_pdo);
+        $lazy_pdo->disconnect();
+        $this->assertEquals(null, $lazy_pdo->getPdo());
+    }
 }
