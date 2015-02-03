@@ -43,6 +43,15 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
 
     /**
      *
+     * The instance of PDO being decorated.
+     *
+     * @var PDO
+     *
+     */
+    protected $disconnected = false;
+
+    /**
+     *
      * The DSN for a lazy connection.
      *
      * @var string
@@ -210,6 +219,21 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
         // set attributes
         foreach ($this->attributes as $attribute => $value) {
             $this->setAttribute($attribute, $value);
+        }
+    }
+
+    /**
+     *
+     * Manual method that disconnects PDO and unsets PDO object
+     *
+     * @return null
+     *
+     */
+    public function disconnect()
+    {
+        if ($this->pdo) {
+            $this->disconnected = true;
+            $this->pdo = null;
         }
     }
 
@@ -628,7 +652,9 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      */
     public function getPdo()
     {
-        $this->connect();
+        if ($this->disconnected === false) {
+            $this->connect();
+        }
         return $this->pdo;
     }
 
