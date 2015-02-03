@@ -17,4 +17,14 @@ class DecoratedPdoTest extends AbstractExtendedPdoTest
     {
         $this->assertSame($this->decorated_pdo, $this->pdo->getPdo());
     }
+
+
+    public function testDisconnect()
+    {
+        $this->setExpectedException(
+            'Aura\Sql\Exception\CannotDisconnect',
+            'Cannot disconnect an injected PDO instance.'
+        );
+        $this->pdo->disconnect();
+    }
 }

@@ -19,10 +19,16 @@ class ExtendedPdoTest extends AbstractExtendedPdoTest
 
     public function testDisconnect()
     {
-        $lazy_pdo = $this->pdo;
-        $connected_pdo = $lazy_pdo->getPdo();
-        $this->assertNotEquals(null, $connected_pdo);
-        $lazy_pdo->disconnect();
-        $this->assertEquals(null, $lazy_pdo->getPdo());
+        // connect
+        $this->pdo->connect();
+        $this->assertTrue($this->pdo->isConnected());
+
+        // disconnect
+        $this->pdo->disconnect();
+        $this->assertFalse($this->pdo->isConnected());
+
+        // reconnect
+        $this->pdo->connect();
+        $this->assertTrue($this->pdo->isConnected());
     }
 }

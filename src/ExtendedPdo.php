@@ -8,6 +8,7 @@
  */
 namespace Aura\Sql;
 
+use Aura\Sql\Exception;
 use PDO;
 use PDOStatement;
 
@@ -23,7 +24,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
 {
     /**
      *
-     * The instance of PDO being decorated.
+     * The PDO connection itself.
      *
      * @var PDO
      *
@@ -43,12 +44,12 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
 
     /**
      *
-     * The instance of PDO being decorated.
+     * Was the PDO connection injected at construction time?
      *
      * @var PDO
      *
      */
-    protected $disconnected = false;
+    protected $injected = false;
 
     /**
      *
@@ -145,6 +146,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
     ) {
         if ($dsn instanceof PDO) {
             $this->pdo = $dsn;
+            $this->injected = true;
         } else {
             $this->dsn = $dsn;
             $this->username = $username;
@@ -224,17 +226,22 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
 
     /**
      *
-     * Manual method that disconnects PDO and unsets PDO object
+     * Explicitly disconnect by unsetting the PDO instance; does not prevent
+     * later reconnection, whether implicit or explicit.
      *
      * @return null
+     *
+     * @throws Exception\CannotDisconnect when the PDO instance was injected
+     * for decoration; manage the lifecycle of that PDO instance elsewhere.
      *
      */
     public function disconnect()
     {
-        if ($this->pdo) {
-            $this->disconnected = true;
-            $this->pdo = null;
+        if ($this->injected) {
+            $message = "Cannot disconnect an injected PDO instance.";
+            throw new Exception\CannotDisconnect($message);
         }
+        $this->pdo = null;
     }
 
     /**
@@ -652,23 +659,8 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      */
     public function getPdo()
     {
-        if ($this->disconnected === false) {
-            $this->connect();
-        }
+        $this->connect();
         return $this->pdo;
-    }
-
-    /**
-     *
-     * Closes the current connection by null-ing out the underlying PDO
-     * instance. Useful for long-running scripts to avoid connection timeouts.
-     *
-     * @return null
-     *
-     */
-    public function close()
-    {
-        $this->pdo = null;
     }
 
     /**
