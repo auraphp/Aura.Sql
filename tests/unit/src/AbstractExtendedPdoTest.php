@@ -571,23 +571,23 @@ abstract class AbstractExtendedPdoTest extends \PHPUnit_Framework_TestCase
         $stm = 'SELECT * FROM pdotest WHERE id = :id';
 
         // PDO::PARAM_INT
-        $sth = $this->pdo->prepareWithValues($stm, ['id' => 1]);
+        $sth = $this->pdo->prepareWithValues($stm, array('id' => 1));
         $this->assertInstanceOf('PDOStatement', $sth);
 
         // PDO::PARAM_BOOL
-        $sth = $this->pdo->prepareWithValues($stm, ['id' => true]);
+        $sth = $this->pdo->prepareWithValues($stm, array('id' => true));
         $this->assertInstanceOf('PDOStatement', $sth);
 
         // PDO::PARAM_NULL
-        $sth = $this->pdo->prepareWithValues($stm, ['id' => null]);
+        $sth = $this->pdo->prepareWithValues($stm, array('id' => null));
         $this->assertInstanceOf('PDOStatement', $sth);
 
         // string (not a special type)
-        $sth = $this->pdo->prepareWithValues($stm, ['id' => 'xyz']);
+        $sth = $this->pdo->prepareWithValues($stm, array('id' => 'xyz'));
         $this->assertInstanceOf('PDOStatement', $sth);
 
         // float (also not a special type)
-        $sth = $this->pdo->prepareWithValues($stm, ['id' => 1.23]);
+        $sth = $this->pdo->prepareWithValues($stm, array('id' => 1.23));
         $this->assertInstanceOf('PDOStatement', $sth);
 
         // non-bindable
@@ -595,6 +595,6 @@ abstract class AbstractExtendedPdoTest extends \PHPUnit_Framework_TestCase
             'Aura\Sql\Exception\CannotBindValue',
             "Cannot bind value of type 'object' to placeholder 'id'"
         );
-        $sth = $this->pdo->prepareWithValues($stm, ['id' => new StdClass]);
+        $sth = $this->pdo->prepareWithValues($stm, array(('id' => new StdClass));
     }
 }
