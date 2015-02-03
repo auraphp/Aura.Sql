@@ -122,6 +122,17 @@ $pdo->connect();
 ?>
 ```
 
+If you want to explicitly force a disconnect, call the `disconnect()` method.
+
+```php
+<?php
+// explicitly forces disconnection
+$pdo->disconnect();
+?>
+```
+
+Doing so will close the connection by unsetting the internal _PDO_ instance. However, calling an _ExtendedPdo_ method that implicitly establishes a connection, such as `query()` or one of the `fetch*()` methods, will automatically re-connect to the database.
+
 #### Decorator Instance
 
 The _ExtendedPdo_ class can be used to decorate an existing PDO connection as well. To do so, instantiate _ExtendedPdo_ by passing an existing PDO connection:
@@ -139,6 +150,7 @@ The decorated _PDO_ instance now provides all the _ExtendedPdo_ functionality (a
 
 Decoration of this kind can be useful when you have access to an existing _PDO_ connection managed elsewhere in your application.
 
+> N.b.: The `disconnect()` method **will not work** on decorated _PDO_ connections, since _ExtendedPdo_ did not create the connection itself. You will need to manage the decorated _PDO_ instance yourself in that case.
 
 ### Array Quoting
 
