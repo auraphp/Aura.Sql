@@ -976,6 +976,10 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
             return $this->prepare($statement);
         }
 
+		// rebuild multiline insert|replace pattern
+        $mlrebuilder = new InsertsRebuilder($this);
+        list($statement, $values) = $mlrebuilder->__invoke($statement, $values);
+
         // rebuild the statement and values
         $rebuilder = new Rebuilder($this);
         list($statement, $values) = $rebuilder->__invoke($statement, $values);
