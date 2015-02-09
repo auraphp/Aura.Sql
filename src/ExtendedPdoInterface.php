@@ -30,15 +30,6 @@ interface ExtendedPdoInterface extends PdoInterface
 
     /**
      *
-     * Manual method that disconnects PDO and unsets PDO object
-     *
-     * @return null
-     *
-     */
-    public function disconnect();
-
-    /**
-     *
      * Performs a statement and returns the number of affected rows.
      *
      * @param string $statement The SQL statement to prepare and execute.
