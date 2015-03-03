@@ -92,7 +92,7 @@ class Rebuilder
     public function __invoke($statement, $values)
     {
         // match standard PDO execute() behavior of zero-indexed arrays
-        if (isset($values[0]) || array_key_exists(0, $values)) {
+        if (array_key_exists(0, $values)) {
             array_unshift($values, null);
         }
 
