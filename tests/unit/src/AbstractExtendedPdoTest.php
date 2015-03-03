@@ -597,4 +597,11 @@ abstract class AbstractExtendedPdoTest extends \PHPUnit_Framework_TestCase
         );
         $sth = $this->pdo->prepareWithValues($stm, array('id' => new StdClass));
     }
+
+    public function testBindNullFirstParameter ()
+    {
+        $rebuilder = new Rebuilder($this->newExtendedPdo());
+        $result = $rebuilder('SELECT * FROM test WHERE column_one = ?', [null]);
+        $this->assertTrue(array_key_exists(1, $result[1]));
+    }
 }
