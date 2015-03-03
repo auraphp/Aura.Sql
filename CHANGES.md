@@ -1,1 +1,1 @@
-The previous release changed the ExtendedPdoInterface by adding a new `disconnect()` method. That was an unintentional BC break to existing implementations of the interface. This release corrects that break by removing the `disconnect()` method from the interface, while leaving it in the implementation.
+- FIX: #96: Allow first bind value of query with numbered placeholders to be null.
