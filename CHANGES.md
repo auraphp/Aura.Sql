@@ -1,1 +1,1 @@
-- FIX: #96: Allow first bind value of query with numbered placeholders to be null.
+This is a hygiene release to update support files.
