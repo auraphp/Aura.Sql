@@ -45,7 +45,7 @@ Added functionality in _Aura.Sql_ over the native _PDO_ includes:
 
 ### Installation
 
-This library requires PHP 5.3 or later, and has no userland dependencies.
+This library requires PHP 5.3 or later; we recommend using the latest available version of PHP as a matter of principle. It has no userland dependencies.
 
 It is installable and autoloadable via Composer as [aura/sql](https://packagist.org/packages/aura/sql).
 
@@ -57,7 +57,7 @@ Alternatively, [download a release](https://github.com/auraphp/Aura.Sql/releases
 [![Code Coverage](https://scrutinizer-ci.com/g/auraphp/Aura.Sql/badges/coverage.png?b=develop-2)](https://scrutinizer-ci.com/g/auraphp/Aura.Sql/)
 [![Build Status](https://travis-ci.org/auraphp/Aura.Sql.png?branch=develop-2)](https://travis-ci.org/auraphp/Aura.Sql)
 
-To run the unit tests at the command line, issue `phpunit -c tests/unit/`. (This requires [PHPUnit][] to be available as `phpunit`.)
+To run the unit tests at the command line, issue `phpunit` at the package root. (This requires [PHPUnit][] to be available as `phpunit`.)
 
 [PHPUnit]: http://phpunit.de/manual/
 

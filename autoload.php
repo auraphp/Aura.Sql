@@ -6,13 +6,9 @@ spl_autoload_register(function ($class) {
 
     // what prefixes should be recognized?
     $prefixes = array(
-        "{$ns}\_Config\\" => array(
-            __DIR__ . '/config',
-            __DIR__ . '/tests/container/src',
-        ),
         "{$ns}\\" => array(
             __DIR__ . '/src',
-            __DIR__ . '/tests/unit/src',
+            __DIR__ . '/tests',
         ),
     );
 
