@@ -1,1 +1,1 @@
-This is a hygiene release to update support files.
+This release modifies the testing structure and updates other support files.
