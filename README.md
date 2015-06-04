@@ -328,6 +328,8 @@ Each profile entry will have these keys:
 - `trace`: An exception stack trace indicating where the query was issued from
   in the codebase.
 
+Note that an entry is made into the profile for each call to underlying _ExtendedPDO_ methods.  For example, in a simple query using a bind value, there will be two entries, one for the call to `prepare` and one for the call to `perform`.
+
 Setting the _Profiler_ into the _ExtendedPdo_ instance is optional. Once it
 is set, you can activate and deactivate it as you wish using the
 `Profiler::setActive()` method. When not active, query profiles will not be
