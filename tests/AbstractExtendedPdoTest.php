@@ -119,6 +119,21 @@ abstract class AbstractExtendedPdoTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expect, $actual);
     }
 
+    public function testPerformWithCommentedSQL()
+    {
+        $stm = "SELECT * -- Don't bind :foo
+                FROM pdotest
+                /*
+                Don't bind :bar
+                 */";
+        $sth = $this->pdo->perform($stm, array('unused' => '1'));
+        $this->assertInstanceOf('PDOStatement', $sth);
+        $result = $sth->fetchAll(Pdo::FETCH_ASSOC);
+        $expect = 10;
+        $actual = count($result);
+        $this->assertEquals($expect, $actual);
+    }
+
     public function testQueryWithArrayValues()
     {
         $stm = "SELECT * FROM pdotest WHERE id IN (:list) OR id = :id";
@@ -174,7 +189,7 @@ abstract class AbstractExtendedPdoTest extends \PHPUnit_Framework_TestCase
 
     public function testPrepareWithValues()
     {
-        $stm = "SELECT * FROM pdotest
+        $stm = " SELECT * FROM pdotest
                  WHERE 'leave '':foo'' alone'
                  AND id IN (:list)
                  AND \"leave '':bar' alone\"";
