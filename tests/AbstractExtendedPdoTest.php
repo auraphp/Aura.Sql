@@ -168,6 +168,26 @@ abstract class AbstractExtendedPdoTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($expect, $actual);
     }
 
+    public function testPrepareWithPostgresJsonOperators()
+    {
+        $stm = 'SELECT CAST(\'{"a": 1, "b": 2, "c": 3}\' AS JSONB) ? \'b\'';
+        $values = array(array('this', 'should', 'be', 'left', 'alone'));
+
+        $rebuilder = new Rebuilder($this->pdo);
+
+        list($actual, $values) = $rebuilder->__invoke($stm, $values);
+
+        $expect = $stm;
+        $this->assertSame($expect, $actual);
+        /*
+
+        $sth = $this->pdo->prepareWithValues($stm, array('this value should not be used'));
+
+        $expect = $stm;
+        $actual = $sth->queryString;
+        $this->assertSame($expect, $actual);*/
+    }
+
     public function testQueryWithFetchMode()
     {
         $stm = "SELECT id, name FROM pdotest";
