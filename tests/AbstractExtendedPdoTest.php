@@ -119,21 +119,6 @@ abstract class AbstractExtendedPdoTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expect, $actual);
     }
 
-    public function testPerformWithCommentedSQL()
-    {
-        $stm = "SELECT * -- Don't bind :foo
-                FROM pdotest
-                /*
-                Don't bind :bar
-                 */";
-        $sth = $this->pdo->perform($stm, array('unused' => '1'));
-        $this->assertInstanceOf('PDOStatement', $sth);
-        $result = $sth->fetchAll(Pdo::FETCH_ASSOC);
-        $expect = 10;
-        $actual = count($result);
-        $this->assertEquals($expect, $actual);
-    }
-
     public function testQueryWithArrayValues()
     {
         $stm = "SELECT * FROM pdotest WHERE id IN (:list) OR id = :id";
@@ -149,43 +134,6 @@ abstract class AbstractExtendedPdoTest extends \PHPUnit_Framework_TestCase
         $expect = 5;
         $actual = count($result);
         $this->assertEquals($expect, $actual);
-    }
-
-    public function testPrepareWithPostgresCastOperator()
-    {
-        $stm = "SELECT name::TEXT FROM pdotest WHERE id = :id";
-        $values = array(
-            'TEXT' => array('this', 'should', 'be', 'left', 'alone'),
-            'id' => 5
-        );
-
-        $rebuilder = new Rebuilder($this->pdo);
-
-        list($actual, $values) = $rebuilder->__invoke($stm, $values);
-
-
-        $expect = $stm;
-        $this->assertSame($expect, $actual);
-    }
-
-    public function testPrepareWithPostgresJsonOperators()
-    {
-        $stm = 'SELECT CAST(\'{"a": 1, "b": 2, "c": 3}\' AS JSONB) ? \'b\'';
-        $values = array(array('this', 'should', 'be', 'left', 'alone'));
-
-        $rebuilder = new Rebuilder($this->pdo);
-
-        list($actual, $values) = $rebuilder->__invoke($stm, $values);
-
-        $expect = $stm;
-        $this->assertSame($expect, $actual);
-        /*
-
-        $sth = $this->pdo->prepareWithValues($stm, array('this value should not be used'));
-
-        $expect = $stm;
-        $actual = $sth->queryString;
-        $this->assertSame($expect, $actual);*/
     }
 
     public function testQueryWithFetchMode()
@@ -237,7 +185,7 @@ abstract class AbstractExtendedPdoTest extends \PHPUnit_Framework_TestCase
             'bar' => 'WRONG',
         ));
 
-        $expect = str_replace(':list', "'1', '2', '3', '4', '5'", $stm);
+        $expect = str_replace(':list', ":list_0, :list_1, :list_2, :list_3, :list_4", $stm);
         $actual = $sth->queryString;
         $this->assertSame($expect, $actual);
     }
@@ -648,12 +596,5 @@ abstract class AbstractExtendedPdoTest extends \PHPUnit_Framework_TestCase
             "Cannot bind value of type 'object' to placeholder 'id'"
         );
         $sth = $this->pdo->prepareWithValues($stm, array('id' => new StdClass));
-    }
-
-    public function testBindNullFirstParameter ()
-    {
-        $rebuilder = new Rebuilder($this->newExtendedPdo());
-        $result = $rebuilder('SELECT * FROM test WHERE column_one = ?', array(null));
-        $this->assertTrue(array_key_exists(1, $result[1]));
     }
 }
