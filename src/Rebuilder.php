@@ -20,15 +20,6 @@ class Rebuilder
 {
     /**
      *
-     * The calling ExtendedPdo object.
-     *
-     * @var ExtendedPdo
-     *
-     */
-    protected $xpdo;
-
-    /**
-     *
      * How many numbered placeholders in the original statement.
      *
      * @var int
@@ -64,18 +55,6 @@ class Rebuilder
      *
      */
     protected $final_values = array();
-
-    /**
-     *
-     * Constructor.
-     *
-     * @param ExtendedPdo $xpdo The calling ExtendedPdo object.
-     *
-     */
-    public function __construct(ExtendedPdo $xpdo)
-    {
-        $this->xpdo = $xpdo;
-    }
 
     /**
      *
@@ -213,7 +192,12 @@ class Rebuilder
                    && is_array($this->values[$this->num]);
         if ($bind_array) {
             // PDO won't bind an array; quote and replace directly
-            $sub = $this->xpdo->quote($this->values[$this->num]);
+            $sub = '';
+            foreach($this->values[$this->num] as $value) {
+                $sub .= ( $sub ? ', ' : '') . '?';
+                $this->count ++;
+                $this->final_values[$this->count] = $value;
+            }
         } else {
             // increase the count of numbered placeholders to be bound
             $this->count ++;
@@ -240,8 +224,20 @@ class Rebuilder
         $bind_array = isset($this->values[$name])
                    && is_array($this->values[$name]);
         if ($bind_array) {
-            // PDO won't bind an array; quote and replace directly
-            $sub = $this->xpdo->quote($this->values[$name]);
+            $sub = '';
+            $index = -1;
+            foreach($this->values[$name] as $value){
+                do {
+                    $index ++;
+                    $final_name = $name . '_' . $index;
+                } while(isset( $this->final_values[$final_name]));
+
+                if ($sub) {
+                    $sub .= ', ';
+                }
+                $sub .= ':' . $final_name;
+                $this->final_values[$final_name] = $value;
+            }
         } else {
             // not an array, retain the placeholder for later
             $this->final_values[$name] = $this->values[$name];
