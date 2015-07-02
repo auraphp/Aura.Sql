@@ -225,7 +225,7 @@ internally, so quoting-and-replacement of array placeholders is supported.)
 ```php
 <?php
 $stm  = 'SELECT * FROM test WHERE foo = :foo AND bar = :bar';
-$bind = array('foo' => 'bar', 'baz' => 'dib');
+$bind = array('foo' => 'baz', 'bar' => 'dib');
 
 // the native PDO way to "fetch all" where the result is a sequential array
 // of rows, and the row arrays are keyed on the column names
