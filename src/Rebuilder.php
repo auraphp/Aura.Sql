@@ -16,7 +16,7 @@ namespace Aura\Sql;
  * @package Aura.Sql
  *
  */
-class Rebuilder
+class Rebuilder implements RebuilderInterface
 {
     /**
      *
@@ -58,49 +58,109 @@ class Rebuilder
 
     /**
      *
-     * Rebuilds a statement with array values replaced into placeholders.
+     * Rebuilds a statement with array values put in individual values and parameters. Multiple occurrences of the same
+     * placeholder are also replaced.
      *
      * @param string $statement The statement to rebuild.
      *
      * @param array $values The values to bind and/or replace into a statement.
      *
+     * @param string $charset The character set the statement is using.
+     *
      * @return array An array where element 0 is the rebuilt statement and
      * element 1 is the rebuilt array of values.
      *
      */
-    public function __invoke($statement, $values)
+    public function rebuildStatement($statement, $values = array(), $charset = 'UTF-8')
     {
         // match standard PDO execute() behavior of zero-indexed arrays
         if (array_key_exists(0, $values)) {
             array_unshift($values, null);
         }
-
         $this->values = $values;
-        $statement = $this->rebuildStatement($statement);
-        return array($statement, $this->final_values);
-    }
 
-    /**
-     *
-     * Given a statement, rebuilds it with array values embedded.
-     *
-     * @param string $statement The SQL statement.
-     *
-     * @return string The rebuilt statement.
-     *
-     */
-    protected function rebuildStatement($statement)
-    {
-        // find all parts not inside quotes or backslashed-quotes
-        $apos = "'";
-        $quot = '"';
-        $parts = preg_split(
-            "/(($apos+|$quot+|\\$apos+|\\$quot+).*?)\\2/m",
-            $statement,
-            -1,
-            PREG_SPLIT_DELIM_CAPTURE
-        );
-        return $this->rebuildParts($parts);
+        $final_statement = '';
+        for ($current_index = 0, $last_index = mb_strlen($statement, $charset) - 1; $current_index <= $last_index;) {
+            $current_character = mb_substr($statement, $current_index, 1, $charset);
+            switch ($current_character) {
+                case '-':
+                    if (mb_substr($statement, $current_index + 1, 1, $charset) === '-') {
+                        // One line comment
+                        $eol_index = mb_strpos($statement, "\n", $current_index, $charset);
+                        if ($eol_index === false) {
+                            $eol_index = $last_index;
+                        }
+                        $final_statement .= mb_substr($statement, $current_index, $eol_index - $current_index, $charset);
+                        $current_index = $eol_index;
+                    }
+                    else{
+                        $final_statement .= $current_character;
+                        $current_index ++;
+                    }
+                    break;
+                case '/':
+                    if (mb_substr($statement, $current_index + 1, 1, $charset) === '*') {
+                        // Multi line comment
+                        $end_of_comment_index = mb_strpos($statement, "*/", $current_index, $charset);
+                        if ($end_of_comment_index === false) {
+                            $end_of_comment_index = $last_index;
+                        }
+                        else {
+                            $end_of_comment_index += 2;
+                        }
+
+                        $final_statement .= mb_substr($statement, $current_index, $end_of_comment_index - $current_index, $charset);
+                        $current_index = $end_of_comment_index;
+                    }
+                    else{
+                        $final_statement .= $current_character;
+                        $current_index ++;
+                    }
+                    break;
+                case "'":
+                case '"':
+                    $length = $this->getQuotedStringLength($statement, $current_index, $current_character, $charset);
+                    $final_statement .= mb_substr($statement, $current_index, $length);
+                    $current_index += $length;
+                    break;
+                case ':':
+                    $last_colon = $current_index;
+                    while (mb_substr($statement, $last_colon + 1, 1) === ':') {
+                        $current_character .= ':';
+                        $last_colon ++;
+                    }
+                    if ($last_colon == $current_index) {
+                        // Named placeholder
+                        $end_of_placeholder_index = $last_index;
+                        if (mb_ereg_search_init($statement) !== false) {
+                            $end_of_placeholder_index = $last_index + 1;
+                            mb_ereg_search_setpos($current_index + 1);
+                            if (mb_ereg_search('\\W')) {
+                                $pos = mb_ereg_search_getpos();
+                                $end_of_placeholder_index = $pos - 1;
+                            }
+                        }
+
+                        $sub = mb_substr($statement, $current_index, $end_of_placeholder_index - $current_index);
+                        $final_statement .= $this->prepareNamedPlaceholder($sub);
+                        $current_index = $end_of_placeholder_index;
+                    }
+                    else {
+                        $final_statement .= $current_character;
+                        $current_index = $last_colon + 1;
+                    }
+                    break;
+                case '?':
+                    $final_statement .= $this->prepareNumberedPlaceholder('?');
+                    $current_index ++;
+                    break;
+                default:
+                    $final_statement .= $current_character;
+                    $current_index ++;
+                    break;
+            }
+        }
+        return array($final_statement, $this->final_values);
     }
 
     /**
@@ -244,5 +304,55 @@ class Rebuilder
         }
 
         return $sub;
+    }
+
+    /**
+     *
+     * Returns the length of a quoted string part of statement
+     *
+     * @param string $statement The SQL statement
+     * @param int $position Position of the quote character starting the string
+     * @param string $quote_character Quote character, ' or "
+     * @param string $charset Charset of the string
+     *
+     * @return int
+     */
+    protected function getQuotedStringLength($statement, $position, $quote_character, $charset)
+    {
+        $start = $position;
+        $last_index = mb_strlen($statement, $charset) - 1;
+        // Search for end of string character, passing '', "", \' and \" groupings.
+        $end_found = false;
+        while (!$end_found)
+        {
+            $end_of_quoted_string_index = mb_strpos($statement, $quote_character, $position + 1, $charset);
+            if ($end_of_quoted_string_index === false) {
+                return $last_index - $start;
+            }
+
+            // Count the number of \ characters before the quote character found.
+            $escape_count = 0;
+            while (mb_substr($statement, $end_of_quoted_string_index - ($escape_count + 1), 1, $charset) === "\\")
+            {
+                $escape_count ++;
+            }
+            // If it is even, count the number of same character after the current one
+            if ($escape_count % 2 == 0)
+            {
+                $escape_count = 0;
+                while (mb_substr($statement, $end_of_quoted_string_index + $escape_count + 1, 1, $charset) === $quote_character)
+                {
+                    $escape_count ++;
+                }
+                if ($escape_count % 2 == 0)
+                {
+                    return $end_of_quoted_string_index + $escape_count - $start + 1;
+                }
+                $position = $end_of_quoted_string_index + $escape_count;
+            }
+            else {
+                $position = $end_of_quoted_string_index;
+            }
+        }
     }
 }

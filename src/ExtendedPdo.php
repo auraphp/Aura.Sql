@@ -978,7 +978,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
 
         // rebuild the statement and values
         $rebuilder = new Rebuilder();
-        list($statement, $values) = $rebuilder->__invoke($statement, $values);
+        list($statement, $values) = $rebuilder->rebuildStatement($statement, $values);
 
         // prepare the statement
         $sth = $this->prepare($statement);
