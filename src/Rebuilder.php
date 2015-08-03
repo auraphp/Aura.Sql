@@ -58,6 +58,17 @@ class Rebuilder implements RebuilderInterface
         );
     }
 
+    /**
+     *
+     * Registers a callable to use when a character is found in the statement
+     *
+     * @param string $key Character to check for
+     * @param callable $callback A callback which has the same properties as those found in $statementPartsHandlers
+     */
+    public function registerStatementPartsHandler($key, $callback)
+    {
+        $this->statementPartsHandlers[$key] = $callback;
+    }
 
     /**
      *
