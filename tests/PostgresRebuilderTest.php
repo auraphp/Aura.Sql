@@ -17,6 +17,12 @@ class PostgresRebuilderTest extends \PHPUnit_Framework_TestCase
 
         $expect = $stm;
         $this->assertSame($expect, $actual);
+
+        $stm = 'SELECT $$$ This should not be bound :foo $$ FROM pdotest';
+        list($actual, $values) = $rebuilder->rebuildStatement($stm, $values);
+
+        $expect = $stm;
+        $this->assertSame($expect, $actual);
     }
 
     public function testDollarStringWithNonEmptyIdentifier()
@@ -43,7 +49,7 @@ class PostgresRebuilderTest extends \PHPUnit_Framework_TestCase
 
         $rebuilder = new PostgresRebuilder();
 
-        list($actual, $values) = $rebuilder->rebuildStatement($stm, $values);
+        list($actual, $actual_values) = $rebuilder->rebuildStatement($stm, $values);
 
         $expect = str_replace(':list', ':list_0, :list_1, :list_2', $stm);
         $expected_values = array(
@@ -52,7 +58,7 @@ class PostgresRebuilderTest extends \PHPUnit_Framework_TestCase
             'list_2' => 3,
         );
         $this->assertSame($expect, $actual);
-        $this->assertEquals($expected_values, $values);
+        $this->assertEquals($expected_values, $actual_values);
     }
 
     public function testDollarButNotStringIdentifier()

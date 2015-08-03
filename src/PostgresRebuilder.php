@@ -71,8 +71,35 @@ class PostgresRebuilder implements \Aura\Sql\RebuilderInterface
      */
     public function handleDollarCharacter($statement, $values, $final_statement, $final_values, $current_index, $current_character, $last_index, $charset, $num, $count)
     {
-        $final_statement .= $current_character;
-        $current_index ++;
+        mb_regex_encoding($charset);
+        mb_ereg_search_init($statement);
+
+        $identifier = '';
+        if (mb_ereg_search_init($statement) !== false) {
+            mb_ereg_search_setpos($current_index);
+            $pos = mb_ereg_search_pos('\\$\\w*\\$');
+            if ($pos && $pos[0] == $current_index) {
+                $identifier = mb_substr($statement, $current_index, $pos[1], $charset);
+            }
+        }
+
+        if($identifier){
+            $end_of_string_index = mb_strpos($statement, $identifier, $current_index + $pos[1], $charset);
+            if ($end_of_string_index) {
+                $end_of_string_index += $pos[1];
+                $final_statement .= mb_substr($statement, $current_index, $end_of_string_index - $current_index, $charset);
+                $current_index = $end_of_string_index;
+            }
+            else {
+                $final_statement .= $current_character;
+                $current_index ++;
+            }
+        }
+        else{
+            $final_statement .= $current_character;
+            $current_index ++;
+        }
+
         return array($final_statement, $final_values, $current_index, $num, $count);
     }
 }
