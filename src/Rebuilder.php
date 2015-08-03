@@ -20,41 +20,44 @@ class Rebuilder implements RebuilderInterface
 {
     /**
      *
-     * How many numbered placeholders in the original statement.
-     *
-     * @var int
-     *
-     */
-    protected $num = 0;
-
-    /**
-     *
-     * How many numbered placeholders to actually be bound; this may
-     * differ from 'num' in that some numbered placeholders may get
-     * replaced with quoted CSV strings
-     *
-     * @var int
-     *
-     */
-    protected $count = 0;
-
-    /**
-     *
-     * The initial values to be bound.
+     * List of handlers to call when a character is found.
+     * The key is the character, the value is a callable which takes seven parameters and returns an array:
+     * - string $statement The original statement
+     * - array $values The original list of parameter values
+     * - string $final_statement The final statement
+     * - array $final_values The array of values to bind
+     * - int $current_index The index of the character
+     * - int $current_character The character
+     * - int $last_index The last index of the original statement
+     * - string $charset The statement charset
+     * - int $num How many numbered placeholders in the original statement
+     * - int $count How many numbered placeholders to actually be bound
+     * The returned array contains three items:
+     * - at index 0, the modified statement
+     * - at index 1, the modified values array
+     * - at index 2, the index of next character to handle
+     * - at index 3, the index of the last numbered placeholder from the original statement used
+     * - at index 4, the index of the last numbered placeholder to bind
      *
      * @var array
-     *
      */
-    protected $values = array();
+    protected $statementPartsHandlers = array();
 
     /**
-     *
-     * Named and numbered placeholders to bind at the end.
-     *
-     * @var array
-     *
+     * Constructor. Sets up the array of callbacks.
      */
-    protected $final_values = array();
+    public function __construct()
+    {
+        $this->statementPartsHandlers = array(
+            '-' => array($this, 'handleSingleLineComment'),
+            '/' => array($this, 'handleMultiLineComment'),
+            '"' => array($this, 'handleQuotedString'),
+            "'" => array($this, 'handleQuotedString'),
+            ':' => array($this, 'handleColon'),
+            '?' => array($this, 'handleQuestionMark'),
+        );
+    }
+
 
     /**
      *
@@ -77,233 +80,124 @@ class Rebuilder implements RebuilderInterface
         if (array_key_exists(0, $values)) {
             array_unshift($values, null);
         }
-        $this->values = $values;
 
         $final_statement = '';
-        for ($current_index = 0, $last_index = mb_strlen($statement, $charset) - 1; $current_index <= $last_index;) {
+        $final_values = array();
+        $last_index = mb_strlen($statement, $charset) - 1;
+        $current_index = 0;
+        $num = 0;
+        $count = 0;
+        while ($current_index <= $last_index) {
             $current_character = mb_substr($statement, $current_index, 1, $charset);
-            switch ($current_character) {
-                case '-':
-                    if (mb_substr($statement, $current_index + 1, 1, $charset) === '-') {
-                        // One line comment
-                        $eol_index = mb_strpos($statement, "\n", $current_index, $charset);
-                        if ($eol_index === false) {
-                            $eol_index = $last_index;
-                        }
-                        $final_statement .= mb_substr($statement, $current_index, $eol_index - $current_index, $charset);
-                        $current_index = $eol_index;
-                    }
-                    else{
-                        $final_statement .= $current_character;
-                        $current_index ++;
-                    }
-                    break;
-                case '/':
-                    if (mb_substr($statement, $current_index + 1, 1, $charset) === '*') {
-                        // Multi line comment
-                        $end_of_comment_index = mb_strpos($statement, "*/", $current_index, $charset);
-                        if ($end_of_comment_index === false) {
-                            $end_of_comment_index = $last_index;
-                        }
-                        else {
-                            $end_of_comment_index += 2;
-                        }
-
-                        $final_statement .= mb_substr($statement, $current_index, $end_of_comment_index - $current_index, $charset);
-                        $current_index = $end_of_comment_index;
-                    }
-                    else{
-                        $final_statement .= $current_character;
-                        $current_index ++;
-                    }
-                    break;
-                case "'":
-                case '"':
-                    $length = $this->getQuotedStringLength($statement, $current_index, $current_character, $charset);
-                    $final_statement .= mb_substr($statement, $current_index, $length);
-                    $current_index += $length;
-                    break;
-                case ':':
-                    $last_colon = $current_index;
-                    while (mb_substr($statement, $last_colon + 1, 1) === ':') {
-                        $current_character .= ':';
-                        $last_colon ++;
-                    }
-                    if ($last_colon == $current_index) {
-                        // Named placeholder
-                        $end_of_placeholder_index = $last_index;
-                        if (mb_ereg_search_init($statement) !== false) {
-                            $end_of_placeholder_index = $last_index + 1;
-                            mb_ereg_search_setpos($current_index + 1);
-                            if (mb_ereg_search('\\W')) {
-                                $pos = mb_ereg_search_getpos();
-                                $end_of_placeholder_index = $pos - 1;
-                            }
-                        }
-
-                        $sub = mb_substr($statement, $current_index, $end_of_placeholder_index - $current_index);
-                        $final_statement .= $this->prepareNamedPlaceholder($sub);
-                        $current_index = $end_of_placeholder_index;
-                    }
-                    else {
-                        $final_statement .= $current_character;
-                        $current_index = $last_colon + 1;
-                    }
-                    break;
-                case '?':
-                    $final_statement .= $this->prepareNumberedPlaceholder('?');
-                    $current_index ++;
-                    break;
-                default:
-                    $final_statement .= $current_character;
-                    $current_index ++;
-                    break;
+            if (isset($this->statementPartsHandlers[$current_character])) {
+                $handler = $this->statementPartsHandlers[$current_character];
+                list($final_statement, $final_values, $current_index, $num, $count) = $handler(
+                    $statement,
+                    $values,
+                    $final_statement,
+                    $final_values,
+                    $current_index,
+                    $current_character,
+                    $last_index,
+                    $charset,
+                    $num,
+                    $count
+                );
+            }
+            else {
+                $final_statement .= $current_character;
+                $current_index ++;
             }
         }
-        return array($final_statement, $this->final_values);
+        return array($final_statement, $final_values);
     }
 
     /**
      *
-     * Given an array of statement parts, rebuilds each part.
+     * Bind or quote a numbered placeholder in a query subpart
      *
-     * @param array $parts The statement parts.
+     * @param array $values The original array of values
      *
-     * @return string The rebuilt statement.
+     * @param int $num The last index of a numbered placeholder added to the statement
      *
-     */
-    protected function rebuildParts($parts)
-    {
-        // loop through the non-quoted parts (0, 3, 6, 9, etc.)
-        $k = count($parts);
-        for ($i = 0; $i <= $k; $i += 3) {
-            $parts[$i] = $this->rebuildPart($parts[$i]);
-        }
-        return implode('', $parts);
-    }
-
-    /**
+     * @param array $final_values The current modified array of values to effectively bind
      *
-     * Rebuilds a single statement part.
+     * @param int $count The last index of a numbered placeholder in the modified array of values
      *
-     * @param string $part The statement part.
-     *
-     * @return string The rebuilt statement.
+     * @return array An array which has at index 0 the modified subpart, at index 1 the final values to bind, at index 2
+     * the current index of the last numbered placeholder used from the original values array and at index 3 the index of the last
+     * numbered placeholder in the final values array
      *
      */
-    protected function rebuildPart($part)
-    {
-        // split into subparts by ":name" and "?"
-        $subs = preg_split(
-            "/(:[a-zA-Z_][a-zA-Z0-9_]*)|(\?)/m",
-            $part,
-            -1,
-            PREG_SPLIT_DELIM_CAPTURE
-        );
-
-        // check subparts to convert bound arrays to quoted CSV strings
-        $subs = $this->prepareValuePlaceholders($subs);
-
-        // reassemble
-        return implode('', $subs);
-    }
-
-    /**
-     *
-     * Prepares the sub-parts of a query with placeholders.
-     *
-     * @param array $subs The query subparts.
-     *
-     * @return array The prepared subparts.
-     *
-     */
-    protected function prepareValuePlaceholders(array $subs)
-    {
-        foreach ($subs as $i => $sub) {
-            $char = substr($sub, 0, 1);
-            if ($char == '?') {
-                $subs[$i] = $this->prepareNumberedPlaceholder($sub);
-            }
-
-            if ($char == ':') {
-                $subs[$i] = $this->prepareNamedPlaceholder($sub);
-            }
-        }
-
-        return $subs;
-    }
-
-    /**
-     *
-     * Bind or quote a numbered placeholder in a query subpart.
-     *
-     * @param string $sub The query subpart.
-     *
-     * @return string The prepared query subpart.
-     *
-     */
-    protected function prepareNumberedPlaceholder($sub)
+    protected function prepareNumberedPlaceholder($values, $num, $final_values, $count)
     {
         // what numbered placeholder is this in the original statement?
-        $this->num ++;
+        $num ++;
 
         // is the corresponding data element an array?
-        $bind_array = isset($this->values[$this->num])
-                   && is_array($this->values[$this->num]);
+        $bind_array = isset($values[$num])
+                   && is_array($values[$num]);
         if ($bind_array) {
-            // PDO won't bind an array; quote and replace directly
+            // PDO won't bind an array; replace placeholder with multiple placeholder, one for each value in the array
             $sub = '';
-            foreach($this->values[$this->num] as $value) {
+            foreach($values[$num] as $value) {
                 $sub .= ( $sub ? ', ' : '') . '?';
-                $this->count ++;
-                $this->final_values[$this->count] = $value;
+                $count ++;
+                $final_values[$count] = $value;
             }
         } else {
             // increase the count of numbered placeholders to be bound
-            $this->count ++;
-            $this->final_values[$this->count] = $this->values[$this->num];
+            $count ++;
+            $final_values[$count] = $values[$num];
+            $sub = '?';
         }
 
-        return $sub;
+        return array($sub, $final_values, $num, $count);
     }
 
     /**
      *
-     * Bind or quote a named placeholder in a query subpart.
+     * Bind or quote a named placeholder in a query subpart
      *
-     * @param string $sub The query subpart.
+     * @param string $sub The query subpart
      *
-     * @return string The prepared query subpart.
+     * @param array $values The original array of values to bind
+     *
+     * @param array $final_values The modified array of values which will be bound
+     *
+     * @param string $charset
+     *
+     * @return array An array containing at index 0 the possibly modified subpart and at index 1 the array of values to bind
      *
      */
-    protected function prepareNamedPlaceholder($sub)
+    protected function prepareNamedPlaceholder($sub, $values, $final_values, $charset)
     {
-        $name = substr($sub, 1);
+        $name = mb_substr($sub, 1, null, $charset);
 
         // is the corresponding data element an array?
-        $bind_array = isset($this->values[$name])
-                   && is_array($this->values[$name]);
+        $bind_array = isset($values[$name])
+                   && is_array($values[$name]);
         if ($bind_array) {
             $sub = '';
             $index = -1;
-            foreach($this->values[$name] as $value){
+            foreach($values[$name] as $value){
                 do {
                     $index ++;
                     $final_name = $name . '_' . $index;
-                } while(isset( $this->final_values[$final_name]));
+                } while(isset($final_values[$final_name]));
 
                 if ($sub) {
                     $sub .= ', ';
                 }
                 $sub .= ':' . $final_name;
-                $this->final_values[$final_name] = $value;
+                $final_values[$final_name] = $value;
             }
         } else {
             // not an array, retain the placeholder for later
-            $this->final_values[$name] = $this->values[$name];
+            $final_values[$name] = $values[$name];
         }
 
-        return $sub;
+        return array($sub, $final_values);
     }
 
     /**
@@ -311,8 +205,11 @@ class Rebuilder implements RebuilderInterface
      * Returns the length of a quoted string part of statement
      *
      * @param string $statement The SQL statement
+     *
      * @param int $position Position of the quote character starting the string
+     *
      * @param string $quote_character Quote character, ' or "
+     *
      * @param string $charset Charset of the string
      *
      * @return int
@@ -354,5 +251,181 @@ class Rebuilder implements RebuilderInterface
                 $position = $end_of_quoted_string_index;
             }
         }
+    }
+
+    /**
+     *
+     * Returns a modified statement, values and current index depending on what follow a '-' character.
+     *
+     * @param string $statement
+     * @param array $values
+     * @param string $final_statement
+     * @param array $final_values
+     * @param int $current_index
+     * @param string $current_character
+     * @param int $last_index
+     * @param string $charset
+     * @param int $num
+     * @param int $count
+     *
+     * @return array
+     */
+    protected function handleSingleLineComment($statement, $values, $final_statement, $final_values, $current_index, $current_character, $last_index, $charset, $num, $count)
+    {
+        if (mb_substr($statement, $current_index + 1, 1, $charset) === '-') {
+            // One line comment
+            $eol_index = mb_strpos($statement, "\n", $current_index, $charset);
+            if ($eol_index === false) {
+                $eol_index = $last_index;
+            }
+            $final_statement .= mb_substr($statement, $current_index, $eol_index - $current_index, $charset);
+            $current_index = $eol_index;
+        }
+        else {
+            $final_statement .= $current_character;
+            $current_index ++;
+        }
+
+        return array($final_statement, $final_values, $current_index, $num, $count);
+    }
+
+    /**
+     *
+     * If the character following a '/' one is a '*', advance the $current_index to the end of this multiple line comment
+     *
+     * @param string $statement
+     * @param array $values
+     * @param string $final_statement
+     * @param array $final_values
+     * @param int $current_index
+     * @param string $current_character
+     * @param int $last_index
+     * @param string $charset
+     * @param int $num
+     * @param int $count
+     *
+     * @return array
+     */
+    protected function handleMultiLineComment($statement, $values, $final_statement, $final_values, $current_index, $current_character, $last_index, $charset, $num, $count)
+    {
+        if (mb_substr($statement, $current_index + 1, 1, $charset) === '*') {
+            // Multi line comment
+            $end_of_comment_index = mb_strpos($statement, "*/", $current_index, $charset);
+            if ($end_of_comment_index === false) {
+                $end_of_comment_index = $last_index;
+            }
+            else {
+                $end_of_comment_index += 2;
+            }
+
+            $final_statement .= mb_substr($statement, $current_index, $end_of_comment_index - $current_index, $charset);
+            $current_index = $end_of_comment_index;
+        }
+        else{
+            $final_statement .= $current_character;
+            $current_index ++;
+        }
+
+        return array($final_statement, $final_values, $current_index, $num, $count);
+    }
+
+    /**
+     *
+     * After a single quote or double quote string, advance the $current_index to the end of the string
+     *
+     * @param string $statement
+     * @param array $values
+     * @param string $final_statement
+     * @param array $final_values
+     * @param int $current_index
+     * @param string $current_character
+     * @param int $last_index
+     * @param string $charset
+     * @param int $num
+     * @param int $count
+     *
+     * @return array
+     */
+    protected function handleQuotedString($statement, $values, $final_statement, $final_values, $current_index, $current_character, $last_index, $charset, $num, $count)
+    {
+        $length = $this->getQuotedStringLength($statement, $current_index, $current_character, $charset);
+        $final_statement .= mb_substr($statement, $current_index, $length, $charset);
+        $current_index += $length;
+        return array($final_statement, $final_values, $current_index, $num, $count);
+    }
+
+    /**
+     *
+     * Check if a ':' colon character is followed by what can be a named placeholder.
+     *
+     * @param string $statement
+     * @param array $values
+     * @param string $final_statement
+     * @param array $final_values
+     * @param int $current_index
+     * @param string $current_character
+     * @param int $last_index
+     * @param string $charset
+     * @param int $num
+     * @param int $count
+     *
+     * @return array
+     */
+    protected function handleColon($statement, $values, $final_statement, $final_values, $current_index, $current_character, $last_index, $charset, $num, $count)
+    {
+        $last_colon = $current_index;
+        while (mb_substr($statement, $last_colon + 1, 1, $charset) === ':') {
+            $current_character .= ':';
+            $last_colon ++;
+        }
+        if ($last_colon == $current_index) {
+            // Named placeholder
+            mb_regex_encoding($charset);
+            $end_of_placeholder_index = $last_index;
+            if (mb_ereg_search_init($statement) !== false) {
+                $end_of_placeholder_index = $last_index + 1;
+                mb_ereg_search_setpos($current_index + 1);
+                if (mb_ereg_search('\\W')) {
+                    $pos = mb_ereg_search_getpos();
+                    $end_of_placeholder_index = $pos - 1;
+                }
+            }
+
+            $sub = mb_substr($statement, $current_index, $end_of_placeholder_index - $current_index);
+            list($sub, $final_values) = $this->prepareNamedPlaceholder($sub, $values, $final_values, $charset);
+            $final_statement .= $sub;
+            $current_index = $end_of_placeholder_index;
+        }
+        else {
+            $final_statement .= $current_character;
+            $current_index = $last_colon + 1;
+        }
+
+        return array($final_statement, $final_values, $current_index, $num, $count);
+    }
+
+    /**
+     *
+     * Replace a question mark by multiple question marks if a numbered placeholder contains an array
+     *
+     * @param string $statement
+     * @param array $values
+     * @param string $final_statement
+     * @param array $final_values
+     * @param int $current_index
+     * @param string $current_character
+     * @param int $last_index
+     * @param string $charset
+     * @param int $num
+     * @param int $count
+     *
+     * @return array
+     */
+    protected function handleQuestionMark($statement, $values, $final_statement, $final_values, $current_index, $current_character, $last_index, $charset, $num, $count)
+    {
+        list($sub, $final_values, $num, $count) = $this->prepareNumberedPlaceholder($values, $num, $final_values, $count);
+        $final_statement .= $sub;
+        $current_index ++;
+        return array($final_statement, $final_values, $current_index, $num, $count);
     }
 }
