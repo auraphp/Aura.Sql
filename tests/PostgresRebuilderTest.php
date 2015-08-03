@@ -54,4 +54,26 @@ class PostgresRebuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($expect, $actual);
         $this->assertEquals($expected_values, $values);
     }
+
+    public function testDollarButNotStringIdentifier()
+    {
+        $stm = 'SELECT $a $ :list $a$ FROM pdotest';
+        $values =  array(
+            'list' => array(1, 2, 3),
+        );
+
+        $rebuilder = new PostgresRebuilder();
+
+        list($actual, $values) = $rebuilder->rebuildStatement($stm, $values);
+
+        $expect = str_replace(':list', ':list_0, :list_1, :list_2', $stm);
+        $expected_values = array(
+            'list_0' => 1,
+            'list_1' => 2,
+            'list_2' => 3,
+        );
+        $this->assertSame($expect, $actual);
+        $this->assertEquals($expected_values, $values);
+    }
+
 }
