@@ -41,6 +41,23 @@ class RebuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($expect, $actual);
     }
 
+    public function testUnclosedMultiLineComment()
+    {
+        $stm = "SELECT *
+                FROM pdotest
+                /* Don't bind :foo";
+        $values =  array(
+            'foo' => array('should', 'be', 'left', 'alone'),
+        );
+
+        $rebuilder = new Rebuilder();
+
+        list($actual, $values) = $rebuilder->rebuildStatement($stm, $values);
+
+        $expect = $stm;
+        $this->assertSame($expect, $actual);
+    }
+
     public function testMinusCharacter()
     {
         $stm = "SELECT - :foo
