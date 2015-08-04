@@ -183,7 +183,7 @@ class Rebuilder implements RebuilderInterface
      */
     protected function prepareNamedPlaceholder($sub, $values, $final_values, $charset)
     {
-        $name = mb_substr($sub, 1, null, $charset);
+        $name = mb_substr($sub, 1, mb_strlen($sub, $charset) - 1, $charset);
 
         // is the corresponding data element an array?
         $bind_array = isset($values[$name])
