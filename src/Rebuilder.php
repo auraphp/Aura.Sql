@@ -102,7 +102,7 @@ class Rebuilder implements RebuilderInterface
             $current_character = mb_substr($statement, $current_index, 1, $charset);
             if (isset($this->statementPartsHandlers[$current_character])) {
                 $handler = $this->statementPartsHandlers[$current_character];
-                list($final_statement, $final_values, $current_index, $num, $count) = $handler(
+                list($final_statement, $final_values, $current_index, $num, $count) = call_user_func($handler,
                     $statement,
                     $values,
                     $final_statement,
