@@ -2,6 +2,7 @@
 namespace Aura\Sql;
 
 use PDO;
+use Rebuilder;
 
 class ExtendedPdoTest extends AbstractExtendedPdoTest
 {
@@ -30,5 +31,11 @@ class ExtendedPdoTest extends AbstractExtendedPdoTest
         // reconnect
         $this->pdo->connect();
         $this->assertTrue($this->pdo->isConnected());
+    }
+
+    public function testGetDefaultBuilder()
+    {
+        $builder = $this->pdo->getRebuilder();
+        $this->assertInstanceOf('Aura\Sql\Rebuilder', $builder);
     }
 }

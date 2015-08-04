@@ -977,7 +977,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
         }
 
         // rebuild the statement and values
-        $rebuilder = new Rebuilder();
+        $rebuilder = $this->getRebuilder();
         list($statement, $values) = $rebuilder->rebuildStatement($statement, $values);
 
         // prepare the statement
@@ -990,6 +990,21 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
 
         // done
         return $sth;
+    }
+
+    /**
+     *
+     * Get a statement rebuilder depending on the current connection driver.
+     *
+     * @return RebuilderInterface
+     */
+    public function getRebuilder()
+    {
+        $driver = $this->pdo ? $this->pdo->getAttribute(\PDO::ATTR_DRIVER_NAME) : '';
+        if ($driver === 'pgsql') {
+            return new PostgresRebuilder();
+        }
+        return new Rebuilder();
     }
 
     /**
