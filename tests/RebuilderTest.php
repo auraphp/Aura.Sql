@@ -24,6 +24,39 @@ class RebuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($expect, $actual);
     }
 
+    public function testSingleLineCommentAsLastLine()
+    {
+        $stm = "SELECT *
+                FROM pdotest
+                -- Don't bind :foo";
+        $values =  array(
+            'foo' => array('should', 'be', 'left', 'alone'),
+        );
+
+        $rebuilder = new Rebuilder();
+
+        list($actual, $values) = $rebuilder->rebuildStatement($stm, $values);
+
+        $expect = $stm;
+        $this->assertSame($expect, $actual);
+    }
+
+    public function testMinusCharacter()
+    {
+        $stm = "SELECT - :foo
+                FROM pdotest";
+        $values =  array(
+            'foo' => array('should', 'be', 'left', 'alone'),
+        );
+
+        $rebuilder = new Rebuilder();
+
+        list($actual, $values) = $rebuilder->rebuildStatement($stm, $values);
+
+        $expect = str_replace(':foo', ':foo_0, :foo_1, :foo_2, :foo_3', $stm);
+        $this->assertSame($expect, $actual);
+    }
+
     public function testBindNullFirstParameter ()
     {
         $rebuilder = new Rebuilder();
@@ -91,6 +124,39 @@ class RebuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($stm, $result);
 
         $stm = 'SELECT "this :bar \\\\\\"should not\\\\\\" be :foo modified" FROM pdotest';
+        list($result, $returnedValues) = $rebuilder->rebuildStatement($stm, $values);
+        $this->assertSame($stm, $result);
+    }
+
+    public function testMultiColon()
+    {
+        $stm = "SELECT ::foo  FROM pdotest";
+        $values =  array(
+            'foo' => array('should', 'be', 'left', 'alone'),
+        );
+        $rebuilder = new Rebuilder();
+
+        list($result, $returnedValues) = $rebuilder->rebuildStatement($stm, $values);
+
+        $this->assertSame($stm, $result);
+
+        $stm = "SELECT :::foo  FROM pdotest";
+        list($result, $returnedValues) = $rebuilder->rebuildStatement($stm, $values);
+        $this->assertSame($stm, $result);
+    }
+
+    public function testUnfinishedCharacterString ()
+    {
+        $values =  array(
+            'foo' => array('should', 'be', 'left', 'alone'),
+        );
+        $rebuilder = new Rebuilder();
+
+        $stm = "SELECT 'this :foo shouldn''t be modified";
+        list($result, $returnedValues) = $rebuilder->rebuildStatement($stm, $values);
+        $this->assertSame($stm, $result);
+
+        $stm = 'SELECT "this :foo should not be modified';
         list($result, $returnedValues) = $rebuilder->rebuildStatement($stm, $values);
         $this->assertSame($stm, $result);
     }
