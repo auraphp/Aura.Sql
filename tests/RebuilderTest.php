@@ -60,17 +60,33 @@ class RebuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testMinusCharacter()
     {
-        $stm = "SELECT - :foo
+        $stm = "SELECT -:foo
                 FROM pdotest";
         $values =  array(
-            'foo' => array('should', 'be', 'left', 'alone'),
+            'foo' => array(2),
         );
 
         $rebuilder = new Rebuilder();
 
         list($actual, $values) = $rebuilder->rebuildStatement($stm, $values);
 
-        $expect = str_replace(':foo', ':foo_0, :foo_1, :foo_2, :foo_3', $stm);
+        $expect = str_replace(':foo', ':foo_0', $stm);
+        $this->assertSame($expect, $actual);
+    }
+
+    public function testSlashCharacter()
+    {
+        $stm = "SELECT 2 / :foo
+                FROM pdotest";
+        $values =  array(
+            'foo' => array(4),
+        );
+
+        $rebuilder = new Rebuilder();
+
+        list($actual, $values) = $rebuilder->rebuildStatement($stm, $values);
+
+        $expect = str_replace(':foo', ':foo_0', $stm);
         $this->assertSame($expect, $actual);
     }
 
