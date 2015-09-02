@@ -8,6 +8,8 @@
  */
 namespace Aura\Sql;
 
+use Aura\Sql\Exception\MissingParameter;
+
 /**
  *
  * This support class for ExtendedPdo rebuilds an SQL statement for automatic
@@ -202,6 +204,7 @@ class Rebuilder
      *
      * @return string The prepared query subpart.
      *
+     * @throws MissingParameter
      */
     protected function prepareNumberedPlaceholder($sub)
     {
@@ -217,6 +220,9 @@ class Rebuilder
         } else {
             // increase the count of numbered placeholders to be bound
             $this->count ++;
+            if (array_key_exists($this->num, $this->values) === false) {
+                throw new MissingParameter('Parameter ' . $this->num . ' is missing from the bound values');
+            }
             $this->final_values[$this->count] = $this->values[$this->num];
         }
 
