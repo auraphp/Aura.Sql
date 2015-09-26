@@ -185,7 +185,7 @@ abstract class AbstractExtendedPdoTest extends \PHPUnit_Framework_TestCase
             'bar' => 'WRONG',
         ));
 
-        $expect = str_replace(':list', ":list_0, :list_1, :list_2, :list_3, :list_4", $stm);
+        $expect = str_replace(':list', ":list, :list_0, :list_1, :list_2, :list_3", $stm);
         $actual = $sth->queryString;
         $this->assertSame($expect, $actual);
     }

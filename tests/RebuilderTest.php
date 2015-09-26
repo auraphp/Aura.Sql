@@ -63,15 +63,18 @@ class RebuilderTest extends \PHPUnit_Framework_TestCase
         $stm = "SELECT -:foo
                 FROM pdotest";
         $values =  array(
-            'foo' => array(2),
+            'foo' => array(2, 3),
         );
 
         $rebuilder = new Rebuilder();
 
         list($actual, $values) = $rebuilder->rebuildStatement($stm, $values);
 
-        $expect = str_replace(':foo', ':foo_0', $stm);
+        $expect = str_replace(':foo', ':foo, :foo_0', $stm);
         $this->assertSame($expect, $actual);
+
+        $expectedValues = array('foo' => 2, 'foo_0' => 3);
+        $this->assertSame($expectedValues, $values);
     }
 
     public function testSlashCharacter()
@@ -79,15 +82,18 @@ class RebuilderTest extends \PHPUnit_Framework_TestCase
         $stm = "SELECT 2 / :foo
                 FROM pdotest";
         $values =  array(
-            'foo' => array(4),
+            'foo' => array(4, 5),
         );
 
         $rebuilder = new Rebuilder();
 
         list($actual, $values) = $rebuilder->rebuildStatement($stm, $values);
 
-        $expect = str_replace(':foo', ':foo_0', $stm);
+        $expect = str_replace(':foo', ':foo, :foo_0', $stm);
         $this->assertSame($expect, $actual);
+
+        $expectedValues = array('foo' => 4, 'foo_0' => 5);
+        $this->assertSame($expectedValues, $values);
     }
 
     public function testBindNullFirstParameter ()
@@ -178,6 +184,16 @@ class RebuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($stm, $result);
     }
 
+    public function testColonWithoutIdentifier()
+    {
+        $stm = "SELECT : FROM pdotest";
+        $rebuilder = new Rebuilder();
+
+        list($result, $returnedValues) = $rebuilder->rebuildStatement($stm);
+
+        $this->assertSame($stm, $result);
+    }
+
     public function testUnfinishedCharacterString ()
     {
         $values =  array(
@@ -192,5 +208,14 @@ class RebuilderTest extends \PHPUnit_Framework_TestCase
         $stm = 'SELECT "this :foo should not be modified';
         list($result, $returnedValues) = $rebuilder->rebuildStatement($stm, $values);
         $this->assertSame($stm, $result);
+    }
+
+    public function testInfiniteLoop()
+    {
+        $rebuilder = new Rebuilder();
+        $stm = "T";
+        $rebuilder->registerStatementPartsHandler("T", function($state){return $state;});
+        $this->setExpectedException('Exception');
+        $rebuilder->rebuildStatement($stm);
     }
 }

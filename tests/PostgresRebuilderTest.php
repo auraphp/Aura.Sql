@@ -51,11 +51,11 @@ class PostgresRebuilderTest extends \PHPUnit_Framework_TestCase
 
         list($actual, $actual_values) = $rebuilder->rebuildStatement($stm, $values);
 
-        $expect = str_replace(':list', ':list_0, :list_1, :list_2', $stm);
+        $expect = str_replace(':list', ':list, :list_0, :list_1', $stm);
         $expected_values = array(
-            'list_0' => 1,
-            'list_1' => 2,
-            'list_2' => 3,
+            'list' => 1,
+            'list_0' => 2,
+            'list_1' => 3,
         );
         $this->assertSame($expect, $actual);
         $this->assertEquals($expected_values, $actual_values);
@@ -72,11 +72,11 @@ class PostgresRebuilderTest extends \PHPUnit_Framework_TestCase
 
         list($actual, $values) = $rebuilder->rebuildStatement($stm, $values);
 
-        $expect = str_replace(':list', ':list_0, :list_1, :list_2', $stm);
+        $expect = str_replace(':list', ':list, :list_0, :list_1', $stm);
         $expected_values = array(
-            'list_0' => 1,
-            'list_1' => 2,
-            'list_2' => 3,
+            'list' => 1,
+            'list_0' => 2,
+            'list_1' => 3,
         );
         $this->assertSame($expect, $actual);
         $this->assertEquals($expected_values, $values);

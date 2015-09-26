@@ -31,6 +31,7 @@ interface RebuilderInterface
      * @return array An array where element 0 is the rebuilt statement and
      * element 1 is the rebuilt array of values.
      *
+     * @throw Exception
      */
     public function rebuildStatement($statement, $values = array(), $charset = 'UTF-8');
 }
