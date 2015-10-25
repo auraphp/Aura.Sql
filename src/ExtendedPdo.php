@@ -154,6 +154,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
             $this->options = $options;
             $this->attributes = array_replace($this->attributes, $attributes);
         }
+        $this->rebuilder = new LegacyRebuilder();
     }
 
     /**
@@ -977,8 +978,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
         }
 
         // rebuild the statement and values
-        $rebuilder = new Rebuilder($this);
-        list($statement, $values) = $rebuilder->__invoke($statement, $values);
+        list($statement, $values) = $this->rebuilder->rebuildStatement($statement, $values);
 
         // prepare the statement
         $sth = $this->prepare($statement);
@@ -990,6 +990,23 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
 
         // done
         return $sth;
+    }
+
+
+    /**
+     *
+     * Set a specific rebuilder to handle the queries and returns the current rebuilder
+     *
+     * @param RebuilderInterface $rebuilder
+     *
+     * @return Rebuilder
+     *
+     */
+    public function setRebuilder(RebuilderInterface $rebuilder)
+    {
+        $oldRebuilder = $this->rebuilder;
+        $this->rebuilder = $rebuilder;
+        return $oldRebuilder;
     }
 
     /**

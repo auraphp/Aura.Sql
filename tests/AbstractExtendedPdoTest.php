@@ -174,7 +174,7 @@ abstract class AbstractExtendedPdoTest extends \PHPUnit_Framework_TestCase
 
     public function testPrepareWithValues()
     {
-        $stm = "SELECT * FROM pdotest
+        $stm = " SELECT * FROM pdotest
                  WHERE 'leave '':foo'' alone'
                  AND id IN (:list)
                  AND \"leave '':bar' alone\"";
@@ -185,7 +185,7 @@ abstract class AbstractExtendedPdoTest extends \PHPUnit_Framework_TestCase
             'bar' => 'WRONG',
         ));
 
-        $expect = str_replace(':list', "'1', '2', '3', '4', '5'", $stm);
+        $expect = str_replace(':list', ":list, :list_0, :list_1, :list_2, :list_3", $stm);
         $actual = $sth->queryString;
         $this->assertSame($expect, $actual);
     }
@@ -603,12 +603,5 @@ abstract class AbstractExtendedPdoTest extends \PHPUnit_Framework_TestCase
             "Cannot bind value of type 'object' to placeholder 'id'"
         );
         $sth = $this->pdo->prepareWithValues($stm, array('id' => new StdClass));
-    }
-
-    public function testBindNullFirstParameter ()
-    {
-        $rebuilder = new Rebuilder($this->newExtendedPdo());
-        $result = $rebuilder('SELECT * FROM test WHERE column_one = ?', array(null));
-        $this->assertTrue(array_key_exists(1, $result[1]));
     }
 }

@@ -4,11 +4,13 @@ namespace Aura\Sql;
 use PDO;
 use Rebuilder;
 
-class ExtendedPdoTest extends AbstractExtendedPdoTest
+class RebuilderPDOTest extends AbstractExtendedPdoTest
 {
     protected function newExtendedPdo()
     {
-        return new ExtendedPdo('sqlite::memory:');
+        $pdo = new ExtendedPdo('sqlite::memory:');
+        $pdo->setRebuilder(new \Aura\Sql\Rebuilder());
+        return $pdo;
     }
 
     public function testGetPdo()
