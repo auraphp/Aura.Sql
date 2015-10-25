@@ -7,6 +7,7 @@
  *
  */
 namespace Aura\Sql;
+use Aura\Sql\Exception\MissingParameter;
 
 /**
  *
@@ -339,10 +340,16 @@ class RebuilderState
      * Returns the last unused numbered parameter value
      *
      * @return $value
+     *
+     * @throws MissingParameter
+     *
      */
     public function getFirstUnusedNumberedValue()
     {
-        $value = isset($this->values[$this->numbered_placeholder_index]) ? $this->values[$this->numbered_placeholder_index] : null;
+        if (array_key_exists($this->numbered_placeholder_index, $this->values) === false) {
+            throw new MissingParameter('Parameter ' . $this->numbered_placeholder_index . ' is missing from the bound values');
+        }
+        $value = $this->values[$this->numbered_placeholder_index];
         $this->numbered_placeholder_index ++;
         return $value;
     }

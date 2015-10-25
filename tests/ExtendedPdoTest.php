@@ -32,10 +32,4 @@ class ExtendedPdoTest extends AbstractExtendedPdoTest
         $this->pdo->connect();
         $this->assertTrue($this->pdo->isConnected());
     }
-
-    public function testGetDefaultBuilder()
-    {
-        $builder = $this->pdo->getRebuilder();
-        $this->assertInstanceOf('Aura\Sql\Rebuilder', $builder);
-    }
 }

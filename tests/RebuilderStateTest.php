@@ -171,16 +171,19 @@ class RebuilderStateTest extends \PHPUnit_Framework_TestCase
         $this->assertSame("foo", $state->getFirstUnusedNumberedValue());
         $this->assertSame("bar", $state->getFirstUnusedNumberedValue());
         $this->assertSame("baz", $state->getFirstUnusedNumberedValue());
-        $this->assertNull($state->getFirstUnusedNumberedValue());
+        $this->setExpectedException('Aura\\Sql\\Exception\\MissingParameter');
+        $state->getFirstUnusedNumberedValue();
 
         $values = array("foo" => 1);
         $state = new RebuilderState($stmt, $values);
-        $this->assertNull($state->getFirstUnusedNumberedValue());
+        $this->setExpectedException('Aura\\Sql\\Exception\\MissingParameter');
+        $state->getFirstUnusedNumberedValue();
 
         $values = array("fizz" => 1, "buzz");
         $state = new RebuilderState($stmt, $values);
         $this->assertSame("buzz", $state->getFirstUnusedNumberedValue());
-        $this->assertNull($state->getFirstUnusedNumberedValue());
+        $this->setExpectedException('Aura\\Sql\\Exception\\MissingParameter');
+        $state->getFirstUnusedNumberedValue();
     }
 
     public function testStoreNumberedValue()

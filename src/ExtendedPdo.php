@@ -154,6 +154,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
             $this->options = $options;
             $this->attributes = array_replace($this->attributes, $attributes);
         }
+        $this->rebuilder = new LegacyRebuilder();
     }
 
     /**
@@ -977,8 +978,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
         }
 
         // rebuild the statement and values
-        $rebuilder = $this->getRebuilder();
-        list($statement, $values) = $rebuilder->rebuildStatement($statement, $values);
+        list($statement, $values) = $this->rebuilder->rebuildStatement($statement, $values);
 
         // prepare the statement
         $sth = $this->prepare($statement);
@@ -992,19 +992,21 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
         return $sth;
     }
 
+
     /**
      *
-     * Get a statement rebuilder depending on the current connection driver.
+     * Set a specific rebuilder to handle the queries and returns the current rebuilder
      *
-     * @return RebuilderInterface
+     * @param RebuilderInterface $rebuilder
+     *
+     * @return Rebuilder
+     *
      */
-    public function getRebuilder()
+    public function setRebuilder(RebuilderInterface $rebuilder)
     {
-        $driver = $this->pdo ? $this->pdo->getAttribute(\PDO::ATTR_DRIVER_NAME) : '';
-        if ($driver === 'pgsql') {
-            return new PostgresRebuilder();
-        }
-        return new Rebuilder();
+        $oldRebuilder = $this->rebuilder;
+        $this->rebuilder = $rebuilder;
+        return $oldRebuilder;
     }
 
     /**
