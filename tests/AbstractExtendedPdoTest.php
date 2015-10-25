@@ -543,6 +543,13 @@ abstract class AbstractExtendedPdoTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(3, count($res));
     }
 
+    public function testNumberedPlaceholderMissing()
+    {
+        $this->setExpectedException('Aura\Sql\Exception\\MissingParameter');
+        $stm = "SELECT id, name FROM pdotest WHERE id = ? OR id = ?";
+        $this->pdo->fetchOne($stm, array(1));
+    }
+
     public function testZeroIndexedPlaceholders()
     {
         $stm = 'SELECT * FROM pdotest WHERE id IN (?, ?, ?)';
