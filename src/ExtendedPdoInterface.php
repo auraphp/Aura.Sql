@@ -50,13 +50,10 @@ interface ExtendedPdoInterface extends PdoInterface
      *
      * @param array $values Values to bind to the query.
      *
-     * @param callable $callable A callable to be applied to each of the rows
-     * to be returned.
-     *
      * @return array
      *
      */
-    public function fetchAll($statement, array $values = array(), $callable = null);
+    public function fetchAll($statement, array $values = array());
 
     /**
      *
@@ -71,13 +68,10 @@ interface ExtendedPdoInterface extends PdoInterface
      *
      * @param array $values Values to bind to the query.
      *
-     * @param callable $callable A callable to be applied to each of the rows
-     * to be returned.
-     *
      * @return array
      *
      */
-    public function fetchAssoc($statement, array $values = array(), $callable = null);
+    public function fetchAssoc($statement, array $values = array());
 
     /**
      *
@@ -87,13 +81,10 @@ interface ExtendedPdoInterface extends PdoInterface
      *
      * @param array $values Values to bind to the query.
      *
-     * @param callable $callable A callable to be applied to each of the rows
-     * to be returned.
-     *
      * @return array
      *
      */
-    public function fetchCol($statement, array $values = array(), $callable = null);
+    public function fetchCol($statement, array $values = array());
 
     /**
      *
@@ -175,15 +166,12 @@ interface ExtendedPdoInterface extends PdoInterface
      *
      * @param string $statement The SQL statement to prepare and execute.
      *
-     * @param callable $callable A callable to be applied to each of the rows
-     * to be returned.
-     *
      * @param array $values Values to bind to the query.
      *
      * @return array
      *
      */
-    public function fetchPairs($statement, array $values = array(), $callable = null);
+    public function fetchPairs($statement, array $values = array());
 
     /**
      *
@@ -200,6 +188,82 @@ interface ExtendedPdoInterface extends PdoInterface
 
     /**
      *
+     * Yields rows from the database
+     *
+     * @param string $statement The SQL statement to prepare and execute.
+     *
+     * @param array $values Values to bind to the query.
+     *
+     * @return array
+     *
+     */
+    public function yieldAll($statement, array $values = array());
+
+    /**
+     *
+     * Yields rows from the database keyed on the first column of each row.
+     *
+     * @param string $statement The SQL statement to prepare and execute.
+     *
+     * @param array $values Values to bind to the query.
+     *
+     * @return array
+     *
+     */
+    public function yieldAssoc($statement, array $values = [ ]);
+
+    /**
+     *
+     * Yields the first column of all rows
+     *
+     * @param string $statement The SQL statement to prepare and execute.
+     *
+     * @param array $values Values to bind to the query.
+     *
+     * @return array
+     *
+     */
+    public function yieldCol($statement, array $values = [ ]);
+
+    /**
+     *
+     * Yields objects where the column values are mapped to object properties.
+     *
+     * Warning: PDO "injects property-values BEFORE invoking the constructor -
+     * in other words, if your class initializes property-values to defaults
+     * in the constructor, you will be overwriting the values injected by
+     * fetchObject() !"
+     * <http://www.php.net/manual/en/pdostatement.fetchobject.php#111744>
+     *
+     * @param string $statement The SQL statement to prepare and execute.
+     *
+     * @param array $values Values to bind to the query.
+     *
+     * @param string $class_name The name of the class to create from each
+     * row.
+     *
+     * @param array $ctor_args Arguments to pass to each object constructor.
+     *
+     * @return array
+     *
+     */
+    public function yieldObjects($statement, array $values = [ ], $class_name = 'StdClass', array $ctor_args = [ ]);
+
+    /**
+     *
+     * Yields key-value pairs (first column is the key, second column is the value).
+     *
+     * @param string $statement The SQL statement to prepare and execute.
+     *
+     * @param array $values Values to bind to the query.
+     *
+     * @return array
+     *
+     */
+    public function yieldPairs($statement, array $values = [ ]);
+
+    /**
+     *
      * Returns the DSN for a lazy connection; if the underlying PDO instance
      * was injected at construction time, this will be null.
      *
@@ -212,7 +276,7 @@ interface ExtendedPdoInterface extends PdoInterface
      *
      * Returns the underlying PDO connection object.
      *
-     * @return PDO or Null if connection was manually disconnected
+     * @return \PDO or Null if connection was manually disconnected
      *
      */
     public function getPdo();
