@@ -67,7 +67,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      * @var array
      *
      */
-    protected $options = array();
+    protected $options = [];
 
     /**
      *
@@ -85,7 +85,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      * @var array
      *
      */
-    protected $profile = array();
+    protected $profile = [];
 
     /**
      *
@@ -141,8 +141,8 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
         $dsn,
         $username = null,
         $password = null,
-        array $options = array(),
-        array $attributes = array()
+        array $options = [],
+        array $attributes = []
     ) {
         if ($dsn instanceof PDO) {
             $this->pdo = $dsn;
@@ -198,7 +198,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      *
      * @return null
      *
-     * @throws PDOException if the connection fails.
+     * @throws \PDOException if the connection fails.
      *
      */
     public function connect()
@@ -301,7 +301,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      * @return int
      *
      */
-    public function fetchAffected($statement, array $values = array())
+    public function fetchAffected($statement, array $values = [])
     {
         $sth = $this->perform($statement, $values);
         return $sth->rowCount();
@@ -316,75 +316,13 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      *
      * @param array $values Values to bind to the query.
      *
-     * @param callable $callable A callable to be applied to each of the rows
-     * to be returned.
-     *
      * @return array
      *
      */
-    public function fetchAll(
-        $statement,
-        array $values = array(),
-        $callable = null
-    ) {
-        return $this->fetchAllWithCallable(
-            self::FETCH_ASSOC,
-            $statement,
-            $values,
-            $callable
-        );
-    }
-
-    /**
-     *
-     * Support for fetchAll() and fetchCol().
-     *
-     * @param string $fetch_type A PDO FETCH_* constant.
-     *
-     * @param string $statement The SQL statement to prepare and execute.
-     *
-     * @param array $values Values to bind to the query.
-     *
-     * @param callable $callable A callable to be applied to each of the rows
-     * to be returned.
-     *
-     * @return array
-     *
-     */
-    protected function fetchAllWithCallable(
-        $fetch_type,
-        $statement,
-        array $values = array(),
-        $callable = null
-    ) {
-        $sth = $this->perform($statement, $values);
-        if ($fetch_type == self::FETCH_COLUMN) {
-            $data = $sth->fetchAll($fetch_type, 0);
-        } else {
-            $data = $sth->fetchAll($fetch_type);
-        }
-        return $this->applyCallableToFetchAll($callable, $data);
-    }
-
-    /**
-     *
-     * Applies a callable to a data set.
-     *
-     * @param callable|null $callable The callable to apply, if any.
-     *
-     * @param array $data The data set.
-     *
-     * @return array
-     *
-     */
-    protected function applyCallableToFetchAll($callable, $data)
+    public function fetchAll($statement, array $values = [])
     {
-        if ($callable) {
-            foreach ($data as $key => $row) {
-                $data[$key] = call_user_func($callable, $row);
-            }
-        }
-        return $data;
+        $sth = $this->perform($statement, $values);
+        return $sth->fetchAll(self::FETCH_ASSOC);
     }
 
     /**
@@ -400,29 +338,16 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      *
      * @param array $values Values to bind to the query.
      *
-     * @param callable $callable A callable to be applied to each of the rows
-     * to be returned.
-     *
      * @return array
      *
      */
-    public function fetchAssoc(
-        $statement,
-        array $values = array(),
-        $callable = null
-    ) {
-        $sth = $this->perform($statement, $values);
-
-        if (! $callable) {
-            $callable = function ($row) { return $row; };
-        }
-
-        $data = array();
+    public function fetchAssoc($statement, array $values = [])
+    {
+        $sth  = $this->perform($statement, $values);
+        $data = [];
         while ($row = $sth->fetch(self::FETCH_ASSOC)) {
-            $key = current($row);
-            $data[$key] = call_user_func($callable, $row);
+            $data[current($row)] = $row;
         }
-
         return $data;
     }
 
@@ -434,23 +359,12 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      *
      * @param array $values Values to bind to the query.
      *
-     * @param callable $callable A callable to be applied to each of the rows
-     * to be returned.
-     *
      * @return array
      *
      */
-    public function fetchCol(
-        $statement,
-        array $values = array(),
-        $callable = null
-    ) {
-        return $this->fetchAllWithCallable(
-            self::FETCH_COLUMN,
-            $statement,
-            $values,
-            $callable
-        );
+    public function fetchCol($statement, array $values = []) {
+        $sth = $this->perform($statement, $values);
+        return $sth->fetchAll(self::FETCH_COLUMN, 0);
     }
 
     /**
@@ -477,9 +391,9 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      */
     public function fetchObject(
         $statement,
-        array $values = array(),
+        array $values = [],
         $class_name = 'StdClass',
-        array $ctor_args = array()
+        array $ctor_args = []
     ) {
         $sth = $this->perform($statement, $values);
 
@@ -516,9 +430,9 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      */
     public function fetchObjects(
         $statement,
-        array $values = array(),
+        array $values = [],
         $class_name = 'StdClass',
-        array $ctor_args = array()
+        array $ctor_args = []
     ) {
         $sth = $this->perform($statement, $values);
 
@@ -540,7 +454,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      * @return array
      *
      */
-    public function fetchOne($statement, array $values = array())
+    public function fetchOne($statement, array $values = [])
     {
         $sth = $this->perform($statement, $values);
         return $sth->fetch(self::FETCH_ASSOC);
@@ -553,32 +467,15 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      *
      * @param string $statement The SQL statement to prepare and execute.
      *
-     * @param callable $callable A callable to be applied to each of the rows
-     * to be returned.
-     *
      * @param array $values Values to bind to the query.
      *
      * @return array
      *
      */
-    public function fetchPairs(
-        $statement,
-        array $values = array(),
-        $callable = null
-    ) {
+    public function fetchPairs($statement, array $values = [])
+    {
         $sth = $this->perform($statement, $values);
-        if ($callable) {
-            $data = array();
-            while ($row = $sth->fetch(self::FETCH_NUM)) {
-                // apply the callback first so the key can be modified
-                $row = call_user_func($callable, $row);
-                // now retain the data
-                $data[$row[0]] = $row[1];
-            }
-        } else {
-            $data = $sth->fetchAll(self::FETCH_KEY_PAIR);
-        }
-        return $data;
+        return $sth->fetchAll(self::FETCH_KEY_PAIR);
     }
 
     /**
@@ -592,7 +489,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      * @return mixed
      *
      */
-    public function fetchValue($statement, array $values = array())
+    public function fetchValue($statement, array $values = [])
     {
         $sth = $this->perform($statement, $values);
         return $sth->fetchColumn(0);
@@ -615,11 +512,123 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      */
     public function fetchGroup(
         $statement,
-        array $values = array(),
+        array $values = [],
         $style = self::FETCH_COLUMN
     ) {
         $sth = $this->perform($statement, $values);
         return $sth->fetchAll(self::FETCH_GROUP | $style);
+    }
+
+    /**
+     *
+     * Yields rows from the database
+     *
+     * @param string $statement The SQL statement to prepare and execute.
+     *
+     * @param array $values Values to bind to the query.
+     *
+     * @return array
+     *
+     */
+    public function yieldAll($statement, array $values = []) {
+        $sth = $this->perform($statement, $values);
+        while ($row = $sth->fetch(self::FETCH_ASSOC)) {
+            yield $row;
+        }
+    }
+
+    /**
+     *
+     * Yields rows from the database keyed on the first column of each row.
+     *
+     * @param string $statement The SQL statement to prepare and execute.
+     *
+     * @param array $values Values to bind to the query.
+     *
+     * @return array
+     *
+     */
+    public function yieldAssoc($statement, array $values = [])
+    {
+        $sth = $this->perform($statement, $values);
+        while ($row = $sth->fetch(self::FETCH_ASSOC)) {
+            $key = current($row);
+            yield $key => $row;
+        }
+    }
+
+    /**
+     *
+     * Yields the first column of all rows
+     *
+     * @param string $statement The SQL statement to prepare and execute.
+     *
+     * @param array $values Values to bind to the query.
+     *
+     * @return array
+     *
+     */
+    public function yieldCol($statement, array $values = []) {
+        $sth = $this->perform($statement, $values);
+        while ($row = $sth->fetch(self::FETCH_NUM)) {
+            yield $row[0];
+        }
+    }
+
+    /**
+     *
+     * Yields objects where the column values are mapped to object properties.
+     *
+     * Warning: PDO "injects property-values BEFORE invoking the constructor -
+     * in other words, if your class initializes property-values to defaults
+     * in the constructor, you will be overwriting the values injected by
+     * fetchObject() !"
+     * <http://www.php.net/manual/en/pdostatement.fetchobject.php#111744>
+     *
+     * @param string $statement The SQL statement to prepare and execute.
+     *
+     * @param array $values Values to bind to the query.
+     *
+     * @param string $class_name The name of the class to create from each
+     * row.
+     *
+     * @param array $ctor_args Arguments to pass to each object constructor.
+     *
+     * @return array
+     *
+     */
+    public function yieldObjects($statement, array $values = [], $class_name = 'StdClass', array $ctor_args = [])
+    {
+        $sth = $this->perform($statement, $values);
+
+        if ($ctor_args) {
+            while ($instance = $sth->fetchObject($class_name, $ctor_args)) {
+                yield $instance;
+            }
+        } else {
+            while ($instance = $sth->fetchObject($class_name)) {
+                yield $instance;
+            }
+        }
+    }
+
+    /**
+     *
+     * Yields key-value pairs (first column is the key, second column is the value).
+     *
+     * @param string $statement The SQL statement to prepare and execute.
+     *
+     * @param array $values Values to bind to the query.
+     *
+     * @return array
+     *
+     */
+    public function yieldPairs($statement, array $values = [])
+    {
+        $sth = $this->perform($statement, $values);
+        while ($row = $sth->fetch(self::FETCH_NUM)) {
+            yield $row[0] => $row[1];
+        }
     }
 
     /**
@@ -741,7 +750,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      * @see quote()
      *
      */
-    public function perform($statement, array $values = array())
+    public function perform($statement, array $values = [])
     {
         $sth = $this->prepareWithValues($statement, $values);
         $this->beginProfile(__FUNCTION__);
@@ -764,7 +773,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      * @see http://php.net/manual/en/pdo.prepare.php
      *
      */
-    public function prepare($statement, $options = array())
+    public function prepare($statement, $options = [])
     {
         $this->connect();
         $this->beginProfile(__FUNCTION__);
@@ -800,7 +809,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
 
         // remove empty constructor params list if it exists
         $args = func_get_args();
-        if (count($args) === 4 && $args[3] === array()) {
+        if (count($args) === 4 && $args[3] === []) {
             unset($args[3]);
         }
 
@@ -929,7 +938,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      * @return null
      *
      */
-    protected function endProfile($statement = null, array $values = array())
+    protected function endProfile($statement = null, array $values = [])
     {
         // is there a profiler in place?
         if ($this->profiler) {
@@ -943,7 +952,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
         }
 
         // clear the starting profile info
-        $this->profile = array();
+        $this->profile = [];
     }
 
     /**
@@ -968,7 +977,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      * @see http://php.net/manual/en/pdo.prepare.php
      *
      */
-    public function prepareWithValues($statement, array $values = array())
+    public function prepareWithValues($statement, array $values = [])
     {
         // if there are no values to bind ...
         if (! $values) {
