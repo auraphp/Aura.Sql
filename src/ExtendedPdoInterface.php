@@ -39,7 +39,7 @@ interface ExtendedPdoInterface extends PdoInterface
      * @return array
      *
      */
-    public function fetchAffected($statement, array $values = array());
+    public function fetchAffected($statement, array $values = []);
 
     /**
      *
@@ -53,7 +53,7 @@ interface ExtendedPdoInterface extends PdoInterface
      * @return array
      *
      */
-    public function fetchAll($statement, array $values = array());
+    public function fetchAll($statement, array $values = []);
 
     /**
      *
@@ -71,7 +71,7 @@ interface ExtendedPdoInterface extends PdoInterface
      * @return array
      *
      */
-    public function fetchAssoc($statement, array $values = array());
+    public function fetchAssoc($statement, array $values = []);
 
     /**
      *
@@ -84,7 +84,7 @@ interface ExtendedPdoInterface extends PdoInterface
      * @return array
      *
      */
-    public function fetchCol($statement, array $values = array());
+    public function fetchCol($statement, array $values = []);
 
     /**
      *
@@ -110,9 +110,9 @@ interface ExtendedPdoInterface extends PdoInterface
      */
     public function fetchObject(
         $statement,
-        array $values = array(),
+        array $values = [],
         $class_name = 'StdClass',
-        array $ctor_args = array()
+        array $ctor_args = []
     );
 
     /**
@@ -141,9 +141,9 @@ interface ExtendedPdoInterface extends PdoInterface
      */
     public function fetchObjects(
         $statement,
-        array $values = array(),
+        array $values = [],
         $class_name = 'StdClass',
-        array $ctor_args = array()
+        array $ctor_args = []
     );
 
     /**
@@ -157,7 +157,7 @@ interface ExtendedPdoInterface extends PdoInterface
      * @return array
      *
      */
-    public function fetchOne($statement, array $values = array());
+    public function fetchOne($statement, array $values = []);
 
     /**
      *
@@ -171,7 +171,7 @@ interface ExtendedPdoInterface extends PdoInterface
      * @return array
      *
      */
-    public function fetchPairs($statement, array $values = array());
+    public function fetchPairs($statement, array $values = []);
 
     /**
      *
@@ -184,7 +184,7 @@ interface ExtendedPdoInterface extends PdoInterface
      * @return mixed
      *
      */
-    public function fetchValue($statement, array $values = array());
+    public function fetchValue($statement, array $values = []);
 
     /**
      *
@@ -197,7 +197,7 @@ interface ExtendedPdoInterface extends PdoInterface
      * @return array
      *
      */
-    public function yieldAll($statement, array $values = array());
+    public function yieldAll($statement, array $values = []);
 
     /**
      *
@@ -210,7 +210,7 @@ interface ExtendedPdoInterface extends PdoInterface
      * @return array
      *
      */
-    public function yieldAssoc($statement, array $values = [ ]);
+    public function yieldAssoc($statement, array $values = []);
 
     /**
      *
@@ -223,7 +223,7 @@ interface ExtendedPdoInterface extends PdoInterface
      * @return array
      *
      */
-    public function yieldCol($statement, array $values = [ ]);
+    public function yieldCol($statement, array $values = []);
 
     /**
      *
@@ -247,7 +247,7 @@ interface ExtendedPdoInterface extends PdoInterface
      * @return array
      *
      */
-    public function yieldObjects($statement, array $values = [ ], $class_name = 'StdClass', array $ctor_args = [ ]);
+    public function yieldObjects($statement, array $values = [], $class_name = 'StdClass', array $ctor_args = []);
 
     /**
      *
@@ -260,7 +260,7 @@ interface ExtendedPdoInterface extends PdoInterface
      * @return array
      *
      */
-    public function yieldPairs($statement, array $values = [ ]);
+    public function yieldPairs($statement, array $values = []);
 
     /**
      *
@@ -311,7 +311,7 @@ interface ExtendedPdoInterface extends PdoInterface
      * @return \PDOStatement
      *
      */
-    public function perform($statement, array $values = array());
+    public function perform($statement, array $values = []);
 
     /**
      *
