@@ -362,7 +362,8 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      * @return array
      *
      */
-    public function fetchCol($statement, array $values = []) {
+    public function fetchCol($statement, array $values = [])
+    {
         $sth = $this->perform($statement, $values);
         return $sth->fetchAll(self::FETCH_COLUMN, 0);
     }
@@ -530,7 +531,8 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      * @return array
      *
      */
-    public function yieldAll($statement, array $values = []) {
+    public function yieldAll($statement, array $values = [])
+    {
         $sth = $this->perform($statement, $values);
         while ($row = $sth->fetch(self::FETCH_ASSOC)) {
             yield $row;
@@ -568,7 +570,8 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      * @return array
      *
      */
-    public function yieldCol($statement, array $values = []) {
+    public function yieldCol($statement, array $values = [])
+    {
         $sth = $this->perform($statement, $values);
         while ($row = $sth->fetch(self::FETCH_NUM)) {
             yield $row[0];
