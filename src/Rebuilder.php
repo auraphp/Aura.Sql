@@ -24,7 +24,7 @@ class Rebuilder
      *
      * The calling ExtendedPdo object.
      *
-     * @var ExtendedPdo
+     * @var ExtendedPdoInterface
      *
      */
     protected $xpdo;
@@ -71,10 +71,10 @@ class Rebuilder
      *
      * Constructor.
      *
-     * @param ExtendedPdo $xpdo The calling ExtendedPdo object.
+     * @param ExtendedPdoInterface $xpdo The calling ExtendedPdo object.
      *
      */
-    public function __construct(ExtendedPdo $xpdo)
+    public function __construct(ExtendedPdoInterface $xpdo)
     {
         $this->xpdo = $xpdo;
     }

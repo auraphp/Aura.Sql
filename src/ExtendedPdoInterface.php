@@ -19,17 +19,6 @@ interface ExtendedPdoInterface extends PdoInterface
 {
     /**
      *
-     * Connects to the database and sets PDO attributes.
-     *
-     * @return null
-     *
-     * @throws \PDOException if the connection fails.
-     *
-     */
-    public function connect();
-
-    /**
-     *
      * Performs a statement and returns the number of affected rows.
      *
      * @param string $statement The SQL statement to prepare and execute.
@@ -188,6 +177,23 @@ interface ExtendedPdoInterface extends PdoInterface
 
     /**
      *
+     * Fetches multiple from the database as an associative array.
+     * The first column will be the index
+     *
+     * @param string $statement The SQL statement to prepare and execute.
+     *
+     * @param array $values Values to bind to the query.
+     *
+     * @param int $style a fetch style defaults to PDO::FETCH_COLUMN for single
+     *      values, use PDO::FETCH_NAMED when fetching a multiple columns
+     *
+     * @return array
+     *
+     */
+    public function fetchGroup($statement, array $values = [], $style = \PDO::FETCH_COLUMN);
+
+    /**
+     *
      * Yields rows from the database
      *
      * @param string $statement The SQL statement to prepare and execute.
@@ -264,43 +270,6 @@ interface ExtendedPdoInterface extends PdoInterface
 
     /**
      *
-     * Returns the DSN for a lazy connection; if the underlying PDO instance
-     * was injected at construction time, this will be null.
-     *
-     * @return string|null
-     *
-     */
-    public function getDsn();
-
-    /**
-     *
-     * Returns the underlying PDO connection object.
-     *
-     * @return \PDO or Null if connection was manually disconnected
-     *
-     */
-    public function getPdo();
-
-    /**
-     *
-     * Returns the profiler object.
-     *
-     * @return ProfilerInterface
-     *
-     */
-    public function getProfiler();
-
-    /**
-     *
-     * Is the instance connected to a database?
-     *
-     * @return bool
-     *
-     */
-    public function isConnected();
-
-    /**
-     *
      * Performs a query after preparing the statement with bound values, then
      * returns the result as a PDOStatement.
      *
@@ -315,12 +284,25 @@ interface ExtendedPdoInterface extends PdoInterface
 
     /**
      *
-     * Sets the profiler object.
+     * Prepares an SQL statement with bound values.
      *
-     * @param ProfilerInterface $profiler
+     * This method only binds values that have placeholders in the
+     * statement, thereby avoiding errors from PDO regarding too many bound
+     * values. It also binds all sequential (question-mark) placeholders.
      *
-     * @return null
+     * If a placeholder value is an array, the array is converted to a string
+     * of comma-separated quoted values; e.g., for an `IN (...)` condition.
+     * The quoted string is replaced directly into the statement instead of
+     * using `PDOStatement::bindValue()` proper.
+     *
+     * @param string $statement The SQL statement to prepare for execution.
+     *
+     * @param array $values The values to bind to the statement, if any.
+     *
+     * @return \PDOStatement
+     *
+     * @see http://php.net/manual/en/pdo.prepare.php
      *
      */
-    public function setProfiler(ProfilerInterface $profiler);
+    public function prepareWithValues($statement, array $values = []);
 }

@@ -67,8 +67,6 @@ abstract class AbstractExtendedPdoTest extends \PHPUnit_Framework_TestCase
         $this->pdo->perform($stm, $data);
     }
 
-    abstract public function testGetPdo();
-
     public function testErrorCodeAndInfo()
     {
         $actual = $this->pdo->errorCode();
@@ -78,24 +76,6 @@ abstract class AbstractExtendedPdoTest extends \PHPUnit_Framework_TestCase
         $actual = $this->pdo->errorInfo();
         $expect = array('00000', null, null);
         $this->assertSame($expect, $actual);
-    }
-
-    public function testSetAndGetAttribute()
-    {
-        $pdo = new ExtendedPdo('sqlite::memory:');
-        $this->assertFalse($pdo->isConnected());
-
-        $pdo->setAttribute(Pdo::ATTR_ERRMODE, ExtendedPdo::ERRMODE_WARNING);
-        $this->assertFalse($pdo->isConnected());
-
-        $actual = $pdo->getAttribute(Pdo::ATTR_ERRMODE);
-        $this->assertSame(Pdo::ERRMODE_WARNING, $actual);
-        $this->assertTrue($pdo->isConnected());
-
-        // set again now that we're connected
-        $pdo->setAttribute(Pdo::ATTR_ERRMODE, ExtendedPdo::ERRMODE_EXCEPTION);
-        $actual = $pdo->getAttribute(Pdo::ATTR_ERRMODE);
-        $this->assertSame(Pdo::ERRMODE_EXCEPTION, $actual);
     }
 
     public function testQuery()

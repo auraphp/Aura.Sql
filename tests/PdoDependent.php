@@ -5,7 +5,7 @@ use PDO;
 
 class PdoDependent
 {
-    public function __construct(PDO $pdo)
+    public function __construct($pdo)
     {
         $this->pdo = $pdo;
     }
