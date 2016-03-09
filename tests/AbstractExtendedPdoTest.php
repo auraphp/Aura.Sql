@@ -122,7 +122,7 @@ abstract class AbstractExtendedPdoTest extends \PHPUnit_Framework_TestCase
         $stm = "SELECT id, name FROM pdotest";
 
         // mode and 2 args
-        $sth = $this->pdo->query($stm, ExtendedPdo::FETCH_CLASS, 'StdClass', array());
+        $sth = $this->pdo->query($stm, ExtendedPdo::FETCH_CLASS, 'stdClass', null);
         $actual = $sth->fetchAll();
         $expect = array();
         foreach ($this->data as $id => $name) {
