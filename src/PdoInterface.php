@@ -101,7 +101,7 @@ interface PdoInterface
      * @param string $name The name of the sequence to check; typically needed
      * only for PostgreSQL, where it takes the form of `<table>_<column>_seq`.
      *
-     * @return int
+     * @return string
      *
      * @see http://php.net/manual/en/pdo.lastinsertid.php
      *
@@ -154,7 +154,7 @@ interface PdoInterface
      *
      * @param int $parameter_type A data type hint for the database driver.
      *
-     * @return mixed The quoted value.
+     * @return string The quoted value.
      *
      * @see http://php.net/manual/en/pdo.quote.php
      *

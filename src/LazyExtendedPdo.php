@@ -349,7 +349,7 @@ class LazyExtendedPdo implements ExtendedPdoInterface
      * @param string $name The name of the sequence to check; typically needed
      *                     only for PostgreSQL, where it takes the form of `<table>_<column>_seq`.
      *
-     * @return int
+     * @return string
      *
      * @see http://php.net/manual/en/pdo.lastinsertid.php
      *
@@ -449,10 +449,10 @@ class LazyExtendedPdo implements ExtendedPdoInterface
      * @see http://php.net/manual/en/pdo.query.php
      *
      */
-    public function query($statement)
+    public function query($statement, $fetch_mode = 0, $fetch_arg1 = null, $fetch_arg2 = null)
     {
         $this->connect();
-        return call_user_func_array([$this->pdo, 'query'], func_get_args());
+        return $this->pdo->query($statement, $fetch_mode, $fetch_arg1, $fetch_arg2);
     }
 
     /**
@@ -466,7 +466,7 @@ class LazyExtendedPdo implements ExtendedPdoInterface
      *
      * @param int   $parameter_type A data type hint for the database driver.
      *
-     * @return mixed The quoted value.
+     * @return string The quoted value.
      *
      * @see http://php.net/manual/en/pdo.quote.php
      *

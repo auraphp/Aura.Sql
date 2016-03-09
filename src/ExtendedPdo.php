@@ -476,7 +476,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      * @param string $name The name of the sequence to check; typically needed
      * only for PostgreSQL, where it takes the form of `<table>_<column>_seq`.
      *
-     * @return int
+     * @return string
      *
      * @see http://php.net/manual/en/pdo.lastinsertid.php
      *
@@ -555,7 +555,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      * @see http://php.net/manual/en/pdo.query.php
      *
      */
-    public function query($statement, $fetch_mode = 0, $fetch_arg1 = null, $fetch_arg2 = [])
+    public function query($statement, $fetch_mode = 0, $fetch_arg1 = null, $fetch_arg2 = null)
     {
         $this->beginProfile(__FUNCTION__);
         // ouch this is ugly. what we really wanted was a way to do
@@ -589,7 +589,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      *
      * @param int $parameter_type A data type hint for the database driver.
      *
-     * @return mixed The quoted value.
+     * @return string The quoted value.
      *
      * @see http://php.net/manual/en/pdo.quote.php
      *
@@ -744,7 +744,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      *
      * @param mixed $val The value to bind to the statement.
      *
-     * @return null
+     * @return boolean
      *
      * @throws Exception\CannotBindValue when the value to be bound is not
      * bindable (e.g., array, object, or resource).
