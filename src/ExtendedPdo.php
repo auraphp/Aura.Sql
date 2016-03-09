@@ -209,7 +209,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
     ) {
         $sth = $this->perform($statement, $values);
 
-        if ($ctor_args) {
+        if (!empty($ctor_args)) {
             return $sth->fetchObject($class_name, $ctor_args);
         }
 
@@ -248,7 +248,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
     ) {
         $sth = $this->perform($statement, $values);
 
-        if ($ctor_args) {
+        if (!empty($ctor_args)) {
             return $sth->fetchAll(self::FETCH_CLASS, $class_name, $ctor_args);
         }
 
@@ -410,12 +410,12 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
     {
         $sth = $this->perform($statement, $values);
 
-        if ($ctor_args) {
-            while ($instance = $sth->fetchObject($class_name, $ctor_args)) {
+        if (empty($ctor_args)) {
+            while ($instance = $sth->fetchObject($class_name)) {
                 yield $instance;
             }
         } else {
-            while ($instance = $sth->fetchObject($class_name)) {
+            while ($instance = $sth->fetchObject($class_name, $ctor_args)) {
                 yield $instance;
             }
         }
