@@ -7,4 +7,9 @@ class ExtendedPdoTest extends AbstractExtendedPdoTest
     {
         return new ExtendedPdo('sqlite::memory:');
     }
+
+    public function testGetPdo()
+    {
+        $this->assertSame($this->pdo, $this->pdo->getPdo());
+    }
 }

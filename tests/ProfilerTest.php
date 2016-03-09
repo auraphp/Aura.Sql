@@ -10,6 +10,12 @@ class ProfilerTest extends AbstractExtendedPdoTest
         return new ExtendedPdo('sqlite::memory:');
     }
 
+    public function testGetPdo()
+    {
+        $lazy_pdo = $this->pdo->getPdo();
+        $this->assertInstanceOf('PDO', $lazy_pdo);
+    }
+
     public function testProfiling()
     {
         $this->pdo->setProfiler(new Profiler);

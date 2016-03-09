@@ -51,6 +51,18 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
 
     /**
      *
+     * Returns the underlying PDO connection object.
+     *
+     * @return \PDO|null if connection was manually disconnected
+     *
+     */
+    public function getPdo()
+    {
+        return $this;
+    }
+
+    /**
+     *
      * Begins a transaction and turns off autocommit mode.
      *
      * @return bool True on success, false on failure.

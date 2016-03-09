@@ -305,4 +305,13 @@ interface ExtendedPdoInterface extends PdoInterface
      *
      */
     public function prepareWithValues($statement, array $values = []);
+
+    /**
+     *
+     * Returns the underlying PDO connection object.
+     *
+     * @return \PDO|null if connection was manually disconnected
+     *
+     */
+    public function getPdo();
 }

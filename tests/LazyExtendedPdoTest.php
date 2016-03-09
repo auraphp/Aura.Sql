@@ -10,6 +10,13 @@ class LazyExtendedPdoTest extends AbstractExtendedPdoTest
         return new LazyExtendedPdo('sqlite::memory:');
     }
 
+    public function testGetPdo()
+    {
+        $lazy_pdo = $this->pdo->getPdo();
+        $this->assertInstanceOf('PDO', $lazy_pdo);
+        $this->assertNotSame($this->pdo, $lazy_pdo);
+    }
+
     public function testConnect()
     {
         $pdo = new LazyExtendedPdo('sqlite::memory:');
