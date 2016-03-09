@@ -19,7 +19,7 @@ use PDOStatement;
  * @package Aura.Sql
  *
  */
-class LazyExtendedPdo implements ExtendedPdoInterface
+class LazyExtendedPdo extends PDO implements ExtendedPdoInterface
 {
     /**
      *
