@@ -2,10 +2,11 @@
 namespace Aura\Sql;
 
 use PDO;
-use StdClass;
+use stdClass;
 
 abstract class AbstractExtendedPdoTest extends \PHPUnit_Framework_TestCase
 {
+    /** @var ExtendedPdoInterface */
     protected $pdo;
 
     protected $data = array(
@@ -212,23 +213,14 @@ abstract class AbstractExtendedPdoTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expect, $actual);
     }
 
-    public function testFetchAllWithCallback()
+    public function testYieldAll()
     {
-        $stm = "SELECT * FROM pdotest ORDER BY id LIMIT 5";
-        $result = $this->pdo->fetchAll($stm, array(), function ($row) {
-            return array(strtolower($row['name']));
-        });
-        $expect = 5;
-        $actual = count($result);
-        $this->assertEquals($expect, $actual);
-        $expect = array(
-            array('anna'),
-            array('betty'),
-            array('clara'),
-            array('donna'),
-            array('fiona'),
-        );
-        $this->assertEquals($expect, $result);
+        $stm = "SELECT * FROM pdotest";
+        $actual = [];
+        foreach ($this->pdo->yieldAll($stm) as $row) {
+            $actual[$row['id']] = $row['name'];
+        }
+        $this->assertEquals($this->data, $actual);
     }
 
     public function testFetchAssoc()
@@ -245,30 +237,15 @@ abstract class AbstractExtendedPdoTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expect, $actual);
     }
 
-    public function testFetchAssocWithCallback()
+    public function testYieldAssoc()
     {
-        $stm = "SELECT * FROM pdotest ORDER BY id LIMIT 5";
-        $result = $this->pdo->fetchAssoc($stm, array(), function ($row) {
-            return array(strtolower($row['name']));
-        });
-        $expect = 5;
-        $actual = count($result);
-        $this->assertEquals($expect, $actual);
-
-        // 1-based IDs, not 0-based sequential values
-        $expect = array(1, 2, 3, 4, 5);
-        $actual = array_keys($result);
-        $this->assertEquals($expect, $actual);
-
-        $expect = array(
-            array('anna'),
-            array('betty'),
-            array('clara'),
-            array('donna'),
-            array('fiona'),
-        );
-        $actual = array_values($result);
-        $this->assertEquals($expect, $actual);
+        $stm = "SELECT * FROM pdotest ORDER BY id";
+        $actual = [];
+        foreach ($this->pdo->yieldAssoc($stm) as $key => $row) {
+            $this->assertEquals($key, $row['id']);
+            $actual[$key] = $row['name'];
+        }
+        $this->assertEquals($this->data, $actual);
     }
 
     public function testFetchCol()
@@ -284,18 +261,14 @@ abstract class AbstractExtendedPdoTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expect, $result);
     }
 
-    public function testFetchColWithCallback()
+    public function testYieldCol()
     {
-        $stm = "SELECT id FROM pdotest ORDER BY id LIMIT 5";
-        $result = $this->pdo->fetchCol($stm, array(), function ($val) {
-            return $val * 2;
-        });
-        $expect = 5;
-        $actual = count($result);
-        $this->assertEquals($expect, $actual);
-
-        $expect = array(2, 4, 6, 8, 10);
-        $this->assertEquals($expect, $result);
+        $stm = "SELECT id FROM pdotest ORDER BY id";
+        $actual = [];
+        foreach ($this->pdo->yieldCol($stm) as $value) {
+            $actual[]= $value;
+        };
+        $this->assertEquals(array_keys($this->data), $actual);
     }
 
     public function testFetchObject()
@@ -334,6 +307,23 @@ abstract class AbstractExtendedPdoTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expect, $actual);
     }
 
+    public function testYieldObjects()
+    {
+        $stm = "SELECT * FROM pdotest";
+        $actual = [];
+        foreach ($this->pdo->yieldObjects($stm) as $object) {
+            $actual[]= $object;
+        }
+        $expect = array();
+        foreach ($this->data as $id => $name) {
+            $expect[] = (object) array(
+                'id' => $id,
+                'name' => $name
+            );
+        }
+        $this->assertEquals($expect, $actual);
+    }
+
     public function testFetchObjects_withCtorArgs()
     {
         $stm = "SELECT * FROM pdotest";
@@ -343,6 +333,29 @@ abstract class AbstractExtendedPdoTest extends \PHPUnit_Framework_TestCase
             'Aura\Sql\FakeObject',
             array('bar')
         );
+        $expect = array();
+        foreach ($this->data as $id => $name) {
+            $object = new FakeObject('bar');
+            $object->id = $id;
+            $object->name = $name;
+            $expect[] = $object;
+        }
+        $this->assertEquals($expect, $actual);
+    }
+
+    public function testYieldObjects_withCtorArgs()
+    {
+        $stm = "SELECT * FROM pdotest";
+        $actual = [];
+        foreach ($this->pdo->yieldObjects(
+            $stm,
+            array(),
+            'Aura\Sql\FakeObject',
+            array('bar')
+        ) as $object)
+        {
+            $actual[]= $object;
+        }
         $expect = array();
         foreach ($this->data as $id => $name) {
             $object = new FakeObject('bar');
@@ -394,40 +407,17 @@ abstract class AbstractExtendedPdoTest extends \PHPUnit_Framework_TestCase
     {
         $stm = "SELECT id, name FROM pdotest ORDER BY id";
         $actual = $this->pdo->fetchPairs($stm);
-        $expect = array(
-          1  => 'Anna',
-          2  => 'Betty',
-          3  => 'Clara',
-          4  => 'Donna',
-          5  => 'Fiona',
-          6  => 'Gertrude',
-          7  => 'Hanna',
-          8  => 'Ione',
-          9  => 'Julia',
-          10 => 'Kara',
-        );
-        $this->assertEquals($expect, $actual);
+        $this->assertEquals($this->data, $actual);
     }
 
-    public function testFetchPairsWithCallback()
+    public function testYieldPairs()
     {
         $stm = "SELECT id, name FROM pdotest ORDER BY id";
-        $actual = $this->pdo->fetchPairs($stm, array(), function ($row) {
-            return array((string) $row[0], strtolower($row[1]));
-        });
-        $expect = array(
-          '1'  => 'anna',
-          '2'  => 'betty',
-          '3'  => 'clara',
-          '4'  => 'donna',
-          '5'  => 'fiona',
-          '6'  => 'gertrude',
-          '7'  => 'hanna',
-          '8'  => 'ione',
-          '9'  => 'julia',
-          '10' => 'kara',
-        );
-        $this->assertSame($expect, $actual);
+        $actual = [];
+        foreach ($this->pdo->yieldPairs($stm) as $key => $value) {
+            $actual[$key] = $value;
+        }
+        $this->assertEquals($this->data, $actual);
     }
 
     public function testFetchValue()
