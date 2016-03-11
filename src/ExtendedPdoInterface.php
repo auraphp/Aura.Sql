@@ -264,16 +264,6 @@ interface ExtendedPdoInterface extends PdoInterface
 
     /**
      *
-     * Returns the DSN for a lazy connection; if the underlying PDO instance
-     * was injected at construction time, this will be null.
-     *
-     * @return string|null
-     *
-     */
-    public function getDsn();
-
-    /**
-     *
      * Returns the underlying PDO connection object.
      *
      * @return \PDO or Null if connection was manually disconnected
