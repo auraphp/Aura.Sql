@@ -521,7 +521,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
     public function prepareWithValues($statement, array $values = [])
     {
         // if there are no values to bind ...
-        if (! $values) {
+        if (empty($values)) {
             // ... use the normal preparation
             return $this->prepare($statement);
         }

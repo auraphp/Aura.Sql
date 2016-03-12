@@ -421,16 +421,9 @@ class LazyExtendedPdo extends ExtendedPdo
      *
      * Queries the database and returns a PDOStatement.
      *
-     * @param string $statement  The SQL statement to prepare and execute.
+     * @param string $statement The SQL statement to prepare and execute.
      *
-     * @param int    $fetch_mode The `PDO::FETCH_*` type to set on the returned
-     *                           `PDOStatement::setFetchMode()`.
-     *
-     * @param mixed  $fetch_arg1 The first additional argument to send to
-     *                           `PDOStatement::setFetchMode()`.
-     *
-     * @param mixed  $fetch_arg2 The second additional argument to send to
-     *                           `PDOStatement::setFetchMode()`.
+     * @param mixed ...$fetch Optional fetch-related parameters.
      *
      * @return PDOStatement
      *
