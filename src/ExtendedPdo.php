@@ -319,7 +319,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      *
      * @param array $values Values to bind to the query.
      *
-     * @return array
+     * @return \Generator
      *
      */
     public function yieldAll($statement, array $values = []) {
@@ -337,7 +337,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      *
      * @param array $values Values to bind to the query.
      *
-     * @return array
+     * @return \Generator
      *
      */
     public function yieldAssoc($statement, array $values = [])
@@ -357,7 +357,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      *
      * @param array $values Values to bind to the query.
      *
-     * @return array
+     * @return \Generator
      *
      */
     public function yieldCol($statement, array $values = []) {
@@ -386,7 +386,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      *
      * @param array $ctor_args Arguments to pass to each object constructor.
      *
-     * @return array
+     * @return \Generator
      *
      */
     public function yieldObjects($statement, array $values = [], $class_name = 'stdClass', array $ctor_args = [])
@@ -412,7 +412,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      *
      * @param array $values Values to bind to the query.
      *
-     * @return array
+     * @return \Generator
      *
      */
     public function yieldPairs($statement, array $values = [])

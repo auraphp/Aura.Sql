@@ -200,7 +200,7 @@ interface ExtendedPdoInterface extends PdoInterface
      *
      * @param array $values Values to bind to the query.
      *
-     * @return array
+     * @return \Generator
      *
      */
     public function yieldAll($statement, array $values = []);
@@ -213,7 +213,7 @@ interface ExtendedPdoInterface extends PdoInterface
      *
      * @param array $values Values to bind to the query.
      *
-     * @return array
+     * @return \Generator
      *
      */
     public function yieldAssoc($statement, array $values = []);
@@ -226,7 +226,7 @@ interface ExtendedPdoInterface extends PdoInterface
      *
      * @param array $values Values to bind to the query.
      *
-     * @return array
+     * @return \Generator
      *
      */
     public function yieldCol($statement, array $values = []);
@@ -250,7 +250,7 @@ interface ExtendedPdoInterface extends PdoInterface
      *
      * @param array $ctor_args Arguments to pass to each object constructor.
      *
-     * @return array
+     * @return \Generator
      *
      */
     public function yieldObjects($statement, array $values = [], $class_name = 'StdClass', array $ctor_args = []);
@@ -263,7 +263,7 @@ interface ExtendedPdoInterface extends PdoInterface
      *
      * @param array $values Values to bind to the query.
      *
-     * @return array
+     * @return \Generator
      *
      */
     public function yieldPairs($statement, array $values = []);

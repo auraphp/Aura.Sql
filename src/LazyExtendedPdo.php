@@ -25,7 +25,7 @@ class LazyExtendedPdo extends ExtendedPdo
      *
      * The PDO connection itself.
      *
-     * @var ExtendedPdoInterface
+     * @var ExtendedPdo
      *
      */
     protected $pdo = null;
@@ -231,7 +231,7 @@ class LazyExtendedPdo extends ExtendedPdo
      *
      * Returns the underlying PDO connection object.
      *
-     * @return ExtendedPdo
+     * @return PDO|null
      *
      */
     public function getPdo()
@@ -473,7 +473,7 @@ class LazyExtendedPdo extends ExtendedPdo
      *
      * @param array  $values    Values to bind to the query.
      *
-     * @return array
+     * @return int
      *
      */
     public function fetchAffected($statement, array $values = [])
@@ -678,7 +678,7 @@ class LazyExtendedPdo extends ExtendedPdo
      *
      * @param array  $values    Values to bind to the query.
      *
-     * @return array
+     * @return \Generator
      *
      */
     public function yieldAll($statement, array $values = [])
@@ -695,7 +695,7 @@ class LazyExtendedPdo extends ExtendedPdo
      *
      * @param array  $values    Values to bind to the query.
      *
-     * @return array
+     * @return \Generator
      *
      */
     public function yieldAssoc($statement, array $values = [])
@@ -712,7 +712,7 @@ class LazyExtendedPdo extends ExtendedPdo
      *
      * @param array  $values    Values to bind to the query.
      *
-     * @return array
+     * @return \Generator
      *
      */
     public function yieldCol($statement, array $values = [])
@@ -740,7 +740,7 @@ class LazyExtendedPdo extends ExtendedPdo
      *
      * @param array  $ctor_args  Arguments to pass to each object constructor.
      *
-     * @return array
+     * @return \Generator
      *
      */
     public function yieldObjects($statement, array $values = [], $class_name = 'stdClass', array $ctor_args = [])
@@ -757,7 +757,7 @@ class LazyExtendedPdo extends ExtendedPdo
      *
      * @param array  $values    Values to bind to the query.
      *
-     * @return array
+     * @return \Generator
      *
      */
     public function yieldPairs($statement, array $values = [])
