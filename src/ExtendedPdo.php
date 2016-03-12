@@ -414,25 +414,9 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      * @see http://php.net/manual/en/pdo.query.php
      *
      */
-    public function query($statement, $fetch_mode = 0, $fetch_arg1 = null, $fetch_arg2 = null)
+    public function query($statement, ...$fetch)
     {
-        // ouch this is ugly. what we really wanted was a way to do
-        // $sth = call_user_func_array(array(parent, 'query'), $args);
-        // but could not find a way to do that with PDO::query() multiple function signatures.
-        // this is likely to break if PDO::query() is changed
-        switch ($fetch_mode) {
-            default:
-                $sth = parent::query($statement, $fetch_mode);
-                break;
-            case PDO::FETCH_COLUMN:
-            case PDO::FETCH_INTO:
-                $sth = parent::query($statement, $fetch_mode, $fetch_arg1);
-                break;
-            case PDO::FETCH_CLASS:
-                $sth = parent::query($statement, $fetch_mode, $fetch_arg1, $fetch_arg2);
-                break;
-        }
-        return $sth;
+        return parent::query($statement, ...$fetch);
     }
 
     /**
