@@ -80,24 +80,6 @@ abstract class AbstractExtendedPdoTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($expect, $actual);
     }
 
-    public function testSetAndGetAttribute()
-    {
-        $pdo = new ExtendedPdo('sqlite::memory:');
-        $this->assertFalse($pdo->isConnected());
-
-        $pdo->setAttribute(Pdo::ATTR_ERRMODE, ExtendedPdo::ERRMODE_WARNING);
-        $this->assertFalse($pdo->isConnected());
-
-        $actual = $pdo->getAttribute(Pdo::ATTR_ERRMODE);
-        $this->assertSame(Pdo::ERRMODE_WARNING, $actual);
-        $this->assertTrue($pdo->isConnected());
-
-        // set again now that we're connected
-        $pdo->setAttribute(Pdo::ATTR_ERRMODE, ExtendedPdo::ERRMODE_EXCEPTION);
-        $actual = $pdo->getAttribute(Pdo::ATTR_ERRMODE);
-        $this->assertSame(Pdo::ERRMODE_EXCEPTION, $actual);
-    }
-
     public function testQuery()
     {
         $stm = "SELECT * FROM pdotest";
@@ -142,7 +124,7 @@ abstract class AbstractExtendedPdoTest extends \PHPUnit_Framework_TestCase
         $stm = "SELECT id, name FROM pdotest";
 
         // mode and 2 args
-        $sth = $this->pdo->query($stm, ExtendedPdo::FETCH_CLASS, 'StdClass', array());
+        $sth = $this->pdo->query($stm, ExtendedPdo::FETCH_CLASS, 'stdClass', null);
         $actual = $sth->fetchAll();
         $expect = array();
         foreach ($this->data as $id => $name) {

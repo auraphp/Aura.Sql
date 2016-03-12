@@ -19,7 +19,7 @@ class ConnectionLocatorTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->default = function () {
-            return new ExtendedPdo(
+            return new LazyExtendedPdo(
                 'mock:host=default.example.com',
                 'user_name',
                 'pass_word',
@@ -29,7 +29,7 @@ class ConnectionLocatorTest extends \PHPUnit_Framework_TestCase
 
         $this->read = array(
             'read1' => function () {
-                return new ExtendedPdo(
+                return new LazyExtendedPdo(
                     'mock:host=read1.example.com',
                     'user_name',
                     'pass_word',
@@ -37,7 +37,7 @@ class ConnectionLocatorTest extends \PHPUnit_Framework_TestCase
                 );
             },
             'read2' => function () {
-                return new ExtendedPdo(
+                return new LazyExtendedPdo(
                     'mock:host=read2.example.com',
                     'user_name',
                     'pass_word',
@@ -45,7 +45,7 @@ class ConnectionLocatorTest extends \PHPUnit_Framework_TestCase
                 );
             },
             'read3' => function () {
-                return new ExtendedPdo(
+                return new LazyExtendedPdo(
                     'mock:host=read3.example.com',
                     'user_name',
                     'pass_word',
@@ -56,7 +56,7 @@ class ConnectionLocatorTest extends \PHPUnit_Framework_TestCase
 
         $this->write = array(
             'write1' => function () {
-                return new ExtendedPdo(
+                return new LazyExtendedPdo(
                     'mock:host=write1.example.com',
                     'user_name',
                     'pass_word',
@@ -64,7 +64,7 @@ class ConnectionLocatorTest extends \PHPUnit_Framework_TestCase
                 );
             },
             'write2' => function () {
-                return new ExtendedPdo(
+                return new LazyExtendedPdo(
                     'mock:host=write2.example.com',
                     'user_name',
                     'pass_word',
@@ -72,7 +72,7 @@ class ConnectionLocatorTest extends \PHPUnit_Framework_TestCase
                 );
             },
             'write3' => function () {
-                return new ExtendedPdo(
+                return new LazyExtendedPdo(
                     'mock:host=write3.example.com',
                     'user_name',
                     'pass_word',

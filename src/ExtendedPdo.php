@@ -14,7 +14,7 @@ use PDOStatement;
 
 /**
  *
- * This extended decorator for PDO provides lazy connection, array quoting, a
+ * This extended decorator for PDO provides array quoting, a
  * new `perform()` method, and new `fetch*()` methods.
  *
  * @package Aura.Sql
@@ -24,173 +24,12 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
 {
     /**
      *
-     * The PDO connection itself.
-     *
-     * @var PDO
-     *
-     */
-    protected $pdo;
-
-    /**
-     *
-     * The attributes for a lazy connection.
-     *
-     * @var array
-     *
-     */
-    protected $attributes = array(
-        self::ATTR_ERRMODE => self::ERRMODE_EXCEPTION,
-    );
-
-    /**
-     *
-     * Was the PDO connection injected at construction time?
-     *
-     * @var PDO
-     *
-     */
-    protected $injected = false;
-
-    /**
-     *
-     * The DSN for a lazy connection.
-     *
-     * @var string
-     *
-     */
-    protected $dsn;
-
-    /**
-     *
-     * PDO options for a lazy connection.
-     *
-     * @var array
-     *
-     */
-    protected $options = [];
-
-    /**
-     *
-     * The password for a lazy connection.
-     *
-     * @var string
-     *
-     */
-    protected $password;
-
-    /**
-     *
-     * The current profile information.
-     *
-     * @var array
-     *
-     */
-    protected $profile = [];
-
-    /**
-     *
-     * A query profiler.
-     *
-     * @var ProfilerInterface
-     *
-     */
-    protected $profiler;
-
-    /**
-     *
-     * The username for a lazy connection.
-     *
-     * @var string
-     *
-     */
-    protected $username;
-
-    /**
-     *
      * A specialized statement preparer.
      *
      * @var Rebuilder
      *
      */
     protected $rebuilder;
-
-    /**
-     *
-     * This constructor is pseudo-polymorphic. You may pass a normal set of PDO
-     * constructor parameters, and ExtendedPdo will use them for a lazy
-     * connection. Alternatively, if the `$dsn` parameter is an existing PDO
-     * instance, that instance will be decorated by ExtendedPdo; the remaining
-     * parameters will be ignored.
-     *
-     * @param PDO|string $dsn The data source name for a lazy PDO connection,
-     * or an existing instance of PDO. If the latter, the remaining params are
-     * ignored.
-     *
-     * @param string $username The username for a lazy connection.
-     *
-     * @param string $password The password for a lazy connection.
-     *
-     * @param array $options Driver-specific options for a lazy connection.
-     *
-     * @param array $attributes Attributes to set after a lazy connection.
-     *
-     * @see http://php.net/manual/en/pdo.construct.php
-     *
-     */
-    public function __construct(
-        $dsn,
-        $username = null,
-        $password = null,
-        array $options = [],
-        array $attributes = []
-    ) {
-        if ($dsn instanceof PDO) {
-            $this->pdo = $dsn;
-            $this->injected = true;
-        } else {
-            $this->dsn = $dsn;
-            $this->username = $username;
-            $this->password = $password;
-            $this->options = $options;
-            $this->attributes = array_replace($this->attributes, $attributes);
-        }
-    }
-
-    /**
-     *
-     * Begins a transaction and turns off autocommit mode.
-     *
-     * @return bool True on success, false on failure.
-     *
-     * @see http://php.net/manual/en/pdo.begintransaction.php
-     *
-     */
-    public function beginTransaction()
-    {
-        $this->connect();
-        $this->beginProfile(__FUNCTION__);
-        $result = $this->pdo->beginTransaction();
-        $this->endProfile();
-        return $result;
-    }
-
-    /**
-     *
-     * Commits the existing transaction and restores autocommit mode.
-     *
-     * @return bool True on success, false on failure.
-     *
-     * @see http://php.net/manual/en/pdo.commit.php
-     *
-     */
-    public function commit()
-    {
-        $this->connect();
-        $this->beginProfile(__FUNCTION__);
-        $result = $this->pdo->commit();
-        $this->endProfile();
-        return $result;
-    }
 
     /**
      *
@@ -203,25 +42,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      */
     public function connect()
     {
-        // don't connect twice
-        if ($this->pdo) {
-            return;
-        }
-
-        // connect to the database
-        $this->beginProfile(__FUNCTION__);
-        $this->pdo = new PDO(
-            $this->dsn,
-            $this->username,
-            $this->password,
-            $this->options
-        );
-        $this->endProfile();
-
-        // set attributes
-        foreach ($this->attributes as $attribute => $value) {
-            $this->setAttribute($attribute, $value);
-        }
+        // do nothing: already connected
     }
 
     /**
@@ -237,57 +58,31 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      */
     public function disconnect()
     {
-        if ($this->injected) {
-            $message = "Cannot disconnect an injected PDO instance.";
-            throw new Exception\CannotDisconnect($message);
-        }
-        $this->pdo = null;
+        throw new Exception\CannotDisconnect();
     }
 
     /**
      *
-     * Gets the most recent error code.
+     * Is this instance connected to a database?
      *
-     * @return mixed
+     * @return bool
      *
      */
-    public function errorCode()
+    public function isConnected()
     {
-        $this->connect();
-        return $this->pdo->errorCode();
+        return true;
     }
 
     /**
      *
-     * Gets the most recent error info.
+     * Returns the underlying PDO connection object.
      *
-     * @return array
-     *
-     */
-    public function errorInfo()
-    {
-        $this->connect();
-        return $this->pdo->errorInfo();
-    }
-
-    /**
-     *
-     * Executes an SQL statement and returns the number of affected rows.
-     *
-     * @param string $statement The SQL statement to prepare and execute.
-     *
-     * @return int The number of affected rows.
-     *
-     * @see http://php.net/manual/en/pdo.exec.php
+     * @return \PDO|null if connection was manually disconnected
      *
      */
-    public function exec($statement)
+    public function getPdo()
     {
-        $this->connect();
-        $this->beginProfile(__FUNCTION__);
-        $affected_rows = $this->pdo->exec($statement);
-        $this->endProfile($statement);
-        return $affected_rows;
+        return $this;
     }
 
     /**
@@ -393,12 +188,12 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
     public function fetchObject(
         $statement,
         array $values = [],
-        $class_name = 'StdClass',
+        $class_name = 'stdClass',
         array $ctor_args = []
     ) {
         $sth = $this->perform($statement, $values);
 
-        if ($ctor_args) {
+        if (!empty($ctor_args)) {
             return $sth->fetchObject($class_name, $ctor_args);
         }
 
@@ -432,12 +227,12 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
     public function fetchObjects(
         $statement,
         array $values = [],
-        $class_name = 'StdClass',
+        $class_name = 'stdClass',
         array $ctor_args = []
     ) {
         $sth = $this->perform($statement, $values);
 
-        if ($ctor_args) {
+        if (!empty($ctor_args)) {
             return $sth->fetchAll(self::FETCH_CLASS, $class_name, $ctor_args);
         }
 
@@ -511,11 +306,8 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      * @return array
      *
      */
-    public function fetchGroup(
-        $statement,
-        array $values = [],
-        $style = self::FETCH_COLUMN
-    ) {
+    public function fetchGroup($statement, array $values = [], $style = \PDO::FETCH_COLUMN)
+    {
         $sth = $this->perform($statement, $values);
         return $sth->fetchAll(self::FETCH_GROUP | $style);
     }
@@ -528,7 +320,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      *
      * @param array $values Values to bind to the query.
      *
-     * @return array
+     * @return \Generator
      *
      */
     public function yieldAll($statement, array $values = [])
@@ -547,7 +339,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      *
      * @param array $values Values to bind to the query.
      *
-     * @return array
+     * @return \Generator
      *
      */
     public function yieldAssoc($statement, array $values = [])
@@ -567,7 +359,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      *
      * @param array $values Values to bind to the query.
      *
-     * @return array
+     * @return \Generator
      *
      */
     public function yieldCol($statement, array $values = [])
@@ -597,19 +389,19 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      *
      * @param array $ctor_args Arguments to pass to each object constructor.
      *
-     * @return array
+     * @return \Generator
      *
      */
-    public function yieldObjects($statement, array $values = [], $class_name = 'StdClass', array $ctor_args = [])
+    public function yieldObjects($statement, array $values = [], $class_name = 'stdClass', array $ctor_args = [])
     {
         $sth = $this->perform($statement, $values);
 
-        if ($ctor_args) {
-            while ($instance = $sth->fetchObject($class_name, $ctor_args)) {
+        if (empty($ctor_args)) {
+            while ($instance = $sth->fetchObject($class_name)) {
                 yield $instance;
             }
         } else {
-            while ($instance = $sth->fetchObject($class_name)) {
+            while ($instance = $sth->fetchObject($class_name, $ctor_args)) {
                 yield $instance;
             }
         }
@@ -623,7 +415,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      *
      * @param array $values Values to bind to the query.
      *
-     * @return array
+     * @return \Generator
      *
      */
     public function yieldPairs($statement, array $values = [])
@@ -632,110 +424,6 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
         while ($row = $sth->fetch(self::FETCH_NUM)) {
             yield $row[0] => $row[1];
         }
-    }
-
-    /**
-     *
-     * Gets a PDO attribute value.
-     *
-     * @param mixed $attribute The PDO::ATTR_* constant.
-     *
-     * @return mixed The value for the attribute.
-     *
-     */
-    public function getAttribute($attribute)
-    {
-        $this->connect();
-        return $this->pdo->getAttribute($attribute);
-    }
-
-    /**
-     *
-     * Returns the DSN for a lazy connection; if the underlying PDO instance
-     * was injected at construction time, this will be null.
-     *
-     * @return string|null
-     *
-     */
-    public function getDsn()
-    {
-        return $this->dsn;
-    }
-
-    /**
-     *
-     * Returns the underlying PDO connection object.
-     *
-     * @return PDO
-     *
-     */
-    public function getPdo()
-    {
-        $this->connect();
-        return $this->pdo;
-    }
-
-    /**
-     *
-     * Returns the profiler object.
-     *
-     * @return ProfilerInterface
-     *
-     */
-    public function getProfiler()
-    {
-        return $this->profiler;
-    }
-
-    /**
-     *
-     * Is a transaction currently active?
-     *
-     * @return bool
-     *
-     * @see http://php.net/manual/en/pdo.intransaction.php
-     *
-     */
-    public function inTransaction()
-    {
-        $this->connect();
-        $this->beginProfile(__FUNCTION__);
-        $result = $this->pdo->inTransaction();
-        $this->endProfile();
-        return $result;
-    }
-
-    /**
-     *
-     * Is this instance connected to a database?
-     *
-     * @return bool
-     *
-     */
-    public function isConnected()
-    {
-        return isset($this->pdo);
-    }
-
-    /**
-     *
-     * Returns the last inserted autoincrement sequence value.
-     *
-     * @param string $name The name of the sequence to check; typically needed
-     * only for PostgreSQL, where it takes the form of `<table>_<column>_seq`.
-     *
-     * @return int
-     *
-     * @see http://php.net/manual/en/pdo.lastinsertid.php
-     *
-     */
-    public function lastInsertId($name = null)
-    {
-        $this->connect();
-        $this->beginProfile(__FUNCTION__);
-        $result = $this->pdo->lastInsertId($name);
-        $this->endProfile();
-        return $result;
     }
 
     /**
@@ -756,32 +444,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
     public function perform($statement, array $values = [])
     {
         $sth = $this->prepareWithValues($statement, $values);
-        $this->beginProfile(__FUNCTION__);
         $sth->execute();
-        $this->endProfile($statement, $values);
-        return $sth;
-    }
-
-    /**
-     *
-     * Prepares an SQL statement for execution.
-     *
-     * @param string $statement The SQL statement to prepare for execution.
-     *
-     * @param array $options Set these attributes on the returned
-     * PDOStatement.
-     *
-     * @return PDOStatement
-     *
-     * @see http://php.net/manual/en/pdo.prepare.php
-     *
-     */
-    public function prepare($statement, $options = [])
-    {
-        $this->connect();
-        $this->beginProfile(__FUNCTION__);
-        $sth = $this->pdo->prepare($statement, $options);
-        $this->endProfile($statement, $options);
         return $sth;
     }
 
@@ -805,20 +468,24 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      * @see http://php.net/manual/en/pdo.query.php
      *
      */
-    public function query($statement)
+    public function query($statement, $fetch_mode = 0, $fetch_arg1 = null, $fetch_arg2 = null)
     {
-        $this->connect();
-        $this->beginProfile(__FUNCTION__);
-
-        // remove empty constructor params list if it exists
-        $args = func_get_args();
-        if (count($args) === 4 && $args[3] === []) {
-            unset($args[3]);
+        // ouch this is ugly. what we really wanted was a way to do
+        // $sth = call_user_func_array(array(parent, 'query'), $args);
+        // but could not find a way to do that with PDO::query() multiple function signatures.
+        // this is likely to break if PDO::query() is changed
+        switch ($fetch_mode) {
+            default:
+                $sth = parent::query($statement, $fetch_mode);
+                break;
+            case PDO::FETCH_COLUMN:
+            case PDO::FETCH_INTO:
+                $sth = parent::query($statement, $fetch_mode, $fetch_arg1);
+                break;
+            case PDO::FETCH_CLASS:
+                $sth = parent::query($statement, $fetch_mode, $fetch_arg1, $fetch_arg2);
+                break;
         }
-
-        $sth = call_user_func_array(array($this->pdo, 'query'), $args);
-
-        $this->endProfile($sth->queryString);
         return $sth;
     }
 
@@ -833,129 +500,23 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      *
      * @param int $parameter_type A data type hint for the database driver.
      *
-     * @return mixed The quoted value.
+     * @return string The quoted value.
      *
      * @see http://php.net/manual/en/pdo.quote.php
      *
      */
     public function quote($value, $parameter_type = self::PARAM_STR)
     {
-        $this->connect();
-
         // non-array quoting
         if (! is_array($value)) {
-            return $this->pdo->quote($value, $parameter_type);
+            return parent::quote($value, $parameter_type);
         }
 
         // quote array values, not keys, then combine with commas
         foreach ($value as $k => $v) {
-            $value[$k] = $this->pdo->quote($v, $parameter_type);
+            $value[$k] = parent::quote($v, $parameter_type);
         }
         return implode(', ', $value);
-    }
-
-    /**
-     *
-     * Rolls back the current transaction, and restores autocommit mode.
-     *
-     * @return bool True on success, false on failure.
-     *
-     * @see http://php.net/manual/en/pdo.rollback.php
-     *
-     */
-    public function rollBack()
-    {
-        $this->connect();
-        $this->beginProfile(__FUNCTION__);
-        $result = $this->pdo->rollBack();
-        $this->endProfile();
-
-        return $result;
-    }
-
-    /**
-     *
-     * Sets a PDO attribute value.
-     *
-     * @param mixed $attribute The PDO::ATTR_* constant.
-     *
-     * @param mixed $value The value for the attribute.
-     *
-     * @return bool True on success, false on failure. Note that if PDO has not
-     * not connected, all calls will be treated as successful.
-     *
-     */
-    public function setAttribute($attribute, $value)
-    {
-        if ($this->pdo) {
-            return $this->pdo->setAttribute($attribute, $value);
-        }
-
-        $this->attributes[$attribute] = $value;
-        return true;
-    }
-
-    /**
-     *
-     * Sets the profiler object.
-     *
-     * @param ProfilerInterface $profiler
-     *
-     * @return null
-     *
-     */
-    public function setProfiler(ProfilerInterface $profiler)
-    {
-        $this->profiler = $profiler;
-    }
-
-    /**
-     *
-     * Begins a profile entry.
-     *
-     * @param string $function The function starting the profile entry.
-     *
-     * @return null
-     *
-     */
-    protected function beginProfile($function)
-    {
-        // if there's no profiler, can't profile
-        if (! $this->profiler) {
-            return;
-        }
-
-        // retain starting profile info
-        $this->profile['time'] = microtime(true);
-        $this->profile['function'] = $function;
-    }
-
-    /**
-     *
-     * Ends and records a profile entry.
-     *
-     * @param string $statement The statement being profiled, if any.
-     *
-     * @param array $values The values bound to the statement, if any.
-     *
-     * @return null
-     *
-     */
-    protected function endProfile($statement = null, array $values = [])
-    {
-        // is there a profiler in place?
-        if ($this->profiler) {
-            // add an entry to the profiler
-            $this->profiler->addProfile(
-                microtime(true) - $this->profile['time'],
-                $this->profile['function'],
-                $statement,
-                $values
-            );
-        }
-
-        // clear the starting profile info
-        $this->profile = [];
     }
 
     /**
@@ -1014,7 +575,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      *
      * @param mixed $val The value to bind to the statement.
      *
-     * @return null
+     * @return boolean
      *
      * @throws Exception\CannotBindValue when the value to be bound is not
      * bindable (e.g., array, object, or resource).
@@ -1041,6 +602,6 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
             );
         }
 
-        $sth->bindValue($key, $val);
+        return $sth->bindValue($key, $val);
     }
 }
