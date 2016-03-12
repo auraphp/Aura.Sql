@@ -437,10 +437,10 @@ class LazyExtendedPdo extends ExtendedPdo
      * @see http://php.net/manual/en/pdo.query.php
      *
      */
-    public function query($statement, $fetch_mode = 0, $fetch_arg1 = null, $fetch_arg2 = null)
+    public function query($statement, ...$fetch)
     {
         $this->connect();
-        return $this->pdo->query($statement, $fetch_mode, $fetch_arg1, $fetch_arg2);
+        return $this->pdo->query($statement, ...$fetch);
     }
 
     /**

@@ -287,10 +287,10 @@ class ProfiledExtendedPdo extends ExtendedPdo
      * @see http://php.net/manual/en/pdo.query.php
      *
      */
-    public function query($statement, $fetch_mode = 0, $fetch_arg1 = null, $fetch_arg2 = null)
+    public function query($statement, ...$fetch)
     {
         $this->beginProfile(__FUNCTION__);
-        $sth = parent::query($statement, $fetch_mode, $fetch_arg1, $fetch_arg2);
+        $sth = parent::query($statement, ...$fetch);
         $this->endProfile($sth->queryString);
         return $sth;
     }
