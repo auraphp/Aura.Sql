@@ -305,46 +305,4 @@ interface ExtendedPdoInterface extends PdoInterface
      *
      */
     public function prepareWithValues($statement, array $values = []);
-
-    /**
-     *
-     * Returns the underlying PDO connection object.
-     *
-     * @return \PDO|null if connection was manually disconnected
-     *
-     */
-    public function getPdo();
-
-    /**
-     *
-     * Connects to the database and sets PDO attributes.
-     *
-     * @return null
-     *
-     * @throws \PDOException if the connection fails.
-     *
-     */
-    public function connect();
-
-    /**
-     *
-     * Explicitly disconnect by unsetting the PDO instance; does not prevent
-     * later reconnection, whether implicit or explicit.
-     *
-     * @return null
-     *
-     * @throws Exception\CannotDisconnect when the PDO instance was injected
-     * for decoration; manage the lifecycle of that PDO instance elsewhere.
-     *
-     */
-    public function disconnect();
-
-    /**
-     *
-     * Is this instance connected to a database?
-     *
-     * @return bool
-     *
-     */
-    public function isConnected();
 }

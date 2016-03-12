@@ -33,60 +33,6 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
 
     /**
      *
-     * Connects to the database and sets PDO attributes.
-     *
-     * @return null
-     *
-     * @throws \PDOException if the connection fails.
-     *
-     */
-    public function connect()
-    {
-        // do nothing: already connected
-    }
-
-    /**
-     *
-     * Explicitly disconnect by unsetting the PDO instance; does not prevent
-     * later reconnection, whether implicit or explicit.
-     *
-     * @return null
-     *
-     * @throws Exception\CannotDisconnect when the PDO instance was injected
-     * for decoration; manage the lifecycle of that PDO instance elsewhere.
-     *
-     */
-    public function disconnect()
-    {
-        throw new Exception\CannotDisconnect();
-    }
-
-    /**
-     *
-     * Is this instance connected to a database?
-     *
-     * @return bool
-     *
-     */
-    public function isConnected()
-    {
-        return true;
-    }
-
-    /**
-     *
-     * Returns the underlying PDO connection object.
-     *
-     * @return \PDO|null if connection was manually disconnected
-     *
-     */
-    public function getPdo()
-    {
-        return $this;
-    }
-
-    /**
-     *
      * Performs a statement and returns the number of affected rows.
      *
      * @param string $statement The SQL statement to prepare and execute.

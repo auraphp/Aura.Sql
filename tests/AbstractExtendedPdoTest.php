@@ -67,8 +67,6 @@ abstract class AbstractExtendedPdoTest extends \PHPUnit_Framework_TestCase
         $this->pdo->perform($stm, $data);
     }
 
-    abstract public function testGetPdo();
-
     public function testErrorCodeAndInfo()
     {
         $actual = $this->pdo->errorCode();
