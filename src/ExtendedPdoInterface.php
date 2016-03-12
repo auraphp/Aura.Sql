@@ -25,7 +25,7 @@ interface ExtendedPdoInterface extends PdoInterface
      *
      * @param array $values Values to bind to the query.
      *
-     * @return array
+     * @return int
      *
      */
     public function fetchAffected($statement, array $values = []);
