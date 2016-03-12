@@ -400,16 +400,9 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      *
      * @param string $statement The SQL statement to prepare and execute.
      *
-     * @param int $fetch_mode The `PDO::FETCH_*` type to set on the returned
-     * `PDOStatement::setFetchMode()`.
+     * @param mixed ...$fetch Optional fetch-related parameters.
      *
-     * @param mixed $fetch_arg1 The first additional argument to send to
-     * `PDOStatement::setFetchMode()`.
-     *
-     * @param mixed $fetch_arg2 The second additional argument to send to
-     * `PDOStatement::setFetchMode()`.
-     *
-     * @return PDOStatement
+     * @return \PDOStatement
      *
      * @see http://php.net/manual/en/pdo.query.php
      *
@@ -474,7 +467,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
     public function prepareWithValues($statement, array $values = [])
     {
         // if there are no values to bind ...
-        if (! $values) {
+        if (empty($values)) {
             // ... use the normal preparation
             return $this->prepare($statement);
         }
