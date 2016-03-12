@@ -7,7 +7,7 @@ class ProfilerTest extends AbstractExtendedPdoTest
 {
     protected function newExtendedPdo()
     {
-        return new ExtendedPdo('sqlite::memory:');
+        return new ProfiledExtendedPdo('sqlite::memory:');
     }
 
     public function testGetPdo()

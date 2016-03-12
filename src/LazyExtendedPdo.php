@@ -19,7 +19,7 @@ use PDOStatement;
  * @package Aura.Sql
  *
  */
-class LazyExtendedPdo extends PDO implements ExtendedPdoInterface
+class LazyExtendedPdo extends ExtendedPdo
 {
     /**
      *
@@ -107,18 +107,6 @@ class LazyExtendedPdo extends PDO implements ExtendedPdoInterface
         $this->password   = $password;
         $this->options    = $options;
         $this->attributes = array_replace($this->attributes, $attributes);
-    }
-
-    /**
-     *
-     * Returns all currently available PDO drivers.
-     *
-     * @return array
-     *
-     */
-    public static function getAvailableDrivers()
-    {
-        return PDO::getAvailableDrivers();
     }
 
     /**
@@ -668,10 +656,10 @@ class LazyExtendedPdo extends PDO implements ExtendedPdoInterface
      *
      * @param string $statement The SQL statement to prepare and execute.
      *
-     * @param array $values Values to bind to the query.
+     * @param array  $values    Values to bind to the query.
      *
-     * @param int $style a fetch style defaults to PDO::FETCH_COLUMN for single
-     *      values, use PDO::FETCH_NAMED when fetching a multiple columns
+     * @param int    $style     a fetch style defaults to PDO::FETCH_COLUMN for single
+     *                          values, use PDO::FETCH_NAMED when fetching a multiple columns
      *
      * @return array
      *
