@@ -44,4 +44,23 @@ class LazyExtendedPdoTest extends AbstractExtendedPdoTest
         $actual = $pdo->getAttribute(PDO::ATTR_ERRMODE);
         $this->assertSame(PDO::ERRMODE_EXCEPTION, $actual);
     }
+
+    public function testPdoFactory()
+    {
+        $callCount = 0;
+
+        $pdo = new LazyExtendedPdo($originalDsn = 'sqlite::memory:');
+        $pdo->setPdoFactory(function ($dsn, $username, $password, $options) use (&$callCount, $originalDsn) {
+            $callCount++;
+            $this->assertEquals($originalDsn, $dsn);
+            return new ProfiledExtendedPdo($dsn, $username, $password, $options);
+        });
+        $this->assertFalse($pdo->isConnected());
+        $this->assertEquals(0, $callCount);
+
+        $pdo->connect();
+        $this->assertTrue($pdo->isConnected());
+        $this->assertEquals(1, $callCount);
+        $this->assertInstanceOf('\Aura\Sql\ProfiledExtendedPdo', $pdo->getPdo());
+    }
 }

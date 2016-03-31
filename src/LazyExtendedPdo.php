@@ -79,6 +79,15 @@ class LazyExtendedPdo extends ExtendedPdo
 
     /**
      *
+     * Creates a new PDO when connect() is called
+     *
+     * @var callable
+     *
+     */
+    private $pdo_factory;
+
+    /**
+     *
      * Pass a normal set of PDO constructor parameters and LazyExtendedPdo will use them
      * for a lazy connection.
      *
@@ -107,6 +116,19 @@ class LazyExtendedPdo extends ExtendedPdo
         $this->password   = $password;
         $this->options    = $options;
         $this->attributes = array_replace($this->attributes, $attributes);
+    }
+
+    /**
+     *
+     * When connect() is called, it will call $factory($dsn,$username,$password,$options) and expect
+     * a PDO to be returned. If no factory is provided, an ExtendedPdo will be created
+     *
+     * @param callable $factory
+     *
+     */
+    public function setPdoFactory(callable $factory)
+    {
+        $this->pdo_factory = $factory;
     }
 
     /**
@@ -186,13 +208,22 @@ class LazyExtendedPdo extends ExtendedPdo
         }
 
         // connect to the database
-        $this->pdo = new ExtendedPdo(
-            $this->dsn,
-            $this->username,
-            $this->password,
-            $this->options
-        );
-
+        if ($this->pdo_factory) {
+            $this->pdo = call_user_func(
+                $this->pdo_factory,
+                $this->dsn,
+                $this->username,
+                $this->password,
+                $this->options
+            );
+        } else {
+            $this->pdo = new ExtendedPdo(
+                $this->dsn,
+                $this->username,
+                $this->password,
+                $this->options
+            );
+        }
         // set attributes
         foreach ($this->attributes as $attribute => $value) {
             $this->setAttribute($attribute, $value);
