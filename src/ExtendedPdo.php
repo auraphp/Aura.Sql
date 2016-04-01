@@ -33,6 +33,45 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
 
     /**
      *
+     * Constructor.
+     *
+     * This overrides the parent so that it can take connection attributes as a
+     * constructor parameter, and set them after connection.
+     *
+     * @param string $dsn The data source name for the PDO connection.
+     *
+     * @param string $username The username for the connection.
+     *
+     * @param string $password The password for the connection.
+     *
+     * @param array $options Driver-specific options for the connection.
+     *
+     * @param array $attributes Attributes to set after the connection.
+     *
+     * @see http://php.net/manual/en/pdo.construct.php
+     *
+     */
+    public function __construct(
+        $dsn,
+        $username = null,
+        $password = null,
+        array $options = [],
+        array $attributes = []
+    ) {
+        parent::__construct($dsn, $username, $password, $options);
+
+        $attributes = array_replace(
+            [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION],
+            $attributes
+        );
+
+        foreach ($attributes as $attribute => $value) {
+            $this->setAttribute($attribute, $value);
+        }
+    }
+
+    /**
+     *
      * Performs a statement and returns the number of affected rows.
      *
      * @param string $statement The SQL statement to prepare and execute.
