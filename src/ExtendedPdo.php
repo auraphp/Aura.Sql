@@ -11,6 +11,7 @@ namespace Aura\Sql;
 use Aura\Sql\Exception;
 use PDO;
 use PDOStatement;
+use Psr\Log\NullLogger;
 
 /**
  *
@@ -67,7 +68,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
         ];
 
         if ($profiler === null) {
-            $profiler = new NullProfiler();
+            $profiler = new Profiler(new NullLogger());
         }
 
         $this->setProfiler($profiler);
