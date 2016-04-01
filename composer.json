@@ -34,8 +34,5 @@
         "psr-4": {
             "Aura\\Sql\\": "tests/"
         }
-    },
-    "require-dev": {
-        "monolog/monolog": "^1.18"
     }
 }

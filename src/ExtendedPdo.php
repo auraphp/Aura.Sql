@@ -65,10 +65,15 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
             $this->setAttribute($attribute, $value);
         }
 
-        $this->profiler = $profiler;
-        if (! $this->profiler) {
-            $this->profiler = new NullProfiler();
+        if ($profiler === null) {
+            $profiler = new NullProfiler();
         }
+        $this->setProfiler($profiler);
+    }
+
+    public function setProfiler(ProfilerInterface $profiler)
+    {
+        $this->profiler = $profiler;
     }
 
     public function getProfiler()
@@ -677,7 +682,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
         }
 
         // finish profiling
-        $this->profiler->finish();
+        $this->profiler->finish($statement);
 
         // done
         return $sth;

@@ -40,18 +40,22 @@ class Profiler implements ProfilerInterface
 
     /**
      *
-     * So you can switch logging on and off. See enable() and disable().
+     * Turns profile logging off and on.
      *
      * @var bool
+     *
+     * @see setActive()
      *
      */
     private $active = false;
 
     /**
      *
-     * The log level for all messages. See setLogLevel()
+     * The log level for all messages.
      *
      * @var string
+     *
+     * @see setLogLevel()
      *
      */
     private $logLevel = LogLevel::DEBUG;
@@ -59,13 +63,22 @@ class Profiler implements ProfilerInterface
     /**
      *
      * Added in front of each message to help identify several connections
-     * in a ConnectionLocator. See setMessagePrefix()
+     * in a ConnectionLocator.
      *
      * @var string
+     *
+     * @see setMessagePrefix()
      *
      */
     private $messagePrefix = '';
 
+    /**
+     *
+     * Constructor.
+     *
+     * @param LoggerInterface $logger Record profiles through this interface.
+     *
+     */
     public function __construct(LoggerInterface $logger)
     {
         $this->logger = $logger;
@@ -85,7 +98,7 @@ class Profiler implements ProfilerInterface
 
     /**
      *
-     * Return true if logging is active
+     * Returns true if logging is active.
      *
      * @return bool
      *
@@ -127,8 +140,8 @@ class Profiler implements ProfilerInterface
 
     /**
      *
-     * Sets the text to be shown at the start of each logged message to help differentiate multiple connections
-     * when using a ConnectionLocator
+     * Sets the text to be shown at the start of each logged message to help
+     * differentiate multiple connections when using a ConnectionLocator.
      *
      * @param string $messagePrefix
      *
