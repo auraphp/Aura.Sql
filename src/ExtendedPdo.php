@@ -83,9 +83,14 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
         return $this->profiler;
     }
 
-    public function __call($method, $params)
+    public function errorCode()
     {
-        return $this->getPdo()->$method(...$params);
+        return $this->getPdo()->errorCode();
+    }
+
+    public function errorInfo()
+    {
+        return $this->getPdo()->errorInfo();
     }
 
     public function connect()
