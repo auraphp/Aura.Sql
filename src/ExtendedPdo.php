@@ -14,14 +14,16 @@ use PDOStatement;
 
 /**
  *
- * This extended decorator for PDO provides array quoting, a
- * new `perform()` method, and new `fetch*()` methods.
+ * Provides array quoting, a new `perform()` method, new `fetch*()` methods,
+ * and new `yield*()` methods.
  *
  * @package Aura.Sql
  *
  */
 class ExtendedPdo extends PDO implements ExtendedPdoInterface
 {
+    protected $profiler;
+
     /**
      *
      * Constructor.
@@ -39,6 +41,8 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      *
      * @param array $attributes Attributes to set after the connection.
      *
+     * @param ProfilerInterface $profiler Records query profiles to a log.
+     *
      * @see http://php.net/manual/en/pdo.construct.php
      *
      */
@@ -47,7 +51,8 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
         $username = null,
         $password = null,
         array $options = [],
-        array $attributes = []
+        array $attributes = [],
+        ProfilerInterface $profiler = null
     ) {
         parent::__construct($dsn, $username, $password, $options);
 
@@ -59,6 +64,145 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
         foreach ($attributes as $attribute => $value) {
             $this->setAttribute($attribute, $value);
         }
+
+        $this->profiler = $profiler;
+        if (! $this->profiler) {
+            $this->profiler = new NullProfiler();
+        }
+    }
+
+    public function getProfiler()
+    {
+        return $this->profiler;
+    }
+
+    /**
+     *
+     * Begins a transaction and turns off autocommit mode.
+     *
+     * @return bool True on success, false on failure.
+     *
+     * @see http://php.net/manual/en/pdo.begintransaction.php
+     *
+     */
+    public function beginTransaction()
+    {
+        $this->profiler->start(__FUNCTION__);
+        $result = parent::beginTransaction();
+        $this->profiler->finish();
+        return $result;
+    }
+
+    /**
+     *
+     * Commits the existing transaction and restores autocommit mode.
+     *
+     * @return bool True on success, false on failure.
+     *
+     * @see http://php.net/manual/en/pdo.commit.php
+     *
+     */
+    public function commit()
+    {
+        $this->profiler->start(__FUNCTION__);
+        $result = parent::commit();
+        $this->profiler->finish();
+        return $result;
+    }
+
+    /**
+     *
+     * Rolls back the current transaction, and restores autocommit mode.
+     *
+     * @return bool True on success, false on failure.
+     *
+     * @see http://php.net/manual/en/pdo.rollback.php
+     *
+     */
+    public function rollBack()
+    {
+        $this->profiler->start(__FUNCTION__);
+        $result = parent::rollBack();
+        $this->profiler->finish();
+        return $result;
+    }
+
+    /**
+     *
+     * Is a transaction currently active?
+     *
+     * @return bool
+     *
+     * @see http://php.net/manual/en/pdo.intransaction.php
+     *
+     */
+    public function inTransaction()
+    {
+        $this->profiler->start(__FUNCTION__);
+        $result = parent::inTransaction();
+        $this->profiler->finish();
+        return $result;
+    }
+
+    /**
+     *
+     * Executes an SQL statement and returns the number of affected rows.
+     *
+     * @param string $statement The SQL statement to prepare and execute.
+     *
+     * @return int The number of affected rows.
+     *
+     * @see http://php.net/manual/en/pdo.exec.php
+     *
+     */
+    public function exec($statement)
+    {
+        $this->profiler->start(__FUNCTION__);
+        $affected_rows = parent::exec($statement);
+        $this->profiler->finish($statement);
+        return $affected_rows;
+    }
+
+    /**
+     *
+     * Returns the last inserted autoincrement sequence value.
+     *
+     * @param string $name The name of the sequence to check; typically needed
+     *                     only for PostgreSQL, where it takes the form of `<table>_<column>_seq`.
+     *
+     * @return string
+     *
+     * @see http://php.net/manual/en/pdo.lastinsertid.php
+     *
+     */
+    public function lastInsertId($name = null)
+    {
+        $this->profiler->start(__FUNCTION__);
+        $result = parent::lastInsertId($name);
+        $this->profiler->finish();
+        return $result;
+    }
+
+    /**
+     *
+     * Prepares an SQL statement for execution.
+     *
+     * @param string $statement The SQL statement to prepare for execution.
+     *
+     * @param array  $options   Set these attributes on the returned
+     *                          PDOStatement.
+     *
+     * @return PDOStatement
+     *
+     * @see http://php.net/manual/en/pdo.prepare.php
+     *
+     */
+    public function prepare($statement, $options = [])
+    {
+        $this->profiler->start(__FUNCTION__);
+        $sth = parent::prepare($statement, $options);
+        $this->profiler->finish($statement, $options);
+        return $sth;
     }
 
     /**
@@ -430,7 +574,9 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
     public function perform($statement, array $values = [])
     {
         $sth = $this->prepareWithValues($statement, $values);
+        $this->profiler->start(__FUNCTION__);
         $sth->execute();
+        $this->profiler->finish($statement, $values);
         return $sth;
     }
 
@@ -449,7 +595,10 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      */
     public function query($statement, ...$fetch)
     {
-        return parent::query($statement, ...$fetch);
+        $this->profiler->start(__FUNCTION__);
+        $sth = parent::query($statement, ...$fetch);
+        $this->profiler->finish($sth->queryString);
+        return $sth;
     }
 
     /**
@@ -512,17 +661,23 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
             return $this->prepare($statement);
         }
 
+        // start profiling
+        $this->profiler->start(__FUNCTION__);
+
         // rebuild the statement and values
         $rebuilder = new Rebuilder($this);
         list($statement, $values) = $rebuilder->__invoke($statement, $values);
 
         // prepare the statement
-        $sth = $this->prepare($statement);
+        $sth = parent::prepare($statement);
 
         // for the placeholders we found, bind the corresponding data values
         foreach ($values as $key => $val) {
             $this->bindValue($sth, $key, $val);
         }
+
+        // finish profiling
+        $this->profiler->finish();
 
         // done
         return $sth;
