@@ -157,6 +157,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      * in other words, if your class initializes property-values to defaults
      * in the constructor, you will be overwriting the values injected by
      * fetchObject() !"
+     *
      * <http://www.php.net/manual/en/pdostatement.fetchobject.php#111744>
      *
      * @param string $statement The SQL statement to prepare and execute.
@@ -195,6 +196,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      * in other words, if your class initializes property-values to defaults
      * in the constructor, you will be overwriting the values injected by
      * fetchObject() !"
+     *
      * <http://www.php.net/manual/en/pdostatement.fetchobject.php#111744>
      *
      * @param string $statement The SQL statement to prepare and execute.
@@ -217,7 +219,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
     ) {
         $sth = $this->perform($statement, $values);
 
-        if (!empty($ctor_args)) {
+        if (! empty($ctor_args)) {
             return $sth->fetchAll(self::FETCH_CLASS, $class_name, $ctor_args);
         }
 
@@ -278,28 +280,31 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
 
     /**
      *
-     * Fetches multiple from the database as an associative array.
-     * The first column will be the index
+     * Fetches multiple from the database as an associative array. The first
+     * column will be the index key.
      *
      * @param string $statement The SQL statement to prepare and execute.
      *
      * @param array $values Values to bind to the query.
      *
      * @param int $style a fetch style defaults to PDO::FETCH_COLUMN for single
-     *      values, use PDO::FETCH_NAMED when fetching a multiple columns
+     * values, use PDO::FETCH_NAMED when fetching a multiple columns
      *
      * @return array
      *
      */
-    public function fetchGroup($statement, array $values = [], $style = \PDO::FETCH_COLUMN)
-    {
+    public function fetchGroup(
+        $statement,
+        array $values = [],
+        $style = PDO::FETCH_COLUMN
+    ) {
         $sth = $this->perform($statement, $values);
         return $sth->fetchAll(self::FETCH_GROUP | $style);
     }
 
     /**
      *
-     * Yields rows from the database
+     * Yields rows from the database.
      *
      * @param string $statement The SQL statement to prepare and execute.
      *
@@ -338,7 +343,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
 
     /**
      *
-     * Yields the first column of all rows
+     * Yields the first column of each row.
      *
      * @param string $statement The SQL statement to prepare and execute.
      *
@@ -377,8 +382,12 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      * @return \Generator
      *
      */
-    public function yieldObjects($statement, array $values = [], $class_name = 'stdClass', array $ctor_args = [])
-    {
+    public function yieldObjects(
+        $statement,
+        array $values = [],
+        $class_name = 'stdClass',
+        array $ctor_args = []
+    ) {
         $sth = $this->perform($statement, $values);
 
         if (empty($ctor_args)) {
@@ -394,7 +403,8 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
 
     /**
      *
-     * Yields key-value pairs (first column is the key, second column is the value).
+     * Yields key-value pairs (first column is the key, second column is the
+     * value).
      *
      * @param string $statement The SQL statement to prepare and execute.
      *
@@ -441,7 +451,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      *
      * @param mixed ...$fetch Optional fetch-related parameters.
      *
-     * @return \PDOStatement
+     * @return PDOStatement
      *
      * @see http://php.net/manual/en/pdo.query.php
      *
