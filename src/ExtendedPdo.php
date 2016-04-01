@@ -24,6 +24,10 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
 {
     protected $profiler;
 
+    protected $args = [];
+
+    protected $pdo;
+
     /**
      *
      * Constructor.
@@ -54,20 +58,18 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
         array $attributes = [],
         ProfilerInterface $profiler = null
     ) {
-        parent::__construct($dsn, $username, $password, $options);
-
-        $attributes = array_replace(
-            [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION],
-            $attributes
-        );
-
-        foreach ($attributes as $attribute => $value) {
-            $this->setAttribute($attribute, $value);
-        }
+        $this->args = [
+            $dsn,
+            $username,
+            $password,
+            $options,
+            $attributes,
+        ];
 
         if ($profiler === null) {
             $profiler = new NullProfiler();
         }
+
         $this->setProfiler($profiler);
     }
 
@@ -79,6 +81,39 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
     public function getProfiler()
     {
         return $this->profiler;
+    }
+
+    public function __call($method, $params)
+    {
+        return $this->getPdo()->$method(...$params);
+    }
+
+    public function connect()
+    {
+        if ($this->pdo) {
+            return;
+        }
+
+        $this->profiler->start(__FUNCTION__);
+
+        list($dsn, $username, $password, $options, $attributes) = $this->args;
+        $this->pdo = new PDO($dsn, $username, $password, $options);
+
+        $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        foreach ($attributes as $attribute => $value) {
+            $this->pdo->setAttribute($attribute, $value);
+        }
+
+        $this->profiler->finish();
+    }
+
+    public function getPdo()
+    {
+        if (! $this->pdo) {
+            $this->connect();
+        }
+
+        return $this->pdo;
     }
 
     /**
@@ -93,7 +128,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
     public function beginTransaction()
     {
         $this->profiler->start(__FUNCTION__);
-        $result = parent::beginTransaction();
+        $result = $this->getPdo()->beginTransaction();
         $this->profiler->finish();
         return $result;
     }
@@ -110,7 +145,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
     public function commit()
     {
         $this->profiler->start(__FUNCTION__);
-        $result = parent::commit();
+        $result = $this->getPdo()->commit();
         $this->profiler->finish();
         return $result;
     }
@@ -127,7 +162,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
     public function rollBack()
     {
         $this->profiler->start(__FUNCTION__);
-        $result = parent::rollBack();
+        $result = $this->getPdo()->rollBack();
         $this->profiler->finish();
         return $result;
     }
@@ -144,7 +179,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
     public function inTransaction()
     {
         $this->profiler->start(__FUNCTION__);
-        $result = parent::inTransaction();
+        $result = $this->getPdo()->inTransaction();
         $this->profiler->finish();
         return $result;
     }
@@ -163,7 +198,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
     public function exec($statement)
     {
         $this->profiler->start(__FUNCTION__);
-        $affected_rows = parent::exec($statement);
+        $affected_rows = $this->getPdo()->exec($statement);
         $this->profiler->finish($statement);
         return $affected_rows;
     }
@@ -183,7 +218,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
     public function lastInsertId($name = null)
     {
         $this->profiler->start(__FUNCTION__);
-        $result = parent::lastInsertId($name);
+        $result = $this->getPdo()->lastInsertId($name);
         $this->profiler->finish();
         return $result;
     }
@@ -205,7 +240,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
     public function prepare($statement, $options = [])
     {
         $this->profiler->start(__FUNCTION__);
-        $sth = parent::prepare($statement, $options);
+        $sth = $this->getPdo()->prepare($statement, $options);
         $this->profiler->finish($statement, $options);
         return $sth;
     }
@@ -601,7 +636,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
     public function query($statement, ...$fetch)
     {
         $this->profiler->start(__FUNCTION__);
-        $sth = parent::query($statement, ...$fetch);
+        $sth = $this->getPdo()->query($statement, ...$fetch);
         $this->profiler->finish($sth->queryString);
         return $sth;
     }
@@ -626,12 +661,12 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
     {
         // non-array quoting
         if (! is_array($value)) {
-            return parent::quote($value, $parameter_type);
+            return $this->getPdo()->quote($value, $parameter_type);
         }
 
         // quote array values, not keys, then combine with commas
         foreach ($value as $k => $v) {
-            $value[$k] = parent::quote($v, $parameter_type);
+            $value[$k] = $this->getPdo()->quote($v, $parameter_type);
         }
         return implode(', ', $value);
     }
@@ -674,7 +709,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
         list($statement, $values) = $rebuilder->__invoke($statement, $values);
 
         // prepare the statement
-        $sth = parent::prepare($statement);
+        $sth = $this->getPdo()->prepare($statement);
 
         // for the placeholders we found, bind the corresponding data values
         foreach ($values as $key => $val) {
