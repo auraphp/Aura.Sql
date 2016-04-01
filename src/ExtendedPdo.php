@@ -24,15 +24,6 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
 {
     /**
      *
-     * A specialized statement preparer.
-     *
-     * @var Rebuilder
-     *
-     */
-    protected $rebuilder;
-
-    /**
-     *
      * Constructor.
      *
      * This overrides the parent so that it can take connection attributes as a
