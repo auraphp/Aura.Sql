@@ -43,43 +43,12 @@ Added functionality in _Aura.Sql_ over the native _PDO_ includes:
 - **Connection locator.** A optional lazy-loading service locator is provided
   for picking different database connections (default, read, and write).
 
-
-## Foreword
-
-### Installation
-
-This library requires PHP 5.6 or later; we recommend using the latest available version of PHP as a matter of principle. It has no userland dependencies.
-
-It is installable and autoloadable via Composer as [aura/sql](https://packagist.org/packages/aura/sql).
-
-Alternatively, [download a release](https://github.com/auraphp/Aura.Sql/releases) or clone this repository, then require or include its _autoload.php_ file.
-
-### Quality
-
-[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/auraphp/Aura.Sql/badges/quality-score.png?b=develop-2)](https://scrutinizer-ci.com/g/auraphp/Aura.Sql/)
-[![Code Coverage](https://scrutinizer-ci.com/g/auraphp/Aura.Sql/badges/coverage.png?b=develop-2)](https://scrutinizer-ci.com/g/auraphp/Aura.Sql/)
-[![Build Status](https://travis-ci.org/auraphp/Aura.Sql.png?branch=develop-2)](https://travis-ci.org/auraphp/Aura.Sql)
-
-To run the unit tests at the command line, issue `phpunit` at the package root. (This requires [PHPUnit][] to be available as `phpunit`.)
-
-[PHPUnit]: http://phpunit.de/manual/
-
-This library attempts to comply with [PSR-1][], [PSR-2][], and [PSR-4][]. If
-you notice compliance oversights, please send a patch via pull request.
-
-[PSR-1]: https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-1-basic-coding-standard.md
-[PSR-2]: https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-2-coding-style-guide.md
-[PSR-4]: https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-4-autoloader.md
-
-### Community
-
-To ask questions, provide feedback, or otherwise communicate with the Aura community, please join our [Google Group](http://groups.google.com/group/auraphp), follow [@auraphp on Twitter](http://twitter.com/auraphp), or chat with us on #auraphp on Freenode.
-
 ## Getting Started
 
 ### Instantiation
 
-You can instantiate _ExtendedPdo_ so that it uses lazy connection, or you can use it to decorate an existing _PDO_ instance.
+You can instantiate _ExtendedPdo_ so that it uses lazy connection, or you can
+use _DecoratedPdo_ to decorate an existing _PDO_ instance.
 
 #### Lazy Connection Instance
 
@@ -102,9 +71,14 @@ $pdo = new ExtendedPdo(
 ?>
 ```
 
-> N.b.: The `sqlsrv` extension will fail to connect when using error mode `PDO::ERRMODE_EXCEPTION`. To connect, you will need to explicitly pass `array(PDO::ATTR_ERRMODE => PDO::ERRMODE_WARNING)` (or `PDO::ERRMODE_SILENT`) when using `sqlsrv`.
+> N.b.: The `sqlsrv` extension will fail to connect when using error mode
+> `PDO::ERRMODE_EXCEPTION`. To connect, you will need to explicitly pass
+> `array(PDO::ATTR_ERRMODE => PDO::ERRMODE_WARNING)` (or `PDO::ERRMODE_SILENT`)
+> when using `sqlsrv`.
 
-Whereas the native _PDO_ connects on instantiation, _ExtendedPdo_ does not connect immediately. Instead, it connects only when you call a method that actually needs the connection to the database; e.g., on `query()`.
+Whereas the native _PDO_ connects on instantiation, _ExtendedPdo_ does not
+connect immediately. Instead, it connects only when you call a method that
+actually needs the connection to the database; e.g., on `query()`.
 
 If you want to force a connection, call the `connect()` method.
 
@@ -134,7 +108,10 @@ $pdo->disconnect();
 ?>
 ```
 
-Doing so will close the connection by unsetting the internal _PDO_ instance. However, calling an _ExtendedPdo_ method that implicitly establishes a connection, such as `query()` or one of the `fetch*()` methods, will automatically re-connect to the database.
+Doing so will close the connection by unsetting the internal _PDO_ instance.
+However, calling an _ExtendedPdo_ method that implicitly establishes a
+connection, such as `query()` or one of the `fetch*()` methods, will
+automatically re-connect to the database.
 
 #### Decorator Instance
 
@@ -331,64 +308,69 @@ foreach ($pdo->yieldPairs($stm, $bind) as $key => $val) {
 ```
 
 
-## Profiler
+## Profiling and Logging
 
-When debugging, it is often useful to see what queries have been executed,
-where they were issued from in the codebase, and how long they took to
-complete. _ExtendedPdo_ comes with an optional profiler that you can use to
-discover that information.
+REWRITE THIS SECTION ENTIRELY.
 
-```php
-<?php
-use Aura\Sql\ExtendedPdo;
-use Aura\Sql\Profiler;
-
-$pdo = new ExtendedPdo(...);
-$pdo->setProfiler(new Profiler);
-
-// ...
-// query(), fetch(), beginTransaction()/commit()/rollback() etc.
-// ...
-
-// now retrieve the profile information:
-$profiles = $pdo->getProfiler()->getProfiles();
-?>
-```
-
-Each profile entry will have these keys:
-
-- `duration`: How long the query took to complete, in seconds.
-
-- `function`: The method that was called on _ExtendedPdo_ that created the
-  profile entry.
-
-- `statement`: The query string that was issued, if any. (Methods like
-  `connect()` and `rollBack()` do not send query strings.)
-
-- `bind_values`: Any values that were bound to the query.
-
-- `trace`: An exception stack trace indicating where the query was issued from
-  in the codebase.
-
-Note that an entry is made into the profile for each call to underlying _ExtendedPDO_ methods.  For example, in a simple query using a bind value, there will be two entries, one for the call to `prepare` and one for the call to `perform`.
-
-Setting the _Profiler_ into the _ExtendedPdo_ instance is optional. Once it
-is set, you can activate and deactivate it as you wish using the
-`Profiler::setActive()` method. When not active, query profiles will not be
-retained.
-
-```php
-<?php
-$pdo = new ExtendedPdo(...);
-$pdo->setProfiler(new Profiler);
-
-// deactivate, issue a query, and reactivate;
-// the query will not show up in the profiles
-$pdo->getProfiler()->setActive(false);
-$pdo->fetchAll('SELECT * FROM foo');
-$pdo->getProfiler()->setActive(true);
-?>
-```
+> When debugging, it is often useful to see what queries have been executed,
+> where they were issued from in the codebase, and how long they took to
+> complete. _ExtendedPdo_ comes with an optional profiler that you can use to
+> discover that information.
+>
+> ```php
+> <?php
+> use Aura\Sql\ExtendedPdo;
+> use Aura\Sql\Profiler;
+>
+> $pdo = new ExtendedPdo(...);
+> $pdo->setProfiler(new Profiler());
+>
+> // ...
+> // query(), fetch(), beginTransaction()/commit()/rollback() etc.
+> // ...
+>
+> // now retrieve the profile information:
+> $profiles = $pdo->getProfiler()->getProfiles();
+> ?>
+> ```
+>
+> Each profile entry will have these keys:
+>
+> - `duration`: How long the query took to complete, in seconds.
+>
+> - `function`: The method that was called on _ExtendedPdo_ that created the
+>   profile entry.
+>
+> - `statement`: The query string that was issued, if any. (Methods like
+>   `connect()` and `rollBack()` do not send query strings.)
+>
+> - `values`: Any values that were bound to the query.
+>
+> - `trace`: An exception stack trace indicating where the query was issued from
+>   in the codebase.
+>
+> Note that an entry is made into the profile for each call to underlying
+> _ExtendedPDO_ methods.  For example, in a simple query using a bind value, there
+> will be two entries, one for the call to `prepare` and one for the call to
+> `perform`.
+>
+> Setting the _Profiler_ into the _ExtendedPdo_ instance is optional. Once it
+> is set, you can activate and deactivate it as you wish using the
+> `Profiler::setActive()` method. When not active, query profiles will not be
+> retained.
+>
+> ```php
+> <?php
+> $pdo = new ExtendedPdo(...);
+> $pdo->setProfiler(new Profiler());
+>
+> // deactivate, issue a query, and reactivate;
+> // the query will not show up in the profiles
+> $pdo->getProfiler()->setActive(false);
+> $pdo->fetchAll('SELECT * FROM foo');
+> $pdo->getProfiler()->setActive(true);
+> ?>
+> ```
 
 ## Connection Locator
 
@@ -405,7 +387,7 @@ First, create the _ConnectionLocator_:
 use Aura\Sql\ExtendedPdo;
 use Aura\Sql\ConnectionLocator;
 
-$connections = new ConnectionLocator;
+$connections = new ConnectionLocator();
 ?>
 ```
 
