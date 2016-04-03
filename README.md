@@ -21,8 +21,10 @@ Added functionality in _Aura.Sql_ over the native _PDO_ includes:
   return a string of comma-separated quoted values.
 
 - **New `perform()` method.** The `perform()` method acts just like `query()`,
-  but binds values to a prepared statement as part of the call.  In addition, placeholders that represent array values will be replaced with comma-
-  separated quoted values. This means you can bind an  array of values to a placeholder used with an `IN (...)`  condition when using `perform()`.
+  but binds values to a prepared statement as part of the call.  In addition,
+  placeholders that represent array values will be replaced with comma-
+  separated quoted values. This means you can bind an  array of values to a
+  placeholder used with an `IN (...)`  condition when using `perform()`.
 
 - **New `fetch*()` methods.** The new `fetch*()` methods provide for
   commonly-used fetch actions. For example, you can call `fetchAll()` directly
@@ -45,7 +47,7 @@ Added functionality in _Aura.Sql_ over the native _PDO_ includes:
 
 ### Installation
 
-This library requires PHP 5.3 or later; we recommend using the latest available version of PHP as a matter of principle. It has no userland dependencies.
+This library requires PHP 5.6 or later; we recommend using the latest available version of PHP as a matter of principle. It has no userland dependencies.
 
 It is installable and autoloadable via Composer as [aura/sql](https://packagist.org/packages/aura/sql).
 
