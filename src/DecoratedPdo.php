@@ -8,9 +8,7 @@
  */
 namespace Aura\Sql;
 
-use Aura\Sql\Exception;
 use PDO;
-use PDOStatement;
 use Psr\Log\NullLogger;
 
 /**
