@@ -575,7 +575,7 @@ class ExtendedPdoTest extends \PHPUnit_Framework_TestCase
             'Aura\Sql\Exception\CannotBindValue',
             "Cannot bind value of type 'object' to placeholder 'id'"
         );
-        $sth = $this->pdo->prepareWithValues($stm, array('id' => new StdClass));
+        $sth = $this->pdo->prepareWithValues($stm, array('id' => new stdClass));
     }
 
     public function testBindNullFirstParameter ()

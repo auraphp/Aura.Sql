@@ -106,7 +106,7 @@ interface ExtendedPdoInterface extends PdoInterface
     public function fetchObject(
         $statement,
         array $values = [],
-        $class_name = 'StdClass',
+        $class_name = 'stdClass',
         array $ctor_args = []
     );
 
@@ -137,7 +137,7 @@ interface ExtendedPdoInterface extends PdoInterface
     public function fetchObjects(
         $statement,
         array $values = [],
-        $class_name = 'StdClass',
+        $class_name = 'stdClass',
         array $ctor_args = []
     );
 
@@ -259,7 +259,7 @@ interface ExtendedPdoInterface extends PdoInterface
      * @return \Generator
      *
      */
-    public function yieldObjects($statement, array $values = [], $class_name = 'StdClass', array $ctor_args = []);
+    public function yieldObjects($statement, array $values = [], $class_name = 'stdClass', array $ctor_args = []);
 
     /**
      *
