@@ -207,9 +207,9 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
     {
         $this->connect();
         $this->profiler->start(__FUNCTION__);
-        $affected_rows = $this->pdo->exec($statement);
+        $affectedRows = $this->pdo->exec($statement);
         $this->profiler->finish($statement);
-        return $affected_rows;
+        return $affectedRows;
     }
 
     /**
@@ -350,9 +350,9 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      *
      * @param array $values Values to bind to the query.
      *
-     * @param string $class_name The name of the class to create.
+     * @param string $class The name of the class to create.
      *
-     * @param array $ctor_args Arguments to pass to the object constructor.
+     * @param array $args Arguments to pass to the object constructor.
      *
      * @return object
      *
@@ -360,16 +360,16 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
     public function fetchObject(
         $statement,
         array $values = [],
-        $class_name = 'stdClass',
-        array $ctor_args = []
+        $class = 'stdClass',
+        array $args = []
     ) {
         $sth = $this->perform($statement, $values);
 
-        if (!empty($ctor_args)) {
-            return $sth->fetchObject($class_name, $ctor_args);
+        if (!empty($args)) {
+            return $sth->fetchObject($class, $args);
         }
 
-        return $sth->fetchObject($class_name);
+        return $sth->fetchObject($class);
     }
 
     /**
@@ -389,10 +389,10 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      *
      * @param array $values Values to bind to the query.
      *
-     * @param string $class_name The name of the class to create from each
+     * @param string $class The name of the class to create from each
      * row.
      *
-     * @param array $ctor_args Arguments to pass to each object constructor.
+     * @param array $args Arguments to pass to each object constructor.
      *
      * @return array
      *
@@ -400,16 +400,16 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
     public function fetchObjects(
         $statement,
         array $values = [],
-        $class_name = 'stdClass',
-        array $ctor_args = []
+        $class = 'stdClass',
+        array $args = []
     ) {
         $sth = $this->perform($statement, $values);
 
-        if (! empty($ctor_args)) {
-            return $sth->fetchAll(self::FETCH_CLASS, $class_name, $ctor_args);
+        if (! empty($args)) {
+            return $sth->fetchAll(self::FETCH_CLASS, $class, $args);
         }
 
-        return $sth->fetchAll(self::FETCH_CLASS, $class_name);
+        return $sth->fetchAll(self::FETCH_CLASS, $class);
     }
 
     /**
@@ -560,10 +560,10 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      *
      * @param array $values Values to bind to the query.
      *
-     * @param string $class_name The name of the class to create from each
+     * @param string $class The name of the class to create from each
      * row.
      *
-     * @param array $ctor_args Arguments to pass to each object constructor.
+     * @param array $args Arguments to pass to each object constructor.
      *
      * @return \Generator
      *
@@ -571,17 +571,17 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
     public function yieldObjects(
         $statement,
         array $values = [],
-        $class_name = 'stdClass',
-        array $ctor_args = []
+        $class = 'stdClass',
+        array $args = []
     ) {
         $sth = $this->perform($statement, $values);
 
-        if (empty($ctor_args)) {
-            while ($instance = $sth->fetchObject($class_name)) {
+        if (empty($args)) {
+            while ($instance = $sth->fetchObject($class)) {
                 yield $instance;
             }
         } else {
-            while ($instance = $sth->fetchObject($class_name, $ctor_args)) {
+            while ($instance = $sth->fetchObject($class, $args)) {
                 yield $instance;
             }
         }
@@ -663,25 +663,25 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      *
      * @param mixed $value The value to quote.
      *
-     * @param int $parameter_type A data type hint for the database driver.
+     * @param int $type A data type hint for the database driver.
      *
      * @return string The quoted value.
      *
      * @see http://php.net/manual/en/pdo.quote.php
      *
      */
-    public function quote($value, $parameter_type = self::PARAM_STR)
+    public function quote($value, $type = self::PARAM_STR)
     {
         $this->connect();
 
         // non-array quoting
         if (! is_array($value)) {
-            return $this->pdo->quote($value, $parameter_type);
+            return $this->pdo->quote($value, $type);
         }
 
         // quote array values, not keys, then combine with commas
         foreach ($value as $k => $v) {
-            $value[$k] = $this->pdo->quote($v, $parameter_type);
+            $value[$k] = $this->pdo->quote($v, $type);
         }
         return implode(', ', $value);
     }

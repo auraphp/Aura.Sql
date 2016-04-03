@@ -96,9 +96,9 @@ interface ExtendedPdoInterface extends PdoInterface
      *
      * @param array $values Values to bind to the query.
      *
-     * @param string $class_name The name of the class to create.
+     * @param string $class The name of the class to create.
      *
-     * @param array $ctor_args Arguments to pass to the object constructor.
+     * @param array $args Arguments to pass to the object constructor.
      *
      * @return object
      *
@@ -106,8 +106,8 @@ interface ExtendedPdoInterface extends PdoInterface
     public function fetchObject(
         $statement,
         array $values = [],
-        $class_name = 'stdClass',
-        array $ctor_args = []
+        $class = 'stdClass',
+        array $args = []
     );
 
     /**
@@ -126,10 +126,10 @@ interface ExtendedPdoInterface extends PdoInterface
      *
      * @param array $values Values to bind to the query.
      *
-     * @param string $class_name The name of the class to create from each
+     * @param string $class The name of the class to create from each
      * row.
      *
-     * @param array $ctor_args Arguments to pass to each object constructor.
+     * @param array $args Arguments to pass to each object constructor.
      *
      * @return array
      *
@@ -137,8 +137,8 @@ interface ExtendedPdoInterface extends PdoInterface
     public function fetchObjects(
         $statement,
         array $values = [],
-        $class_name = 'stdClass',
-        array $ctor_args = []
+        $class = 'stdClass',
+        array $args = []
     );
 
     /**
@@ -251,15 +251,15 @@ interface ExtendedPdoInterface extends PdoInterface
      *
      * @param array $values Values to bind to the query.
      *
-     * @param string $class_name The name of the class to create from each
+     * @param string $class The name of the class to create from each
      * row.
      *
-     * @param array $ctor_args Arguments to pass to each object constructor.
+     * @param array $args Arguments to pass to each object constructor.
      *
      * @return \Generator
      *
      */
-    public function yieldObjects($statement, array $values = [], $class_name = 'stdClass', array $ctor_args = []);
+    public function yieldObjects($statement, array $values = [], $class = 'stdClass', array $args = []);
 
     /**
      *
