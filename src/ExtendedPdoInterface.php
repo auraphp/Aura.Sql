@@ -17,6 +17,12 @@ namespace Aura\Sql;
  */
 interface ExtendedPdoInterface extends PdoInterface
 {
+    public function getProfiler();
+
+    public function setProfiler(ProfilerInterface $profiler);
+
+    public function disconnect();
+
     /**
      *
      * Performs a statement and returns the number of affected rows.

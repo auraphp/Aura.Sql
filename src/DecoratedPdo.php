@@ -49,6 +49,12 @@ class DecoratedPdo extends ExtendedPdo
         // already connected
     }
 
+    public function disconnect()
+    {
+        $message = "Cannot disconnect a DecoratedPdo instance.";
+        throw new Exception\CannotDisconnect($message);
+    }
+
     public function getPdo()
     {
         return $this->pdo;
