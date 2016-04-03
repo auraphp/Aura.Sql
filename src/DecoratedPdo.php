@@ -21,7 +21,7 @@ use Psr\Log\NullLogger;
  * @package Aura.Sql
  *
  */
-class DecoratedPdo extends ExtendedPdo
+class DecoratedPdo extends AbstractExtendedPdo
 {
     /**
      *
@@ -53,10 +53,5 @@ class DecoratedPdo extends ExtendedPdo
     {
         $message = "Cannot disconnect a DecoratedPdo instance.";
         throw new Exception\CannotDisconnect($message);
-    }
-
-    public function getPdo()
-    {
-        return $this->pdo;
     }
 }
