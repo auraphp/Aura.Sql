@@ -15,8 +15,7 @@ use Psr\Log\NullLogger;
 
 /**
  *
- * Provides array quoting, a new `perform()` method, new `fetch*()` methods,
- * and new `yield*()` methods.
+ * Decorates an existing PDO instance with the extended methods.
  *
  * @package Aura.Sql
  *
@@ -32,7 +31,7 @@ class DecoratedPdo extends AbstractExtendedPdo
      *
      * @param PDO $pdo An existing PDO instance to decorate.
      *
-     * @param ProfilerInterface $profiler Records query profiles to a log.
+     * @param ProfilerInterface $profiler Tracks and logs query profiles.
      *
      */
     public function __construct(PDO $pdo, ProfilerInterface $profiler = null)
@@ -44,11 +43,25 @@ class DecoratedPdo extends AbstractExtendedPdo
         $this->setProfiler($profiler);
     }
 
+    /**
+     *
+     * Connects to the database.
+     *
+     * @return null
+     *
+     */
     public function connect()
     {
         // already connected
     }
 
+    /**
+     *
+     * Disconnects from the database; disallowed with decorated PDO connections.
+     *
+     * @return null
+     *
+     */
     public function disconnect()
     {
         $message = "Cannot disconnect a DecoratedPdo instance.";

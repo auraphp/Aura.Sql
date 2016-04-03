@@ -23,35 +23,23 @@ use Psr\Log\NullLogger;
  */
 abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
 {
-    protected $profiler;
-
+    /**
+     *
+     * The internal PDO connection.
+     *
+     * @var PDO
+     *
+     */
     protected $pdo;
 
-    abstract public function connect();
-
-    abstract public function disconnect();
-
-    public function setProfiler(ProfilerInterface $profiler)
-    {
-        $this->profiler = $profiler;
-    }
-
-    public function getProfiler()
-    {
-        return $this->profiler;
-    }
-
-    public function errorCode()
-    {
-        $this->connect();
-        return $this->pdo->errorCode();
-    }
-
-    public function errorInfo()
-    {
-        $this->connect();
-        return $this->pdo->errorInfo();
-    }
+    /**
+     *
+     * Tracks and logs query profiles.
+     *
+     * @var ProfilerInterface
+     *
+     */
+    protected $profiler;
 
     /**
      *
@@ -91,38 +79,46 @@ abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
 
     /**
      *
-     * Rolls back the current transaction, and restores autocommit mode.
+     * Connects to the database.
      *
-     * @return bool True on success, false on failure.
-     *
-     * @see http://php.net/manual/en/pdo.rollback.php
+     * @return null
      *
      */
-    public function rollBack()
+    abstract public function connect();
+
+    /**
+     *
+     * Disconnects from the database.
+     *
+     * @return null
+     *
+     */
+    abstract public function disconnect();
+
+    /**
+     *
+     * Gets the most recent error code.
+     *
+     * @return mixed
+     *
+     */
+    public function errorCode()
     {
         $this->connect();
-        $this->profiler->start(__FUNCTION__);
-        $result = $this->pdo->rollBack();
-        $this->profiler->finish();
-        return $result;
+        return $this->pdo->errorCode();
     }
 
     /**
      *
-     * Is a transaction currently active?
+     * Gets the most recent error info.
      *
-     * @return bool
-     *
-     * @see http://php.net/manual/en/pdo.intransaction.php
+     * @return array
      *
      */
-    public function inTransaction()
+    public function errorInfo()
     {
         $this->connect();
-        $this->profiler->start(__FUNCTION__);
-        $result = $this->pdo->inTransaction();
-        $this->profiler->finish();
-        return $result;
+        return $this->pdo->errorInfo();
     }
 
     /**
@@ -143,50 +139,6 @@ abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
         $affectedRows = $this->pdo->exec($statement);
         $this->profiler->finish($statement);
         return $affectedRows;
-    }
-
-    /**
-     *
-     * Returns the last inserted autoincrement sequence value.
-     *
-     * @param string $name The name of the sequence to check; typically needed
-     *                     only for PostgreSQL, where it takes the form of `<table>_<column>_seq`.
-     *
-     * @return string
-     *
-     * @see http://php.net/manual/en/pdo.lastinsertid.php
-     *
-     */
-    public function lastInsertId($name = null)
-    {
-        $this->connect();
-        $this->profiler->start(__FUNCTION__);
-        $result = $this->pdo->lastInsertId($name);
-        $this->profiler->finish();
-        return $result;
-    }
-
-    /**
-     *
-     * Prepares an SQL statement for execution.
-     *
-     * @param string $statement The SQL statement to prepare for execution.
-     *
-     * @param array $options Set these attributes on the returned
-     * PDOStatement.
-     *
-     * @return PDOStatement
-     *
-     * @see http://php.net/manual/en/pdo.prepare.php
-     *
-     */
-    public function prepare($statement, $options = [])
-    {
-        $this->connect();
-        $this->profiler->start(__FUNCTION__);
-        $sth = $this->pdo->prepare($statement, $options);
-        $this->profiler->finish($statement, $options);
-        return $sth;
     }
 
     /**
@@ -265,6 +217,30 @@ abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
     {
         $sth = $this->perform($statement, $values);
         return $sth->fetchAll(self::FETCH_COLUMN, 0);
+    }
+
+    /**
+     *
+     * Fetches multiple from the database as an associative array. The first
+     * column will be the index key.
+     *
+     * @param string $statement The SQL statement to prepare and execute.
+     *
+     * @param array $values Values to bind to the query.
+     *
+     * @param int $style a fetch style defaults to PDO::FETCH_COLUMN for single
+     * values, use PDO::FETCH_NAMED when fetching a multiple columns
+     *
+     * @return array
+     *
+     */
+    public function fetchGroup(
+        $statement,
+        array $values = [],
+        $style = PDO::FETCH_COLUMN
+    ) {
+        $sth = $this->perform($statement, $values);
+        return $sth->fetchAll(self::FETCH_GROUP | $style);
     }
 
     /**
@@ -397,28 +373,227 @@ abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
         return $sth->fetchColumn(0);
     }
 
+    public function getProfiler()
+    {
+        return $this->profiler;
+    }
+
     /**
      *
-     * Fetches multiple from the database as an associative array. The first
-     * column will be the index key.
+     * Is a transaction currently active?
+     *
+     * @return bool
+     *
+     * @see http://php.net/manual/en/pdo.intransaction.php
+     *
+     */
+    public function inTransaction()
+    {
+        $this->connect();
+        $this->profiler->start(__FUNCTION__);
+        $result = $this->pdo->inTransaction();
+        $this->profiler->finish();
+        return $result;
+    }
+
+    /**
+     *
+     * Returns the last inserted autoincrement sequence value.
+     *
+     * @param string $name The name of the sequence to check; typically needed
+     *                     only for PostgreSQL, where it takes the form of `<table>_<column>_seq`.
+     *
+     * @return string
+     *
+     * @see http://php.net/manual/en/pdo.lastinsertid.php
+     *
+     */
+    public function lastInsertId($name = null)
+    {
+        $this->connect();
+        $this->profiler->start(__FUNCTION__);
+        $result = $this->pdo->lastInsertId($name);
+        $this->profiler->finish();
+        return $result;
+    }
+
+    /**
+     *
+     * Performs a query with bound values and returns the resulting
+     * PDOStatement; array values will be passed through `quote()` and their
+     * respective placeholders will be replaced in the query string.
+     *
+     * @param string $statement The SQL statement to perform.
+     *
+     * @param array $values Values to bind to the query
+     *
+     * @return PDOStatement
+     *
+     * @see quote()
+     *
+     */
+    public function perform($statement, array $values = [])
+    {
+        $this->connect();
+        $sth = $this->prepareWithValues($statement, $values);
+        $this->profiler->start(__FUNCTION__);
+        $sth->execute();
+        $this->profiler->finish($statement, $values);
+        return $sth;
+    }
+
+    /**
+     *
+     * Prepares an SQL statement for execution.
+     *
+     * @param string $statement The SQL statement to prepare for execution.
+     *
+     * @param array $options Set these attributes on the returned
+     * PDOStatement.
+     *
+     * @return PDOStatement
+     *
+     * @see http://php.net/manual/en/pdo.prepare.php
+     *
+     */
+    public function prepare($statement, $options = [])
+    {
+        $this->connect();
+        $this->profiler->start(__FUNCTION__);
+        $sth = $this->pdo->prepare($statement, $options);
+        $this->profiler->finish($statement, $options);
+        return $sth;
+    }
+
+    /**
+     *
+     * Prepares an SQL statement with bound values.
+     *
+     * This method only binds values that have placeholders in the
+     * statement, thereby avoiding errors from PDO regarding too many bound
+     * values. It also binds all sequential (question-mark) placeholders.
+     *
+     * If a placeholder value is an array, the array is converted to a string
+     * of comma-separated quoted values; e.g., for an `IN (...)` condition.
+     * The quoted string is replaced directly into the statement instead of
+     * using `PDOStatement::bindValue()` proper.
+     *
+     * @param string $statement The SQL statement to prepare for execution.
+     *
+     * @param array $values The values to bind to the statement, if any.
+     *
+     * @return PDOStatement
+     *
+     * @see http://php.net/manual/en/pdo.prepare.php
+     *
+     */
+    public function prepareWithValues($statement, array $values = [])
+    {
+        // if there are no values to bind ...
+        if (empty($values)) {
+            // ... use the normal preparation
+            return $this->prepare($statement);
+        }
+
+        $this->connect();
+
+        // start profiling
+        $this->profiler->start(__FUNCTION__);
+
+        // rebuild the statement and values
+        $rebuilder = new Rebuilder($this);
+        list($statement, $values) = $rebuilder->__invoke($statement, $values);
+
+        // prepare the statement
+        $sth = $this->pdo->prepare($statement);
+
+        // for the placeholders we found, bind the corresponding data values
+        foreach ($values as $key => $val) {
+            $this->bindValue($sth, $key, $val);
+        }
+
+        // finish profiling
+        $this->profiler->finish($statement);
+
+        // done
+        return $sth;
+    }
+
+    /**
+     *
+     * Queries the database and returns a PDOStatement.
      *
      * @param string $statement The SQL statement to prepare and execute.
      *
-     * @param array $values Values to bind to the query.
+     * @param mixed ...$fetch Optional fetch-related parameters.
      *
-     * @param int $style a fetch style defaults to PDO::FETCH_COLUMN for single
-     * values, use PDO::FETCH_NAMED when fetching a multiple columns
+     * @return PDOStatement
      *
-     * @return array
+     * @see http://php.net/manual/en/pdo.query.php
      *
      */
-    public function fetchGroup(
-        $statement,
-        array $values = [],
-        $style = PDO::FETCH_COLUMN
-    ) {
-        $sth = $this->perform($statement, $values);
-        return $sth->fetchAll(self::FETCH_GROUP | $style);
+    public function query($statement, ...$fetch)
+    {
+        $this->connect();
+        $this->profiler->start(__FUNCTION__);
+        $sth = $this->pdo->query($statement, ...$fetch);
+        $this->profiler->finish($sth->queryString);
+        return $sth;
+    }
+
+    /**
+     *
+     * Quotes a value for use in an SQL statement.
+     *
+     * This differs from `PDO::quote()` in that it will convert an array into
+     * a string of comma-separated quoted values.
+     *
+     * @param mixed $value The value to quote.
+     *
+     * @param int $type A data type hint for the database driver.
+     *
+     * @return string The quoted value.
+     *
+     * @see http://php.net/manual/en/pdo.quote.php
+     *
+     */
+    public function quote($value, $type = self::PARAM_STR)
+    {
+        $this->connect();
+
+        // non-array quoting
+        if (! is_array($value)) {
+            return $this->pdo->quote($value, $type);
+        }
+
+        // quote array values, not keys, then combine with commas
+        foreach ($value as $k => $v) {
+            $value[$k] = $this->pdo->quote($v, $type);
+        }
+        return implode(', ', $value);
+    }
+
+    public function setProfiler(ProfilerInterface $profiler)
+    {
+        $this->profiler = $profiler;
+    }
+
+    /**
+     *
+     * Rolls back the current transaction, and restores autocommit mode.
+     *
+     * @return bool True on success, false on failure.
+     *
+     * @see http://php.net/manual/en/pdo.rollback.php
+     *
+     */
+    public function rollBack()
+    {
+        $this->connect();
+        $this->profiler->start(__FUNCTION__);
+        $result = $this->pdo->rollBack();
+        $this->profiler->finish();
+        return $result;
     }
 
     /**
@@ -538,139 +713,6 @@ abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
         while ($row = $sth->fetch(self::FETCH_NUM)) {
             yield $row[0] => $row[1];
         }
-    }
-
-    /**
-     *
-     * Performs a query with bound values and returns the resulting
-     * PDOStatement; array values will be passed through `quote()` and their
-     * respective placeholders will be replaced in the query string.
-     *
-     * @param string $statement The SQL statement to perform.
-     *
-     * @param array $values Values to bind to the query
-     *
-     * @return PDOStatement
-     *
-     * @see quote()
-     *
-     */
-    public function perform($statement, array $values = [])
-    {
-        $this->connect();
-        $sth = $this->prepareWithValues($statement, $values);
-        $this->profiler->start(__FUNCTION__);
-        $sth->execute();
-        $this->profiler->finish($statement, $values);
-        return $sth;
-    }
-
-    /**
-     *
-     * Queries the database and returns a PDOStatement.
-     *
-     * @param string $statement The SQL statement to prepare and execute.
-     *
-     * @param mixed ...$fetch Optional fetch-related parameters.
-     *
-     * @return PDOStatement
-     *
-     * @see http://php.net/manual/en/pdo.query.php
-     *
-     */
-    public function query($statement, ...$fetch)
-    {
-        $this->connect();
-        $this->profiler->start(__FUNCTION__);
-        $sth = $this->pdo->query($statement, ...$fetch);
-        $this->profiler->finish($sth->queryString);
-        return $sth;
-    }
-
-    /**
-     *
-     * Quotes a value for use in an SQL statement.
-     *
-     * This differs from `PDO::quote()` in that it will convert an array into
-     * a string of comma-separated quoted values.
-     *
-     * @param mixed $value The value to quote.
-     *
-     * @param int $type A data type hint for the database driver.
-     *
-     * @return string The quoted value.
-     *
-     * @see http://php.net/manual/en/pdo.quote.php
-     *
-     */
-    public function quote($value, $type = self::PARAM_STR)
-    {
-        $this->connect();
-
-        // non-array quoting
-        if (! is_array($value)) {
-            return $this->pdo->quote($value, $type);
-        }
-
-        // quote array values, not keys, then combine with commas
-        foreach ($value as $k => $v) {
-            $value[$k] = $this->pdo->quote($v, $type);
-        }
-        return implode(', ', $value);
-    }
-
-    /**
-     *
-     * Prepares an SQL statement with bound values.
-     *
-     * This method only binds values that have placeholders in the
-     * statement, thereby avoiding errors from PDO regarding too many bound
-     * values. It also binds all sequential (question-mark) placeholders.
-     *
-     * If a placeholder value is an array, the array is converted to a string
-     * of comma-separated quoted values; e.g., for an `IN (...)` condition.
-     * The quoted string is replaced directly into the statement instead of
-     * using `PDOStatement::bindValue()` proper.
-     *
-     * @param string $statement The SQL statement to prepare for execution.
-     *
-     * @param array $values The values to bind to the statement, if any.
-     *
-     * @return PDOStatement
-     *
-     * @see http://php.net/manual/en/pdo.prepare.php
-     *
-     */
-    public function prepareWithValues($statement, array $values = [])
-    {
-        // if there are no values to bind ...
-        if (empty($values)) {
-            // ... use the normal preparation
-            return $this->prepare($statement);
-        }
-
-        $this->connect();
-
-        // start profiling
-        $this->profiler->start(__FUNCTION__);
-
-        // rebuild the statement and values
-        $rebuilder = new Rebuilder($this);
-        list($statement, $values) = $rebuilder->__invoke($statement, $values);
-
-        // prepare the statement
-        $sth = $this->pdo->prepare($statement);
-
-        // for the placeholders we found, bind the corresponding data values
-        foreach ($values as $key => $val) {
-            $this->bindValue($sth, $key, $val);
-        }
-
-        // finish profiling
-        $this->profiler->finish($statement);
-
-        // done
-        return $sth;
     }
 
     /**

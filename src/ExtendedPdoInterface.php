@@ -19,24 +19,6 @@ interface ExtendedPdoInterface extends PdoInterface
 {
     /**
      *
-     * Sets the Profiler instance.
-     *
-     * @param ProfilerInterface $profiler The profiler instance.
-     *
-     */
-    public function setProfiler(ProfilerInterface $profiler);
-
-    /**
-     *
-     * Returns the Profiler instance.
-     *
-     * @return ProfilerInterface
-     *
-     */
-    public function getProfiler();
-
-    /**
-     *
      * Connects to the database.
      *
      */
@@ -106,6 +88,27 @@ interface ExtendedPdoInterface extends PdoInterface
      *
      */
     public function fetchCol($statement, array $values = []);
+
+    /**
+     *
+     * Fetches multiple from the database as an associative array.
+     * The first column will be the index
+     *
+     * @param string $statement The SQL statement to prepare and execute.
+     *
+     * @param array $values Values to bind to the query.
+     *
+     * @param int $style a fetch style defaults to PDO::FETCH_COLUMN for single
+     * values, use PDO::FETCH_NAMED when fetching a multiple columns
+     *
+     * @return array
+     *
+     */
+    public function fetchGroup(
+        $statement,
+        array $values = [],
+        $style = PDO::FETCH_COLUMN
+    );
 
     /**
      *
@@ -209,24 +212,21 @@ interface ExtendedPdoInterface extends PdoInterface
 
     /**
      *
-     * Fetches multiple from the database as an associative array.
-     * The first column will be the index
+     * Returns the Profiler instance.
      *
-     * @param string $statement The SQL statement to prepare and execute.
-     *
-     * @param array $values Values to bind to the query.
-     *
-     * @param int $style a fetch style defaults to PDO::FETCH_COLUMN for single
-     *      values, use PDO::FETCH_NAMED when fetching a multiple columns
-     *
-     * @return array
+     * @return ProfilerInterface
      *
      */
-    public function fetchGroup(
-        $statement,
-        array $values = [],
-        $style = PDO::FETCH_COLUMN
-    );
+    public function getProfiler();
+
+    /**
+     *
+     * Sets the Profiler instance.
+     *
+     * @param ProfilerInterface $profiler The profiler instance.
+     *
+     */
+    public function setProfiler(ProfilerInterface $profiler);
 
     /**
      *

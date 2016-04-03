@@ -46,7 +46,7 @@ class ExtendedPdo extends AbstractExtendedPdo
      *
      * @param array $attributes Attributes to set after the connection.
      *
-     * @param ProfilerInterface $profiler Records query profiles to a log.
+     * @param ProfilerInterface $profiler Tracks and logs query profiles.
      *
      * @see http://php.net/manual/en/pdo.construct.php
      *
@@ -74,6 +74,13 @@ class ExtendedPdo extends AbstractExtendedPdo
         $this->setProfiler($profiler);
     }
 
+    /**
+     *
+     * Connects to the database.
+     *
+     * @return null
+     *
+     */
     public function connect()
     {
         if ($this->pdo) {
@@ -93,8 +100,17 @@ class ExtendedPdo extends AbstractExtendedPdo
         $this->profiler->finish();
     }
 
+    /**
+     *
+     * Disconnects from the database.
+     *
+     * @return null
+     *
+     */
     public function disconnect()
     {
+        $this->profiler->start(__FUNCTION__);
         $this->pdo = null;
+        $this->profiler->finish();
     }
 }

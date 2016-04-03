@@ -13,7 +13,7 @@ use Psr\Log\LogLevel;
 
 /**
  *
- * Retains query profiles.
+ * Tracks and logs query profiles.
  *
  * @package Aura.Sql
  *
