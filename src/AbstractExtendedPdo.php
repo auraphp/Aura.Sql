@@ -3,7 +3,7 @@
  *
  * This file is part of Aura for PHP.
  *
- * @license http://opensource.org/licenses/bsd-license.php BSD
+ * @license https://opensource.org/licenses/MIT MIT
  *
  */
 namespace Aura\Sql;
@@ -15,8 +15,8 @@ use Psr\Log\NullLogger;
 
 /**
  *
- * Provides array quoting, a new `perform()` method, new `fetch*()` methods,
- * and new `yield*()` methods.
+ * Provides array quoting, profiling, a new `perform()` method, new `fetch*()`
+ * methods, and new `yield*()` methods.
  *
  * @package Aura.Sql
  *
@@ -26,6 +26,10 @@ abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
     protected $profiler;
 
     protected $pdo;
+
+    abstract public function connect();
+
+    abstract public function disconnect();
 
     public function setProfiler(ProfilerInterface $profiler)
     {
@@ -48,10 +52,6 @@ abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
         $this->connect();
         return $this->pdo->errorInfo();
     }
-
-    abstract public function connect();
-
-    abstract public function disconnect();
 
     /**
      *

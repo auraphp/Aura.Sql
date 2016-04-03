@@ -3,7 +3,7 @@
  *
  * This file is part of Aura for PHP.
  *
- * @license http://opensource.org/licenses/bsd-license.php BSD
+ * @license https://opensource.org/licenses/MIT MIT
  *
  */
 namespace Aura\Sql;
@@ -17,12 +17,36 @@ namespace Aura\Sql;
  */
 interface ExtendedPdoInterface extends PdoInterface
 {
-    public function getProfiler();
-
+    /**
+     *
+     * Sets the Profiler instance.
+     *
+     * @param ProfilerInterface $profiler The profiler instance.
+     *
+     */
     public function setProfiler(ProfilerInterface $profiler);
 
+    /**
+     *
+     * Returns the Profiler instance.
+     *
+     * @return ProfilerInterface
+     *
+     */
+    public function getProfiler();
+
+    /**
+     *
+     * Connects to the database.
+     *
+     */
     public function connect();
 
+    /**
+     *
+     * Disconnects from the database.
+     *
+     */
     public function disconnect();
 
     /**
@@ -198,7 +222,11 @@ interface ExtendedPdoInterface extends PdoInterface
      * @return array
      *
      */
-    public function fetchGroup($statement, array $values = [], $style = \PDO::FETCH_COLUMN);
+    public function fetchGroup(
+        $statement,
+        array $values = [],
+        $style = PDO::FETCH_COLUMN
+    );
 
     /**
      *
@@ -261,11 +289,17 @@ interface ExtendedPdoInterface extends PdoInterface
      * @return \Generator
      *
      */
-    public function yieldObjects($statement, array $values = [], $class = 'stdClass', array $args = []);
+    public function yieldObjects(
+        $statement,
+        array $values = [],
+        $class = 'stdClass',
+        array $args = []
+    );
 
     /**
      *
-     * Yields key-value pairs (first column is the key, second column is the value).
+     * Yields key-value pairs (first column is the key, second column is the
+     * value).
      *
      * @param string $statement The SQL statement to prepare and execute.
      *

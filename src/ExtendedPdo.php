@@ -3,26 +3,30 @@
  *
  * This file is part of Aura for PHP.
  *
- * @license http://opensource.org/licenses/bsd-license.php BSD
+ * @license https://opensource.org/licenses/MIT MIT
  *
  */
 namespace Aura\Sql;
 
-use Aura\Sql\Exception;
 use PDO;
-use PDOStatement;
 use Psr\Log\NullLogger;
 
 /**
  *
- * Provides array quoting, a new `perform()` method, new `fetch*()` methods,
- * and new `yield*()` methods.
+ * A lazy-connecting PDO with extended methods.
  *
  * @package Aura.Sql
  *
  */
 class ExtendedPdo extends AbstractExtendedPdo
 {
+    /**
+     *
+     * Constructor arguments for instantiating the PDO connection.
+     *
+     * @var array
+     *
+     */
     protected $args = [];
 
     /**
@@ -32,7 +36,7 @@ class ExtendedPdo extends AbstractExtendedPdo
      * This overrides the parent so that it can take connection attributes as a
      * constructor parameter, and set them after connection.
      *
-     * @param string $dsn The data source name for the PDO connection.
+     * @param string $dsn The data source name for the connection.
      *
      * @param string $username The username for the connection.
      *
