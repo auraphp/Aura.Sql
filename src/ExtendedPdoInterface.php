@@ -21,6 +21,8 @@ interface ExtendedPdoInterface extends PdoInterface
 
     public function setProfiler(ProfilerInterface $profiler);
 
+    public function connect();
+
     public function disconnect();
 
     /**
