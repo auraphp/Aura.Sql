@@ -235,8 +235,8 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      *
      * @param string $statement The SQL statement to prepare for execution.
      *
-     * @param array  $options   Set these attributes on the returned
-     *                          PDOStatement.
+     * @param array $options Set these attributes on the returned
+     * PDOStatement.
      *
      * @return PDOStatement
      *
