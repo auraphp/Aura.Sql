@@ -22,12 +22,12 @@ class Profiler implements ProfilerInterface
 {
     /**
      *
-     * The current profile information in a stack to allow nesting.
+     * The current profile information.
      *
      * @var array
      *
      */
-    private $stack = [];
+    private $profile = [];
 
     /**
      *
@@ -169,8 +169,7 @@ class Profiler implements ProfilerInterface
         }
 
         // keep starting information in a stack
-        $profile = ['function' => $function, 'start' => microtime(true)];
-        array_push($this->stack, $profile);
+        $this->profile = ['function' => $function, 'start' => microtime(true)];
     }
 
     /**
@@ -190,8 +189,8 @@ class Profiler implements ProfilerInterface
             return;
         }
 
-        $profile = array_pop($this->stack);
-        assert(! empty($profile)); // you are missing a call to begin()
+        $profile = $this->profile;
+        $this->profile = [];
 
         $finish                 = microtime(true);
         $profile['finish']      = $finish;
