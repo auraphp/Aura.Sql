@@ -64,15 +64,10 @@ $pdo = new ExtendedPdo(
     'mysql:host=localhost;dbname=test',
     'username',
     'password',
-    array(), // driver options as key-value pairs
-    array()  // attributes as key-value pairs
+    array(), // driver attributes/options as key-value pairs
+    array()  // queries to execute after connection
 );
 ```
-
-> N.b.: The `sqlsrv` extension will fail to connect when using error mode
-> `PDO::ERRMODE_EXCEPTION`. To connect, you will need to explicitly pass
-> `array(PDO::ATTR_ERRMODE => PDO::ERRMODE_WARNING)` (or `PDO::ERRMODE_SILENT`)
-> when using `sqlsrv`.
 
 Whereas the native _PDO_ connects on instantiation, _ExtendedPdo_ does not
 connect immediately. Instead, it connects only when you call a method that
