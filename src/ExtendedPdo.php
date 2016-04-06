@@ -59,10 +59,19 @@ class ExtendedPdo extends AbstractExtendedPdo
         array $queries = [],
         ProfilerInterface $profiler = null
     ) {
+        // if no error mode is specified, use exceptions
         if (! isset($options[PDO::ATTR_ERRMODE])) {
             $options[PDO::ATTR_ERRMODE] = PDO::ERRMODE_EXCEPTION;
         }
 
+        // sqlsrv fails to connect when the error mode uses exceptions
+        $sqlsrvWarnEx = substr($dsn, 0, 7) == 'sqlsrv:'
+            && $options[PDO::ATTR_ERRMODE] == PDO::ERRMODE_EXCEPTION;
+        if ($sqlsrvWarnEx) {
+            $options[PDO::ATTR_ERRMODE] == PDO::ERRMODE_WARNING;
+        }
+
+        // retain the arguments for later
         $this->args = [
             $dsn,
             $username,
@@ -71,10 +80,10 @@ class ExtendedPdo extends AbstractExtendedPdo
             $queries
         ];
 
+        // retain a profiler, instantiating a null profiler if needed
         if ($profiler === null) {
             $profiler = new Profiler(new NullLogger());
         }
-
         $this->setProfiler($profiler);
     }
 
@@ -97,7 +106,7 @@ class ExtendedPdo extends AbstractExtendedPdo
         $this->pdo = new PDO($dsn, $username, $password, $options);
         $this->profiler->finish();
 
-        // connection-time queries, such as setting charset and collation
+        // connection-time queries
         foreach ($queries as $query) {
             $this->exec($query);
         }
