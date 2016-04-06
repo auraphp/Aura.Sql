@@ -56,15 +56,19 @@ class ExtendedPdo extends AbstractExtendedPdo
         $username = null,
         $password = null,
         array $options = [],
-        array $attributes = [],
+        array $queries = [],
         ProfilerInterface $profiler = null
     ) {
+        if (! isset($options[PDO::ATTR_ERRMODE])) {
+            $options[PDO::ATTR_ERRMODE] = PDO::ERRMODE_EXCEPTION;
+        }
+
         $this->args = [
             $dsn,
             $username,
             $password,
             $options,
-            $attributes,
+            $queries
         ];
 
         if ($profiler === null) {
@@ -87,17 +91,16 @@ class ExtendedPdo extends AbstractExtendedPdo
             return;
         }
 
+        // connect
         $this->profiler->start(__FUNCTION__);
-
-        list($dsn, $username, $password, $options, $attributes) = $this->args;
+        list($dsn, $username, $password, $options, $queries) = $this->args;
         $this->pdo = new PDO($dsn, $username, $password, $options);
-
-        $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        foreach ($attributes as $attribute => $value) {
-            $this->pdo->setAttribute($attribute, $value);
-        }
-
         $this->profiler->finish();
+
+        // connection-time queries, such as setting charset and collation
+        foreach ($queries as $query) {
+            $this->exec($query);
+        }
     }
 
     /**
