@@ -86,7 +86,7 @@ class ExtendedPdoTest extends \PHPUnit_Framework_TestCase
         $stm = "SELECT * FROM pdotest";
         $sth = $this->pdo->query($stm);
         $this->assertInstanceOf('PDOStatement', $sth);
-        $result = $sth->fetchAll(Pdo::FETCH_ASSOC);
+        $result = $sth->fetchAll(PDO::FETCH_ASSOC);
         $expect = 10;
         $actual = count($result);
         $this->assertEquals($expect, $actual);
@@ -97,7 +97,7 @@ class ExtendedPdoTest extends \PHPUnit_Framework_TestCase
         $stm = "SELECT * FROM pdotest WHERE id <= :val";
         $sth = $this->pdo->perform($stm, array('val' => '5'));
         $this->assertInstanceOf('PDOStatement', $sth);
-        $result = $sth->fetchAll(Pdo::FETCH_ASSOC);
+        $result = $sth->fetchAll(PDO::FETCH_ASSOC);
         $expect = 5;
         $actual = count($result);
         $this->assertEquals($expect, $actual);
@@ -114,7 +114,7 @@ class ExtendedPdoTest extends \PHPUnit_Framework_TestCase
 
         $this->assertInstanceOf('PDOStatement', $sth);
 
-        $result = $sth->fetchAll(Pdo::FETCH_ASSOC);
+        $result = $sth->fetchAll(PDO::FETCH_ASSOC);
         $expect = 5;
         $actual = count($result);
         $this->assertEquals($expect, $actual);
