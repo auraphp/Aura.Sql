@@ -231,6 +231,15 @@ abstract class AbstractExtendedPdoTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expect, $result);
     }
 
+    public function testYieldAll()
+    {
+        $stm = "SELECT * FROM pdotest";
+        $expect = $this->pdo->fetchAll($stm);
+        $actual = $this->iteratorIntoArray($this->pdo->yieldAll($stm));
+
+        $this->assertEquals($expect, $actual);
+    }
+
     public function testFetchAssoc()
     {
         $stm = "SELECT * FROM pdotest ORDER BY id";
@@ -242,6 +251,15 @@ abstract class AbstractExtendedPdoTest extends \PHPUnit_Framework_TestCase
         // 1-based IDs, not 0-based sequential values
         $expect = array(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
         $actual = array_keys($result);
+        $this->assertEquals($expect, $actual);
+    }
+
+    public function testYieldAssoc()
+    {
+        $stm = "SELECT * FROM pdotest ORDER BY id";
+        $expect = $this->pdo->fetchAssoc($stm);
+        $actual = $this->iteratorIntoArray($this->pdo->yieldAssoc($stm));
+
         $this->assertEquals($expect, $actual);
     }
 
@@ -282,6 +300,15 @@ abstract class AbstractExtendedPdoTest extends \PHPUnit_Framework_TestCase
         // // 1-based IDs, not 0-based sequential values
         $expect = array('1', '2', '3', '4', '5', '6', '7', '8', '9', '10');
         $this->assertEquals($expect, $result);
+    }
+
+    public function testYieldCol()
+    {
+        $stm = "SELECT id FROM pdotest ORDER BY id";
+        $expect = $this->pdo->fetchCol($stm);
+        $actual = $this->iteratorIntoArray($this->pdo->yieldCol($stm));
+
+        $this->assertEquals($expect, $actual);
     }
 
     public function testFetchColWithCallback()
@@ -334,6 +361,15 @@ abstract class AbstractExtendedPdoTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expect, $actual);
     }
 
+    public function testYieldObjects()
+    {
+        $stm = "SELECT * FROM pdotest";
+        $expect = $this->pdo->fetchObjects($stm);
+        $actual = $this->iteratorIntoArray($this->pdo->yieldObjects($stm));
+
+        $this->assertEquals($expect, $actual);
+    }
+
     public function testFetchObjects_withCtorArgs()
     {
         $stm = "SELECT * FROM pdotest";
@@ -350,6 +386,25 @@ abstract class AbstractExtendedPdoTest extends \PHPUnit_Framework_TestCase
             $object->name = $name;
             $expect[] = $object;
         }
+        $this->assertEquals($expect, $actual);
+    }
+
+    public function testYieldObjects_withCtorArgs()
+    {
+        $stm = "SELECT * FROM pdotest";
+        $expect = $this->pdo->fetchObjects(
+            $stm,
+            array(),
+            'Aura\Sql\FakeObject',
+            array('bar')
+        );
+        $actual = $this->iteratorIntoArray($this->pdo->yieldObjects(
+            $stm,
+            array(),
+            'Aura\Sql\FakeObject',
+            array('bar')
+        ));
+
         $this->assertEquals($expect, $actual);
     }
 
@@ -406,6 +461,15 @@ abstract class AbstractExtendedPdoTest extends \PHPUnit_Framework_TestCase
           9  => 'Julia',
           10 => 'Kara',
         );
+        $this->assertEquals($expect, $actual);
+    }
+
+    public function testYieldPairs()
+    {
+        $stm = "SELECT id, name FROM pdotest ORDER BY id";
+        $expect = $this->pdo->fetchPairs($stm);
+        $actual = $this->iteratorIntoArray($this->pdo->yieldPairs($stm));
+
         $this->assertEquals($expect, $actual);
     }
 
@@ -610,5 +674,14 @@ abstract class AbstractExtendedPdoTest extends \PHPUnit_Framework_TestCase
         $rebuilder = new Rebuilder($this->newExtendedPdo());
         $result = $rebuilder('SELECT * FROM test WHERE column_one = ?', array(null));
         $this->assertTrue(array_key_exists(1, $result[1]));
+    }
+
+    protected function iteratorIntoArray(\Iterator $iterator)
+    {
+        $result = array();
+        foreach ($iterator as $key => $value) {
+            $result[$key] = $value;
+        }
+        return $result;
     }
 }
