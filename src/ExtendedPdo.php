@@ -9,11 +9,6 @@
 namespace Aura\Sql;
 
 use Aura\Sql\Exception;
-use Aura\Sql\Iterator\AllStatementIterator;
-use Aura\Sql\Iterator\AssocStatementIterator;
-use Aura\Sql\Iterator\ColStatementIterator;
-use Aura\Sql\Iterator\ObjectsStatementIterator;
-use Aura\Sql\Iterator\PairsStatementIterator;
 use PDO;
 use PDOStatement;
 
@@ -1005,13 +1000,13 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      *
      * @param array $values Values to bind to the query.
      *
-     * @return AllStatementIterator
+     * @return Iterator\AllIterator
      *
      */
     public function yieldAll($statement, array $values = array())
     {
         $sth = $this->perform($statement, $values);
-        return new AllStatementIterator($sth);
+        return new Iterator\AllIterator($sth);
     }
 
     /**
@@ -1022,13 +1017,13 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      *
      * @param array $values Values to bind to the query.
      *
-     * @return AssocStatementIterator
+     * @return Iterator\AssocIterator
      *
      */
     public function yieldAssoc($statement, array $values = array())
     {
         $sth = $this->perform($statement, $values);
-        return new AssocStatementIterator($sth);
+        return new Iterator\AssocIterator($sth);
     }
 
     /**
@@ -1039,13 +1034,13 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      *
      * @param array $values Values to bind to the query.
      *
-     * @return ColStatementIterator
+     * @return Iterator\ColIterator
      *
      */
     public function yieldCol($statement, array $values = array())
     {
         $sth = $this->perform($statement, $values);
-        return new ColStatementIterator($sth);
+        return new Iterator\ColIterator($sth);
     }
 
     /**
@@ -1067,7 +1062,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      *
      * @param array $ctor_args Arguments to pass to each object constructor.
      *
-     * @return ObjectsStatementIterator
+     * @return Iterator\ObjectsIterator
      *
      */
     public function yieldObjects(
@@ -1077,7 +1072,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
         array $ctor_args = array()
     ) {
         $sth = $this->perform($statement, $values);
-        return new ObjectsStatementIterator($sth, $class_name, $ctor_args);
+        return new Iterator\ObjectsIterator($sth, $class_name, $ctor_args);
     }
 
     /**
@@ -1089,13 +1084,13 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      *
      * @param array $values Values to bind to the query.
      *
-     * @return PairsStatementIterator
+     * @return Iterator\PairsIterator
      *
      */
     public function yieldPairs($statement, array $values = array())
     {
         $sth = $this->perform($statement, $values);
-        return new PairsStatementIterator($sth);
+        return new Iterator\PairsIterator($sth);
     }
 
     /**

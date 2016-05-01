@@ -11,11 +11,18 @@ namespace Aura\Sql\Iterator;
 use PDO;
 use PDOStatement;
 
-class ColStatementIterator extends AbstractIterator
+/**
+ *
+ * The iterator equivalent of `fetchCol()`.
+ *
+ * @package Aura.Sql
+ *
+ */
+class ColIterator extends AbstractIterator
 {
     /**
      *
-     * Creates new iterator.
+     * Constructor.
      *
      * @param PDOStatement $statement PDO statement.
      *
@@ -28,13 +35,15 @@ class ColStatementIterator extends AbstractIterator
 
     /**
      *
-     * Returns value at current position.
-     *
-     * @return mixed
+     * Fetches next row from statement.
      *
      */
-    public function current()
+    public function next()
     {
-        return $this->rowData[0];
+        $this->row = $this->statement->fetch();
+        if ($this->row !== false) {
+            $this->row = $this->row[0];
+        }
+        $this->key ++;
     }
 }

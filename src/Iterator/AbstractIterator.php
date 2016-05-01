@@ -9,46 +9,56 @@
 namespace Aura\Sql\Iterator;
 
 use Iterator;
+use PDOStatement;
 
 abstract class AbstractIterator implements Iterator
 {
     /**
      *
-     * Current index in recordset.
-     *
-     * @var integer
-     *
-     */
-    protected $position = -1;
-
-    /**
-     *
      * PDO statement.
      *
-     * @var \PDOStatement
+     * @var PDOStatement
      *
      */
     protected $statement;
 
     /**
      *
-     * Data in current row of recordset.
+     * Current row value.
      *
-     * @var array
+     * @var mixed
      *
      */
-    protected $rowData = array();
+    protected $row;
 
     /**
      *
-     * Moves recordset pointer to first element.
+     * Current key.
      *
-     * @return void
+     * @var mixed
+     *
+     */
+    protected $key = -1;
+
+    /**
+     *
+     * Frees memory when object is destroyed.
+     *
+     */
+    public function __destruct()
+    {
+        $this->statement->closeCursor();
+        unset($this->statement);
+    }
+
+    /**
+     *
+     * Moves row set pointer to first element.
      *
      */
     public function rewind()
     {
-        $this->position = -1;
+        $this->key = -1;
         $this->next();
     }
 
@@ -61,7 +71,7 @@ abstract class AbstractIterator implements Iterator
      */
     public function current()
     {
-        return $this->rowData;
+        return $this->row;
     }
 
     /**
@@ -73,56 +83,25 @@ abstract class AbstractIterator implements Iterator
      */
     public function key()
     {
-        return $this->position;
+        return $this->key;
     }
 
     /**
      *
-     * Moves recordset pointer to next position.
-     *
-     * @return void
+     * Fetches next row from statement.
      *
      */
-    public function next()
-    {
-        $this->position ++;
-        $this->rowData = $this->statement->fetch();
-    }
+    abstract public function next();
 
     /**
      *
-     * Detects if current position is within recordset bounds.
+     * Detects if iterator state is valid.
      *
-     * @return boolean
+     * @return bool
      *
      */
     public function valid()
     {
-        return $this->rowData !== false;
-    }
-
-    /**
-     *
-     * Closes recordset and frees memory.
-     *
-     * @return void
-     *
-     */
-    public function close()
-    {
-        $this->statement->closeCursor();
-        unset($this->statement);
-    }
-
-    /**
-     *
-     * Frees memory when object is destroyed.
-     *
-     * @return void
-     *
-     */
-    public function __destruct()
-    {
-        $this->close();
+        return $this->row !== false;
     }
 }

@@ -11,11 +11,18 @@ namespace Aura\Sql\Iterator;
 use PDO;
 use PDOStatement;
 
-class PairsStatementIterator extends AbstractIterator
+/**
+ *
+ * The iterator equivalent of `fetchPairs()`.
+ *
+ * @package Aura.Sql
+ *
+ */
+class PairsIterator extends AbstractIterator
 {
     /**
      *
-     * Creates new iterator.
+     * Constructor.
      *
      * @param PDOStatement $statement PDO statement.
      *
@@ -28,25 +35,16 @@ class PairsStatementIterator extends AbstractIterator
 
     /**
      *
-     * Returns key at current position.
-     *
-     * @return mixed
+     * Fetches next row from statement.
      *
      */
-    public function key()
+    public function next()
     {
-        return $this->rowData[0];
-    }
-
-    /**
-     *
-     * Returns value at current position.
-     *
-     * @return mixed
-     *
-     */
-    public function current()
-    {
-        return $this->rowData[1];
+        $this->key = false;
+        $this->row = $this->statement->fetch();
+        if ($this->row !== false) {
+            $this->key = $this->row[0];
+            $this->row = $this->row[1];
+        }
     }
 }

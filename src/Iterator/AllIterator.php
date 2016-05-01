@@ -11,11 +11,18 @@ namespace Aura\Sql\Iterator;
 use PDO;
 use PDOStatement;
 
-class AssocStatementIterator extends AbstractIterator
+/**
+ *
+ * The iterator equivalent of `fetchAll()`.
+ *
+ * @package Aura.Sql
+ *
+ */
+class AllIterator extends AbstractIterator
 {
     /**
      *
-     * Creates new iterator.
+     * Constructor.
      *
      * @param PDOStatement $statement PDO statement.
      *
@@ -28,13 +35,12 @@ class AssocStatementIterator extends AbstractIterator
 
     /**
      *
-     * Returns key at current position.
-     *
-     * @return mixed
+     * Fetches next row from statement.
      *
      */
-    public function key()
+    public function next()
     {
-        return current($this->rowData);
+        $this->row = $this->statement->fetch();
+        $this->key ++;
     }
 }

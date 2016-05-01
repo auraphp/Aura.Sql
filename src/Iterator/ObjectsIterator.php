@@ -11,13 +11,20 @@ namespace Aura\Sql\Iterator;
 use PDO;
 use PDOStatement;
 
-class ObjectsStatementIterator extends AbstractIterator
+/**
+ *
+ * The iterator equivalent of `fetchObjects()`.
+ *
+ * @package Aura.Sql
+ *
+ */
+class ObjectsIterator extends AbstractIterator
 {
     /**
      *
-     * Creates new iterator.
+     * Constructor.
      *
-     * @param \PDOStatement $statement PDO statement.
+     * @param PDOStatement $statement PDO statement.
      *
      * @param string $class_name The name of the class to create.
      *
@@ -30,14 +37,24 @@ class ObjectsStatementIterator extends AbstractIterator
         array $ctor_args = array()
     ) {
         $this->statement = $statement;
+        $this->statement->setFetchMode(PDO::FETCH_CLASS, $class_name);
         if ($ctor_args) {
             $this->statement->setFetchMode(
                 PDO::FETCH_CLASS,
                 $class_name,
                 $ctor_args
             );
-        } else {
-            $this->statement->setFetchMode(PDO::FETCH_CLASS, $class_name);
         }
+    }
+
+    /**
+     *
+     * Fetches next row from statement.
+     *
+     */
+    public function next()
+    {
+        $this->row = $this->statement->fetch();
+        $this->key ++;
     }
 }
