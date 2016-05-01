@@ -11,6 +11,13 @@ namespace Aura\Sql\Iterator;
 use Iterator;
 use PDOStatement;
 
+/**
+ *
+ * A base class for iterators.
+ *
+ * @package Aura.Sql
+ *
+ */
 abstract class AbstractIterator implements Iterator
 {
     /**

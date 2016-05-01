@@ -175,10 +175,10 @@ interface ExtendedPdoInterface extends PdoInterface
      *
      * @param string $statement The SQL statement to prepare and execute.
      *
+     * @param array $values Values to bind to the query.
+     *
      * @param callable $callable A callable to be applied to each of the rows
      * to be returned.
-     *
-     * @param array $values Values to bind to the query.
      *
      * @return array
      *
