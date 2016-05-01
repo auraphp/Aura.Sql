@@ -31,6 +31,11 @@ Added functionality in _Aura.Sql_ over the native _PDO_ includes:
   methods take an array of values to bind to to the query statement, and use
   the new `perform()` method internally.
 
+- **New `yield*()` methods.** The equivalent of various `fetch*()` methods, the
+  `yield*()` methods return an iterator instead of a complete result set. Using
+  the iterator to fetch one result at a time can help reduce memory usage with
+  very large result sets.
+
 - **Exceptions by default.** _ExtendedPdo_ starts in the `ERRMODE_EXCEPTION`
   mode for error reporting instead of the `ERRMODE_SILENT` mode.
 
