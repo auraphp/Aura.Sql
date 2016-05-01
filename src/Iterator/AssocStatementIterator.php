@@ -8,18 +8,22 @@
  */
 namespace Aura\Sql\Iterator;
 
-class AssocStatementIterator extends StatementIterator
+use PDO;
+use PDOStatement;
+
+class AssocStatementIterator extends AbstractIterator
 {
     /**
      *
      * Creates new iterator.
      *
-     * @param \PDOStatement $statement PDO statement.
+     * @param PDOStatement $statement PDO statement.
      *
      */
-    public function __construct(\PDOStatement $statement)
+    public function __construct(PDOStatement $statement)
     {
-        parent::__construct($statement, \PDO::FETCH_ASSOC);
+        $this->statement = $statement;
+        $this->statement->setFetchMode(PDO::FETCH_ASSOC);
     }
 
     /**

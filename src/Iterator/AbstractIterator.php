@@ -8,7 +8,9 @@
  */
 namespace Aura\Sql\Iterator;
 
-class StatementIterator implements \Iterator
+use Iterator;
+
+abstract class AbstractIterator implements Iterator
 {
     /**
      *
@@ -30,50 +32,12 @@ class StatementIterator implements \Iterator
 
     /**
      *
-     * Fetch style.
-     *
-     * @var integer
-     *
-     */
-    protected $fetchStyle;
-
-    /**
-     *
      * Data in current row of recordset.
      *
      * @var array
      *
      */
     protected $rowData = array();
-
-    /**
-     *
-     * Flag indicating there's a valid resource or not.
-     *
-     * @var boolean
-     *
-     */
-    protected $isValid = false;
-
-    /**
-     *
-     * Creates new iterator.
-     *
-     * @param \PDOStatement $statement PDO statement.
-     *
-     * @param integer $fetch_style Fetch style.
-     *
-     */
-    public function __construct(\PDOStatement $statement, $fetch_style = null)
-    {
-        $this->statement = $statement;
-
-        if (isset($fetch_style)) {
-            $this->fetchStyle = $fetch_style;
-        } else {
-            $this->fetchStyle = \PDO::ATTR_DEFAULT_FETCH_MODE;
-        }
-    }
 
     /**
      *
@@ -121,9 +85,8 @@ class StatementIterator implements \Iterator
      */
     public function next()
     {
-        $this->position++;
-        $this->fetch();
-        $this->isValid = $this->rowData !== false;
+        $this->position ++;
+        $this->rowData = $this->statement->fetch();
     }
 
     /**
@@ -135,19 +98,7 @@ class StatementIterator implements \Iterator
      */
     public function valid()
     {
-        return $this->isValid;
-    }
-
-    /**
-     *
-     * Fetches data for next row.
-     *
-     * @return void
-     *
-     */
-    protected function fetch()
-    {
-        $this->rowData = $this->statement->fetch($this->fetchStyle);
+        return $this->rowData !== false;
     }
 
     /**

@@ -8,7 +8,10 @@
  */
 namespace Aura\Sql\Iterator;
 
-class ObjectsStatementIterator extends StatementIterator
+use PDO;
+use PDOStatement;
+
+class ObjectsStatementIterator extends AbstractIterator
 {
     /**
      *
@@ -22,20 +25,19 @@ class ObjectsStatementIterator extends StatementIterator
      *
      */
     public function __construct(
-        \PDOStatement $statement,
+        PDOStatement $statement,
         $class_name = 'StdClass',
         array $ctor_args = array()
     ) {
+        $this->statement = $statement;
         if ($ctor_args) {
-            $statement->setFetchMode(
-                \PDO::FETCH_CLASS,
+            $this->statement->setFetchMode(
+                PDO::FETCH_CLASS,
                 $class_name,
                 $ctor_args
             );
         } else {
-            $statement->setFetchMode(\PDO::FETCH_CLASS, $class_name);
+            $this->statement->setFetchMode(PDO::FETCH_CLASS, $class_name);
         }
-
-        parent::__construct($statement, \PDO::FETCH_CLASS);
     }
 }
