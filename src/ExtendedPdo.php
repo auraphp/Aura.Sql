@@ -1000,13 +1000,20 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      *
      * @param array $values Values to bind to the query.
      *
-     * @return Iterator\AllIterator
+     * @param callable $callable A callable to be applied to each of the rows
+     * to be returned.
+     *
+     * @return Iterator
      *
      */
-    public function yieldAll($statement, array $values = array())
+    public function yieldAll($statement, array $values = array(), $callable = null)
     {
         $sth = $this->perform($statement, $values);
-        return new Iterator\AllIterator($sth);
+        $iterator = new Iterator\AllIterator($sth);
+        if ($callable) {
+            return new Iterator\MapIterator($iterator, $callable);
+        }
+        return $iterator;
     }
 
     /**
@@ -1017,13 +1024,20 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      *
      * @param array $values Values to bind to the query.
      *
-     * @return Iterator\AssocIterator
+     * @param callable $callable A callable to be applied to each of the rows
+     * to be returned.
+     *
+     * @return Iterator
      *
      */
-    public function yieldAssoc($statement, array $values = array())
+    public function yieldAssoc($statement, array $values = array(), $callable = null)
     {
         $sth = $this->perform($statement, $values);
-        return new Iterator\AssocIterator($sth);
+        $iterator = new Iterator\AssocIterator($sth);
+        if ($callable) {
+            return new Iterator\MapIterator($iterator, $callable);
+        }
+        return $iterator;
     }
 
     /**
@@ -1034,13 +1048,20 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      *
      * @param array $values Values to bind to the query.
      *
-     * @return Iterator\ColIterator
+     * @param callable $callable A callable to be applied to each of the rows
+     * to be returned.
+     *
+     * @return Iterator
      *
      */
-    public function yieldCol($statement, array $values = array())
+    public function yieldCol($statement, array $values = array(), $callable = null)
     {
         $sth = $this->perform($statement, $values);
-        return new Iterator\ColIterator($sth);
+        $iterator = new Iterator\ColIterator($sth);
+        if ($callable) {
+            return new Iterator\MapIterator($iterator, $callable);
+        }
+        return $iterator;
     }
 
     /**
@@ -1084,13 +1105,16 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      *
      * @param array $values Values to bind to the query.
      *
+     * @param callable $callable A callable to be applied to each of the rows
+     * to be returned.
+     *
      * @return Iterator\PairsIterator
      *
      */
-    public function yieldPairs($statement, array $values = array())
+    public function yieldPairs($statement, array $values = array(), $callable = null)
     {
         $sth = $this->perform($statement, $values);
-        return new Iterator\PairsIterator($sth);
+        return new Iterator\PairsIterator($sth, $callable);
     }
 
     /**

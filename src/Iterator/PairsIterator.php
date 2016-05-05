@@ -21,16 +21,29 @@ use PDOStatement;
 class PairsIterator extends AbstractIterator
 {
     /**
+     * The function to be apply on all element
+     *
+     * @var callable
+     */
+    protected $callable;
+
+    /**
      *
      * Constructor.
      *
      * @param PDOStatement $statement PDO statement.
      *
      */
-    public function __construct(PDOStatement $statement)
+    public function __construct(PDOStatement $statement, $callable = null)
     {
         $this->statement = $statement;
         $this->statement->setFetchMode(PDO::FETCH_NUM);
+        if (! $callable) {
+            $callable = function (array $row) {
+                return $row;
+            };
+        }
+        $this->callable = $callable;
     }
 
     /**
@@ -43,6 +56,7 @@ class PairsIterator extends AbstractIterator
         $this->key = false;
         $this->row = $this->statement->fetch();
         if ($this->row !== false) {
+            $this->row = call_user_func($this->callable, $this->row);
             $this->key = $this->row[0];
             $this->row = $this->row[1];
         }
