@@ -333,6 +333,13 @@ abstract class AbstractExtendedPdoTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('Anna', $actual->name);
     }
 
+    public function testFetchObjectReturningFalse()
+    {
+        $stm = "SELECT id, name FROM pdotest WHERE id = ?";
+        $actual = $this->pdo->fetchObject($stm, array(-1));
+        $this->assertSame(false, $actual);
+    }
+
     public function testFetchObject_withCtorArgs()
     {
         $stm = "SELECT id, name FROM pdotest WHERE id = ?";
@@ -417,6 +424,13 @@ abstract class AbstractExtendedPdoTest extends \PHPUnit_Framework_TestCase
             'name' => 'Anna',
         );
         $this->assertEquals($expect, $actual);
+    }
+
+    public function testFetchOneReturningFalse()
+    {
+        $stm = "SELECT id, name FROM pdotest WHERE id = -1";
+        $actual = $this->pdo->fetchOne($stm);
+        $this->assertSame(false, $actual);
     }
 
     public function testGroupSingleColumn()
