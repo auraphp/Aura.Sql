@@ -114,7 +114,7 @@ interface ExtendedPdoInterface extends PdoInterface
      *
      * @param array $ctor_args Arguments to pass to the object constructor.
      *
-     * @return object
+     * @return object|false
      *
      */
     public function fetchObject(
@@ -163,7 +163,7 @@ interface ExtendedPdoInterface extends PdoInterface
      *
      * @param array $values Values to bind to the query.
      *
-     * @return array
+     * @return array|false
      *
      */
     public function fetchOne($statement, array $values = array());
