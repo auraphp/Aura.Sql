@@ -337,7 +337,7 @@ abstract class AbstractExtendedPdoTest extends \PHPUnit_Framework_TestCase
     {
         $stm = "SELECT id, name FROM pdotest WHERE id = ?";
         $actual = $this->pdo->fetchObject($stm, array(-1));
-        $this->assertSame(false, $actual);
+        $this->assertFalse($actual);
     }
 
     public function testFetchObject_withCtorArgs()
@@ -430,7 +430,7 @@ abstract class AbstractExtendedPdoTest extends \PHPUnit_Framework_TestCase
     {
         $stm = "SELECT id, name FROM pdotest WHERE id = -1";
         $actual = $this->pdo->fetchOne($stm);
-        $this->assertSame(false, $actual);
+        $this->assertFalse($actual);
     }
 
     public function testGroupSingleColumn()
