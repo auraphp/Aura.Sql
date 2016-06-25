@@ -13,7 +13,7 @@ namespace Aura\Sql;
  * Parser specific to PostgreSQL syntax
  * @package Aura\Sql
  */
-class PgParser implements QueryParserInterface
+class PgParser extends BaseParser implements QueryParserInterface
 {
     public function normalize($query)
     {

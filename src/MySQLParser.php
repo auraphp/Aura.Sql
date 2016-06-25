@@ -13,7 +13,7 @@ namespace Aura\Sql;
  * Query parser for MySQL flavored queries
  * @package Aura\Sql
  */
-class MySQLParser implements QueryParserInterface
+class MySQLParser extends BaseParser implements QueryParserInterface
 {
     /**
      * @inheritdoc

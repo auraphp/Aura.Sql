@@ -42,6 +42,17 @@ class MySQLParserTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expectedParameters, $parsedQuery->getParameters());
     }
 
+    public function testReplaceNumberedParameter()
+    {
+        $parameters = array('bar', 'baz');
+        $sql = "SELECT ? AS a, ? AS b";
+        $parsedQuery = $this->parseSingleQuery($sql, $parameters);
+        $expectedSql = "SELECT :__numbered AS a, :__numbered_0 AS b";
+        $expectedParameters = array('__numbered' => 'bar', '__numbered_0' => 'baz');
+        $this->assertEquals($expectedSql, $parsedQuery->getString());
+        $this->assertEquals($expectedParameters, $parsedQuery->getParameters());
+    }
+
     public function testReplaceArrayAsParameter()
     {
         $parameters = array('foo' => array('bar', 'baz'));
@@ -49,6 +60,14 @@ class MySQLParserTest extends \PHPUnit_Framework_TestCase
         $parsedQuery = $this->parseSingleQuery($sql, $parameters);
         $expectedSql = "SELECT :foo, :foo_0";
         $expectedParameters = array('foo' => 'bar', 'foo_0' => 'baz');
+        $this->assertEquals($expectedSql, $parsedQuery->getString());
+        $this->assertEquals($expectedParameters, $parsedQuery->getParameters());
+
+        $parameters = array(array('bar', 'baz'));
+        $sql = "SELECT ?";
+        $parsedQuery = $this->parseSingleQuery($sql, $parameters);
+        $expectedSql = "SELECT :__numbered, :__numbered_0";
+        $expectedParameters = array('__numbered' => 'bar', '__numbered_0' => 'baz');
         $this->assertEquals($expectedSql, $parsedQuery->getString());
         $this->assertEquals($expectedParameters, $parsedQuery->getParameters());
     }
@@ -230,5 +249,13 @@ SQL;
         $expectedParameters = array('foo' => 'bar', 'foo_0' => 'baz');
         $this->assertEquals($expectedSql, $queries[1]->getString());
         $this->assertEquals($expectedParameters, $queries[1]->getParameters());
+    }
+
+    public function testSetNumberedCharacter()
+    {
+        $parser = new PgParser();
+        $this->assertEquals("?", $parser->getNumberedPlaceholderCharacter());
+        $parser->setNumberedPlaceholderCharacter("#");
+        $this->assertEquals("#", $parser->getNumberedPlaceholderCharacter());
     }
 }

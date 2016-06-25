@@ -17,4 +17,16 @@ interface QueryParserInterface
      * @return Query[]
      */
     public function normalize($query);
+
+    /**
+     * Set a character to be used instead of the "?" character to define numbered placeholders
+     * @param string $character
+     */
+    public function setNumberedPlaceholderCharacter($character);
+
+    /**
+     * Returns the current character used for numbered placeholders
+     * @return string
+     */
+    public function getNumberedPlaceholderCharacter();
 }

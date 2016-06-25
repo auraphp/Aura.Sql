@@ -42,6 +42,17 @@ class PgParserTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expectedParameters, $parsedQuery->getParameters());
     }
 
+    public function testReplaceNumberedParameter()
+    {
+        $parameters = array('bar', 'baz');
+        $sql = "SELECT ? AS a, ? AS b";
+        $parsedQuery = $this->parseSingleQuery($sql, $parameters);
+        $expectedSql = "SELECT :__numbered AS a, :__numbered_0 AS b";
+        $expectedParameters = array('__numbered' => 'bar', '__numbered_0' => 'baz');
+        $this->assertEquals($expectedSql, $parsedQuery->getString());
+        $this->assertEquals($expectedParameters, $parsedQuery->getParameters());
+    }
+
     public function testReplaceArrayAsParameter()
     {
         $parameters = array('foo' => array('bar', 'baz'));
@@ -49,6 +60,14 @@ class PgParserTest extends \PHPUnit_Framework_TestCase
         $parsedQuery = $this->parseSingleQuery($sql, $parameters);
         $expectedSql = "SELECT :foo, :foo_0";
         $expectedParameters = array('foo' => 'bar', 'foo_0' => 'baz');
+        $this->assertEquals($expectedSql, $parsedQuery->getString());
+        $this->assertEquals($expectedParameters, $parsedQuery->getParameters());
+
+        $parameters = array(array('bar', 'baz'));
+        $sql = "SELECT ?";
+        $parsedQuery = $this->parseSingleQuery($sql, $parameters);
+        $expectedSql = "SELECT :__numbered, :__numbered_0";
+        $expectedParameters = array('__numbered' => 'bar', '__numbered_0' => 'baz');
         $this->assertEquals($expectedSql, $parsedQuery->getString());
         $this->assertEquals($expectedParameters, $parsedQuery->getParameters());
     }
@@ -169,21 +188,15 @@ SQL;
     public function testDollarQuotedStrings()
     {
         $parameters = array('foo' => array('bar', 'baz'));
-        $sql = <<<SQL
-SELECT $$:foo$$
-SQL;
+        $sql = 'SELECT $$:foo$$';
         $parsedQuery = $this->parseSingleQuery($sql, $parameters);
         $this->assertEquals($sql, $parsedQuery->getString());
 
-        $sql = <<<SQL
-SELECT $tag$ :foo $tag$
-SQL;
+        $sql = 'SELECT $tag$ :foo $tag$';
         $parsedQuery = $this->parseSingleQuery($sql, $parameters);
         $this->assertEquals($sql, $parsedQuery->getString());
 
-        $sql = <<<SQL
-SELECT $outer$ nested strings $inner$:foo$inner$ $outer$
-SQL;
+        $sql = 'SELECT $outer$ nested strings $inner$:foo$inner$ $outer$';
         $parsedQuery = $this->parseSingleQuery($sql, $parameters);
         $this->assertEquals($sql, $parsedQuery->getString());
     }
@@ -269,5 +282,13 @@ SQL;
         $expectedParameters = array('foo' => 'bar', 'foo_0' => 'baz');
         $this->assertEquals($expectedSql, $queries[1]->getString());
         $this->assertEquals($expectedParameters, $queries[1]->getParameters());
+    }
+
+    public function testSetNumberedCharacter()
+    {
+        $parser = new PgParser();
+        $this->assertEquals("?", $parser->getNumberedPlaceholderCharacter());
+        $parser->setNumberedPlaceholderCharacter("#");
+        $this->assertEquals("#", $parser->getNumberedPlaceholderCharacter());
     }
 }
