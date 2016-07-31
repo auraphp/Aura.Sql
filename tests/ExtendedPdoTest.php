@@ -600,7 +600,7 @@ class ExtendedPdoTest extends \PHPUnit_Framework_TestCase
 
         // activate
         $this->pdo->getProfiler()->setActive(true);
-        $this->pdo->getProfiler()->setMessagePrefix($prefix = 'My Connection');
+        $this->pdo->getProfiler()->setLogFormat("{function}\n{statement}\n{values}\n\n");
 
         $this->pdo->query("SELECT 1 FROM pdotest");
         $this->pdo->exec("SELECT 2 FROM pdotest");
@@ -613,33 +613,34 @@ class ExtendedPdoTest extends \PHPUnit_Framework_TestCase
             0 => array(
                 'function' => 'query',
                 'statement' => 'SELECT 1 FROM pdotest',
-                'bind_values' => array(),
+                'values' => print_r(array(), true),
             ),
             1 => array(
                 'function' => 'exec',
                 'statement' => 'SELECT 2 FROM pdotest',
-                'bind_values' => array(),
+                'values' => print_r(array(), true),
             ),
             2 => array(
                 'function' => 'prepareWithValues',
                 'statement' => 'SELECT 3 FROM pdotest',
-                'bind_values' => array(),
+                'values' => print_r(array(), true),
             ),
             3 => array(
                 'function' => 'perform',
                 'statement' => 'SELECT 3 FROM pdotest',
-                'bind_values' => array(
-                    'zim' => 'gir',
+                'values' => print_r(
+                    array(
+                        'zim' => 'gir',
+                    ),
+                    true
                 ),
             ),
         );
 
         foreach ($logger->getLog() as $key => $log) {
-            $this->assertRegExp('|' . $prefix . '.*' . $expect[$key]['function'] . '|', $log['message'], $key);
-            $this->assertEquals($prefix, $log['context']['context'], $key);
             $this->assertEquals($expect[$key]['function'], $log['context']['function'], $key);
             $this->assertEquals($expect[$key]['statement'], $log['context']['statement'], $key);
-            $this->assertEquals($expect[$key]['bind_values'], $log['context']['values'], $key);
+            $this->assertEquals($expect[$key]['values'], $log['context']['values'], $key);
             $this->assertGreaterThan(0, $log['context']['duration'], $key);
             $this->assertGreaterThan(0, $log['context']['start'], $key);
             $this->assertGreaterThan($log['context']['start'], $log['context']['finish'], $key);

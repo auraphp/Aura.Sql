@@ -10,10 +10,11 @@ namespace Aura\Sql;
 
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
+use Exception;
 
 /**
  *
- * Tracks and logs query profiles.
+ * Sends query profiles to a logger.
  *
  * @package Aura.Sql
  *
@@ -27,7 +28,7 @@ class Profiler implements ProfilerInterface
      * @var array
      *
      */
-    private $profile = [];
+    protected $context = [];
 
     /**
      *
@@ -36,7 +37,7 @@ class Profiler implements ProfilerInterface
      * @var LoggerInterface
      *
      */
-    private $logger;
+    protected $logger;
 
     /**
      *
@@ -47,7 +48,7 @@ class Profiler implements ProfilerInterface
      * @see setActive()
      *
      */
-    private $active = false;
+    protected $active = false;
 
     /**
      *
@@ -58,19 +59,18 @@ class Profiler implements ProfilerInterface
      * @see setLogLevel()
      *
      */
-    private $logLevel = LogLevel::DEBUG;
+    protected $logLevel = LogLevel::DEBUG;
 
     /**
      *
-     * Added in front of each message to help identify several connections
-     * in a ConnectionLocator.
+     * Sets the format for the log message, with placeholders.
      *
      * @var string
      *
-     * @see setMessagePrefix()
+     * @see setLogFormat()
      *
      */
-    private $messagePrefix = '';
+    protected $logFormat = "{function} ({duration} seconds): {statement} {backtrace}";
 
     /**
      *
@@ -109,7 +109,11 @@ class Profiler implements ProfilerInterface
     }
 
     /**
+     *
+     * Returns the level at which to log profile messages.
+     *
      * @return string
+     *
      */
     public function getLogLevel()
     {
@@ -118,9 +122,9 @@ class Profiler implements ProfilerInterface
 
     /**
      *
-     * Level at which to log profile messages
+     * Level at which to log profile messages.
      *
-     * @param string $logLevel Psr\Log\LogLevel constant
+     * @param string $logLevel A PSR LogLevel constant.
      *
      * @return null
      *
@@ -131,31 +135,34 @@ class Profiler implements ProfilerInterface
     }
 
     /**
+     *
+     * Returns the log message format string, with placeholders.
+     *
      * @return string
+     *
      */
-    public function getMessagePrefix()
+    public function getLogFormat()
     {
-        return $this->messagePrefix;
+        return $this->logFormat;
     }
 
     /**
      *
-     * Sets the text to be shown at the start of each logged message to help
-     * differentiate multiple connections when using a ConnectionLocator.
+     * Sets the log message format string, with placeholders.
      *
-     * @param string $messagePrefix
+     * @param string $logFormat
      *
      * @return null
      *
      */
-    public function setMessagePrefix($messagePrefix)
+    public function setLogFormat($logFormat)
     {
-        $this->messagePrefix = $messagePrefix;
+        $this->logFormat = $logFormat;
     }
 
     /**
      *
-     * Begins a profile entry.
+     * Starts a profile entry.
      *
      * @param string $function The function starting the profile entry.
      *
@@ -168,8 +175,10 @@ class Profiler implements ProfilerInterface
             return;
         }
 
-        // keep starting information in a stack
-        $this->profile = ['function' => $function, 'start' => microtime(true)];
+        $this->context = [
+            'function' => $function,
+            'start' => microtime(true),
+        ];
     }
 
     /**
@@ -189,19 +198,18 @@ class Profiler implements ProfilerInterface
             return;
         }
 
-        $profile = $this->profile;
-        $this->profile = [];
+        $finish = microtime(true);
 
-        $finish                 = microtime(true);
-        $profile['finish']      = $finish;
-        $profile['duration']    = $finish - $profile['start'];
-        $profile['statement']   = $statement;
-        $profile['values']      = $values;
-        $profile['context']     = $this->messagePrefix;
-        $this->logger->log(
-            $this->logLevel,
-            $this->messagePrefix . $profile['function'],
-            $profile
-        );
+        $context = $this->context;
+        $this->context = [];
+        $e = new Exception();
+
+        $context['finish'] = $finish;
+        $context['duration'] = $finish - $context['start'];
+        $context['statement'] = $statement;
+        $context['values'] = print_r($values, true);
+        $context['backtrace'] = $e->getTraceAsString();
+
+        $this->logger->log($this->logLevel, $this->logFormat, $context);
     }
 }

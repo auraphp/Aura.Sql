@@ -10,7 +10,7 @@ namespace Aura\Sql;
 
 /**
  *
- * Logs query profiles.
+ * Interface to send query profiles to a logger.
  *
  * @package Aura.Sql
  *
@@ -25,10 +25,9 @@ interface ProfilerInterface
      *
      */
     public function setActive($active);
-
     /**
      *
-     * Return true if logging is active
+     * Returns true if logging is active.
      *
      * @return bool
      *
@@ -36,15 +35,19 @@ interface ProfilerInterface
     public function isActive();
 
     /**
+     *
+     * Returns the level at which to log profile messages.
+     *
      * @return string
+     *
      */
     public function getLogLevel();
 
     /**
      *
-     * Level at which to log profile messages
+     * Level at which to log profile messages.
      *
-     * @param string $logLevel Psr\Log\LogLevel constant
+     * @param string $logLevel A PSR LogLevel constant.
      *
      * @return null
      *
@@ -52,24 +55,28 @@ interface ProfilerInterface
     public function setLogLevel($logLevel);
 
     /**
+     *
+     * Returns the log message format string, with placeholders.
+     *
      * @return string
+     *
      */
-    public function getMessagePrefix();
+    public function getLogFormat();
+
     /**
      *
-     * Sets the text to be shown at the start of each logged message to help differentiate multiple connections
-     * when using a ConnectionLocator
+     * Sets the log message format string, with placeholders.
      *
-     * @param string $messagePrefix
+     * @param string $logFormat
      *
      * @return null
      *
      */
-    public function setMessagePrefix($messagePrefix);
+    public function setLogFormat($logFormat);
 
     /**
      *
-     * Begins a profile entry.
+     * Starts a profile entry.
      *
      * @param string $function The function starting the profile entry.
      *
@@ -80,7 +87,7 @@ interface ProfilerInterface
 
     /**
      *
-     * Finished and logs a profile entry.
+     * Finishes and logs a profile entry.
      *
      * @param string $statement The statement being profiled, if any.
      *
