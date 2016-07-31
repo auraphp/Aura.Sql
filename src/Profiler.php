@@ -10,7 +10,6 @@ namespace Aura\Sql;
 
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
-use Exception;
 
 /**
  *
@@ -202,7 +201,7 @@ class Profiler implements ProfilerInterface
 
         $context = $this->context;
         $this->context = [];
-        $e = new Exception();
+        $e = new \Exception();
 
         $context['finish'] = $finish;
         $context['duration'] = $finish - $context['start'];
