@@ -15,11 +15,4 @@ namespace Aura\Sql;
  */
 class MySQLParser extends BaseParser implements QueryParserInterface
 {
-    /**
-     * @inheritdoc
-     */
-    public function normalize($query)
-    {
-        return array($query);
-    }
 }
