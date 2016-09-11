@@ -127,7 +127,7 @@ SQL;
         $parameters = array('a000' => array('foo', 'bar'));
         $sql = <<<SQL
 SELECT U&"\a000"
-FROM (SELECT 1 AS U&":a000" UESCAPE ':') AS temp
+FROM (SELECT 1 AS U&":a000" UEScAPE ':') AS temp
 SQL;
         $parsedQuery = $this->parseSingleQuery($sql, $parameters);
         $this->assertEquals($sql, $parsedQuery->getString());
@@ -178,8 +178,8 @@ SQL;
     {
         $parameters = array('b0a0' => array('foo', 'bar'), 'a000' => array('baz', 'qux'));
         $sql = <<<SQL
-SELECT U&':a000'
-'\'':b0a0' UESCAPE ':'
+SELECT u&':a000'
+'\'':b0a0' UeSCaPE ':'
 SQL;
         $parsedQuery = $this->parseSingleQuery($sql, $parameters);
         $this->assertEquals($sql, $parsedQuery->getString());

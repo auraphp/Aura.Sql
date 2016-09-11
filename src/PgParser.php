@@ -25,9 +25,12 @@ class PgParser extends BaseParser implements QueryParserInterface
             '/' => array($this, 'handleMultiLineComment'),
             '"' => array($this, 'handleQuotedString'),
             "'" => array($this, 'handleQuotedString'),
+            'E' => array($this, 'handlePossibleCStyleString'),
             ':' => array($this, 'handleColon'),
             '?' => array($this, 'handleNumberedParameter'),
             ';' => array($this, 'handleSemiColon'),
+            '$' => array($this, 'handleDollar'),
+            '[' => array($this, 'handleArray'),
         );
     }
 
@@ -84,7 +87,7 @@ class PgParser extends BaseParser implements QueryParserInterface
 
     /**
      *
-     * After a single quote or double quote string, advance the $current_index to the end of the string
+     * After a signle or double quote string, advance the $current_index to the end of the string
      *
      * @param RebuilderState $state
      *
@@ -92,8 +95,85 @@ class PgParser extends BaseParser implements QueryParserInterface
      */
     protected function handleQuotedString($state)
     {
-        $length = $this->getQuotedStringLength($state->getStatement(), $state->getCurrentIndex(), $state->getCurrentCharacter(), $state->getCharset());
-        $state->copyCharacters($length);
+        $quoteCharacter = $state->getCurrentCharacter();
+        $state->copyCurrentCharacter();
+        if (!$state->done()) {
+            $state->copyUntilCharacter($quoteCharacter);
+        }
+        return $state;
+    }
+
+    /**
+     *
+     * After a E or e character, a single quote string use the \ character as an escape character
+     *
+     * @param RebuilderState $state
+     *
+     * @return RebuilderState
+     */
+    protected function handlePossibleCStyleString($state)
+    {
+        $state->copyCurrentCharacter();
+        if (!$state->done() && ($currentCharacter = $state->getCurrentCharacter()) === "'") {
+            $escaped = false;
+            $inCString = true;
+            do {
+                $state->copyCurrentCharacter();
+                $currentCharacter = $state->getCurrentCharacter();
+                if ($currentCharacter === '\\') {
+                    $escaped = !$escaped;
+                }
+                else if ($currentCharacter === "'" && !$escaped) {
+                    if($state->nextCharactersAre("'")) {
+                        $escaped = true;
+                    }
+                    else {
+                        $inCString = false;
+                    }
+                }
+                if (!$inCString) {
+                    // Checking if we have blank characters until next quote. In which case it is the same string
+                    $blanks = $state->capture("\\s*'");
+                    if($blanks){
+                        $state->copyUntilCharacter("'");
+                        $state->copyCurrentCharacter();
+                        $inCString = true;
+                    }
+                }
+            } while(!$state->done() && $inCString);
+        }
+        return $state;
+    }
+
+    /**
+     *
+     * $ charaters can be used to create strings
+     *
+     * @param RebuilderState $state
+     *
+     * @return RebuilderState
+     */
+    protected function handleDollar($state)
+    {
+        $identifier =  $state->capture('\\$([a-zA-Z_]\\w*)*\\$');
+        if ($identifier) {
+            $state->copyUntilCharacter($identifier);
+            $state->copyUntilCharacter($identifier);
+        }
+        return $state;
+    }
+
+    /**
+     *
+     * As the : character can appear in array accessors, we have to manage this state
+     *
+     * @param RebuilderState $state
+     *
+     * @return RebuilderState
+     */
+    protected function handleArray($state)
+    {
+        $state->copyUntilCharacter(']');
         return $state;
     }
 
@@ -125,22 +205,23 @@ class PgParser extends BaseParser implements QueryParserInterface
         }
 
         $value = $state->getNamedParameterValue($name);
-        if (! is_array($value)) {
-            $state->storeValueToBind($name, $value);
-            $state->copyIdentifier();
-            return $state;
-        }
         $placeholder_identifiers = '';
-        foreach ($value as $sub) {
-            $identifier = $state->storeValueToBind($name, $sub);
-            if ($placeholder_identifiers) {
-                $placeholder_identifiers .= ', :';
-            }
+
+        if (! is_array($value)) {
+            $identifier = $state->storeValueToBind($name, $value);
             $placeholder_identifiers .= $identifier;
+        }
+        else {
+            foreach ($value as $sub) {
+                $identifier = $state->storeValueToBind($name, $sub);
+                if ($placeholder_identifiers) {
+                    $placeholder_identifiers .= ', :';
+                }
+                $placeholder_identifiers .= $identifier;
+            }
         }
         $state->passString($name);
         $state->addStringToStatement($placeholder_identifiers);
-
         return $state;
     }
 
@@ -159,15 +240,15 @@ class PgParser extends BaseParser implements QueryParserInterface
 
         $name = '__numbered';
 
-        $placeholder_identifiers = '';
         if (! is_array($value)) {
-            $placeholder_identifiers = $state->storeValueToBind($name, $value);
+            $placeholder_identifiers = ':' . $state->storeValueToBind($name, $value);
         }
         else {
+            $placeholder_identifiers = '';
             foreach ($value as $sub) {
-                $identifier = $state->storeValueToBind($name, $sub);
+                $identifier = ':' . $state->storeValueToBind($name, $sub);
                 if ($placeholder_identifiers) {
-                    $placeholder_identifiers .= ', :';
+                    $placeholder_identifiers .= ', ';
                 }
                 $placeholder_identifiers .= $identifier;
             }
@@ -187,7 +268,9 @@ class PgParser extends BaseParser implements QueryParserInterface
      */
     protected function handleSemiColon($state)
     {
-        $state->passString(";");
+        $uselessCharacters = $state->capture(';\\s*');
+        $state->passString($uselessCharacters);
         $state->setNewStatementCharacterFound(true);
+        return $state;
     }
 }

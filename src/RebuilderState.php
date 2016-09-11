@@ -83,7 +83,7 @@ class RebuilderState
         $this->charset = $charset;
         $this->last_index = mb_strlen($statement, $charset) - 1;
         $this->current_index = 0;
-        $this->numbered_placeholder_index = 1;
+        $this->numbered_placeholder_index = 0;
         $this->resetFinalStatement();
     }
 

@@ -76,7 +76,7 @@ abstract class BaseParser
                 $state = call_user_func($handler, $state);
                 // if we encountered a statement separator, we have to prepare a new Query
                 if ($state->isNewStatementCharacterFound()) {
-                    $queries[] = new Query($state->getStatement(), $state->getValuesToBind());
+                    $this->storeQuery($state, $queries);
                     $state->resetFinalStatement();
                 }
             }
@@ -84,7 +84,36 @@ abstract class BaseParser
                 $state->copyCurrentCharacter();
             }
         }
-        $queries[] = new Query($state->getStatement(), $state->getValuesToBind());
-        return array($queries);
+        $this->storeQuery($state, $queries);
+        return $queries;
+    }
+
+    /**
+     *
+     * Add a Query using the current statement and values from a RebuilderState
+     *
+     * @param RebuilderState $state
+     * @param Query[] $queries reference to the array holding a list of queries
+     *
+     */
+    private function storeQuery($state, &$queries)
+    {
+        $statement = $state->getFinalStatement();
+        if (!$this->isStatementEmpty($statement)) {
+            $queries[] = new Query($statement, $state->getValuesToBind());
+        }
+    }
+
+    /**
+     *
+     * Returns if an SQL statement is empty
+     *
+     * @param string $statement
+     *
+     * @return bool
+     */
+    private function isStatementEmpty($statement)
+    {
+        return mb_ereg_match('^\\s*$', $statement);
     }
 }
