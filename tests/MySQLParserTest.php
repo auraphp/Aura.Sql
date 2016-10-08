@@ -186,10 +186,10 @@ SQL;
         $this->assertEquals($sql, $parsedQuery->getString());
 
         $sql = <<<SQL
-SELECT "Escaping \\" :foo ""
+SELECT "Escaping \\\\" :foo ""
 SQL;
         $expectedSql = <<<SQL
-SELECT "Escaping \\" :foo, :foo_0 ""
+SELECT "Escaping \\\\" :foo, :foo_0 ""
 SQL;
         $expectedParameters = array('foo' => 'bar', 'foo_0' => 'baz');
         $parsedQuery = $this->parseSingleQuery($sql, $parameters);

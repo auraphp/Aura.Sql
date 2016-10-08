@@ -116,4 +116,123 @@ abstract class BaseParser
     {
         return mb_ereg_match('^\\s*$', $statement);
     }
+
+    /**
+     * Common handling methods.
+     */
+
+    /**
+     *
+     * After a single or double quote string, advance the $current_index to the end of the string
+     *
+     * @param RebuilderState $state
+     *
+     * @return RebuilderState
+     */
+    protected function handleQuotedString($state)
+    {
+        $quoteCharacter = $state->getCurrentCharacter();
+        $state->copyCurrentCharacter();
+        if (!$state->done()) {
+            $state->copyUntilCharacter($quoteCharacter);
+        }
+        return $state;
+    }
+
+    /**
+     *
+     * Check if a ':' colon character is followed by what can be a named placeholder.
+     *
+     * @param RebuilderState $state
+     *
+     * @return RebuilderState
+     */
+    protected function handleColon($state)
+    {
+        $colon_number = 0;
+        do {
+            $state->copyCurrentCharacter();
+            $colon_number++;
+        }
+        while($state->getCurrentCharacter() === ':');
+
+        if ($colon_number != 1) {
+            return $state;
+        }
+
+        $name = $state->getIdentifier();
+
+        if (! $name) {
+            return $state;
+        }
+
+        $value = $state->getNamedParameterValue($name);
+        $placeholder_identifiers = '';
+
+        if (! is_array($value)) {
+            $identifier = $state->storeValueToBind($name, $value);
+            $placeholder_identifiers .= $identifier;
+        }
+        else {
+            foreach ($value as $sub) {
+                $identifier = $state->storeValueToBind($name, $sub);
+                if ($placeholder_identifiers) {
+                    $placeholder_identifiers .= ', :';
+                }
+                $placeholder_identifiers .= $identifier;
+            }
+        }
+        $state->passString($name);
+        $state->addStringToStatement($placeholder_identifiers);
+        return $state;
+    }
+
+    /**
+     *
+     * Replace a numbered placeholder character by multiple ones if a numbered placeholder contains an array.
+     * As the '?' character can't be used with PG queries, replace it with a named placeholder
+     *
+     * @param RebuilderState $state
+     *
+     * @return RebuilderState
+     */
+    protected function handleNumberedParameter($state)
+    {
+        $value = $state->getFirstUnusedNumberedValue();
+
+        $name = '__numbered';
+
+        if (! is_array($value)) {
+            $placeholder_identifiers = ':' . $state->storeValueToBind($name, $value);
+        }
+        else {
+            $placeholder_identifiers = '';
+            foreach ($value as $sub) {
+                $identifier = ':' . $state->storeValueToBind($name, $sub);
+                if ($placeholder_identifiers) {
+                    $placeholder_identifiers .= ', ';
+                }
+                $placeholder_identifiers .= $identifier;
+            }
+        }
+        $state->passString($this->getNumberedPlaceholderCharacter());
+        $state->addStringToStatement($placeholder_identifiers);
+
+        return $state;
+    }
+
+    /**
+     * Saves the fact a new statement is starting
+     *
+     * @param RebuilderState $state
+     *
+     * @return RebuilderState
+     */
+    protected function handleSemiColon($state)
+    {
+        $uselessCharacters = $state->capture(';\\s*');
+        $state->passString($uselessCharacters);
+        $state->setNewStatementCharacterFound(true);
+        return $state;
+    }
 }
