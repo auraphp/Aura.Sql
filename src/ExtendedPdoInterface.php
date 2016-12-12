@@ -221,12 +221,30 @@ interface ExtendedPdoInterface extends PdoInterface
 
     /**
      *
+     * Returns the Rebuilder instance.
+     *
+     * @return RebuilderInterface
+     *
+     */
+    public function getRebuilder();
+
+    /**
+     *
      * Sets the Profiler instance.
      *
      * @param ProfilerInterface $profiler The profiler instance.
      *
      */
     public function setProfiler(ProfilerInterface $profiler);
+
+    /**
+     *
+     * Sets the Rebuilder instance.
+     *
+     * @param RebuilderInterface $rebuilder The rebuilder instance.
+     *
+     */
+    public function setRebuilder(RebuilderInterface $rebuilder);
 
     /**
      *

@@ -41,6 +41,13 @@ abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
      */
     protected $profiler;
 
+    /**
+     *
+     * Rebuilds the SQL statement for array binding.
+     *
+     * @var RebuilderInterface
+     *
+     */
     protected $rebuilder;
 
     /**
@@ -380,6 +387,11 @@ abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
         return $this->profiler;
     }
 
+    public function getRebuilder()
+    {
+        return $this->rebuilder;
+    }
+
     /**
      *
      * Is a transaction currently active?
@@ -578,6 +590,11 @@ abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
     public function setProfiler(ProfilerInterface $profiler)
     {
         $this->profiler = $profiler;
+    }
+
+    public function setRebuilder(RebuilderInterface $rebuilder)
+    {
+        $this->rebuilder = $rebuilder;
     }
 
     /**
