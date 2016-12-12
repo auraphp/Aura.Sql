@@ -83,8 +83,12 @@ class RebuilderState
         $this->charset = $charset;
         $this->last_index = mb_strlen($statement, $charset) - 1;
         $this->current_index = 0;
-        $this->numbered_placeholder_index = 0;
+        $this->numbered_placeholder_index = 1;
         $this->resetFinalStatement();
+        // PDO numbered parameters start at index 1
+        if (array_key_exists(0, $this->values)) {
+            array_unshift($this->values, null);
+        }
     }
 
     /**
