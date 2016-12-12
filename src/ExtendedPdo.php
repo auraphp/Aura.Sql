@@ -85,6 +85,9 @@ class ExtendedPdo extends AbstractExtendedPdo
             $profiler = new Profiler(new NullLogger());
         }
         $this->setProfiler($profiler);
+
+        // retain a rebuilder
+        $this->rebuilder = new Rebuilder();
     }
 
     /**

@@ -39,6 +39,7 @@ class DecoratedPdo extends AbstractExtendedPdo
             $profiler = new Profiler(new NullLogger());
         }
         $this->setProfiler($profiler);
+        $this->rebuilder = new Rebuilder();
     }
 
     /**

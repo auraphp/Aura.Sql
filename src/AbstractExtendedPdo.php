@@ -41,6 +41,8 @@ abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
      */
     protected $profiler;
 
+    protected $rebuilder;
+
     /**
      *
      * Begins a transaction and turns off autocommit mode.
@@ -502,7 +504,7 @@ abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
 
         // rebuild the statement and values
         $rebuilder = new Rebuilder($this);
-        list($statement, $values) = $rebuilder->__invoke($statement, $values);
+        list($statement, $values) = $rebuilder->rebuildStatement($statement, $values);
 
         // prepare the statement
         $sth = $this->pdo->prepare($statement);

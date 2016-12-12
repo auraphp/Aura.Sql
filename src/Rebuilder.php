@@ -8,8 +8,6 @@
  */
 namespace Aura\Sql;
 
-use Aura\Sql\Exception\MissingParameter;
-
 /**
  *
  * This support class for ExtendedPdo rebuilds an SQL statement for automatic
@@ -18,241 +16,273 @@ use Aura\Sql\Exception\MissingParameter;
  * @package Aura.Sql
  *
  */
-class Rebuilder
+class Rebuilder implements RebuilderInterface
 {
     /**
      *
-     * The calling ExtendedPdo object.
-     *
-     * @var ExtendedPdoInterface
-     *
-     */
-    protected $xpdo;
-
-    /**
-     *
-     * How many numbered placeholders in the original statement.
-     *
-     * @var int
-     *
-     */
-    protected $num = 0;
-
-    /**
-     *
-     * How many numbered placeholders to actually be bound; this may
-     * differ from 'num' in that some numbered placeholders may get
-     * replaced with quoted CSV strings
-     *
-     * @var int
-     *
-     */
-    protected $count = 0;
-
-    /**
-     *
-     * The initial values to be bound.
+     * List of handlers to call when a character is found.
+     * The key is the character, the value is a callable which takes a RebuildState as parameter and returns a RebuilderState
      *
      * @var array
-     *
      */
-    protected $values = array();
+    protected $statementPartsHandlers = array();
 
     /**
-     *
-     * Named and numbered placeholders to bind at the end.
-     *
-     * @var array
-     *
+     * Constructor. Sets up the array of callbacks.
      */
-    protected $final_values = array();
-
-    /**
-     *
-     * Constructor.
-     *
-     * @param ExtendedPdoInterface $xpdo The calling ExtendedPdo object.
-     *
-     */
-    public function __construct(ExtendedPdoInterface $xpdo)
+    public function __construct()
     {
-        $this->xpdo = $xpdo;
+        $this->statementPartsHandlers = array(
+            '-' => array($this, 'handleSingleLineComment'),
+            '/' => array($this, 'handleMultiLineComment'),
+            '"' => array($this, 'handleQuotedString'),
+            "'" => array($this, 'handleQuotedString'),
+            ':' => array($this, 'handleColon'),
+            '?' => array($this, 'handleQuestionMark'),
+        );
     }
 
     /**
      *
-     * Rebuilds a statement with array values replaced into placeholders.
+     * Registers a callable to use when a character is found in the statement
+     *
+     * @param string $key Character to check for
+     * @param callable $callback A callback which has the same properties as those found in $statementPartsHandlers
+     */
+    public function registerStatementPartsHandler($key, $callback)
+    {
+        $this->statementPartsHandlers[$key] = $callback;
+    }
+
+    /**
+     *
+     * Rebuilds a statement with array values put in individual values and parameters. Multiple occurrences of the same
+     * placeholder are also replaced.
      *
      * @param string $statement The statement to rebuild.
      *
      * @param array $values The values to bind and/or replace into a statement.
      *
+     * @param string $charset The character set the statement is using.
+     *
      * @return array An array where element 0 is the rebuilt statement and
      * element 1 is the rebuilt array of values.
      *
-     */
-    public function __invoke($statement, $values)
-    {
-        // match standard PDO execute() behavior of zero-indexed arrays
-        if (array_key_exists(0, $values)) {
-            array_unshift($values, null);
-        }
-
-        $this->values = $values;
-        $statement = $this->rebuildStatement($statement);
-        return array($statement, $this->final_values);
-    }
-
-    /**
-     *
-     * Given a statement, rebuilds it with array values embedded.
-     *
-     * @param string $statement The SQL statement.
-     *
-     * @return string The rebuilt statement.
+     * @throws \Exception
      *
      */
-    protected function rebuildStatement($statement)
+    public function rebuildStatement($statement, $values = array(), $charset = 'UTF-8')
     {
-        // find all parts not inside quotes or backslashed-quotes
-        $apos = "'";
-        $quot = '"';
-        $parts = preg_split(
-            "/(($apos+|$quot+|\\$apos+|\\$quot+).*?)\\2/m",
-            $statement,
-            -1,
-            PREG_SPLIT_DELIM_CAPTURE
-        );
-        return $this->rebuildParts($parts);
-    }
+        $state = new RebuilderState($statement, $values, $charset);
 
-    /**
-     *
-     * Given an array of statement parts, rebuilds each part.
-     *
-     * @param array $parts The statement parts.
-     *
-     * @return string The rebuilt statement.
-     *
-     */
-    protected function rebuildParts($parts)
-    {
-        // loop through the non-quoted parts (0, 3, 6, 9, etc.)
-        $k = count($parts);
-        for ($i = 0; $i <= $k; $i += 3) {
-            $parts[$i] = $this->rebuildPart($parts[$i]);
-        }
-        return implode('', $parts);
-    }
+        $last_check_index = -1;
 
-    /**
-     *
-     * Rebuilds a single statement part.
-     *
-     * @param string $part The statement part.
-     *
-     * @return string The rebuilt statement.
-     *
-     */
-    protected function rebuildPart($part)
-    {
-        // split into subparts by ":name" and "?"
-        $subs = preg_split(
-            "/(:[a-zA-Z_][a-zA-Z0-9_]*)|(\?)/m",
-            $part,
-            -1,
-            PREG_SPLIT_DELIM_CAPTURE
-        );
-
-        // check subparts to convert bound arrays to quoted CSV strings
-        $subs = $this->prepareValuePlaceholders($subs);
-
-        // reassemble
-        return implode('', $subs);
-    }
-
-    /**
-     *
-     * Prepares the sub-parts of a query with placeholders.
-     *
-     * @param array $subs The query subparts.
-     *
-     * @return array The prepared subparts.
-     *
-     */
-    protected function prepareValuePlaceholders(array $subs)
-    {
-        foreach ($subs as $i => $sub) {
-            $char = substr($sub, 0, 1);
-            if ($char == '?') {
-                $subs[$i] = $this->prepareNumberedPlaceholder($sub);
+        while (! $state->done()) {
+            if ($state->getCurrentIndex() <= $last_check_index) {
+                throw (new \Exception('SQL rebuilder seems to be in an infinite loop.'));
             }
+            $last_check_index = $state->getCurrentIndex();
 
-            if ($char == ':') {
-                $subs[$i] = $this->prepareNamedPlaceholder($sub);
+            if (isset($this->statementPartsHandlers[$state->getCurrentCharacter()])) {
+                $handler = $this->statementPartsHandlers[$state->getCurrentCharacter()];
+                call_user_func($handler, $state);
+            }
+            else {
+                $state->copyCurrentCharacter();
             }
         }
 
-        return $subs;
+        return array($state->getFinalStatement(), $state->getValuesToBind());
     }
 
     /**
      *
-     * Bind or quote a numbered placeholder in a query subpart.
+     * Returns the length of a quoted string part of statement
      *
-     * @param string $sub The query subpart.
+     * @param string $statement The SQL statement
      *
-     * @return string The prepared query subpart.
+     * @param int $position Position of the quote character starting the string
      *
-     * @throws MissingParameter
+     * @param string $quote_character Quote character, ' or "
+     *
+     * @param string $charset Charset of the string
+     *
+     * @return int
      */
-    protected function prepareNumberedPlaceholder($sub)
+    protected function getQuotedStringLength($statement, $position, $quote_character, $charset)
     {
-        // what numbered placeholder is this in the original statement?
-        $this->num ++;
-
-        // is the corresponding data element an array?
-        $bind_array = isset($this->values[$this->num])
-                   && is_array($this->values[$this->num]);
-        if ($bind_array) {
-            // PDO won't bind an array; quote and replace directly
-            $sub = $this->xpdo->quote($this->values[$this->num]);
-        } else {
-            // increase the count of numbered placeholders to be bound
-            $this->count ++;
-            if (array_key_exists($this->num, $this->values) === false) {
-                throw new MissingParameter('Parameter ' . $this->num . ' is missing from the bound values');
+        $start = $position;
+        $last_index = mb_strlen($statement, $charset) - 1;
+        // Search for end of string character, passing '', "", \' and \" groupings.
+        $end_found = false;
+        $length = 0;
+        while (!$end_found)
+        {
+            $end_of_quoted_string_index = mb_strpos($statement, $quote_character, $position + 1, $charset);
+            if ($end_of_quoted_string_index === false) {
+                $length = $last_index - $start;
+                break;
             }
-            $this->final_values[$this->count] = $this->values[$this->num];
-        }
 
-        return $sub;
+            // Count the number of \ characters before the quote character found.
+            $escape_count = 0;
+            while (mb_substr($statement, $end_of_quoted_string_index - ($escape_count + 1), 1, $charset) === "\\")
+            {
+                $escape_count ++;
+            }
+            // If it is even, count the number of same character after the current one
+            if ($escape_count % 2 == 0)
+            {
+                $escape_count = 0;
+                while (mb_substr($statement, $end_of_quoted_string_index + $escape_count + 1, 1, $charset) === $quote_character)
+                {
+                    $escape_count ++;
+                }
+                $position = $end_of_quoted_string_index + $escape_count;
+                if ($escape_count % 2 == 0)
+                {
+                    $length = $end_of_quoted_string_index + $escape_count - $start + 1;
+                    $end_found = true;
+                }
+            }
+            else {
+                // Character is escaped so we try to find another one after
+                $position = $end_of_quoted_string_index;
+            }
+        }
+        return $length;
     }
 
     /**
      *
-     * Bind or quote a named placeholder in a query subpart.
+     * Returns a modified statement, values and current index depending on what follow a '-' character.
      *
-     * @param string $sub The query subpart.
+     * @param RebuilderState $state
      *
-     * @return string The prepared query subpart.
-     *
+     * @return RebuilderState
      */
-    protected function prepareNamedPlaceholder($sub)
+    protected function handleSingleLineComment($state)
     {
-        $name = substr($sub, 1);
-
-        // is the corresponding data element an array?
-        $bind_array = isset($this->values[$name])
-                   && is_array($this->values[$name]);
-        if ($bind_array) {
-            // PDO won't bind an array; quote and replace directly
-            $sub = $this->xpdo->quote($this->values[$name]);
-        } else {
-            // not an array, retain the placeholder for later
-            $this->final_values[$name] = $this->values[$name];
+        if ($state->nextCharactersAre('-')) {
+            // One line comment
+            $state->copyUntilCharacter("\n");
+        }
+        else {
+            $state->copyCurrentCharacter();
         }
 
-        return $sub;
+        return $state;
     }
+
+    /**
+     *
+     * If the character following a '/' one is a '*', advance the $current_index to the end of this multiple line comment
+     *
+     * @param RebuilderState $state
+     *
+     * @return RebuilderState
+     */
+    protected function handleMultiLineComment($state)
+    {
+        if ($state->nextCharactersAre('*')) {
+            $state->copyUntilCharacter('*/');
+        }
+        else {
+            $state->copyCurrentCharacter();
+        }
+        return $state;
+    }
+
+    /**
+     *
+     * After a single quote or double quote string, advance the $current_index to the end of the string
+     *
+     * @param RebuilderState $state
+     *
+     * @return RebuilderState
+     */
+    protected function handleQuotedString($state)
+    {
+        $length = $this->getQuotedStringLength($state->getStatement(), $state->getCurrentIndex(), $state->getCurrentCharacter(), $state->getCharset());
+        $state->copyCharacters($length);
+        return $state;
+    }
+
+    /**
+     *
+     * Check if a ':' colon character is followed by what can be a named placeholder.
+     *
+     * @param RebuilderState $state
+     *
+     * @return RebuilderState
+     */
+    protected function handleColon($state)
+    {
+        $colon_number = 0;
+        do {
+            $state->copyCurrentCharacter();
+            $colon_number++;
+        }
+        while($state->getCurrentCharacter() === ':');
+
+        if ($colon_number != 1) {
+            return $state;
+        }
+
+        $name = $state->getIdentifier();
+
+        if (! $name) {
+            return $state;
+        }
+
+        $value = $state->getNamedParameterValue($name);
+        if (! is_array($value)) {
+            $state->storeValueToBind($name, $value);
+            $state->copyIdentifier();
+            return $state;
+        }
+        $placeholder_identifiers = '';
+        foreach ($value as $sub) {
+            $identifier = $state->storeValueToBind($name, $sub);
+            if ($placeholder_identifiers) {
+                $placeholder_identifiers .= ', :';
+            }
+            $placeholder_identifiers .= $identifier;
+        }
+        $state->passString($name);
+        $state->addStringToStatement($placeholder_identifiers);
+
+        return $state;
+    }
+
+    /**
+     *
+     * Replace a question mark by multiple question marks if a numbered placeholder contains an array
+     *
+     * @param RebuilderState $state
+     *
+     * @return RebuilderState
+     */
+    protected function handleQuestionMark($state)
+    {
+        $value = $state->getFirstUnusedNumberedValue();
+        $state->copyCurrentCharacter();
+
+        if (! is_array($value)) {
+            $state->storeNumberedValueToBind($value);
+            return $state;
+        }
+        $placeholder_string = '';
+        $nbr = 0;
+        foreach ($value as $sub) {
+            $state->storeNumberedValueToBind($sub);
+            if ($nbr) {
+                $placeholder_string .= ', ?';
+            }
+            $nbr++;
+        }
+        $state->addStringToStatement($placeholder_string);
+
+        return $state;
+   }
 }
