@@ -578,13 +578,6 @@ class ExtendedPdoTest extends \PHPUnit_Framework_TestCase
         $sth = $this->pdo->prepareWithValues($stm, array('id' => new stdClass));
     }
 
-    public function testBindNullFirstParameter ()
-    {
-        $rebuilder = new Rebuilder($this->newExtendedPdo());
-        $result = $rebuilder('SELECT * FROM test WHERE column_one = ?', array(null));
-        $this->assertTrue(array_key_exists(1, $result[1]));
-    }
-
     public function testWithProfileLogging()
     {
         $logger = new FakeLogger();
