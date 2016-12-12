@@ -71,6 +71,18 @@ class ExtendedPdo extends AbstractExtendedPdo
             $options[PDO::ATTR_ERRMODE] == PDO::ERRMODE_WARNING;
         }
 
+        // Select a query parser
+        $parts = explode(':', $dsn);
+        $driver = $parts[0];
+        if ($driver === 'pgsql') {
+            $parser = new PgParser();
+        }
+        else {
+            $parser = new MySQLParser();
+        }
+        $this->setParser($parser);
+
+
         // retain the arguments for later
         $this->args = [
             $dsn,
