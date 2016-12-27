@@ -138,7 +138,7 @@ class ExtendedPdo extends AbstractExtendedPdo
         return [
             'args' => [
                 $this->args[0],
-                $this->args[1],
+                '****',
                 '****',
                 $this->args[3],
                 $this->args[4],

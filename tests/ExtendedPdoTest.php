@@ -660,7 +660,7 @@ class ExtendedPdoTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(1, $debugInfo);
         $this->assertCount(5, $debugInfo['args']);
         $this->assertEquals('sqlite::memory:', $debugInfo['args'][0]);
-        $this->assertEquals('username', $debugInfo['args'][1]);
+        $this->assertEquals('****', $debugInfo['args'][1]);
         $this->assertEquals('****', $debugInfo['args'][2]);
         $this->assertTrue(is_array($debugInfo['args'][3]));
         $this->assertTrue(is_array($debugInfo['args'][4]));
