@@ -651,4 +651,18 @@ class ExtendedPdoTest extends \PHPUnit_Framework_TestCase
         $this->pdo->query("SELECT 5 FROM pdotest");
         $this->assertEquals(4, count($logger->getLog()));
     }
+
+    public function testNoExportOfLoginCredentials()
+    {
+        $pdo = new ExtendedPdo('sqlite::memory:', 'username', 'password');
+        $debugInfo = $pdo->__debugInfo();
+
+        $this->assertCount(1, $debugInfo);
+        $this->assertCount(5, $debugInfo['args']);
+        $this->assertEquals('sqlite::memory:', $debugInfo['args'][0]);
+        $this->assertEquals('username', $debugInfo['args'][1]);
+        $this->assertEquals('****', $debugInfo['args'][2]);
+        $this->assertTrue(is_array($debugInfo['args'][3]));
+        $this->assertTrue(is_array($debugInfo['args'][4]));
+    }
 }

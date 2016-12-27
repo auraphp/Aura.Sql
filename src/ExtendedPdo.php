@@ -125,4 +125,24 @@ class ExtendedPdo extends AbstractExtendedPdo
         $this->pdo = null;
         $this->profiler->finish();
     }
+
+    /**
+     *
+     * The purpose of this method is to hide sensitive data from stack traces.
+     *
+     * @return array
+     *
+     */
+    public function __debugInfo()
+    {
+        return [
+            'args' => [
+                $this->args[0],
+                $this->args[1],
+                '****',
+                $this->args[3],
+                $this->args[4],
+            ]
+        ];
+    }
 }
