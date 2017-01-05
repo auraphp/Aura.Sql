@@ -668,6 +668,6 @@ class ExtendedPdoTest extends \PHPUnit_Framework_TestCase
         $this->assertContains('[0]=>string(15) "sqlite::memory:"', $data);
         $this->assertContains('[1]=>string(4) "****"', $data);
         $this->assertContains('[2]=>string(4) "****"', $data);
-        $this->assertContains('[3]=>array(1) {[3] =>int(2)}[4] =>array(0) {}', $data);
+        $this->assertContains('[3]=>array(1) {[3]=>int(2)}[4]=>array(0) {}', $data);
     }
 }
