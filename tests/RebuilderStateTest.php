@@ -200,4 +200,10 @@ class RebuilderStateTest extends \PHPUnit_Framework_TestCase
         );
         $this->assertSame($expected, $state->getValuesToBind());
     }
+    
+    public function testGetCharset()
+    {
+        $state = new RebuilderState('', array(), 'US-ASCII');
+        $this->assertSame('US-ASCII', $state->getCharset());
+    }
 }
