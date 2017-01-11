@@ -87,6 +87,11 @@ class PgParserTest extends \PHPUnit_Framework_TestCase
 -- :foo";
         $parsedQuery = $this->parseSingleQuery($sql, $parameters);
         $this->assertEquals($sql, $parsedQuery->getString());
+
+        $sql = "SELECT 1 - :foo";
+        $parsedQuery = $this->parseSingleQuery($sql, $parameters);
+        $expectedSql = "SELECT 1 - :foo, :foo_0";
+        $this->assertEquals($expectedSql, $parsedQuery->getString());
     }
 
     public function testMultiLineComment()
@@ -107,6 +112,11 @@ class PgParserTest extends \PHPUnit_Framework_TestCase
 1";
         $parsedQuery = $this->parseSingleQuery($sql, $parameters);
         $this->assertEquals($sql, $parsedQuery->getString());
+
+        $sql = "SELECT 1 / :foo";
+        $parsedQuery = $this->parseSingleQuery($sql, $parameters);
+        $expectedSql = "SELECT 1 / :foo, :foo_0";
+        $this->assertEquals($expectedSql, $parsedQuery->getString());
     }
 
     public function testDoubleQuotedIdentifier()
