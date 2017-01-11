@@ -291,4 +291,14 @@ SQL;
         $parser->setNumberedPlaceholderCharacter("#");
         $this->assertEquals("#", $parser->getNumberedPlaceholderCharacter());
     }
+    
+    public function testInvalidPlaceholderName()
+    {
+        $parameters = array(']' => array('bar', 'baz'));
+        $sql = <<<SQL
+SELECT 'hello':]
+SQL;
+        $parsedQuery = $this->parseSingleQuery($sql, $parameters);
+        $this->assertEquals($sql, $parsedQuery->getString());
+    }
 }
