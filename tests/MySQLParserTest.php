@@ -195,6 +195,24 @@ SQL;
         $parsedQuery = $this->parseSingleQuery($sql, $parameters);
         $this->assertEquals($expectedSql, $parsedQuery->getString());
         $this->assertEquals($expectedParameters, $parsedQuery->getParameters());
+
+        $sql = <<<SQL
+SELECT "Escaping \" :foo \"
+SQL;
+        $parsedQuery = $this->parseSingleQuery($sql, $parameters);
+        $this->assertEquals($sql, $parsedQuery->getString());
+
+        $sql = <<<SQL
+SELECT "Escaping "" :foo """
+SQL;
+        $parsedQuery = $this->parseSingleQuery($sql, $parameters);
+        $this->assertEquals($sql, $parsedQuery->getString());
+
+        $sql = <<<SQL
+SELECT 'Escaping '' :foo '''
+SQL;
+        $parsedQuery = $this->parseSingleQuery($sql, $parameters);
+        $this->assertEquals($sql, $parsedQuery->getString());
     }
 
     public function testMultiQueries()
