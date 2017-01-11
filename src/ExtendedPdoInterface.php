@@ -347,4 +347,13 @@ interface ExtendedPdoInterface extends PdoInterface
      *
      */
     public function prepareWithValues($statement, array $values = []);
+
+    /**
+     *
+     * Specify a character to use in queries to replace the ? character for numbered placeholders
+     *
+     * @param string $character
+     *
+     */
+    public function setNumberedParameterCharacter($character);
 }

@@ -38,8 +38,8 @@ abstract class BaseParser
      */
     public function setNumberedPlaceholderCharacter($character)
     {
-        $this->numberedPlaceHolderCharacter = $character;
         $oldCharacter = $this->getNumberedPlaceholderCharacter();
+        $this->numberedPlaceHolderCharacter = $character;
         if($character !== $oldCharacter){
             $this->statementPartsHandlers[$character] = $this->statementPartsHandlers[$oldCharacter];
             unset($this->statementPartsHandlers[$oldCharacter]);
