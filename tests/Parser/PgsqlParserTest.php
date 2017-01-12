@@ -10,7 +10,8 @@ class PgsqlParserTest extends \PHPUnit_Framework_TestCase
      * @param array $parameters
      * @return Query
      */
-    private function parseSingleQuery($sql, $parameters){
+    private function parseSingleQuery($sql, $parameters)
+    {
         $parser = new PgsqlParser();
         $query = new Query($sql, $parameters);
         $parsedQueries = $parser->normalize($query);
@@ -23,7 +24,8 @@ class PgsqlParserTest extends \PHPUnit_Framework_TestCase
      * @param $parameters
      * @return Query[]
      */
-    private function parseMultipleQueries($sql, $parameters){
+    private function parseMultipleQueries($sql, $parameters)
+    {
         $parser = new PgsqlParser();
         $query = new Query($sql, $parameters);
         $parsedQueries = $parser->normalize($query);

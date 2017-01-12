@@ -42,7 +42,7 @@ abstract class AbstractParser
     {
         $oldCharacter = $this->getNumberedPlaceholderCharacter();
         $this->numberedPlaceHolderCharacter = $character;
-        if($character !== $oldCharacter){
+        if ($character !== $oldCharacter) {
             $this->statementPartsHandlers[$character] = $this->statementPartsHandlers[$oldCharacter];
             unset($this->statementPartsHandlers[$oldCharacter]);
             $this->numberedPlaceHolderCharacter = $character;
@@ -81,8 +81,7 @@ abstract class AbstractParser
                     $this->storeQuery($state, $queries);
                     $state->resetFinalStatement();
                 }
-            }
-            else {
+            } else {
                 $state->copyCurrentCharacter();
             }
         }
@@ -155,8 +154,7 @@ abstract class AbstractParser
         do {
             $state->copyCurrentCharacter();
             $colon_number++;
-        }
-        while($state->getCurrentCharacter() === ':');
+        } while ($state->getCurrentCharacter() === ':');
 
         if ($colon_number != 1) {
             return $state;
@@ -174,8 +172,7 @@ abstract class AbstractParser
         if (! is_array($value)) {
             $identifier = $state->storeValueToBind($name, $value);
             $placeholder_identifiers .= $identifier;
-        }
-        else {
+        } else {
             foreach ($value as $sub) {
                 $identifier = $state->storeValueToBind($name, $sub);
                 if ($placeholder_identifiers) {
@@ -206,8 +203,7 @@ abstract class AbstractParser
 
         if (! is_array($value)) {
             $placeholder_identifiers = ':' . $state->storeValueToBind($name, $value);
-        }
-        else {
+        } else {
             $placeholder_identifiers = '';
             foreach ($value as $sub) {
                 $identifier = ':' . $state->storeValueToBind($name, $sub);

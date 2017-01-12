@@ -60,7 +60,7 @@ class StateTest extends \PHPUnit_Framework_TestCase
         $state->copyCurrentCharacter();
         $this->assertSame("S", $state->getFinalStatement());
         $this->assertSame("E", $state->getCurrentCharacter());
-        for($i = 0; $i < 8; $i++){
+        for ($i = 0; $i < 8; $i++) {
             $state->copyCurrentCharacter();
         }
         $this->assertSame("SELECT '฿", $state->getFinalStatement());

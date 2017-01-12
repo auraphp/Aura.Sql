@@ -45,8 +45,7 @@ class MysqlParser extends AbstractParser implements ParserInterface
         if ($state->nextCharactersAre('- ')) {
             // One line comment
             $state->copyUntilCharacter("\n");
-        }
-        else {
+        } else {
             $state->copyCurrentCharacter();
         }
 
@@ -66,8 +65,7 @@ class MysqlParser extends AbstractParser implements ParserInterface
     {
         if ($state->nextCharactersAre('*')) {
             $state->copyUntilCharacter('*/');
-        }
-        else {
+        } else {
             $state->copyCurrentCharacter();
         }
         return $state;
@@ -90,14 +88,12 @@ class MysqlParser extends AbstractParser implements ParserInterface
             $currentCharacter = $state->getCurrentCharacter();
             if ($currentCharacter === '\\') {
                 $backslashEscaping = !$backslashEscaping;
-            }
-            else if($currentCharacter === $quoteCharacter && !$backslashEscaping) {
+            } elseif ($currentCharacter === $quoteCharacter && !$backslashEscaping) {
                 $state->copyCurrentCharacter();
-                if( !$state->nextCharactersAre($quoteCharacter)) {
+                if ( !$state->nextCharactersAre($quoteCharacter)) {
                     return $state;
                 }
-            }
-            else {
+            } else {
                 $backslashEscaping = false;
             }
             $state->copyCurrentCharacter();

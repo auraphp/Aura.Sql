@@ -48,8 +48,7 @@ class PgsqlParser extends AbstractParser implements ParserInterface
         if ($state->nextCharactersAre('-')) {
             // One line comment
             $state->copyUntilCharacter("\n");
-        }
-        else {
+        } else {
             $state->copyCurrentCharacter();
         }
 
@@ -71,16 +70,14 @@ class PgsqlParser extends AbstractParser implements ParserInterface
             $commentLevel = 1;
             while ($commentLevel > 0 && ! $state->done()) {
                 $state->copyCurrentCharacter();
-                if($state->nextCharactersAre('/*')) {
+                if ($state->nextCharactersAre('/*')) {
                     $commentLevel ++;
-                }
-                elseif($state->nextCharactersAre('*/')) {
+                } elseif ($state->nextCharactersAre('*/')) {
                     $commentLevel --;
                 }
             }
             $state->copyUntilCharacter('*/');
-        }
-        else {
+        } else {
             $state->copyCurrentCharacter();
         }
         return $state;
@@ -105,25 +102,23 @@ class PgsqlParser extends AbstractParser implements ParserInterface
                 $currentCharacter = $state->getCurrentCharacter();
                 if ($currentCharacter === '\\') {
                     $escaped = !$escaped;
-                }
-                else if ($currentCharacter === "'" && !$escaped) {
-                    if($state->nextCharactersAre("'")) {
+                } elseif ($currentCharacter === "'" && !$escaped) {
+                    if ($state->nextCharactersAre("'")) {
                         $escaped = true;
-                    }
-                    else {
+                    } else {
                         $inCString = false;
                     }
                 }
                 if (!$inCString) {
                     // Checking if we have blank characters until next quote. In which case it is the same string
                     $blanks = $state->capture("\\s*'");
-                    if($blanks){
+                    if ($blanks) {
                         $state->copyUntilCharacter("'");
                         $state->copyCurrentCharacter();
                         $inCString = true;
                     }
                 }
-            } while(!$state->done() && $inCString);
+            } while (!$state->done() && $inCString);
         }
         return $state;
     }

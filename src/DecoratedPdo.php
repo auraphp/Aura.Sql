@@ -43,8 +43,7 @@ class DecoratedPdo extends AbstractExtendedPdo
         $driver = $pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
         if ($driver === 'pgsql') {
             $parser = new PgsqlParser();
-        }
-        else {
+        } else {
             $parser = new MysqlParser();
         }
         $this->setParser($parser);
