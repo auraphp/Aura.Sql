@@ -284,7 +284,7 @@ abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
     ) {
         $sth = $this->perform($statement, $values);
 
-        if (!empty($args)) {
+        if (! empty($args)) {
             return $sth->fetchObject($class, $args);
         }
 

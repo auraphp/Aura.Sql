@@ -100,7 +100,7 @@ abstract class AbstractParser
     private function storeQuery($state, &$queries)
     {
         $statement = $state->getFinalStatement();
-        if (!$this->isStatementEmpty($statement)) {
+        if (! $this->isStatementEmpty($statement)) {
             $queries[] = new Query($statement, $state->getValuesToBind());
         }
     }
@@ -134,7 +134,7 @@ abstract class AbstractParser
     {
         $quoteCharacter = $state->getCurrentCharacter();
         $state->copyCurrentCharacter();
-        if (!$state->done()) {
+        if (! $state->done()) {
             $state->copyUntilCharacter($quoteCharacter);
         }
         return $state;

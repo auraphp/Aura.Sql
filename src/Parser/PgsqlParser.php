@@ -94,22 +94,22 @@ class PgsqlParser extends AbstractParser implements ParserInterface
     protected function handlePossibleCStyleString($state)
     {
         $state->copyCurrentCharacter();
-        if (!$state->done() && ($currentCharacter = $state->getCurrentCharacter()) === "'") {
+        if (! $state->done() && ($currentCharacter = $state->getCurrentCharacter()) === "'") {
             $escaped = false;
             $inCString = true;
             do {
                 $state->copyCurrentCharacter();
                 $currentCharacter = $state->getCurrentCharacter();
                 if ($currentCharacter === '\\') {
-                    $escaped = !$escaped;
-                } elseif ($currentCharacter === "'" && !$escaped) {
+                    $escaped = ! $escaped;
+                } elseif ($currentCharacter === "'" && ! $escaped) {
                     if ($state->nextCharactersAre("'")) {
                         $escaped = true;
                     } else {
                         $inCString = false;
                     }
                 }
-                if (!$inCString) {
+                if (! $inCString) {
                     // Checking if we have blank characters until next quote. In which case it is the same string
                     $blanks = $state->capture("\\s*'");
                     if ($blanks) {
@@ -118,7 +118,7 @@ class PgsqlParser extends AbstractParser implements ParserInterface
                         $inCString = true;
                     }
                 }
-            } while (!$state->done() && $inCString);
+            } while (! $state->done() && $inCString);
         }
         return $state;
     }

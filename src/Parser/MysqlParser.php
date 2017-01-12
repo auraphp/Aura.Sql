@@ -84,13 +84,13 @@ class MysqlParser extends AbstractParser implements ParserInterface
         $quoteCharacter = $state->getCurrentCharacter();
         $state->copyCurrentCharacter();
         $backslashEscaping = false;
-        while (!$state->done()) {
+        while (! $state->done()) {
             $currentCharacter = $state->getCurrentCharacter();
             if ($currentCharacter === '\\') {
-                $backslashEscaping = !$backslashEscaping;
-            } elseif ($currentCharacter === $quoteCharacter && !$backslashEscaping) {
+                $backslashEscaping = ! $backslashEscaping;
+            } elseif ($currentCharacter === $quoteCharacter && ! $backslashEscaping) {
                 $state->copyCurrentCharacter();
-                if ( !$state->nextCharactersAre($quoteCharacter)) {
+                if ( ! $state->nextCharactersAre($quoteCharacter)) {
                     return $state;
                 }
             } else {
