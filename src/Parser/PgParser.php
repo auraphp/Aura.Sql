@@ -6,14 +6,14 @@
  * @license https://opensource.org/licenses/MIT MIT
  *
  */
-namespace Aura\Sql;
+namespace Aura\Sql\Parser;
 
 /**
  * Class PgParser
  * Parser specific to PostgreSQL syntax
  * @package Aura\Sql
  */
-class PgParser extends BaseParser implements QueryParserInterface
+class PgParser extends AbstractParser implements QueryParserInterface
 {
     /**
      * Constructor. Sets up the array of callbacks.

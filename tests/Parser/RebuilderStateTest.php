@@ -1,8 +1,5 @@
 <?php
-
-
-namespace Aura\Sql;
-
+namespace Aura\Sql\Parser;
 
 class RebuilderStateTest extends \PHPUnit_Framework_TestCase
 {
@@ -200,7 +197,7 @@ class RebuilderStateTest extends \PHPUnit_Framework_TestCase
         );
         $this->assertSame($expected, $state->getValuesToBind());
     }
-    
+
     public function testGetCharset()
     {
         $state = new RebuilderState('', array(), 'US-ASCII');

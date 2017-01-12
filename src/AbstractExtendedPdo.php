@@ -9,6 +9,7 @@
 namespace Aura\Sql;
 
 use Aura\Sql\Exception;
+use Aura\Sql\Parser\QueryParserInterface;
 use PDO;
 use PDOStatement;
 use Psr\Log\NullLogger;

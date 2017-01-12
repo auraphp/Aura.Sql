@@ -6,7 +6,9 @@
  * @license https://opensource.org/licenses/MIT MIT
  *
  */
-namespace Aura\Sql;
+namespace Aura\Sql\Parser;
+
+use Aura\Sql\Query;
 
 /**
  *
@@ -15,7 +17,7 @@ namespace Aura\Sql;
  * @package Aura\Sql
  *
  */
-abstract class BaseParser
+abstract class AbstractParser
 {
     /**
      *

@@ -6,14 +6,14 @@
  * @license https://opensource.org/licenses/MIT MIT
  *
  */
-namespace Aura\Sql;
+namespace Aura\Sql\Parser;
 
 /**
  * Class MySQLParser
  * Query parser for MySQL flavored queries
  * @package Aura\Sql
  */
-class MySQLParser extends BaseParser implements QueryParserInterface
+class MySQLParser extends AbstractParser implements QueryParserInterface
 {
     /**
      * Constructor. Sets up the array of callbacks.

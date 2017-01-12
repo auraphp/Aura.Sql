@@ -1,10 +1,9 @@
 <?php
+namespace Aura\Sql\Parser;
 
+use Aura\Sql\Query;
 
-namespace Aura\Sql;
-
-
-class BaseParserTest extends \PHPUnit_Framework_TestCase
+class LoopParserTest extends \PHPUnit_Framework_TestCase
 {
     public function testInfiniteLoop()
     {
