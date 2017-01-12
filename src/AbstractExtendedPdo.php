@@ -43,6 +43,15 @@ abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
 
     /**
      *
+     * Parses queries and values to generate the usable list of queries
+     *
+     * @var QueryParserInterface
+     *
+     */
+    protected $parser;
+
+    /**
+     *
      * Begins a transaction and turns off autocommit mode.
      *
      * @return bool True on success, false on failure.
@@ -501,14 +510,15 @@ abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
         $this->profiler->start(__FUNCTION__);
 
         // rebuild the statement and values
-        $rebuilder = new Rebuilder($this);
-        list($statement, $values) = $rebuilder->__invoke($statement, $values);
+        $query = new Query($statement, $values);
+        $queries = $this->parser->normalize($query);
+        $firstQuery = $queries[0];
 
         // prepare the statement
-        $sth = $this->pdo->prepare($statement);
+        $sth = $this->pdo->prepare($firstQuery->getString());
 
         // for the placeholders we found, bind the corresponding data values
-        foreach ($values as $key => $val) {
+        foreach ($firstQuery->getParameters() as $key => $val) {
             $this->bindValue($sth, $key, $val);
         }
 
@@ -753,5 +763,29 @@ abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
         }
 
         return $sth->bindValue($key, $val);
+    }
+
+    /**
+     *
+     * Registers a query parser
+     *
+     * @param QueryParserInterface $parser
+     *
+     */
+    public function setParser(QueryParserInterface $parser)
+    {
+        $this->parser = $parser;
+    }
+
+    /**
+     *
+     * Specify a character to use in queries to replace the ? character for numbered placeholders
+     *
+     * @param string $character
+     *
+     */
+    public function setNumberedParameterCharacter($character)
+    {
+        $this->parser->setNumberedPlaceholderCharacter($character);
     }
 }

@@ -39,6 +39,15 @@ class DecoratedPdo extends AbstractExtendedPdo
             $profiler = new Profiler(new NullLogger());
         }
         $this->setProfiler($profiler);
+
+        $driver = $pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
+        if ($driver === 'pgsql') {
+            $parser = new PgParser();
+        }
+        else {
+            $parser = new MySQLParser();
+        }
+        $this->setParser($parser);
     }
 
     /**

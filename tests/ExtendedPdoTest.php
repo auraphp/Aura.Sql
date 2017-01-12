@@ -169,7 +169,7 @@ class ExtendedPdoTest extends \PHPUnit_Framework_TestCase
             'bar' => 'WRONG',
         ));
 
-        $expect = str_replace(':list', "'1', '2', '3', '4', '5'", $stm);
+        $expect = str_replace(':list', ":list, :list_0, :list_1, :list_2, :list_3", $stm);
         $actual = $sth->queryString;
         $this->assertSame($expect, $actual);
     }
@@ -531,6 +531,15 @@ class ExtendedPdoTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(3, count($res));
     }
 
+    public function testChangedNumberedPlaceHolder()
+    {
+        $stm = 'SELECT name FROM pdotest WHERE id = #';
+        $val = array(1);
+        $this->pdo->setNumberedParameterCharacter('#');
+        $res = $this->pdo->fetchValue($stm, $val);
+        $this->assertEquals($this->data[1], $res);
+    }
+    
     public function testPdoDependency()
     {
         // pass in ExtendedPdo to see if it can replace PDO
@@ -576,13 +585,6 @@ class ExtendedPdoTest extends \PHPUnit_Framework_TestCase
             "Cannot bind value of type 'object' to placeholder 'id'"
         );
         $sth = $this->pdo->prepareWithValues($stm, array('id' => new stdClass));
-    }
-
-    public function testBindNullFirstParameter ()
-    {
-        $rebuilder = new Rebuilder($this->newExtendedPdo());
-        $result = $rebuilder('SELECT * FROM test WHERE column_one = ?', array(null));
-        $this->assertTrue(array_key_exists(1, $result[1]));
     }
 
     public function testWithProfileLogging()
