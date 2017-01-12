@@ -9,11 +9,11 @@
 namespace Aura\Sql\Parser;
 
 /**
- * Class PgParser
+ * Class PgsqlParser
  * Parser specific to PostgreSQL syntax
  * @package Aura\Sql
  */
-class PgParser extends AbstractParser implements QueryParserInterface
+class PgsqlParser extends AbstractParser implements QueryParserInterface
 {
     /**
      * Constructor. Sets up the array of callbacks.

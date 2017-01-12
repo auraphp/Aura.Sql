@@ -75,9 +75,9 @@ class ExtendedPdo extends AbstractExtendedPdo
         $parts = explode(':', $dsn);
         $driver = $parts[0];
         if ($driver === 'pgsql') {
-            $parser = new Parser\PgParser();
+            $parser = new Parser\PgsqlParser();
         } else {
-            $parser = new Parser\MySQLParser();
+            $parser = new Parser\MysqlParser();
         }
         $this->setParser($parser);
 

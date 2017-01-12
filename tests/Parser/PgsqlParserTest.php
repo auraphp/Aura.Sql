@@ -3,7 +3,7 @@ namespace Aura\Sql\Parser;
 
 use Aura\Sql\Query;
 
-class MySQLParserTest extends \PHPUnit_Framework_TestCase
+class PgsqlParserTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @param string $sql
@@ -11,7 +11,7 @@ class MySQLParserTest extends \PHPUnit_Framework_TestCase
      * @return Query
      */
     private function parseSingleQuery($sql, $parameters){
-        $parser = new MySQLParser();
+        $parser = new PgsqlParser();
         $query = new Query($sql, $parameters);
         $parsedQueries = $parser->normalize($query);
         $this->assertTrue(count($parsedQueries) == 1);
@@ -24,7 +24,7 @@ class MySQLParserTest extends \PHPUnit_Framework_TestCase
      * @return Query[]
      */
     private function parseMultipleQueries($sql, $parameters){
-        $parser = new MySQLParser();
+        $parser = new PgsqlParser();
         $query = new Query($sql, $parameters);
         $parsedQueries = $parser->normalize($query);
         return $parsedQueries;
@@ -87,13 +87,10 @@ class MySQLParserTest extends \PHPUnit_Framework_TestCase
         $parsedQuery = $this->parseSingleQuery($sql, $parameters);
         $this->assertEquals($sql, $parsedQuery->getString());
 
-        // The space character after the two -- is mandatory for MySQL
-        $sql = "SELECT 1 --:foo";
+        $sql = "SELECT 1 - :foo";
         $parsedQuery = $this->parseSingleQuery($sql, $parameters);
-        $expectedSql = "SELECT 1 --:foo, :foo_0";
-        $expectedParameters = array('foo' => 'bar', 'foo_0' => 'baz');
+        $expectedSql = "SELECT 1 - :foo, :foo_0";
         $this->assertEquals($expectedSql, $parsedQuery->getString());
-        $this->assertEquals($expectedParameters, $parsedQuery->getParameters());
     }
 
     public function testMultiLineComment()
@@ -107,16 +104,18 @@ class MySQLParserTest extends \PHPUnit_Framework_TestCase
         $parsedQuery = $this->parseSingleQuery($sql, $parameters);
         $this->assertEquals($sql, $parsedQuery->getString());
 
-        // MySQL does not handle nested comments
         $sql = "SELECT
 /* comment in
 /* a comment
 */ :foo */
 1";
         $parsedQuery = $this->parseSingleQuery($sql, $parameters);
-        $this->assertNotEquals($sql, $parsedQuery->getString());
-        $expectedParameters = array('foo' => 'bar', 'foo_0' => 'baz');
-        $this->assertEquals($expectedParameters, $parsedQuery->getParameters());
+        $this->assertEquals($sql, $parsedQuery->getString());
+
+        $sql = "SELECT 1 / :foo";
+        $parsedQuery = $this->parseSingleQuery($sql, $parameters);
+        $expectedSql = "SELECT 1 / :foo, :foo_0";
+        $this->assertEquals($expectedSql, $parsedQuery->getString());
     }
 
     public function testDoubleQuotedIdentifier()
@@ -133,6 +132,14 @@ SELECT "to use double quotes, just double them "" :foo "
 SQL;
         $parsedQuery = $this->parseSingleQuery($sql, $parameters);
         $this->assertEquals($sql, $parsedQuery->getString());
+
+        $parameters = array('a000' => array('foo', 'bar'));
+        $sql = <<<SQL
+SELECT U&"\a000"
+FROM (SELECT 1 AS U&":a000" UEScAPE ':') AS temp
+SQL;
+        $parsedQuery = $this->parseSingleQuery($sql, $parameters);
+        $this->assertEquals($sql, $parsedQuery->getString());
     }
 
     public function testStringConstants()
@@ -144,6 +151,13 @@ SQL;
         $parsedQuery = $this->parseSingleQuery($sql, $parameters);
         $this->assertEquals($sql, $parsedQuery->getString());
 
+        $sql = <<<SQL
+SELECT 'multi line string'
+':foo'
+'bar'
+SQL;
+        $parsedQuery = $this->parseSingleQuery($sql, $parameters);
+        $this->assertEquals($sql, $parsedQuery->getString());
 
         $sql = <<<SQL
 SELECT 'single quote''s :foo'
@@ -152,63 +166,68 @@ SQL;
         $this->assertEquals($sql, $parsedQuery->getString());
     }
 
-    public function testIdentifierString()
+    public function testCStyleStringConstants()
     {
         $parameters = array('foo' => array('bar', 'baz'));
         $sql = <<<SQL
-SELECT `:foo`
+SELECT E'C-style escaping \' :foo \''
 SQL;
         $parsedQuery = $this->parseSingleQuery($sql, $parameters);
         $this->assertEquals($sql, $parsedQuery->getString());
 
-
         $sql = <<<SQL
-SELECT `single quote``s :foo`
+SELECT E'Multiline'
+'C-style escaping \' :foo \''
 SQL;
         $parsedQuery = $this->parseSingleQuery($sql, $parameters);
         $this->assertEquals($sql, $parsedQuery->getString());
     }
 
-    public function testEscapedCharactersInStringConstants()
+    public function testUnicodeStringConstants()
+    {
+        $parameters = array('b0a0' => array('foo', 'bar'), 'a000' => array('baz', 'qux'));
+        $sql = <<<SQL
+SELECT u&':a000'
+'\'':b0a0' UeSCaPE ':'
+SQL;
+        $parsedQuery = $this->parseSingleQuery($sql, $parameters);
+        $this->assertEquals($sql, $parsedQuery->getString());
+    }
+
+    public function testDollarQuotedStrings()
     {
         $parameters = array('foo' => array('bar', 'baz'));
-        $sql = <<<SQL
-SELECT 'Escaping \' :foo \''
-SQL;
+        $sql = 'SELECT $$:foo$$';
         $parsedQuery = $this->parseSingleQuery($sql, $parameters);
         $this->assertEquals($sql, $parsedQuery->getString());
 
-        $sql = <<<SQL
-SELECT "Escaping \" :foo \""
-SQL;
+        $sql = 'SELECT $tag$ :foo $tag$';
         $parsedQuery = $this->parseSingleQuery($sql, $parameters);
         $this->assertEquals($sql, $parsedQuery->getString());
 
-        $sql = <<<SQL
-SELECT "Escaping \\\\" :foo ""
-SQL;
-        $expectedSql = <<<SQL
-SELECT "Escaping \\\\" :foo, :foo_0 ""
-SQL;
-        $expectedParameters = array('foo' => 'bar', 'foo_0' => 'baz');
+        $sql = 'SELECT $outer$ nested strings $inner$:foo$inner$ $outer$';
         $parsedQuery = $this->parseSingleQuery($sql, $parameters);
-        $this->assertEquals($expectedSql, $parsedQuery->getString());
-        $this->assertEquals($expectedParameters, $parsedQuery->getParameters());
+        $this->assertEquals($sql, $parsedQuery->getString());
+    }
 
+    public function testTypeCasting()
+    {
+        $parameters = array('TEXT' => array('bar', 'baz'));
         $sql = <<<SQL
-SELECT "Escaping \" :foo \"
+SELECT 'hello'::TEXT
 SQL;
         $parsedQuery = $this->parseSingleQuery($sql, $parameters);
         $this->assertEquals($sql, $parsedQuery->getString());
+    }
 
+    public function testArrayAccessor()
+    {
+        $parameters = array('2' => array('bar', 'baz'));
         $sql = <<<SQL
-SELECT "Escaping "" :foo """
-SQL;
-        $parsedQuery = $this->parseSingleQuery($sql, $parameters);
-        $this->assertEquals($sql, $parsedQuery->getString());
-
-        $sql = <<<SQL
-SELECT 'Escaping '' :foo '''
+SELECT test[1:2]
+FROM (
+SELECT CAST('{"foo", "bar", "baz", "qux"}' AS TEXT[]) AS test
+) AS t
 SQL;
         $parsedQuery = $this->parseSingleQuery($sql, $parameters);
         $this->assertEquals($sql, $parsedQuery->getString());
@@ -231,6 +250,12 @@ SELECT 2
 SQL;
         $queries = $this->parseMultipleQueries($sql, $parameters);
         $this->assertTrue(count($queries) == 2);
+
+        $sql = <<<SQL
+SELECT $$1; SELECT 2$$
+SQL;
+        $queries = $this->parseMultipleQueries($sql, $parameters);
+        $this->assertTrue(count($queries) == 1);
 
         $sql = <<<SQL
 SELECT "'a';SELECT 1" FROM (SELECT 1 AS "'a';SELECT 1") AS t
@@ -270,9 +295,19 @@ SQL;
 
     public function testSetNumberedCharacter()
     {
-        $parser = new PgParser();
+        $parser = new PgsqlParser();
         $this->assertEquals("?", $parser->getNumberedPlaceholderCharacter());
         $parser->setNumberedPlaceholderCharacter("#");
         $this->assertEquals("#", $parser->getNumberedPlaceholderCharacter());
+    }
+
+    public function testInvalidPlaceholderName()
+    {
+        $parameters = array(']' => array('bar', 'baz'));
+        $sql = <<<SQL
+SELECT 'hello':]
+SQL;
+        $parsedQuery = $this->parseSingleQuery($sql, $parameters);
+        $this->assertEquals($sql, $parsedQuery->getString());
     }
 }

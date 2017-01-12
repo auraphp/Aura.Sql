@@ -9,11 +9,11 @@
 namespace Aura\Sql\Parser;
 
 /**
- * Class MySQLParser
+ * Class MysqlParser
  * Query parser for MySQL flavored queries
  * @package Aura\Sql
  */
-class MySQLParser extends AbstractParser implements QueryParserInterface
+class MysqlParser extends AbstractParser implements QueryParserInterface
 {
     /**
      * Constructor. Sets up the array of callbacks.
