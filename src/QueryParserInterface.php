@@ -8,7 +8,6 @@
  */
 namespace Aura\Sql;
 
-
 interface QueryParserInterface
 {
     /**
