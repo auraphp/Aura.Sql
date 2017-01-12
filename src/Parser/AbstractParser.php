@@ -6,7 +6,9 @@
  * @license https://opensource.org/licenses/MIT MIT
  *
  */
-namespace Aura\Sql;
+namespace Aura\Sql\Parser;
+
+use Aura\Sql\Query;
 
 /**
  *
@@ -15,12 +17,12 @@ namespace Aura\Sql;
  * @package Aura\Sql
  *
  */
-abstract class BaseParser
+abstract class AbstractParser
 {
     /**
      *
      * List of handlers to call when a character is found.
-     * The key is the character, the value is a callable which takes a RebuilderState as parameter and returns a RebuilderState
+     * The key is the character, the value is a callable which takes a State as parameter and returns a State
      *
      * @var array
      */
@@ -40,7 +42,7 @@ abstract class BaseParser
     {
         $oldCharacter = $this->getNumberedPlaceholderCharacter();
         $this->numberedPlaceHolderCharacter = $character;
-        if($character !== $oldCharacter){
+        if ($character !== $oldCharacter) {
             $this->statementPartsHandlers[$character] = $this->statementPartsHandlers[$oldCharacter];
             unset($this->statementPartsHandlers[$oldCharacter]);
             $this->numberedPlaceHolderCharacter = $character;
@@ -60,8 +62,8 @@ abstract class BaseParser
     {
         $queries = array();
         $charset = 'UTF-8';
-        /** @var RebuilderState $state */
-        $state = new RebuilderState($query->getString(), $query->getParameters(), $charset);
+        /** @var State $state */
+        $state = new State($query->getString(), $query->getParameters(), $charset);
 
         $last_check_index = -1;
 
@@ -79,8 +81,7 @@ abstract class BaseParser
                     $this->storeQuery($state, $queries);
                     $state->resetFinalStatement();
                 }
-            }
-            else {
+            } else {
                 $state->copyCurrentCharacter();
             }
         }
@@ -90,16 +91,16 @@ abstract class BaseParser
 
     /**
      *
-     * Add a Query using the current statement and values from a RebuilderState
+     * Add a Query using the current statement and values from a State
      *
-     * @param RebuilderState $state
+     * @param State $state
      * @param Query[] $queries reference to the array holding a list of queries
      *
      */
     private function storeQuery($state, &$queries)
     {
         $statement = $state->getFinalStatement();
-        if (!$this->isStatementEmpty($statement)) {
+        if (! $this->isStatementEmpty($statement)) {
             $queries[] = new Query($statement, $state->getValuesToBind());
         }
     }
@@ -125,15 +126,15 @@ abstract class BaseParser
      *
      * After a single or double quote string, advance the $current_index to the end of the string
      *
-     * @param RebuilderState $state
+     * @param State $state
      *
-     * @return RebuilderState
+     * @return State
      */
     protected function handleQuotedString($state)
     {
         $quoteCharacter = $state->getCurrentCharacter();
         $state->copyCurrentCharacter();
-        if (!$state->done()) {
+        if (! $state->done()) {
             $state->copyUntilCharacter($quoteCharacter);
         }
         return $state;
@@ -143,9 +144,9 @@ abstract class BaseParser
      *
      * Check if a ':' colon character is followed by what can be a named placeholder.
      *
-     * @param RebuilderState $state
+     * @param State $state
      *
-     * @return RebuilderState
+     * @return State
      */
     protected function handleColon($state)
     {
@@ -153,8 +154,7 @@ abstract class BaseParser
         do {
             $state->copyCurrentCharacter();
             $colon_number++;
-        }
-        while($state->getCurrentCharacter() === ':');
+        } while ($state->getCurrentCharacter() === ':');
 
         if ($colon_number != 1) {
             return $state;
@@ -172,8 +172,7 @@ abstract class BaseParser
         if (! is_array($value)) {
             $identifier = $state->storeValueToBind($name, $value);
             $placeholder_identifiers .= $identifier;
-        }
-        else {
+        } else {
             foreach ($value as $sub) {
                 $identifier = $state->storeValueToBind($name, $sub);
                 if ($placeholder_identifiers) {
@@ -192,9 +191,9 @@ abstract class BaseParser
      * Replace a numbered placeholder character by multiple ones if a numbered placeholder contains an array.
      * As the '?' character can't be used with PG queries, replace it with a named placeholder
      *
-     * @param RebuilderState $state
+     * @param State $state
      *
-     * @return RebuilderState
+     * @return State
      */
     protected function handleNumberedParameter($state)
     {
@@ -204,8 +203,7 @@ abstract class BaseParser
 
         if (! is_array($value)) {
             $placeholder_identifiers = ':' . $state->storeValueToBind($name, $value);
-        }
-        else {
+        } else {
             $placeholder_identifiers = '';
             foreach ($value as $sub) {
                 $identifier = ':' . $state->storeValueToBind($name, $sub);
@@ -224,9 +222,9 @@ abstract class BaseParser
     /**
      * Saves the fact a new statement is starting
      *
-     * @param RebuilderState $state
+     * @param State $state
      *
-     * @return RebuilderState
+     * @return State
      */
     protected function handleSemiColon($state)
     {

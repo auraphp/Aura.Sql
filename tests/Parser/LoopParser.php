@@ -1,13 +1,11 @@
 <?php
-
-
-namespace Aura\Sql;
+namespace Aura\Sql\Parser;
 
 /**
  * Parser which gets into an infinite loop when finding a 'S' character
  * @package Aura\Sql
  */
-class LoopParser extends BaseParser
+class LoopParser extends AbstractParser
 {
     /**
      * Constructor. Sets up the bad callback
@@ -20,9 +18,9 @@ class LoopParser extends BaseParser
     }
 
     /**
-     * Returns an untouched RebuilderState
-     * @param RebuilderState $state
-     * @return RebuilderState
+     * Returns an untouched State
+     * @param State $state
+     * @return State
      */
     protected function neverEndingHandler($state)
     {

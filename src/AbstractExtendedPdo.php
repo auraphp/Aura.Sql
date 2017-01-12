@@ -9,6 +9,7 @@
 namespace Aura\Sql;
 
 use Aura\Sql\Exception;
+use Aura\Sql\Parser\ParserInterface;
 use PDO;
 use PDOStatement;
 use Psr\Log\NullLogger;
@@ -45,7 +46,7 @@ abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
      *
      * Parses queries and values to generate the usable list of queries
      *
-     * @var QueryParserInterface
+     * @var ParserInterface
      *
      */
     protected $parser;
@@ -283,7 +284,7 @@ abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
     ) {
         $sth = $this->perform($statement, $values);
 
-        if (!empty($args)) {
+        if (! empty($args)) {
             return $sth->fetchObject($class, $args);
         }
 
@@ -769,10 +770,10 @@ abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
      *
      * Registers a query parser
      *
-     * @param QueryParserInterface $parser
+     * @param ParserInterface $parser
      *
      */
-    public function setParser(QueryParserInterface $parser)
+    public function setParser(ParserInterface $parser)
     {
         $this->parser = $parser;
     }

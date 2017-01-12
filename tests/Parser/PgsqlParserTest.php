@@ -1,18 +1,18 @@
 <?php
+namespace Aura\Sql\Parser;
 
+use Aura\Sql\Query;
 
-namespace Aura\Sql;
-
-
-class PgParserTest extends \PHPUnit_Framework_TestCase
+class PgsqlParserTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @param string $sql
      * @param array $parameters
      * @return Query
      */
-    private function parseSingleQuery($sql, $parameters){
-        $parser = new PgParser();
+    private function parseSingleQuery($sql, $parameters)
+    {
+        $parser = new PgsqlParser();
         $query = new Query($sql, $parameters);
         $parsedQueries = $parser->normalize($query);
         $this->assertTrue(count($parsedQueries) == 1);
@@ -24,8 +24,9 @@ class PgParserTest extends \PHPUnit_Framework_TestCase
      * @param $parameters
      * @return Query[]
      */
-    private function parseMultipleQueries($sql, $parameters){
-        $parser = new PgParser();
+    private function parseMultipleQueries($sql, $parameters)
+    {
+        $parser = new PgsqlParser();
         $query = new Query($sql, $parameters);
         $parsedQueries = $parser->normalize($query);
         return $parsedQueries;
@@ -83,7 +84,7 @@ class PgParserTest extends \PHPUnit_Framework_TestCase
         $parsedQuery = $this->parseSingleQuery($sql, $parameters);
         $this->assertEquals($sql, $parsedQuery->getString());
 
-        $sql = "SELECT 1 
+        $sql = "SELECT 1
 -- :foo";
         $parsedQuery = $this->parseSingleQuery($sql, $parameters);
         $this->assertEquals($sql, $parsedQuery->getString());
@@ -98,15 +99,15 @@ class PgParserTest extends \PHPUnit_Framework_TestCase
     {
         $parameters = array('foo' => array('bar', 'baz'));
         $sql = "SELECT
-/* 
-:foo 
+/*
+:foo
 */
 1";
         $parsedQuery = $this->parseSingleQuery($sql, $parameters);
         $this->assertEquals($sql, $parsedQuery->getString());
 
         $sql = "SELECT
-/* comment in 
+/* comment in
 /* a comment
 */ :foo */
 1";
@@ -238,14 +239,14 @@ SQL;
     {
         $parameters = array('foo' => array('bar', 'baz'));
         $sql = <<<SQL
-SELECT 1; 
+SELECT 1;
 
 SQL;
         $queries = $this->parseMultipleQueries($sql, $parameters);
         $this->assertTrue(count($queries) == 1);
 
         $sql = <<<SQL
-SELECT 1; 
+SELECT 1;
 SELECT 2
 
 SQL;
@@ -296,12 +297,12 @@ SQL;
 
     public function testSetNumberedCharacter()
     {
-        $parser = new PgParser();
+        $parser = new PgsqlParser();
         $this->assertEquals("?", $parser->getNumberedPlaceholderCharacter());
         $parser->setNumberedPlaceholderCharacter("#");
         $this->assertEquals("#", $parser->getNumberedPlaceholderCharacter());
     }
-    
+
     public function testInvalidPlaceholderName()
     {
         $parameters = array(']' => array('bar', 'baz'));

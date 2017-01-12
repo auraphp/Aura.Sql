@@ -6,14 +6,14 @@
  * @license https://opensource.org/licenses/MIT MIT
  *
  */
-namespace Aura\Sql;
+namespace Aura\Sql\Parser;
 
 /**
- * Class MySQLParser
+ * Class MysqlParser
  * Query parser for MySQL flavored queries
  * @package Aura\Sql
  */
-class MySQLParser extends BaseParser implements QueryParserInterface
+class MysqlParser extends AbstractParser implements ParserInterface
 {
     /**
      * Constructor. Sets up the array of callbacks.
@@ -36,17 +36,16 @@ class MySQLParser extends BaseParser implements QueryParserInterface
      *
      * If a '-' is followed by another one and a space, it is a valid single line comment
      *
-     * @param RebuilderState $state
+     * @param State $state
      *
-     * @return RebuilderState
+     * @return State
      */
     protected function handleSingleLineComment($state)
     {
         if ($state->nextCharactersAre('- ')) {
             // One line comment
             $state->copyUntilCharacter("\n");
-        }
-        else {
+        } else {
             $state->copyCurrentCharacter();
         }
 
@@ -58,16 +57,15 @@ class MySQLParser extends BaseParser implements QueryParserInterface
      * If the character following a '/' one is a '*', advance the $current_index to the end of this multiple line comment
      * MySQL does not handle multiple levels of comments
      *
-     * @param RebuilderState $state
+     * @param State $state
      *
-     * @return RebuilderState
+     * @return State
      */
     protected function handleMultiLineComment($state)
     {
         if ($state->nextCharactersAre('*')) {
             $state->copyUntilCharacter('*/');
-        }
-        else {
+        } else {
             $state->copyCurrentCharacter();
         }
         return $state;
@@ -77,27 +75,25 @@ class MySQLParser extends BaseParser implements QueryParserInterface
      *
      * By default MySQL can use \ or a doubling of a quote to escape it in a string literal
      *
-     * @param RebuilderState $state
+     * @param State $state
      *
-     * @return RebuilderState
+     * @return State
      */
     protected function handleMySQLQuotedString($state)
     {
         $quoteCharacter = $state->getCurrentCharacter();
         $state->copyCurrentCharacter();
         $backslashEscaping = false;
-        while (!$state->done()) {
+        while (! $state->done()) {
             $currentCharacter = $state->getCurrentCharacter();
             if ($currentCharacter === '\\') {
-                $backslashEscaping = !$backslashEscaping;
-            }
-            else if($currentCharacter === $quoteCharacter && !$backslashEscaping) {
+                $backslashEscaping = ! $backslashEscaping;
+            } elseif ($currentCharacter === $quoteCharacter && ! $backslashEscaping) {
                 $state->copyCurrentCharacter();
-                if( !$state->nextCharactersAre($quoteCharacter)) {
+                if ( ! $state->nextCharactersAre($quoteCharacter)) {
                     return $state;
                 }
-            }
-            else {
+            } else {
                 $backslashEscaping = false;
             }
             $state->copyCurrentCharacter();

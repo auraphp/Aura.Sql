@@ -6,7 +6,8 @@
  * @license https://opensource.org/licenses/MIT MIT
  *
  */
-namespace Aura\Sql;
+namespace Aura\Sql\Parser;
+
 use Aura\Sql\Exception\MissingParameter;
 
 /**
@@ -16,7 +17,7 @@ use Aura\Sql\Exception\MissingParameter;
  * @package Aura.Sql
  *
  */
-class RebuilderState
+class State
 {
     /**
      * @var string Base SQL query
@@ -263,8 +264,7 @@ class RebuilderState
         $index = mb_strpos($this->statement, $character, $this->current_index, $this->charset);
         if ($index === false) {
             $end_index = $this->last_index;
-        }
-        else {
+        } else {
             $end_index = $index + $length;
         }
 
@@ -325,7 +325,8 @@ class RebuilderState
      * @param int $capture_group
      * @return string
      */
-    public function capture($regexp, $capture_group = 0){
+    public function capture($regexp, $capture_group = 0)
+    {
         $capture = '';
         if ($this->last_index <= $this->current_index) {
            return $capture;
@@ -353,7 +354,7 @@ class RebuilderState
     {
         $final_name = $name;
         $index = 0;
-        while(isset($this->values_to_bind[$final_name])){
+        while (isset($this->values_to_bind[$final_name])) {
             $final_name = $name . '_' . $index;
             $index++;
         }

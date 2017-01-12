@@ -1,6 +1,5 @@
 <?php
-
-namespace Aura\Sql;
+namespace Aura\Sql\Parser;
 
 use Aura\Sql\Query;
 
