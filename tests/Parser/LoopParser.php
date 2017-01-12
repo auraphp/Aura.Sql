@@ -18,9 +18,9 @@ class LoopParser extends AbstractParser
     }
 
     /**
-     * Returns an untouched RebuilderState
-     * @param RebuilderState $state
-     * @return RebuilderState
+     * Returns an untouched State
+     * @param State $state
+     * @return State
      */
     protected function neverEndingHandler($state)
     {

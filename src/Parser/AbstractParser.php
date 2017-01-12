@@ -22,7 +22,7 @@ abstract class AbstractParser
     /**
      *
      * List of handlers to call when a character is found.
-     * The key is the character, the value is a callable which takes a RebuilderState as parameter and returns a RebuilderState
+     * The key is the character, the value is a callable which takes a State as parameter and returns a State
      *
      * @var array
      */
@@ -62,8 +62,8 @@ abstract class AbstractParser
     {
         $queries = array();
         $charset = 'UTF-8';
-        /** @var RebuilderState $state */
-        $state = new RebuilderState($query->getString(), $query->getParameters(), $charset);
+        /** @var State $state */
+        $state = new State($query->getString(), $query->getParameters(), $charset);
 
         $last_check_index = -1;
 
@@ -92,9 +92,9 @@ abstract class AbstractParser
 
     /**
      *
-     * Add a Query using the current statement and values from a RebuilderState
+     * Add a Query using the current statement and values from a State
      *
-     * @param RebuilderState $state
+     * @param State $state
      * @param Query[] $queries reference to the array holding a list of queries
      *
      */
@@ -127,9 +127,9 @@ abstract class AbstractParser
      *
      * After a single or double quote string, advance the $current_index to the end of the string
      *
-     * @param RebuilderState $state
+     * @param State $state
      *
-     * @return RebuilderState
+     * @return State
      */
     protected function handleQuotedString($state)
     {
@@ -145,9 +145,9 @@ abstract class AbstractParser
      *
      * Check if a ':' colon character is followed by what can be a named placeholder.
      *
-     * @param RebuilderState $state
+     * @param State $state
      *
-     * @return RebuilderState
+     * @return State
      */
     protected function handleColon($state)
     {
@@ -194,9 +194,9 @@ abstract class AbstractParser
      * Replace a numbered placeholder character by multiple ones if a numbered placeholder contains an array.
      * As the '?' character can't be used with PG queries, replace it with a named placeholder
      *
-     * @param RebuilderState $state
+     * @param State $state
      *
-     * @return RebuilderState
+     * @return State
      */
     protected function handleNumberedParameter($state)
     {
@@ -226,9 +226,9 @@ abstract class AbstractParser
     /**
      * Saves the fact a new statement is starting
      *
-     * @param RebuilderState $state
+     * @param State $state
      *
-     * @return RebuilderState
+     * @return State
      */
     protected function handleSemiColon($state)
     {

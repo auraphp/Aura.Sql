@@ -8,7 +8,7 @@
  */
 namespace Aura\Sql\Parser;
 
-interface QueryParserInterface
+interface ParserInterface
 {
     /**
      * Normalize a query and its parameters to adapt it to PDO's limitations and returns a list of queries

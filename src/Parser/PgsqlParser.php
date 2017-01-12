@@ -13,7 +13,7 @@ namespace Aura\Sql\Parser;
  * Parser specific to PostgreSQL syntax
  * @package Aura\Sql
  */
-class PgsqlParser extends AbstractParser implements QueryParserInterface
+class PgsqlParser extends AbstractParser implements ParserInterface
 {
     /**
      * Constructor. Sets up the array of callbacks.
@@ -39,9 +39,9 @@ class PgsqlParser extends AbstractParser implements QueryParserInterface
      *
      * Returns a modified statement, values and current index depending on what follow a '-' character.
      *
-     * @param RebuilderState $state
+     * @param State $state
      *
-     * @return RebuilderState
+     * @return State
      */
     protected function handleSingleLineComment($state)
     {
@@ -60,9 +60,9 @@ class PgsqlParser extends AbstractParser implements QueryParserInterface
      *
      * If the character following a '/' one is a '*', advance the $current_index to the end of this multiple line comment
      *
-     * @param RebuilderState $state
+     * @param State $state
      *
-     * @return RebuilderState
+     * @return State
      */
     protected function handleMultiLineComment($state)
     {
@@ -90,9 +90,9 @@ class PgsqlParser extends AbstractParser implements QueryParserInterface
      *
      * After a E or e character, a single quote string use the \ character as an escape character
      *
-     * @param RebuilderState $state
+     * @param State $state
      *
-     * @return RebuilderState
+     * @return State
      */
     protected function handlePossibleCStyleString($state)
     {
@@ -132,9 +132,9 @@ class PgsqlParser extends AbstractParser implements QueryParserInterface
      *
      * $ charaters can be used to create strings
      *
-     * @param RebuilderState $state
+     * @param State $state
      *
-     * @return RebuilderState
+     * @return State
      */
     protected function handleDollar($state)
     {
@@ -152,9 +152,9 @@ class PgsqlParser extends AbstractParser implements QueryParserInterface
      *
      * As the : character can appear in array accessors, we have to manage this state
      *
-     * @param RebuilderState $state
+     * @param State $state
      *
-     * @return RebuilderState
+     * @return State
      */
     protected function handleArray($state)
     {

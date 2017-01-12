@@ -1,11 +1,11 @@
 <?php
 namespace Aura\Sql\Parser;
 
-class RebuilderStateTest extends \PHPUnit_Framework_TestCase
+class StateTest extends \PHPUnit_Framework_TestCase
 {
     public function testEmptyStatement()
     {
-        $state = new RebuilderState('');;
+        $state = new State('');;
         $this->assertTrue($state->done());
     }
 
@@ -16,7 +16,7 @@ class RebuilderStateTest extends \PHPUnit_Framework_TestCase
             "foo" => "bar",
         );
 
-        $state = new RebuilderState($stmt, $values);
+        $state = new State($stmt, $values);
         $this->assertSame($stmt, $state->getStatement());
         $this->assertSame('', $state->getFinalStatement());
         $this->assertSame(array(), $state->getValuesToBind());
@@ -25,7 +25,7 @@ class RebuilderStateTest extends \PHPUnit_Framework_TestCase
     public function testNextCharacters()
     {
         $stmt = 'SELECT * FROM test';
-        $state = new RebuilderState($stmt);
+        $state = new State($stmt);
         $this->assertSame('S', $state->getCurrentCharacter());
         $this->assertTrue($state->nextCharactersAre('ELECT *'));
     }
@@ -33,11 +33,11 @@ class RebuilderStateTest extends \PHPUnit_Framework_TestCase
     public function testCurrentCharacter()
     {
         $stmt = 'SELECT * FROM test';
-        $state = new RebuilderState($stmt);
+        $state = new State($stmt);
         $this->assertSame('S', $state->getCurrentCharacter());
 
         $stmt = 'ฒ';
-        $state = new RebuilderState($stmt);
+        $state = new State($stmt);
         $this->assertSame('ฒ', $state->getCurrentCharacter());
     }
 
@@ -48,14 +48,14 @@ class RebuilderStateTest extends \PHPUnit_Framework_TestCase
             "foo" => "bar",
         );
 
-        $state = new RebuilderState($stmt, $values);
+        $state = new State($stmt, $values);
         $this->assertSame("bar", $state->getNamedParameterValue("foo"));
     }
 
     public function testCopyCharacter()
     {
         $stmt = "SELECT '฿๑๑๗' FROM test";
-        $state = new RebuilderState($stmt);
+        $state = new State($stmt);
         $this->assertSame('', $state->getFinalStatement());
         $state->copyCurrentCharacter();
         $this->assertSame("S", $state->getFinalStatement());
@@ -70,7 +70,7 @@ class RebuilderStateTest extends \PHPUnit_Framework_TestCase
     public function testCopyCharacters()
     {
         $stmt = "SELECT '฿๑๑๗' FROM test";
-        $state = new RebuilderState($stmt);
+        $state = new State($stmt);
         $this->assertSame('', $state->getFinalStatement());
         $state->copyCharacters(9);
         $this->assertSame("SELECT '฿", $state->getFinalStatement());
@@ -82,7 +82,7 @@ class RebuilderStateTest extends \PHPUnit_Framework_TestCase
     public function testCopyIdentifier()
     {
         $stmt = "SELECT '฿๑๑๗' FROM test";
-        $state = new RebuilderState($stmt);
+        $state = new State($stmt);
         $state->copyIdentifier();
         $this->assertSame("SELECT", $state->getFinalStatement());
 
@@ -93,7 +93,7 @@ class RebuilderStateTest extends \PHPUnit_Framework_TestCase
     public function testPassString()
     {
         $stmt = "SELECT '฿๑๑๗' FROM test";
-        $state = new RebuilderState($stmt);
+        $state = new State($stmt);
         $state->passString('SELECT');
         $this->assertSame(6, $state->getCurrentIndex());
         $this->assertSame('', $state->getFinalStatement());
@@ -102,7 +102,7 @@ class RebuilderStateTest extends \PHPUnit_Framework_TestCase
     public function testAddString()
     {
         $stmt = "SELECT '฿๑๑๗' FROM test";
-        $state = new RebuilderState($stmt);
+        $state = new State($stmt);
         $state->addStringToStatement('Test');
         $this->assertSame(0, $state->getCurrentIndex());
         $this->assertSame('Test', $state->getFinalStatement());
@@ -111,7 +111,7 @@ class RebuilderStateTest extends \PHPUnit_Framework_TestCase
     public function testCopyUntil()
     {
         $stmt = "SELECT '฿๑๑๗' FROM test";
-        $state = new RebuilderState($stmt);
+        $state = new State($stmt);
         $state->copyUntilCharacter('๑');
         $this->assertSame(10, $state->getCurrentIndex());
         $this->assertSame("SELECT '฿๑", $state->getFinalStatement());
@@ -120,12 +120,12 @@ class RebuilderStateTest extends \PHPUnit_Framework_TestCase
     public function testGetIdentifier()
     {
         $stmt = "test";
-        $state = new RebuilderState($stmt);
+        $state = new State($stmt);
         $identifier = $state->getIdentifier();
         $this->assertSame('test', $identifier);
 
         $stmt = "";
-        $state = new RebuilderState($stmt);
+        $state = new State($stmt);
         $identifier = $state->getIdentifier();
         $this->assertSame('', $identifier);
     }
@@ -133,7 +133,7 @@ class RebuilderStateTest extends \PHPUnit_Framework_TestCase
     public function testStoreSimpleValue()
     {
         $stmt = '';
-        $state = new RebuilderState($stmt);
+        $state = new State($stmt);
         $name = $state->storeValueToBind('foo', 32);
         $this->assertSame('foo', $name);
         $name = $state->storeValueToBind('foo', 10);
@@ -154,7 +154,7 @@ class RebuilderStateTest extends \PHPUnit_Framework_TestCase
         $values = array(
             'foo' => array('bar', 'baz'),
         );
-        $state = new RebuilderState($stmt, $values);
+        $state = new State($stmt, $values);
         $expected = $values['foo'];
         $this->assertSame($expected, $state->getNamedParameterValue('foo'));
         $this->assertNull($state->getNamedParameterValue('bar'));
@@ -164,7 +164,7 @@ class RebuilderStateTest extends \PHPUnit_Framework_TestCase
     {
         $stmt = '';
         $values = array("foo", "bar", "baz");
-        $state = new RebuilderState($stmt, $values);
+        $state = new State($stmt, $values);
         $this->assertSame("foo", $state->getFirstUnusedNumberedValue());
         $this->assertSame("bar", $state->getFirstUnusedNumberedValue());
         $this->assertSame("baz", $state->getFirstUnusedNumberedValue());
@@ -172,12 +172,12 @@ class RebuilderStateTest extends \PHPUnit_Framework_TestCase
         $state->getFirstUnusedNumberedValue();
 
         $values = array("foo" => 1);
-        $state = new RebuilderState($stmt, $values);
+        $state = new State($stmt, $values);
         $this->setExpectedException('Aura\\Sql\\Exception\\MissingParameter');
         $state->getFirstUnusedNumberedValue();
 
         $values = array("fizz" => 1, "buzz");
-        $state = new RebuilderState($stmt, $values);
+        $state = new State($stmt, $values);
         $this->assertSame("buzz", $state->getFirstUnusedNumberedValue());
         $this->setExpectedException('Aura\\Sql\\Exception\\MissingParameter');
         $state->getFirstUnusedNumberedValue();
@@ -186,7 +186,7 @@ class RebuilderStateTest extends \PHPUnit_Framework_TestCase
     public function testStoreNumberedValue()
     {
         $stmt = '';
-        $state = new RebuilderState($stmt);
+        $state = new State($stmt);
         $state->storeNumberedValueToBind("foo");
         $state->storeNumberedValueToBind("bar");
         $state->storeNumberedValueToBind("baz");
@@ -200,7 +200,7 @@ class RebuilderStateTest extends \PHPUnit_Framework_TestCase
 
     public function testGetCharset()
     {
-        $state = new RebuilderState('', array(), 'US-ASCII');
+        $state = new State('', array(), 'US-ASCII');
         $this->assertSame('US-ASCII', $state->getCharset());
     }
 }

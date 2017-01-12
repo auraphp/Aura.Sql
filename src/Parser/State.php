@@ -17,7 +17,7 @@ use Aura\Sql\Exception\MissingParameter;
  * @package Aura.Sql
  *
  */
-class RebuilderState
+class State
 {
     /**
      * @var string Base SQL query
