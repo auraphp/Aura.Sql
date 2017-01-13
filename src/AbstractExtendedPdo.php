@@ -53,17 +53,11 @@ abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
 
     protected function newParser($driver)
     {
-        switch ($driver) {
-            case 'mysql':
-                return new Parser\MysqlParser();
-            case 'pgsql':
-                return new Parser\PgsqlParser();
-            case 'sqlsrv':
-                return new Parser\SqlsrvParser();
-            case 'sqlite':
-            default:
-                return new Parser\SqliteParser();
+        $class = 'Aura\Sql\Parser\\' . ucfirst($driver) . 'Parser';
+        if (! class_exists($class)) {
+            $class = 'Aura\Sql\Parser\Sqlite';
         }
+        return new $class();
     }
 
     /**
