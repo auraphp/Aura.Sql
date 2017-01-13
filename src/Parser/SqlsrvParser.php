@@ -39,7 +39,7 @@ class SqlsrvParser extends AbstractParser
      *
      * @return State
      */
-    protected function handleArray($state)
+    protected function handleIdentifier($state)
     {
         $state->copyUntilCharacter(']');
         return $state;
