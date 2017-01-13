@@ -15,7 +15,7 @@ use Psr\Log\NullLogger;
  *
  * A lazy-connecting PDO with extended methods.
  *
- * @package Aura.Sql
+ * @package aura/sql
  *
  */
 class ExtendedPdo extends AbstractExtendedPdo

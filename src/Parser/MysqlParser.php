@@ -11,7 +11,7 @@ namespace Aura\Sql\Parser;
 /**
  * Class MysqlParser
  * Query parser for MySQL flavored queries
- * @package Aura\Sql
+ * @package aura/sql
  */
 class MysqlParser extends AbstractParser
 {
@@ -38,7 +38,7 @@ class MysqlParser extends AbstractParser
      * single line comment. This differs from the standard, where no trailing
      * whitespace is required.
      *
-     * @param State $state
+     * @param State $state The current parser state.
      *
      * @return State
      *
@@ -63,7 +63,7 @@ class MysqlParser extends AbstractParser
      *
      * By default MySQL can use \ or a doubling of a quote to escape it in a string literal
      *
-     * @param State $state
+     * @param State $state The current parser state.
      *
      * @return State
      */

@@ -15,7 +15,7 @@ use Psr\Log\LogLevel;
  *
  * Tracks and logs query profiles.
  *
- * @package Aura.Sql
+ * @package aura/sql
  *
  */
 class Profiler implements ProfilerInterface

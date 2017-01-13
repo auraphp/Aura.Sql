@@ -10,7 +10,7 @@ namespace Aura\Sql\Parser;
 
 /**
  * Query parser for Microsoft SQL Server flavored queries
- * @package Aura\Sql
+ * @package aura/sql
  */
 class SqlsrvParser extends AbstractParser
 {
@@ -35,7 +35,7 @@ class SqlsrvParser extends AbstractParser
      *
      * Handles `[table.col]` (etc.) identifiers.
      *
-     * @param State $state
+     * @param State $state The current parser state.
      *
      * @return State
      */

@@ -15,7 +15,7 @@ use Psr\Log\NullLogger;
  *
  * Decorates an existing PDO instance with the extended methods.
  *
- * @package Aura.Sql
+ * @package aura/sql
  *
  */
 class DecoratedPdo extends AbstractExtendedPdo

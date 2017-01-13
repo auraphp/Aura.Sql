@@ -19,7 +19,7 @@ use Psr\Log\NullLogger;
  * Provides array quoting, profiling, a new `perform()` method, new `fetch*()`
  * methods, and new `yield*()` methods.
  *
- * @package Aura.Sql
+ * @package aura/sql
  *
  */
 abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
@@ -44,13 +44,22 @@ abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
 
     /**
      *
-     * Parses queries and values to generate the usable list of queries
+     * Parses queries to rebuild them for easier parameter binding.
      *
      * @var ParserInterface
      *
      */
     protected $parser;
 
+    /**
+     *
+     * Returns a new Parser instance.
+     *
+     * @param string $driver Return a parser for this driver.
+     *
+     * @return ParserInterface
+     *
+     */
     protected function newParser($driver)
     {
         $class = 'Aura\Sql\Parser\\' . ucfirst($driver) . 'Parser';

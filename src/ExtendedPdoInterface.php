@@ -12,7 +12,7 @@ namespace Aura\Sql;
  *
  * An interface to the Aura.Sql extended PDO object.
  *
- * @package Aura.Sql
+ * @package aura/sql
  *
  */
 interface ExtendedPdoInterface extends PdoInterface

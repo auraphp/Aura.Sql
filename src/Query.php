@@ -9,9 +9,11 @@
 namespace Aura\Sql;
 
 /**
- * Class Query
- * Contains a SQL query string and the parameters to bind
- * @package Aura\Sql
+ *
+ * A rebuilt query string, with the parameters to bind to it.
+ *
+ * @package aura/sql
+ *
  */
 class Query
 {

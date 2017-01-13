@@ -14,7 +14,7 @@ use Aura\Sql\Exception;
  *
  * The parser appears to be in an infinite loop.
  *
- * @package Aura.Sql
+ * @package aura/sql
  *
  */
 class ParserLoop extends Exception

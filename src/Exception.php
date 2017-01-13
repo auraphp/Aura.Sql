@@ -12,7 +12,7 @@ namespace Aura\Sql;
  *
  * Base Exception class for Aura Sql
  *
- * @package Aura.Sql
+ * @package aura/sql
  *
  */
 class Exception extends \Exception

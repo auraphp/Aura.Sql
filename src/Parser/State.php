@@ -12,9 +12,9 @@ use Aura\Sql\Exception\MissingParameter;
 
 /**
  *
- * This support class is used to store the current rebuilding state
+ * Stores the current parser state.
  *
- * @package Aura.Sql
+ * @package aura/sql
  *
  */
 class State

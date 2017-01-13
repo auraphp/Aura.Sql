@@ -15,7 +15,7 @@ use Aura\Sql\Exception;
  *
  * Base class for parsing/rebuilding functionality.
  *
- * @package Aura\Sql
+ * @package aura/sql
  *
  */
 abstract class AbstractParser implements ParserInterface
@@ -23,21 +23,39 @@ abstract class AbstractParser implements ParserInterface
     /**
      *
      * List of handlers to call when a character is found.
-     * The key is the character, the value is a callable which takes a State as parameter and returns a State
+     *
+     * The key is the character, the value is a method name which takes a State
+     * as parameter and returns a State.
      *
      * @var array
+     *
      */
     protected $handlers = array();
 
     /**
-     * @var string $numberedPlaceHolderCharacter Character used to define numbered placeholders. Default is "?"
+     *
+     * Character used to define numbered placeholders.
+     *
+     * @var string
+     *
      */
     protected $numberedPlaceHolderCharacter = "?";
 
+    /**
+     *
+     * Given a Query object, rebuilds it so that parameters all match up, and
+     * replaces array-based placeholders.
+     *
+     * @param Query $query The query to rebuild.
+     *
+     * @return Query[]
+     *
+     */
     public function rebuild($query)
     {
         $queries = array();
         $charset = 'UTF-8';
+
         /** @var State $state */
         $state = new State($query->getString(), $query->getParameters(), $charset);
 
@@ -54,7 +72,8 @@ abstract class AbstractParser implements ParserInterface
             if (isset($this->handlers[$state->getCurrentCharacter()])) {
                 $handler = $this->handlers[$state->getCurrentCharacter()];
                 $state = $this->$handler($state);
-                // if we encountered a statement separator, we have to prepare a new Query
+                // if we encountered a statement separator,
+                // we have to prepare a new Query
                 if ($state->isNewStatementCharacterFound()) {
                     $this->storeQuery($state, $queries);
                     $state->resetFinalStatement();
@@ -69,10 +88,11 @@ abstract class AbstractParser implements ParserInterface
 
     /**
      *
-     * Add a Query using the current statement and values from a State
+     * Add a Query using the current statement and values from a State.
      *
-     * @param State $state
-     * @param Query[] $queries reference to the array holding a list of queries
+     * @param State $state The parser state.
+     *
+     * @param Query[] $queries reference to the array holding a list of queries.
      *
      */
     private function storeQuery($state, &$queries)
@@ -85,11 +105,12 @@ abstract class AbstractParser implements ParserInterface
 
     /**
      *
-     * Returns if an SQL statement is empty
+     * Is an SQL statement is empty?
      *
-     * @param string $statement
+     * @param string $statement The SQL statement.
      *
-     * @return bool
+     * @return bool True if empty, false if not.
+     *
      */
     private function isStatementEmpty($statement)
     {
@@ -97,14 +118,10 @@ abstract class AbstractParser implements ParserInterface
     }
 
     /**
-     * Common handling methods.
-     */
-
-    /**
      *
      * After a single or double quote string, advance the $current_index to the end of the string
      *
-     * @param State $state
+     * @param State $state The current parser state.
      *
      * @return State
      */
@@ -122,9 +139,10 @@ abstract class AbstractParser implements ParserInterface
      *
      * Check if a ':' colon character is followed by what can be a named placeholder.
      *
-     * @param State $state
+     * @param State $state The current parser state.
      *
      * @return State
+     *
      */
     protected function handleColon($state)
     {
@@ -169,9 +187,10 @@ abstract class AbstractParser implements ParserInterface
      * Replace a numbered placeholder character by multiple ones if a numbered placeholder contains an array.
      * As the '?' character can't be used with PG queries, replace it with a named placeholder
      *
-     * @param State $state
+     * @param State $state The current parser state.
      *
      * @return State
+     *
      */
     protected function handleNumberedParameter($state)
     {
@@ -198,11 +217,13 @@ abstract class AbstractParser implements ParserInterface
     }
 
     /**
-     * Saves the fact a new statement is starting
      *
-     * @param State $state
+     * Saves the fact a new statement is starting.
+     *
+     * @param State $state The current parser state.
      *
      * @return State
+     *
      */
     protected function handleSemiColon($state)
     {
@@ -214,11 +235,13 @@ abstract class AbstractParser implements ParserInterface
 
     /**
      *
-     * Returns a modified statement, values and current index depending on what follow a '-' character.
+     * Returns a modified statement, values, and current index depending on what
+     * follow a '-' character.
      *
-     * @param State $state
+     * @param State $state The current parser state.
      *
      * @return State
+     *
      */
     protected function handleSingleLineComment($state)
     {
@@ -233,10 +256,13 @@ abstract class AbstractParser implements ParserInterface
 
     /**
      *
-     * If the character following a '/' one is a '*', advance the $current_index to the end of this multiple line comment.     *
-     * @param State $state
+     * If the character following a '/' one is a '*', advance the
+     * $current_index to the end of this multiple line comment.
+     *
+     * @param State $state The current parser state.
      *
      * @return State
+     *
      */
     protected function handleMultiLineComment($state)
     {

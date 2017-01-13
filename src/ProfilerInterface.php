@@ -12,7 +12,7 @@ namespace Aura\Sql;
  *
  * Logs query profiles.
  *
- * @package Aura.Sql
+ * @package aura/sql
  *
  */
 interface ProfilerInterface

@@ -12,7 +12,7 @@ namespace Aura\Sql;
  *
  * Manages PDO connection objects for default, read, and write connections.
  *
- * @package Aura.Sql
+ * @package aura/sql
  *
  */
 class ConnectionLocator implements ConnectionLocatorInterface

@@ -3,7 +3,6 @@ namespace Aura\Sql\Parser;
 
 /**
  * Parser which gets into an infinite loop when finding a 'S' character
- * @package Aura\Sql
  */
 class LoopParser extends AbstractParser
 {
@@ -19,7 +18,7 @@ class LoopParser extends AbstractParser
 
     /**
      * Returns an untouched State
-     * @param State $state
+     * @param State $state The current parser state.
      * @return State
      */
     protected function neverEndingHandler($state)
