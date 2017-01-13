@@ -13,12 +13,12 @@ use Aura\Sql\Exception;
 
 /**
  *
- * Basic class used by the parsers. Define some common methods
+ * Base class for parsing/rebuilding functionality.
  *
  * @package Aura\Sql
  *
  */
-abstract class AbstractParser
+abstract class AbstractParser implements ParserInterface
 {
     /**
      *
@@ -209,6 +209,42 @@ abstract class AbstractParser
         $uselessCharacters = $state->capture(';\\s*');
         $state->passString($uselessCharacters);
         $state->setNewStatementCharacterFound(true);
+        return $state;
+    }
+
+    /**
+     *
+     * Returns a modified statement, values and current index depending on what follow a '-' character.
+     *
+     * @param State $state
+     *
+     * @return State
+     */
+    protected function handleSingleLineComment($state)
+    {
+        if ($state->nextCharactersAre('-')) {
+            $state->copyUntilCharacter("\n");
+        } else {
+            $state->copyCurrentCharacter();
+        }
+
+        return $state;
+    }
+
+    /**
+     *
+     * If the character following a '/' one is a '*', advance the $current_index to the end of this multiple line comment.     *
+     * @param State $state
+     *
+     * @return State
+     */
+    protected function handleMultiLineComment($state)
+    {
+        if ($state->nextCharactersAre('*')) {
+            $state->copyUntilCharacter('*/');
+        } else {
+            $state->copyCurrentCharacter();
+        }
         return $state;
     }
 }

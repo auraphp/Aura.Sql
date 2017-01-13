@@ -9,11 +9,10 @@
 namespace Aura\Sql\Parser;
 
 /**
- * Class PgsqlParser
  * Parser specific to PostgreSQL syntax
  * @package Aura\Sql
  */
-class PgsqlParser extends AbstractParser implements ParserInterface
+class PgsqlParser extends AbstractParser
 {
     /**
      * Constructor. Sets up the array of callbacks.
@@ -33,26 +32,6 @@ class PgsqlParser extends AbstractParser implements ParserInterface
             '$' => array($this, 'handleDollar'),
             '[' => array($this, 'handleArray'),
         );
-    }
-
-    /**
-     *
-     * Returns a modified statement, values and current index depending on what follow a '-' character.
-     *
-     * @param State $state
-     *
-     * @return State
-     */
-    protected function handleSingleLineComment($state)
-    {
-        if ($state->nextCharactersAre('-')) {
-            // One line comment
-            $state->copyUntilCharacter("\n");
-        } else {
-            $state->copyCurrentCharacter();
-        }
-
-        return $state;
     }
 
     /**
@@ -133,7 +112,7 @@ class PgsqlParser extends AbstractParser implements ParserInterface
      */
     protected function handleDollar($state)
     {
-        $identifier =  $state->capture('\\$([a-zA-Z_]\\w*)*\\$');
+        $identifier = $state->capture('\\$([a-zA-Z_]\\w*)*\\$');
         if ($identifier) {
             // Copy until the end of the starting tag
             $state->copyUntilCharacter($identifier);

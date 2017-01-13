@@ -13,7 +13,7 @@ namespace Aura\Sql\Parser;
  * Query parser for MySQL flavored queries
  * @package Aura\Sql
  */
-class MysqlParser extends AbstractParser implements ParserInterface
+class MysqlParser extends AbstractParser
 {
     /**
      * Constructor. Sets up the array of callbacks.
@@ -34,40 +34,28 @@ class MysqlParser extends AbstractParser implements ParserInterface
 
     /**
      *
-     * If a '-' is followed by another one and a space, it is a valid single line comment
+     * If a '-' is followed by another one and any whitespace, it is a valid
+     * single line comment. This differs from the standard, where no trailing
+     * whitespace is required.
      *
      * @param State $state
      *
      * @return State
+     *
      */
     protected function handleSingleLineComment($state)
     {
-        if ($state->nextCharactersAre('- ')) {
-            // One line comment
+        $isComment = $state->nextCharactersAre("- ")
+            || $state->nextCharactersAre("-\t")
+            || $state->nextCharactersAre("-\n")
+            || $state->nextCharactersAre("-\r");
+
+        if ($isComment) {
             $state->copyUntilCharacter("\n");
         } else {
             $state->copyCurrentCharacter();
         }
 
-        return $state;
-    }
-
-    /**
-     *
-     * If the character following a '/' one is a '*', advance the $current_index to the end of this multiple line comment
-     * MySQL does not handle multiple levels of comments
-     *
-     * @param State $state
-     *
-     * @return State
-     */
-    protected function handleMultiLineComment($state)
-    {
-        if ($state->nextCharactersAre('*')) {
-            $state->copyUntilCharacter('*/');
-        } else {
-            $state->copyCurrentCharacter();
-        }
         return $state;
     }
 
