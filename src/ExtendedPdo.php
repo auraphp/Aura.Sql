@@ -71,16 +71,6 @@ class ExtendedPdo extends AbstractExtendedPdo
             $options[PDO::ATTR_ERRMODE] == PDO::ERRMODE_WARNING;
         }
 
-        // Select a query parser
-        $parts = explode(':', $dsn);
-        $driver = $parts[0];
-        if ($driver === 'pgsql') {
-            $parser = new Parser\PgsqlParser();
-        } else {
-            $parser = new Parser\MysqlParser();
-        }
-        $this->setParser($parser);
-
         // retain the arguments for later
         $this->args = [
             $dsn,
@@ -95,6 +85,11 @@ class ExtendedPdo extends AbstractExtendedPdo
             $profiler = new Profiler(new NullLogger());
         }
         $this->setProfiler($profiler);
+
+        // retain a query parser
+        $parts = explode(':', $dsn);
+        $parser = $this->newParser($parts[0]);
+        $this->setParser($parser);
     }
 
     /**

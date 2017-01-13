@@ -33,31 +33,6 @@ abstract class AbstractParser
      */
     protected $numberedPlaceHolderCharacter = "?";
 
-    /**
-     * Set a character to be used instead of the "?" character to define numbered placeholders
-     * If an handler has been set for the replaced character, set it for the new one
-     * @param string $character
-     */
-    public function setNumberedPlaceholderCharacter($character)
-    {
-        $oldCharacter = $this->getNumberedPlaceholderCharacter();
-        $this->numberedPlaceHolderCharacter = $character;
-        if ($character !== $oldCharacter) {
-            $this->statementPartsHandlers[$character] = $this->statementPartsHandlers[$oldCharacter];
-            unset($this->statementPartsHandlers[$oldCharacter]);
-            $this->numberedPlaceHolderCharacter = $character;
-        }
-    }
-
-    /**
-     * Returns the current character used for numbered placeholders
-     * @return string
-     */
-    public function getNumberedPlaceholderCharacter()
-    {
-        return $this->numberedPlaceHolderCharacter;
-    }
-
     public function rebuild($query)
     {
         $queries = array();
@@ -213,7 +188,7 @@ abstract class AbstractParser
                 $placeholder_identifiers .= $identifier;
             }
         }
-        $state->passString($this->getNumberedPlaceholderCharacter());
+        $state->passString($this->numberedPlaceHolderCharacter);
         $state->addStringToStatement($placeholder_identifiers);
 
         return $state;

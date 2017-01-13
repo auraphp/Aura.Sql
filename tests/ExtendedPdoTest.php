@@ -531,15 +531,6 @@ class ExtendedPdoTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(3, count($res));
     }
 
-    public function testChangedNumberedPlaceHolder()
-    {
-        $stm = 'SELECT name FROM pdotest WHERE id = #';
-        $val = array(1);
-        $this->pdo->setNumberedParameterCharacter('#');
-        $res = $this->pdo->fetchValue($stm, $val);
-        $this->assertEquals($this->data[1], $res);
-    }
-    
     public function testPdoDependency()
     {
         // pass in ExtendedPdo to see if it can replace PDO

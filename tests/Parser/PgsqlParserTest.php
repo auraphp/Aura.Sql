@@ -295,14 +295,6 @@ SQL;
         $this->assertEquals($expectedParameters, $queries[1]->getParameters());
     }
 
-    public function testSetNumberedCharacter()
-    {
-        $parser = new PgsqlParser();
-        $this->assertEquals("?", $parser->getNumberedPlaceholderCharacter());
-        $parser->setNumberedPlaceholderCharacter("#");
-        $this->assertEquals("#", $parser->getNumberedPlaceholderCharacter());
-    }
-
     public function testInvalidPlaceholderName()
     {
         $parameters = array(']' => array('bar', 'baz'));

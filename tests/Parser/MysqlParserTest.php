@@ -269,12 +269,4 @@ SQL;
         $this->assertEquals($expectedSql, $queries[1]->getString());
         $this->assertEquals($expectedParameters, $queries[1]->getParameters());
     }
-
-    public function testSetNumberedCharacter()
-    {
-        $parser = new PgsqlParser();
-        $this->assertEquals("?", $parser->getNumberedPlaceholderCharacter());
-        $parser->setNumberedPlaceholderCharacter("#");
-        $this->assertEquals("#", $parser->getNumberedPlaceholderCharacter());
-    }
 }

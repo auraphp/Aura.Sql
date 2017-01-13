@@ -51,6 +51,16 @@ abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
      */
     protected $parser;
 
+    protected function newParser($driver)
+    {
+        if ($driver === 'pgsql') {
+            $parser = new Parser\PgsqlParser();
+        } else {
+            $parser = new Parser\MysqlParser();
+        }
+        return $parser;
+    }
+
     /**
      *
      * Begins a transaction and turns off autocommit mode.
@@ -776,17 +786,5 @@ abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
     public function setParser(ParserInterface $parser)
     {
         $this->parser = $parser;
-    }
-
-    /**
-     *
-     * Specify a character to use in queries to replace the ? character for numbered placeholders
-     *
-     * @param string $character
-     *
-     */
-    public function setNumberedParameterCharacter($character)
-    {
-        $this->parser->setNumberedPlaceholderCharacter($character);
     }
 }

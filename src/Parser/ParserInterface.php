@@ -11,21 +11,10 @@ namespace Aura\Sql\Parser;
 interface ParserInterface
 {
     /**
-     * Normalize a query and its parameters to adapt it to PDO's limitations and returns a list of queries
+     * Rebuilds a query and its parameters to adapt it to PDO's limitations,
+     * and returns a list of queries
      * @param Query $query
      * @return Query[]
      */
     public function rebuild($query);
-
-    /**
-     * Set a character to be used instead of the "?" character to define numbered placeholders
-     * @param string $character
-     */
-    public function setNumberedPlaceholderCharacter($character);
-
-    /**
-     * Returns the current character used for numbered placeholders
-     * @return string
-     */
-    public function getNumberedPlaceholderCharacter();
 }
