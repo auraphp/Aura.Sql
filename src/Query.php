@@ -27,13 +27,13 @@ class Query
 
     /**
      * Query constructor.
-     * @param string $query_string
-     * @param array $query_parameters
+     * @param string $string
+     * @param array $parameters
      */
-    public function __construct($query_string, $query_parameters = array())
+    public function __construct($string, $parameters = array())
     {
-        $this->string = $query_string;
-        $this->parameters = $query_parameters;
+        $this->string = $string;
+        $this->parameters = $parameters;
     }
 
     /**
