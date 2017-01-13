@@ -19,18 +19,18 @@ class PgsqlParser extends AbstractParser
      */
     public function __construct()
     {
-        $this->statementPartsHandlers = array(
-            '-' => array($this, 'handleSingleLineComment'),
-            '/' => array($this, 'handleMultiLineComment'),
-            '"' => array($this, 'handleQuotedString'),
-            "'" => array($this, 'handleQuotedString'),
-            'E' => array($this, 'handlePossibleCStyleString'),
-            'e' => array($this, 'handlePossibleCStyleString'),
-            ':' => array($this, 'handleColon'),
-            '?' => array($this, 'handleNumberedParameter'),
-            ';' => array($this, 'handleSemiColon'),
-            '$' => array($this, 'handleDollar'),
-            '[' => array($this, 'handleArray'),
+        $this->handlers = array(
+            '-' => 'handleSingleLineComment',
+            '/' => 'handleMultiLineComment',
+            '"' => 'handleQuotedString',
+            "'" => 'handleQuotedString',
+            'E' => 'handlePossibleCStyleString',
+            'e' => 'handlePossibleCStyleString',
+            ':' => 'handleColon',
+            '?' => 'handleNumberedParameter',
+            ';' => 'handleSemiColon',
+            '$' => 'handleDollar',
+            '[' => 'handleArray',
         );
     }
 

@@ -19,14 +19,14 @@ class SqliteParser extends AbstractParser
      */
     public function __construct()
     {
-        $this->statementPartsHandlers = array(
-            '-' => array($this, 'handleSingleLineComment'),
-            '/' => array($this, 'handleMultiLineComment'),
-            '"' => array($this, 'handleQuotedString'),
-            "'" => array($this, 'handleSqliteQuotedString'),
-            ':' => array($this, 'handleColon'),
-            '?' => array($this, 'handleNumberedParameter'),
-            ';' => array($this, 'handleSemiColon'),
+        $this->handlers = array(
+            '-' => 'handleSingleLineComment',
+            '/' => 'handleMultiLineComment',
+            '"' => 'handleQuotedString',
+            "'" => 'handleSqliteQuotedString',
+            ':' => 'handleColon',
+            '?' => 'handleNumberedParameter',
+            ';' => 'handleSemiColon',
         );
     }
 

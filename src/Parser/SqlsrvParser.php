@@ -19,15 +19,15 @@ class SqlsrvParser extends AbstractParser
      */
     public function __construct()
     {
-        $this->statementPartsHandlers = array(
-            '-' => array($this, 'handleSingleLineComment'),
-            '/' => array($this, 'handleMultiLineComment'),
-            '"' => array($this, 'handleQuotedString'),
-            "'" => array($this, 'handleQuotedString'),
-            "[" => array($this, 'handleIdentifier'),
-            ':' => array($this, 'handleColon'),
-            '?' => array($this, 'handleNumberedParameter'),
-            ';' => array($this, 'handleSemiColon'),
+        $this->handlers = array(
+            '-' => 'handleSingleLineComment',
+            '/' => 'handleMultiLineComment',
+            '"' => 'handleQuotedString',
+            "'" => 'handleQuotedString',
+            "[" => 'handleIdentifier',
+            ':' => 'handleColon',
+            '?' => 'handleNumberedParameter',
+            ';' => 'handleSemiColon',
         );
     }
 

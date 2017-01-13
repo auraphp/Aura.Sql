@@ -12,8 +12,8 @@ class LoopParser extends AbstractParser
      */
     public function __construct()
     {
-        $this->statementPartsHandlers = array(
-            'S' => array($this, 'neverEndingHandler'),
+        $this->handlers = array(
+            'S' => 'neverEndingHandler',
         );
     }
 

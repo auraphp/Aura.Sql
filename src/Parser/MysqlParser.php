@@ -20,15 +20,15 @@ class MysqlParser extends AbstractParser
      */
     public function __construct()
     {
-        $this->statementPartsHandlers = array(
-            '-' => array($this, 'handleSingleLineComment'),
-            '/' => array($this, 'handleMultiLineComment'),
-            '"' => array($this, 'handleMySQLQuotedString'),
-            "'" => array($this, 'handleMySQLQuotedString'),
-            "`" => array($this, 'handleQuotedString'),
-            ':' => array($this, 'handleColon'),
-            '?' => array($this, 'handleNumberedParameter'),
-            ';' => array($this, 'handleSemiColon'),
+        $this->handlers = array(
+            '-' => 'handleSingleLineComment',
+            '/' => 'handleMultiLineComment',
+            '"' => 'handleMySQLQuotedString',
+            "'" => 'handleMySQLQuotedString',
+            "`" => 'handleQuotedString',
+            ':' => 'handleColon',
+            '?' => 'handleNumberedParameter',
+            ';' => 'handleSemiColon',
         );
     }
 

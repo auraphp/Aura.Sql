@@ -27,7 +27,7 @@ abstract class AbstractParser implements ParserInterface
      *
      * @var array
      */
-    protected $statementPartsHandlers = array();
+    protected $handlers = array();
 
     /**
      * @var string $numberedPlaceHolderCharacter Character used to define numbered placeholders. Default is "?"
@@ -51,9 +51,9 @@ abstract class AbstractParser implements ParserInterface
             }
             $last_check_index = $state->getCurrentIndex();
 
-            if (isset($this->statementPartsHandlers[$state->getCurrentCharacter()])) {
-                $handler = $this->statementPartsHandlers[$state->getCurrentCharacter()];
-                $state = call_user_func($handler, $state);
+            if (isset($this->handlers[$state->getCurrentCharacter()])) {
+                $handler = $this->handlers[$state->getCurrentCharacter()];
+                $state = $this->$handler($state);
                 // if we encountered a statement separator, we have to prepare a new Query
                 if ($state->isNewStatementCharacterFound()) {
                     $this->storeQuery($state, $queries);
