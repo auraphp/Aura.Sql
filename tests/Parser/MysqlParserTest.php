@@ -269,4 +269,13 @@ SQL;
         $this->assertEquals($expectedSql, $queries[1]->getString());
         $this->assertEquals($expectedParameters, $queries[1]->getParameters());
     }
+
+    public function testIssue107()
+    {
+        $sql = "UPDATE table SET `value`=:value, `blank`='', `value2` = :value2, `blank2` = '', `value3`=:value3 WHERE id = :id";
+        $parameters = ['value'=> 'string', 'id'=> 1, 'value2'=> 'string', 'value3'=>'string'];
+        $parsedQuery = $this->parseSingleQuery($sql, $parameters);
+        $this->assertEquals($parsedQuery->getString(), $sql);
+        $this->assertEquals($parsedQuery->getParameters(), $parameters);
+    }
 }
