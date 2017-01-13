@@ -9,6 +9,7 @@
 namespace Aura\Sql\Parser;
 
 use Aura\Sql\Query;
+use Aura\Sql\Exception;
 
 /**
  *
@@ -44,7 +45,9 @@ abstract class AbstractParser
 
         while (! $state->done()) {
             if ($state->getCurrentIndex() <= $last_check_index) {
-                throw (new \Exception('SQL rebuilder seems to be in an infinite loop.'));
+                throw new Exception\ParserLoop(
+                    'SQL rebuilder seems to be in an infinite loop.'
+                );
             }
             $last_check_index = $state->getCurrentIndex();
 
