@@ -36,7 +36,6 @@ class SqliteParser extends AbstractParser
      *
      * @param State $state The current parser state.
      *
-     * @return State
      */
     protected function handleSqliteQuotedString($state)
     {
@@ -47,11 +46,10 @@ class SqliteParser extends AbstractParser
             if ($currentCharacter === $quoteCharacter) {
                 $state->copyCurrentCharacter();
                 if ( ! $state->nextCharactersAre($quoteCharacter)) {
-                    return $state;
+                    return;
                 }
             }
             $state->copyCurrentCharacter();
         }
-        return $state;
     }
 }

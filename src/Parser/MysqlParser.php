@@ -40,8 +40,6 @@ class MysqlParser extends AbstractParser
      *
      * @param State $state The current parser state.
      *
-     * @return State
-     *
      */
     protected function handleSingleLineComment($state)
     {
@@ -55,8 +53,6 @@ class MysqlParser extends AbstractParser
         } else {
             $state->copyCurrentCharacter();
         }
-
-        return $state;
     }
 
     /**
@@ -65,7 +61,6 @@ class MysqlParser extends AbstractParser
      *
      * @param State $state The current parser state.
      *
-     * @return State
      */
     protected function handleMySQLQuotedString($state)
     {
@@ -79,13 +74,12 @@ class MysqlParser extends AbstractParser
             } elseif ($currentCharacter === $quoteCharacter && ! $backslashEscaping) {
                 $state->copyCurrentCharacter();
                 if ( ! $state->nextCharactersAre($quoteCharacter)) {
-                    return $state;
+                    return;
                 }
             } else {
                 $backslashEscaping = false;
             }
             $state->copyCurrentCharacter();
         }
-        return $state;
     }
 }

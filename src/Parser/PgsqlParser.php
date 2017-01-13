@@ -40,7 +40,6 @@ class PgsqlParser extends AbstractParser
      *
      * @param State $state The current parser state.
      *
-     * @return State
      */
     protected function handleMultiLineComment($state)
     {
@@ -59,7 +58,6 @@ class PgsqlParser extends AbstractParser
         } else {
             $state->copyCurrentCharacter();
         }
-        return $state;
     }
 
     /**
@@ -68,7 +66,6 @@ class PgsqlParser extends AbstractParser
      *
      * @param State $state The current parser state.
      *
-     * @return State
      */
     protected function handlePossibleCStyleString($state)
     {
@@ -99,7 +96,6 @@ class PgsqlParser extends AbstractParser
                 }
             } while (! $state->done() && $inCString);
         }
-        return $state;
     }
 
     /**
@@ -108,7 +104,6 @@ class PgsqlParser extends AbstractParser
      *
      * @param State $state The current parser state.
      *
-     * @return State
      */
     protected function handleDollar($state)
     {
@@ -119,7 +114,6 @@ class PgsqlParser extends AbstractParser
             // Copy everything between the start and end tag (included)
             $state->copyUntilCharacter($identifier);
         }
-        return $state;
     }
 
     /**
@@ -128,11 +122,9 @@ class PgsqlParser extends AbstractParser
      *
      * @param State $state The current parser state.
      *
-     * @return State
      */
     protected function handleArray($state)
     {
         $state->copyUntilCharacter(']');
-        return $state;
     }
 }

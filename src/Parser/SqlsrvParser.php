@@ -37,11 +37,9 @@ class SqlsrvParser extends AbstractParser
      *
      * @param State $state The current parser state.
      *
-     * @return State
      */
     protected function handleIdentifier($state)
     {
         $state->copyUntilCharacter(']');
-        return $state;
     }
 }

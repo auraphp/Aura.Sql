@@ -71,7 +71,7 @@ abstract class AbstractParser implements ParserInterface
 
             if (isset($this->handlers[$state->getCurrentCharacter()])) {
                 $handler = $this->handlers[$state->getCurrentCharacter()];
-                $state = $this->$handler($state);
+                $this->$handler($state);
                 // if we encountered a statement separator,
                 // we have to prepare a new Query
                 if ($state->isNewStatementCharacterFound()) {
@@ -123,7 +123,6 @@ abstract class AbstractParser implements ParserInterface
      *
      * @param State $state The current parser state.
      *
-     * @return State
      */
     protected function handleQuotedString($state)
     {
@@ -132,7 +131,6 @@ abstract class AbstractParser implements ParserInterface
         if (! $state->done()) {
             $state->copyUntilCharacter($quoteCharacter);
         }
-        return $state;
     }
 
     /**
@@ -140,8 +138,6 @@ abstract class AbstractParser implements ParserInterface
      * Check if a ':' colon character is followed by what can be a named placeholder.
      *
      * @param State $state The current parser state.
-     *
-     * @return State
      *
      */
     protected function handleColon($state)
@@ -153,13 +149,12 @@ abstract class AbstractParser implements ParserInterface
         } while ($state->getCurrentCharacter() === ':');
 
         if ($colon_number != 1) {
-            return $state;
+            return;
         }
 
         $name = $state->getIdentifier();
-
         if (! $name) {
-            return $state;
+            return;
         }
 
         $value = $state->getNamedParameterValue($name);
@@ -179,7 +174,6 @@ abstract class AbstractParser implements ParserInterface
         }
         $state->passString($name);
         $state->addStringToStatement($placeholder_identifiers);
-        return $state;
     }
 
     /**
@@ -188,8 +182,6 @@ abstract class AbstractParser implements ParserInterface
      * As the '?' character can't be used with PG queries, replace it with a named placeholder
      *
      * @param State $state The current parser state.
-     *
-     * @return State
      *
      */
     protected function handleNumberedParameter($state)
@@ -212,8 +204,6 @@ abstract class AbstractParser implements ParserInterface
         }
         $state->passString($this->numberedPlaceHolderCharacter);
         $state->addStringToStatement($placeholder_identifiers);
-
-        return $state;
     }
 
     /**
@@ -222,15 +212,12 @@ abstract class AbstractParser implements ParserInterface
      *
      * @param State $state The current parser state.
      *
-     * @return State
-     *
      */
     protected function handleSemiColon($state)
     {
         $uselessCharacters = $state->capture(';\\s*');
         $state->passString($uselessCharacters);
         $state->setNewStatementCharacterFound(true);
-        return $state;
     }
 
     /**
@@ -240,8 +227,6 @@ abstract class AbstractParser implements ParserInterface
      *
      * @param State $state The current parser state.
      *
-     * @return State
-     *
      */
     protected function handleSingleLineComment($state)
     {
@@ -250,8 +235,6 @@ abstract class AbstractParser implements ParserInterface
         } else {
             $state->copyCurrentCharacter();
         }
-
-        return $state;
     }
 
     /**
@@ -261,8 +244,6 @@ abstract class AbstractParser implements ParserInterface
      *
      * @param State $state The current parser state.
      *
-     * @return State
-     *
      */
     protected function handleMultiLineComment($state)
     {
@@ -271,6 +252,5 @@ abstract class AbstractParser implements ParserInterface
         } else {
             $state->copyCurrentCharacter();
         }
-        return $state;
     }
 }
