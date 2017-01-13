@@ -10,6 +10,6 @@ class LoopParserTest extends \PHPUnit_Framework_TestCase
         $parser = new LoopParser();
         $query = new Query('SELECT *');
         $this->setExpectedException('Exception');
-        $parser->normalize($query);
+        $parser->rebuild($query);
     }
 }

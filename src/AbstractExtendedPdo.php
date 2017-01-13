@@ -512,7 +512,7 @@ abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
 
         // rebuild the statement and values
         $query = new Query($statement, $values);
-        $queries = $this->parser->normalize($query);
+        $queries = $this->parser->rebuild($query);
         $firstQuery = $queries[0];
 
         // prepare the statement

@@ -14,7 +14,7 @@ class PgsqlParserTest extends \PHPUnit_Framework_TestCase
     {
         $parser = new PgsqlParser();
         $query = new Query($sql, $parameters);
-        $parsedQueries = $parser->normalize($query);
+        $parsedQueries = $parser->rebuild($query);
         $this->assertTrue(count($parsedQueries) == 1);
         return $parsedQueries[0];
     }
@@ -28,7 +28,7 @@ class PgsqlParserTest extends \PHPUnit_Framework_TestCase
     {
         $parser = new PgsqlParser();
         $query = new Query($sql, $parameters);
-        $parsedQueries = $parser->normalize($query);
+        $parsedQueries = $parser->rebuild($query);
         return $parsedQueries;
     }
 

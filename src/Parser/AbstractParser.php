@@ -58,7 +58,7 @@ abstract class AbstractParser
         return $this->numberedPlaceHolderCharacter;
     }
 
-    public function normalize($query)
+    public function rebuild($query)
     {
         $queries = array();
         $charset = 'UTF-8';

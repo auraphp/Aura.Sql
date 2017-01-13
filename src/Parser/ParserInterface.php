@@ -15,7 +15,7 @@ interface ParserInterface
      * @param Query $query
      * @return Query[]
      */
-    public function normalize($query);
+    public function rebuild($query);
 
     /**
      * Set a character to be used instead of the "?" character to define numbered placeholders
