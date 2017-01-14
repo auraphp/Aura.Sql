@@ -22,5 +22,5 @@ interface ParserInterface
      * @return Query[]
      *
      */
-    public function rebuild($string, $parameters = []);
+    public function rebuild($string, array $parameters = []);
 }

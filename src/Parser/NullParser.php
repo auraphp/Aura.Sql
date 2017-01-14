@@ -29,7 +29,7 @@ class NullParser implements ParserInterface
      * @return Query[]
      *
      */
-    public function rebuild($string, $parameters = [])
+    public function rebuild($string, array $parameters = [])
     {
         return [new Query($string, $values)];
     }
