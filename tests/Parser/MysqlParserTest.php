@@ -13,8 +13,7 @@ class MysqlParserTest extends \PHPUnit_Framework_TestCase
     private function parseSingleQuery($sql, $parameters)
     {
         $parser = new MysqlParser();
-        $query = new Query($sql, $parameters);
-        $parsedQueries = $parser->rebuild($query);
+        $parsedQueries = $parser->rebuild($sql, $parameters);
         $this->assertTrue(count($parsedQueries) == 1);
         return $parsedQueries[0];
     }
@@ -27,8 +26,7 @@ class MysqlParserTest extends \PHPUnit_Framework_TestCase
     private function parseMultipleQueries($sql, $parameters)
     {
         $parser = new MysqlParser();
-        $query = new Query($sql, $parameters);
-        $parsedQueries = $parser->rebuild($query);
+        $parsedQueries = $parser->rebuild($sql, $parameters);
         return $parsedQueries;
     }
 

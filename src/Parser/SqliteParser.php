@@ -9,8 +9,11 @@
 namespace Aura\Sql\Parser;
 
 /**
- * Query parser for Sqlite flavored queries
+ *
+ * Parsing/rebuilding functionality for the sqlite driver.
+ *
  * @package aura/sql
+ *
  */
 class SqliteParser extends AbstractParser
 {
@@ -34,7 +37,7 @@ class SqliteParser extends AbstractParser
      *
      * Sqlite can use a doubling of a quote to escape it in a string literal
      *
-     * @param State $state The current parser state.
+     * @param State $state The parser state.
      *
      */
     protected function handleSqliteQuotedString($state)

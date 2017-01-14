@@ -13,7 +13,7 @@ use Aura\Sql\Exception;
 
 /**
  *
- * Base class for parsing/rebuilding functionality.
+ * Parsing/rebuilding functionality for all drivers.
  *
  * @package aura/sql
  *
@@ -43,16 +43,19 @@ abstract class AbstractParser implements ParserInterface
 
     /**
      *
-     * Given a Query object, rebuilds it so that parameters all match up, and
-     * replaces array-based placeholders.
+     * Given a query string and parameters, rebuilds it so that parameters all
+     * match up, and replaces array-based placeholders.
      *
-     * @param Query $query The query to rebuild.
+     * @param string $string The query statement string.
+     *
+     * @param array $parameters Bind these values into the query.
      *
      * @return Query[]
      *
      */
-    public function rebuild($query)
+    public function rebuild($string, array $parameters = [])
     {
+        $query = new Query($string, $parameters);
         $queries = array();
         $charset = 'UTF-8';
 
@@ -121,7 +124,7 @@ abstract class AbstractParser implements ParserInterface
      *
      * After a single or double quote string, advance the $current_index to the end of the string
      *
-     * @param State $state The current parser state.
+     * @param State $state The parser state.
      *
      */
     protected function handleQuotedString($state)
@@ -137,7 +140,7 @@ abstract class AbstractParser implements ParserInterface
      *
      * Check if a ':' colon character is followed by what can be a named placeholder.
      *
-     * @param State $state The current parser state.
+     * @param State $state The parser state.
      *
      */
     protected function handleColon($state)
@@ -181,7 +184,7 @@ abstract class AbstractParser implements ParserInterface
      * Replace a numbered placeholder character by multiple ones if a numbered placeholder contains an array.
      * As the '?' character can't be used with PG queries, replace it with a named placeholder
      *
-     * @param State $state The current parser state.
+     * @param State $state The parser state.
      *
      */
     protected function handleNumberedParameter($state)
@@ -210,7 +213,7 @@ abstract class AbstractParser implements ParserInterface
      *
      * Saves the fact a new statement is starting.
      *
-     * @param State $state The current parser state.
+     * @param State $state The parser state.
      *
      */
     protected function handleSemiColon($state)
@@ -225,7 +228,7 @@ abstract class AbstractParser implements ParserInterface
      * Returns a modified statement, values, and current index depending on what
      * follow a '-' character.
      *
-     * @param State $state The current parser state.
+     * @param State $state The parser state.
      *
      */
     protected function handleSingleLineComment($state)
@@ -242,7 +245,7 @@ abstract class AbstractParser implements ParserInterface
      * If the character following a '/' one is a '*', advance the
      * $current_index to the end of this multiple line comment.
      *
-     * @param State $state The current parser state.
+     * @param State $state The parser state.
      *
      */
     protected function handleMultiLineComment($state)

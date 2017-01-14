@@ -9,8 +9,11 @@
 namespace Aura\Sql\Parser;
 
 /**
- * Parser specific to PostgreSQL syntax
+ *
+ * Parsing/rebuilding functionality for the pgsl driver.
+ *
  * @package aura/sql
+ *
  */
 class PgsqlParser extends AbstractParser
 {
@@ -38,7 +41,7 @@ class PgsqlParser extends AbstractParser
      *
      * If the character following a '/' one is a '*', advance the $current_index to the end of this multiple line comment
      *
-     * @param State $state The current parser state.
+     * @param State $state The parser state.
      *
      */
     protected function handleMultiLineComment($state)
@@ -64,7 +67,7 @@ class PgsqlParser extends AbstractParser
      *
      * After a E or e character, a single quote string use the \ character as an escape character
      *
-     * @param State $state The current parser state.
+     * @param State $state The parser state.
      *
      */
     protected function handlePossibleCStyleString($state)
@@ -102,7 +105,7 @@ class PgsqlParser extends AbstractParser
      *
      * $ charaters can be used to create strings
      *
-     * @param State $state The current parser state.
+     * @param State $state The parser state.
      *
      */
     protected function handleDollar($state)
@@ -120,7 +123,7 @@ class PgsqlParser extends AbstractParser
      *
      * As the : character can appear in array accessors, we have to manage this state
      *
-     * @param State $state The current parser state.
+     * @param State $state The parser state.
      *
      */
     protected function handleArray($state)

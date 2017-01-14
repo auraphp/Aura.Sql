@@ -11,10 +11,16 @@ namespace Aura\Sql\Parser;
 interface ParserInterface
 {
     /**
+     *
      * Rebuilds a query and its parameters to adapt it to PDO's limitations,
-     * and returns a list of queries
-     * @param Query $query
+     * and returns a list of queries.
+     *
+     * @param string $string The query statement string.
+     *
+     * @param array $parameters Bind these values into the query.
+     *
      * @return Query[]
+     *
      */
-    public function rebuild($query);
+    public function rebuild($string, $parameters = []);
 }
