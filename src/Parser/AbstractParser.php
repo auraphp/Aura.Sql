@@ -117,7 +117,7 @@ abstract class AbstractParser implements ParserInterface
      */
     private function isStatementEmpty($statement)
     {
-        return mb_ereg_match('^\\s*$', $statement);
+        return trim($statement) === '';
     }
 
     /**
