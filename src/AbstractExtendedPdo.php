@@ -64,7 +64,7 @@ abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
     {
         $class = 'Aura\Sql\Parser\\' . ucfirst($driver) . 'Parser';
         if (! class_exists($class)) {
-            $class = 'Aura\Sql\Parser\Sqlite';
+            $class = 'Aura\Sql\Parser\SqliteParser';
         }
         return new $class();
     }
