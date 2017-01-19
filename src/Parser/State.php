@@ -331,12 +331,15 @@ class State
         if ($this->last_index <= $this->current_index) {
            return $capture;
         }
-        mb_regex_encoding($this->charset);
-        if (mb_ereg_search_init($this->statement) !== false) {
-            mb_ereg_search_setpos($this->current_index);
-            if ($matches = mb_ereg_search_regs('\\G' . $regexp)) {
-                $capture = isset($matches[$capture_group]) ? $matches[$capture_group] : '';
-            }
+        $regexp = "/\G{$regexp}/u";
+        if (preg_match_all(
+            $regexp,
+            $this->statement,
+            $matches,
+            PREG_SET_ORDER,
+            $this->current_index
+        )) {
+            $capture = isset($matches[$capture_group][0]) ? $matches[$capture_group][0] : '';
         }
         return $capture;
     }
