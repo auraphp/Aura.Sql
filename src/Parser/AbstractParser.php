@@ -218,8 +218,15 @@ abstract class AbstractParser implements ParserInterface
      */
     protected function handleSemiColon($state)
     {
-        $uselessCharacters = $state->capture(';\\s*');
-        $state->passString($uselessCharacters);
+        while (! $state->done())
+        {
+            $character = $state->getCurrentCharacter();
+            if (! in_array($character, array(';', "\r", "\n", "\t", " "), true))
+            {
+                break;
+            }
+            $state->passString($character);
+        }
         $state->setNewStatementCharacterFound(true);
     }
 

@@ -96,7 +96,7 @@ class State
             range('a', 'z'),
             range ('A', 'Z'),
             range (0, 9),
-            ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '_']
+            array('0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '_')
         );
     }
 
@@ -160,6 +160,16 @@ class State
     public function getCurrentCharacter()
     {
         return mb_substr($this->statement, $this->current_index, 1, $this->charset);
+    }
+
+    /**
+     * Returns the character $n position after the current character
+     * @param $n
+     * @return string
+     */
+    public function getCharacterFromCurrent($n)
+    {
+        return mb_substr($this->statement, $this->current_index + $n, 1, $this->charset);
     }
 
     /**
@@ -336,33 +346,6 @@ class State
             
         }
         return $identifier;
-    }
-
-    /**
-     *
-     * Tries to matche a regular expression starting at current index and returns the result
-     *
-     * @param string $regexp
-     * @param int $capture_group
-     * @return string
-     */
-    public function capture($regexp, $capture_group = 0)
-    {
-        $capture = '';
-        if ($this->last_index <= $this->current_index) {
-           return $capture;
-        }
-        $regexp = "/\G{$regexp}/u";
-        if (preg_match_all(
-            $regexp,
-            $this->statement,
-            $matches,
-            PREG_SET_ORDER,
-            $this->current_index
-        )) {
-            $capture = isset($matches[$capture_group][0]) ? $matches[$capture_group][0] : '';
-        }
-        return $capture;
     }
 
     /**
