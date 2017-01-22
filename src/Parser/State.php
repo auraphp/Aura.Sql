@@ -69,6 +69,8 @@ class State
      */
     protected $new_statement_character_found = false;
 
+    protected $valid_placeholder_characters = [];
+    
     /**
      *
      * Constructor
@@ -90,6 +92,12 @@ class State
         if (array_key_exists(0, $this->values)) {
             array_unshift($this->values, null);
         }
+        $this->valid_placeholder_characters = array_merge(
+            range('a', 'z'),
+            range ('A', 'Z'),
+            range (0, 9),
+            ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '_']
+        );
     }
 
     /**
@@ -314,7 +322,20 @@ class State
      */
     public function getIdentifier()
     {
-        return $this->capture('\\w+\\b');
+        $identifier = '';
+        $length = 0;
+        while (! $this->done())
+        {
+            $character = mb_substr($this->statement, $this->current_index + $length, 1, $this->charset);
+            if (! in_array($character, $this->valid_placeholder_characters, true))
+            {
+                return $identifier;
+            }
+            $identifier .= $character;
+            $length++;
+            
+        }
+        return $identifier;
     }
 
     /**
