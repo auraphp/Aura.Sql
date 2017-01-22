@@ -69,6 +69,8 @@ class State
      */
     protected $new_statement_character_found = false;
 
+    protected $valid_placeholder_characters = [];
+    
     /**
      *
      * Constructor
@@ -90,6 +92,12 @@ class State
         if (array_key_exists(0, $this->values)) {
             array_unshift($this->values, null);
         }
+        $this->valid_placeholder_characters = array_merge(
+            range('a', 'z'),
+            range ('A', 'Z'),
+            range (0, 9),
+            array('0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '_')
+        );
     }
 
     /**
@@ -152,6 +160,16 @@ class State
     public function getCurrentCharacter()
     {
         return mb_substr($this->statement, $this->current_index, 1, $this->charset);
+    }
+
+    /**
+     * Returns the character $n position after the current character
+     * @param $n
+     * @return string
+     */
+    public function getCharacterFromCurrent($n)
+    {
+        return mb_substr($this->statement, $this->current_index + $n, 1, $this->charset);
     }
 
     /**
@@ -314,31 +332,20 @@ class State
      */
     public function getIdentifier()
     {
-        return $this->capture('\\w+\\b');
-    }
-
-    /**
-     *
-     * Tries to matche a regular expression starting at current index and returns the result
-     *
-     * @param string $regexp
-     * @param int $capture_group
-     * @return string
-     */
-    public function capture($regexp, $capture_group = 0)
-    {
-        $capture = '';
-        if ($this->last_index <= $this->current_index) {
-           return $capture;
-        }
-        mb_regex_encoding($this->charset);
-        if (mb_ereg_search_init($this->statement) !== false) {
-            mb_ereg_search_setpos($this->current_index);
-            if ($matches = mb_ereg_search_regs('\\G' . $regexp)) {
-                $capture = isset($matches[$capture_group]) ? $matches[$capture_group] : '';
+        $identifier = '';
+        $length = 0;
+        while (! $this->done())
+        {
+            $character = mb_substr($this->statement, $this->current_index + $length, 1, $this->charset);
+            if (! in_array($character, $this->valid_placeholder_characters, true))
+            {
+                return $identifier;
             }
+            $identifier .= $character;
+            $length++;
+            
         }
-        return $capture;
+        return $identifier;
     }
 
     /**
