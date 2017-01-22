@@ -90,10 +90,22 @@ class PgsqlParser extends AbstractParser
                 }
                 if (! $inCString) {
                     // Checking if we have blank characters until next quote. In which case it is the same string
-                    $blanks = $state->capture("\\s*'");
+                    $offset = 1;
+                    $blanks = true;
+                    while (! $state->done()) {
+                        $characterAtOffset = $state->getCharacterFromCurrent($offset);
+                        if ($characterAtOffset === "'") {
+                            break;
+                        }
+                        if (! in_array($characterAtOffset, array(" ", "\n", "\r", "\t"), true)) {
+                            $blanks = false;
+                            break;
+                        }
+                        $offset ++;                            
+                    }
                     if ($blanks) {
-                        $state->copyUntilCharacter("'");
                         $state->copyCurrentCharacter();
+                        $state->copyUntilCharacter("'");
                         $inCString = true;
                     }
                 }
@@ -110,7 +122,17 @@ class PgsqlParser extends AbstractParser
      */
     protected function handleDollar($state)
     {
-        $identifier = $state->capture('\\$([a-zA-Z_]\\w*)*\\$');
+        $identifier = '$';
+        $offset = 1;
+        while (! $state->done()) {
+            $character = $state->getCharacterFromCurrent($offset); 
+            $identifier .= $character;
+            if ($character === '$') {
+                break;
+            }
+            $offset ++;
+        }
+        
         if ($identifier) {
             // Copy until the end of the starting tag
             $state->copyUntilCharacter($identifier);

@@ -176,8 +176,8 @@ SQL;
         $this->assertEquals($sql, $parsedQuery->getString());
 
         $sql = <<<SQL
-SELECT E'Multiline'
-'C-style escaping \' :foo \''
+SELECT E'Multiline'  
+       'C-style escaping \' :foo \' :foo'
 SQL;
         $parsedQuery = $this->parseSingleQuery($sql, $parameters);
         $this->assertEquals($sql, $parsedQuery->getString());
@@ -206,6 +206,14 @@ SQL;
         $this->assertEquals($sql, $parsedQuery->getString());
 
         $sql = 'SELECT $outer$ nested strings $inner$:foo$inner$ $outer$';
+        $parsedQuery = $this->parseSingleQuery($sql, $parameters);
+        $this->assertEquals($sql, $parsedQuery->getString());
+
+        $sql = 'SELECT $€$hello$€$';
+        $parsedQuery = $this->parseSingleQuery($sql, $parameters);
+        $this->assertEquals($sql, $parsedQuery->getString());
+
+        $sql = 'SELECT $€$hello$€';
         $parsedQuery = $this->parseSingleQuery($sql, $parameters);
         $this->assertEquals($sql, $parsedQuery->getString());
     }
