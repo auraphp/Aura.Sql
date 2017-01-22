@@ -208,6 +208,10 @@ SQL;
         $sql = 'SELECT $outer$ nested strings $inner$:foo$inner$ $outer$';
         $parsedQuery = $this->parseSingleQuery($sql, $parameters);
         $this->assertEquals($sql, $parsedQuery->getString());
+
+        $sql = 'SELECT $€$hello$€$';
+        $parsedQuery = $this->parseSingleQuery($sql, $parameters);
+        $this->assertEquals($sql, $parsedQuery->getString());
     }
 
     public function testTypeCasting()
