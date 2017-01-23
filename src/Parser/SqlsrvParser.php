@@ -17,22 +17,16 @@ namespace Aura\Sql\Parser;
  */
 class SqlsrvParser extends AbstractParser
 {
-    /**
-     * Constructor. Sets up the array of callbacks.
-     */
-    public function __construct()
-    {
-        $this->handlers = array(
-            '-' => 'handleSingleLineComment',
-            '/' => 'handleMultiLineComment',
-            '"' => 'handleQuotedString',
-            "'" => 'handleQuotedString',
-            "[" => 'handleIdentifier',
-            ':' => 'handleColon',
-            '?' => 'handleNumberedParameter',
-            ';' => 'handleSemiColon',
-        );
-    }
+    protected $handlers = [
+        '-' => 'handleSingleLineComment',
+        '/' => 'handleMultiLineComment',
+        '"' => 'handleQuotedString',
+        "'" => 'handleQuotedString',
+        "[" => 'handleIdentifier',
+        ':' => 'handleColon',
+        '?' => 'handleNumberedParameter',
+        ';' => 'handleSemiColon',
+    ];
 
     /**
      *

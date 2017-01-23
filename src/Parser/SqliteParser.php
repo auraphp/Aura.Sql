@@ -17,21 +17,15 @@ namespace Aura\Sql\Parser;
  */
 class SqliteParser extends AbstractParser
 {
-    /**
-     * Constructor. Sets up the array of callbacks.
-     */
-    public function __construct()
-    {
-        $this->handlers = array(
-            '-' => 'handleSingleLineComment',
-            '/' => 'handleMultiLineComment',
-            '"' => 'handleQuotedString',
-            "'" => 'handleSqliteQuotedString',
-            ':' => 'handleColon',
-            '?' => 'handleNumberedParameter',
-            ';' => 'handleSemiColon',
-        );
-    }
+    protected $handlers = [
+        '-' => 'handleSingleLineComment',
+        '/' => 'handleMultiLineComment',
+        '"' => 'handleQuotedString',
+        "'" => 'handleSqliteQuotedString',
+        ':' => 'handleColon',
+        '?' => 'handleNumberedParameter',
+        ';' => 'handleSemiColon',
+    ];
 
     /**
      *

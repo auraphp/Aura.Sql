@@ -17,22 +17,16 @@ namespace Aura\Sql\Parser;
  */
 class MysqlParser extends AbstractParser
 {
-    /**
-     * Constructor. Sets up the array of callbacks.
-     */
-    public function __construct()
-    {
-        $this->handlers = array(
-            '-' => 'handleSingleLineComment',
-            '/' => 'handleMultiLineComment',
-            '"' => 'handleMySQLQuotedString',
-            "'" => 'handleMySQLQuotedString',
-            "`" => 'handleQuotedString',
-            ':' => 'handleColon',
-            '?' => 'handleNumberedParameter',
-            ';' => 'handleSemiColon',
-        );
-    }
+    protected $handlers = [
+        '-' => 'handleSingleLineComment',
+        '/' => 'handleMultiLineComment',
+        '"' => 'handleMySQLQuotedString',
+        "'" => 'handleMySQLQuotedString',
+        "`" => 'handleQuotedString',
+        ':' => 'handleColon',
+        '?' => 'handleNumberedParameter',
+        ';' => 'handleSemiColon',
+    ];
 
     /**
      *

@@ -29,7 +29,7 @@ abstract class AbstractParser implements ParserInterface
      * @var array
      *
      */
-    protected $handlers = array();
+    protected $handlers = [];
 
     /**
      *
@@ -40,26 +40,32 @@ abstract class AbstractParser implements ParserInterface
      */
     protected $numberedPlaceHolderCharacter = "?";
 
+    protected $charset = 'UTF-8';
+
+    public function __construct($charset = 'UTF-8')
+    {
+        $this->charset = $charset;
+    }
+
     /**
      *
      * Given a query string and parameters, rebuilds it so that parameters all
      * match up, and replaces array-based placeholders.
      *
-     * @param string $string The query statement string.
+     * @param string $statement The query statement string.
      *
-     * @param array $parameters Bind these values into the query.
+     * @param array $values Bind these values into the query.
      *
      * @return Query[]
      *
      */
-    public function rebuild($string, array $parameters = [])
+    public function rebuild($statement, array $values = [])
     {
-        $query = new Query($string, $parameters);
+        $query = new Query($statement, $values);
         $queries = array();
-        $charset = 'UTF-8';
 
         /** @var State $state */
-        $state = new State($query->getStatement(), $query->getValues(), $charset);
+        $state = new State($query->getStatement(), $query->getValues(), $this->charset);
 
         $last_check_index = -1;
 

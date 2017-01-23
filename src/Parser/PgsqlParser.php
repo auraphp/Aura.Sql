@@ -17,25 +17,19 @@ namespace Aura\Sql\Parser;
  */
 class PgsqlParser extends AbstractParser
 {
-    /**
-     * Constructor. Sets up the array of callbacks.
-     */
-    public function __construct()
-    {
-        $this->handlers = array(
-            '-' => 'handleSingleLineComment',
-            '/' => 'handleMultiLineComment',
-            '"' => 'handleQuotedString',
-            "'" => 'handleQuotedString',
-            'E' => 'handlePossibleCStyleString',
-            'e' => 'handlePossibleCStyleString',
-            ':' => 'handleColon',
-            '?' => 'handleNumberedParameter',
-            ';' => 'handleSemiColon',
-            '$' => 'handleDollar',
-            '[' => 'handleArray',
-        );
-    }
+    protected $handlers = [
+        '-' => 'handleSingleLineComment',
+        '/' => 'handleMultiLineComment',
+        '"' => 'handleQuotedString',
+        "'" => 'handleQuotedString',
+        'E' => 'handlePossibleCStyleString',
+        'e' => 'handlePossibleCStyleString',
+        ':' => 'handleColon',
+        '?' => 'handleNumberedParameter',
+        ';' => 'handleSemiColon',
+        '$' => 'handleDollar',
+        '[' => 'handleArray',
+    ];
 
     /**
      *

@@ -18,7 +18,7 @@ namespace Aura\Sql\Parser;
 class Query
 {
     /**
-     * @var string A query statement
+     * @var string A query statement string
      */
     private $statement = '';
 
