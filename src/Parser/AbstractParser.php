@@ -8,7 +8,6 @@
  */
 namespace Aura\Sql\Parser;
 
-use Aura\Sql\Query;
 use Aura\Sql\Exception;
 
 /**

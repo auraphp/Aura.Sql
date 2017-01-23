@@ -6,7 +6,7 @@
  * @license https://opensource.org/licenses/MIT MIT
  *
  */
-namespace Aura\Sql;
+namespace Aura\Sql\Parser;
 
 /**
  *
