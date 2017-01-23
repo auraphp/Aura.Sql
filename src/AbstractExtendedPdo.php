@@ -487,9 +487,7 @@ abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
     public function prepare($statement, $options = [])
     {
         $this->connect();
-        $this->profiler->start(__FUNCTION__);
         $sth = $this->pdo->prepare($statement, $options);
-        $this->profiler->finish($statement, $options);
         return $sth;
     }
 
@@ -525,9 +523,6 @@ abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
 
         $this->connect();
 
-        // start profiling
-        $this->profiler->start(__FUNCTION__);
-
         // rebuild the statement and values
         $queries = $this->parser->rebuild($statement, $values);
         $query = $queries[0];
@@ -539,9 +534,6 @@ abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
         foreach ($query->getParameters() as $key => $val) {
             $this->bindValue($sth, $key, $val);
         }
-
-        // finish profiling
-        $this->profiler->finish($statement);
 
         // done
         return $sth;

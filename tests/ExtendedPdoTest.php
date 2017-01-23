@@ -599,8 +599,7 @@ class ExtendedPdoTest extends \PHPUnit_Framework_TestCase
         $this->pdo->exec("SELECT 2 FROM pdotest");
         $this->pdo->fetchAll("SELECT 3 FROM pdotest", array('zim' => 'gir'));
 
-        // 1 x query(), 1 x exec(), and 2 x fetchAll() which is executed as prepareWithValues() and perform()
-        $this->assertEquals(4, count($logger->getLog()));
+        $this->assertEquals(3, count($logger->getLog()));
 
         $expect = array(
             0 => array(
@@ -614,11 +613,6 @@ class ExtendedPdoTest extends \PHPUnit_Framework_TestCase
                 'values' => print_r(array(), true),
             ),
             2 => array(
-                'function' => 'prepareWithValues',
-                'statement' => 'SELECT 3 FROM pdotest',
-                'values' => print_r(array(), true),
-            ),
-            3 => array(
                 'function' => 'perform',
                 'statement' => 'SELECT 3 FROM pdotest',
                 'values' => print_r(
@@ -641,9 +635,9 @@ class ExtendedPdoTest extends \PHPUnit_Framework_TestCase
 
         // de-activate
         $this->pdo->getProfiler()->setActive(false);
-        $this->assertEquals(4, count($logger->getLog()));
+        $this->assertEquals(3, count($logger->getLog()));
         $this->pdo->query("SELECT 5 FROM pdotest");
-        $this->assertEquals(4, count($logger->getLog()));
+        $this->assertEquals(3, count($logger->getLog()));
     }
 
     public function testNoExportOfLoginCredentials()
