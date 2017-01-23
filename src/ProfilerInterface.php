@@ -25,6 +25,7 @@ interface ProfilerInterface
      *
      */
     public function setActive($active);
+
     /**
      *
      * Returns true if logging is active.
