@@ -198,17 +198,16 @@ class Profiler implements ProfilerInterface
         }
 
         $finish = microtime(true);
+        $e = new Exception();
 
-        $context = $this->context;
+        $this->context['finish'] = $finish;
+        $this->context['duration'] = $finish - $this->context['start'];
+        $this->context['statement'] = $statement;
+        $this->context['values'] = print_r($values, true);
+        $this->context['backtrace'] = $e->getTraceAsString();
+
+        $this->logger->log($this->logLevel, $this->logFormat, $this->context);
+
         $this->context = [];
-        $e = new \Exception();
-
-        $context['finish'] = $finish;
-        $context['duration'] = $finish - $context['start'];
-        $context['statement'] = $statement;
-        $context['values'] = print_r($values, true);
-        $context['backtrace'] = $e->getTraceAsString();
-
-        $this->logger->log($this->logLevel, $this->logFormat, $context);
     }
 }
