@@ -12,12 +12,11 @@ use Aura\Sql\Exception;
 
 /**
  *
- * Could not bind a value to a placeholder in a statement, generally because
- * the value is an array, object, or resource.
+ * The parser appears to be in an infinite loop.
  *
  * @package aura/sql
  *
  */
-class CannotBindValue extends Exception
+class ParserLoop extends Exception
 {
 }

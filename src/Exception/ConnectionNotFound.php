@@ -14,7 +14,7 @@ use Aura\Sql\Exception;
  *
  * Locator could not find a named connection.
  *
- * @package Aura.Sql
+ * @package aura/sql
  *
  */
 class ConnectionNotFound extends Exception

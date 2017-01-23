@@ -15,7 +15,7 @@ use Psr\Log\NullLogger;
  *
  * Decorates an existing PDO instance with the extended methods.
  *
- * @package Aura.Sql
+ * @package aura/sql
  *
  */
 class DecoratedPdo extends AbstractExtendedPdo
@@ -35,10 +35,14 @@ class DecoratedPdo extends AbstractExtendedPdo
     public function __construct(PDO $pdo, ProfilerInterface $profiler = null)
     {
         $this->pdo = $pdo;
+
         if ($profiler === null) {
             $profiler = new Profiler(new NullLogger());
         }
         $this->setProfiler($profiler);
+
+        $parser = $this->newParser($pdo->getAttribute(PDO::ATTR_DRIVER_NAME));
+        $this->setParser($parser);
     }
 
     /**

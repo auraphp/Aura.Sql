@@ -9,6 +9,7 @@
 namespace Aura\Sql;
 
 use Aura\Sql\Exception;
+use Aura\Sql\Parser\ParserInterface;
 use PDO;
 use PDOStatement;
 use Psr\Log\NullLogger;
@@ -18,7 +19,7 @@ use Psr\Log\NullLogger;
  * Provides array quoting, profiling, a new `perform()` method, new `fetch*()`
  * methods, and new `yield*()` methods.
  *
- * @package Aura.Sql
+ * @package aura/sql
  *
  */
 abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
@@ -40,6 +41,33 @@ abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
      *
      */
     protected $profiler;
+
+    /**
+     *
+     * Parses queries to rebuild them for easier parameter binding.
+     *
+     * @var ParserInterface
+     *
+     */
+    protected $parser;
+
+    /**
+     *
+     * Returns a new Parser instance.
+     *
+     * @param string $driver Return a parser for this driver.
+     *
+     * @return ParserInterface
+     *
+     */
+    protected function newParser($driver)
+    {
+        $class = 'Aura\Sql\Parser\\' . ucfirst($driver) . 'Parser';
+        if (! class_exists($class)) {
+            $class = 'Aura\Sql\Parser\SqliteParser';
+        }
+        return new $class();
+    }
 
     /**
      *
@@ -274,7 +302,7 @@ abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
     ) {
         $sth = $this->perform($statement, $values);
 
-        if (!empty($args)) {
+        if (! empty($args)) {
             return $sth->fetchObject($class, $args);
         }
 
@@ -501,14 +529,14 @@ abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
         $this->profiler->start(__FUNCTION__);
 
         // rebuild the statement and values
-        $rebuilder = new Rebuilder($this);
-        list($statement, $values) = $rebuilder->__invoke($statement, $values);
+        $queries = $this->parser->rebuild($statement, $values);
+        $query = $queries[0];
 
         // prepare the statement
-        $sth = $this->pdo->prepare($statement);
+        $sth = $this->pdo->prepare($query->getString());
 
         // for the placeholders we found, bind the corresponding data values
-        foreach ($values as $key => $val) {
+        foreach ($query->getParameters() as $key => $val) {
             $this->bindValue($sth, $key, $val);
         }
 
@@ -753,5 +781,17 @@ abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
         }
 
         return $sth->bindValue($key, $val);
+    }
+
+    /**
+     *
+     * Registers a query parser
+     *
+     * @param ParserInterface $parser
+     *
+     */
+    public function setParser(ParserInterface $parser)
+    {
+        $this->parser = $parser;
     }
 }

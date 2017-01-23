@@ -14,7 +14,7 @@ use PDO;
  *
  * An interface to the native PDO object.
  *
- * @package Aura.Sql
+ * @package aura/sql
  *
  */
 interface PdoInterface

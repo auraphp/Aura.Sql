@@ -169,7 +169,7 @@ class ExtendedPdoTest extends \PHPUnit_Framework_TestCase
             'bar' => 'WRONG',
         ));
 
-        $expect = str_replace(':list', "'1', '2', '3', '4', '5'", $stm);
+        $expect = str_replace(':list', ":list, :list_0, :list_1, :list_2, :list_3", $stm);
         $actual = $sth->queryString;
         $this->assertSame($expect, $actual);
     }
@@ -578,13 +578,6 @@ class ExtendedPdoTest extends \PHPUnit_Framework_TestCase
         $sth = $this->pdo->prepareWithValues($stm, array('id' => new stdClass));
     }
 
-    public function testBindNullFirstParameter ()
-    {
-        $rebuilder = new Rebuilder($this->newExtendedPdo());
-        $result = $rebuilder('SELECT * FROM test WHERE column_one = ?', array(null));
-        $this->assertTrue(array_key_exists(1, $result[1]));
-    }
-
     public function testWithProfileLogging()
     {
         $logger = new FakeLogger();
@@ -651,5 +644,24 @@ class ExtendedPdoTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(4, count($logger->getLog()));
         $this->pdo->query("SELECT 5 FROM pdotest");
         $this->assertEquals(4, count($logger->getLog()));
+    }
+
+    public function testNoExportOfLoginCredentials()
+    {
+        $pdo = new ExtendedPdo('sqlite::memory:', 'username', 'password');
+        ob_start();
+        var_dump($pdo);
+        $data = ob_get_clean();
+
+        // remove spaces for easier output testing
+        $data = preg_replace('/\s\s+/', '', $data);
+
+        // support hhvm tests, it leaves a space out in the var_dump output compared to php
+        $data = str_replace('] ', ']', $data);
+
+        $this->assertContains('[0]=>string(15) "sqlite::memory:"', $data);
+        $this->assertContains('[1]=>string(4) "****"', $data);
+        $this->assertContains('[2]=>string(4) "****"', $data);
+        $this->assertContains('[3]=>array(1) {[3]=>int(2)}[4]=>array(0) {}', $data);
     }
 }

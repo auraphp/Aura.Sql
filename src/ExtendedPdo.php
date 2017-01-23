@@ -15,7 +15,7 @@ use Psr\Log\NullLogger;
  *
  * A lazy-connecting PDO with extended methods.
  *
- * @package Aura.Sql
+ * @package aura/sql
  *
  */
 class ExtendedPdo extends AbstractExtendedPdo
@@ -85,6 +85,11 @@ class ExtendedPdo extends AbstractExtendedPdo
             $profiler = new Profiler(new NullLogger());
         }
         $this->setProfiler($profiler);
+
+        // retain a query parser
+        $parts = explode(':', $dsn);
+        $parser = $this->newParser($parts[0]);
+        $this->setParser($parser);
     }
 
     /**
@@ -124,5 +129,25 @@ class ExtendedPdo extends AbstractExtendedPdo
         $this->profiler->start(__FUNCTION__);
         $this->pdo = null;
         $this->profiler->finish();
+    }
+
+    /**
+     *
+     * The purpose of this method is to hide sensitive data from stack traces.
+     *
+     * @return array
+     *
+     */
+    public function __debugInfo()
+    {
+        return [
+            'args' => [
+                $this->args[0],
+                '****',
+                '****',
+                $this->args[3],
+                $this->args[4],
+            ]
+        ];
     }
 }
