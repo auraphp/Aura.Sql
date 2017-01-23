@@ -44,7 +44,7 @@ class ExtendedPdo extends AbstractExtendedPdo
      *
      * @param array $options Driver-specific options for the connection.
      *
-     * @param array $attributes Attributes to set after the connection.
+     * @param array $queries Queries to execute after the connection.
      *
      * @param ProfilerInterface $profiler Tracks and logs query profiles.
      *

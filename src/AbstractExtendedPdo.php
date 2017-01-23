@@ -383,11 +383,25 @@ abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
         return $sth->fetchColumn(0);
     }
 
+    /**
+     *
+     * Returns the Parser instance.
+     *
+     * @return ParserInterface
+     *
+     */
     public function getParser()
     {
         return $this->parser;
     }
 
+    /**
+     *
+     * Returns the Profiler instance.
+     *
+     * @return ProfilerInterface
+     *
+     */
     public function getProfiler()
     {
         return $this->profiler;
@@ -416,7 +430,7 @@ abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
      * Returns the last inserted autoincrement sequence value.
      *
      * @param string $name The name of the sequence to check; typically needed
-     *                     only for PostgreSQL, where it takes the form of `<table>_<column>_seq`.
+     * only for PostgreSQL, where it takes the form of `<table>_<column>_seq`.
      *
      * @return string
      *
@@ -600,9 +614,9 @@ abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
 
     /**
      *
-     * Registers a query parser
+     * Sets the Parser instance.
      *
-     * @param ParserInterface $parser
+     * @param ParserInterface $parser The Parser instance.
      *
      */
     public function setParser(ParserInterface $parser)
@@ -610,6 +624,13 @@ abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
         $this->parser = $parser;
     }
 
+    /**
+     *
+     * Sets the Profiler instance.
+     *
+     * @param ProfilerInterface $profiler The Profiler instance.
+     *
+     */
     public function setProfiler(ProfilerInterface $profiler)
     {
         $this->profiler = $profiler;

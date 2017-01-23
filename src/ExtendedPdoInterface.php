@@ -243,7 +243,7 @@ interface ExtendedPdoInterface extends PdoInterface
      *
      * Sets the Profiler instance.
      *
-     * @param ProfilerInterface $profiler The profiler instance.
+     * @param ProfilerInterface $profiler The Profiler instance.
      *
      */
     public function setProfiler(ProfilerInterface $profiler);

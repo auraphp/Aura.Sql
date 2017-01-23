@@ -17,6 +17,13 @@ namespace Aura\Sql\Parser;
  */
 class SqliteParser extends AbstractParser
 {
+    /**
+     *
+     * Map of characters to handler methods.
+     *
+     * @var array
+     *
+     */
     protected $handlers = [
         '-' => 'handleSingleLineComment',
         '/' => 'handleMultiLineComment',
@@ -34,7 +41,7 @@ class SqliteParser extends AbstractParser
      * @param State $state The parser state.
      *
      */
-    protected function handleSqliteQuotedString($state)
+    protected function handleSqliteQuotedString(State $state)
     {
         $quoteCharacter = $state->getCurrentCharacter();
         $state->copyCurrentCharacter();

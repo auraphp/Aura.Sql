@@ -17,6 +17,13 @@ namespace Aura\Sql\Parser;
  */
 class PgsqlParser extends AbstractParser
 {
+    /**
+     *
+     * Map of characters to handler methods.
+     *
+     * @var array
+     *
+     */
     protected $handlers = [
         '-' => 'handleSingleLineComment',
         '/' => 'handleMultiLineComment',
@@ -38,7 +45,7 @@ class PgsqlParser extends AbstractParser
      * @param State $state The parser state.
      *
      */
-    protected function handleMultiLineComment($state)
+    protected function handleMultiLineComment(State $state)
     {
         if ($state->nextCharactersAre('*')) {
             // PG handled multiple levels of comments
@@ -64,7 +71,7 @@ class PgsqlParser extends AbstractParser
      * @param State $state The parser state.
      *
      */
-    protected function handlePossibleCStyleString($state)
+    protected function handlePossibleCStyleString(State $state)
     {
         $state->copyCurrentCharacter();
         if (! $state->done() && ($currentCharacter = $state->getCurrentCharacter()) === "'") {
@@ -102,7 +109,7 @@ class PgsqlParser extends AbstractParser
      * @param State $state The parser state.
      *
      */
-    protected function handleDollar($state)
+    protected function handleDollar(State $state)
     {
         $identifier = $state->capture('\\$([a-zA-Z_]\\w*)*\\$');
         if ($identifier) {
@@ -120,7 +127,7 @@ class PgsqlParser extends AbstractParser
      * @param State $state The parser state.
      *
      */
-    protected function handleArray($state)
+    protected function handleArray(State $state)
     {
         $state->copyUntilCharacter(']');
     }

@@ -17,6 +17,13 @@ namespace Aura\Sql\Parser;
  */
 class SqlsrvParser extends AbstractParser
 {
+    /**
+     *
+     * Map of characters to handler methods.
+     *
+     * @var array
+     *
+     */
     protected $handlers = [
         '-' => 'handleSingleLineComment',
         '/' => 'handleMultiLineComment',
@@ -35,7 +42,7 @@ class SqlsrvParser extends AbstractParser
      * @param State $state The parser state.
      *
      */
-    protected function handleIdentifier($state)
+    protected function handleIdentifier(State $state)
     {
         $state->copyUntilCharacter(']');
     }

@@ -17,6 +17,13 @@ namespace Aura\Sql\Parser;
  */
 class MysqlParser extends AbstractParser
 {
+    /**
+     *
+     * Map of characters to handler methods.
+     *
+     * @var array
+     *
+     */
     protected $handlers = [
         '-' => 'handleSingleLineComment',
         '/' => 'handleMultiLineComment',
@@ -37,7 +44,7 @@ class MysqlParser extends AbstractParser
      * @param State $state The parser state.
      *
      */
-    protected function handleSingleLineComment($state)
+    protected function handleSingleLineComment(State $state)
     {
         $isComment = $state->nextCharactersAre("- ")
             || $state->nextCharactersAre("-\t")
@@ -58,7 +65,7 @@ class MysqlParser extends AbstractParser
      * @param State $state The parser state.
      *
      */
-    protected function handleMySQLQuotedString($state)
+    protected function handleMySQLQuotedString(State $state)
     {
         $quoteCharacter = $state->getCurrentCharacter();
         $state->copyCurrentCharacter();

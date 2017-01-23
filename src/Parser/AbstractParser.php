@@ -21,10 +21,16 @@ abstract class AbstractParser implements ParserInterface
 {
     /**
      *
-     * List of handlers to call when a character is found.
+     * The character set to use when parsing query statements.
      *
-     * The key is the character, the value is a method name which takes a State
-     * as parameter and returns a State.
+     * @var string
+     *
+     */
+    protected $charset = 'UTF-8';
+
+    /**
+     *
+     * Map of characters to handler methods.
      *
      * @var array
      *
@@ -40,8 +46,14 @@ abstract class AbstractParser implements ParserInterface
      */
     protected $numberedPlaceHolderCharacter = "?";
 
-    protected $charset = 'UTF-8';
-
+    /**
+     *
+     * Constructor.
+     *
+     * @param string $charset The character set to use when parsing query
+     * statements.
+     *
+     */
     public function __construct($charset = 'UTF-8')
     {
         $this->charset = $charset;
@@ -62,10 +74,14 @@ abstract class AbstractParser implements ParserInterface
     public function rebuild($statement, array $values = [])
     {
         $query = new Query($statement, $values);
-        $queries = array();
 
-        /** @var State $state */
-        $state = new State($query->getStatement(), $query->getValues(), $this->charset);
+        $queries = [];
+
+        $state = new State(
+            $query->getStatement(),
+            $query->getValues(),
+            $this->charset
+        );
 
         $last_check_index = -1;
 
@@ -103,7 +119,7 @@ abstract class AbstractParser implements ParserInterface
      * @param Query[] $queries reference to the array holding a list of queries.
      *
      */
-    private function storeQuery($state, &$queries)
+    private function storeQuery(State $state, &$queries)
     {
         $statement = $state->getFinalStatement();
         if (! $this->isStatementEmpty($statement)) {
@@ -127,12 +143,13 @@ abstract class AbstractParser implements ParserInterface
 
     /**
      *
-     * After a single or double quote string, advance the $current_index to the end of the string
+     * After a single or double quote string, advance the $current_index to the
+     * end of the string
      *
      * @param State $state The parser state.
      *
      */
-    protected function handleQuotedString($state)
+    protected function handleQuotedString(State $state)
     {
         $quoteCharacter = $state->getCurrentCharacter();
         $state->copyCurrentCharacter();
@@ -143,12 +160,13 @@ abstract class AbstractParser implements ParserInterface
 
     /**
      *
-     * Check if a ':' colon character is followed by what can be a named placeholder.
+     * Check if a ':' colon character is followed by what can be a named
+     * placeholder.
      *
      * @param State $state The parser state.
      *
      */
-    protected function handleColon($state)
+    protected function handleColon(State $state)
     {
         $colon_number = 0;
         do {
@@ -186,13 +204,16 @@ abstract class AbstractParser implements ParserInterface
 
     /**
      *
-     * Replace a numbered placeholder character by multiple ones if a numbered placeholder contains an array.
-     * As the '?' character can't be used with PG queries, replace it with a named placeholder
+     * Replace a numbered placeholder character by multiple ones if a numbered
+     * placeholder contains an array.
+     *
+     * As the '?' character can't be used with PG queries, replace it with a
+     * named placeholder.
      *
      * @param State $state The parser state.
      *
      */
-    protected function handleNumberedParameter($state)
+    protected function handleNumberedParameter(State $state)
     {
         $value = $state->getFirstUnusedNumberedValue();
 
@@ -221,7 +242,7 @@ abstract class AbstractParser implements ParserInterface
      * @param State $state The parser state.
      *
      */
-    protected function handleSemiColon($state)
+    protected function handleSemiColon(State $state)
     {
         $uselessCharacters = $state->capture(';\\s*');
         $state->passString($uselessCharacters);
@@ -236,7 +257,7 @@ abstract class AbstractParser implements ParserInterface
      * @param State $state The parser state.
      *
      */
-    protected function handleSingleLineComment($state)
+    protected function handleSingleLineComment(State $state)
     {
         if ($state->nextCharactersAre('-')) {
             $state->copyUntilCharacter("\n");
@@ -253,7 +274,7 @@ abstract class AbstractParser implements ParserInterface
      * @param State $state The parser state.
      *
      */
-    protected function handleMultiLineComment($state)
+    protected function handleMultiLineComment(State $state)
     {
         if ($state->nextCharactersAre('*')) {
             $state->copyUntilCharacter('*/');

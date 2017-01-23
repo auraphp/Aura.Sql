@@ -20,12 +20,12 @@ use Aura\Sql\Exception\MissingParameter;
 class State
 {
     /**
-     * @var string Base SQL query
+     * @var string Original query statement.
      */
     protected $statement;
 
     /**
-     * @var array Raw values to bind
+     * @var array Original query values.
      */
     protected $values;
 
@@ -104,7 +104,11 @@ class State
     }
 
     /**
+     *
+     * Has a new-statement character been found?
+     *
      * @return boolean
+     *
      */
     public function isNewStatementCharacterFound()
     {
@@ -112,7 +116,11 @@ class State
     }
 
     /**
+     *
+     * Sets the flag for when a new-statement character has been found.
+     *
      * @param boolean $new_statement_character_found
+     *
      */
     public function setNewStatementCharacterFound($new_statement_character_found)
     {
@@ -293,7 +301,6 @@ class State
     {
         return $this->current_index;
     }
-
 
     /**
      *
