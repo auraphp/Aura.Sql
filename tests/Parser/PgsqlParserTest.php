@@ -33,10 +33,10 @@ class PgsqlParserTest extends \PHPUnit_Framework_TestCase
         $parameters = array('foo' => 'bar');
         $sql = "SELECT :foo AS a, :foo AS b";
         $parsedQuery = $this->parseSingleQuery($sql, $parameters);
-        $expectedSql = "SELECT :foo AS a, :foo_0 AS b";
-        $expectedParameters = array('foo' => 'bar', 'foo_0' => 'bar');
-        $this->assertEquals($expectedSql, $parsedQuery->getString());
-        $this->assertEquals($expectedParameters, $parsedQuery->getParameters());
+        $expectedStatement = "SELECT :foo AS a, :foo_0 AS b";
+        $expectedValues = array('foo' => 'bar', 'foo_0' => 'bar');
+        $this->assertEquals($expectedStatement, $parsedQuery->getStatement());
+        $this->assertEquals($expectedValues, $parsedQuery->getValues());
     }
 
     public function testReplaceNumberedParameter()
@@ -44,10 +44,10 @@ class PgsqlParserTest extends \PHPUnit_Framework_TestCase
         $parameters = array('bar', 'baz');
         $sql = "SELECT ? AS a, ? AS b";
         $parsedQuery = $this->parseSingleQuery($sql, $parameters);
-        $expectedSql = "SELECT :__numbered AS a, :__numbered_0 AS b";
-        $expectedParameters = array('__numbered' => 'bar', '__numbered_0' => 'baz');
-        $this->assertEquals($expectedSql, $parsedQuery->getString());
-        $this->assertEquals($expectedParameters, $parsedQuery->getParameters());
+        $expectedStatement = "SELECT :__numbered AS a, :__numbered_0 AS b";
+        $expectedValues = array('__numbered' => 'bar', '__numbered_0' => 'baz');
+        $this->assertEquals($expectedStatement, $parsedQuery->getStatement());
+        $this->assertEquals($expectedValues, $parsedQuery->getValues());
     }
 
     public function testReplaceArrayAsParameter()
@@ -55,18 +55,18 @@ class PgsqlParserTest extends \PHPUnit_Framework_TestCase
         $parameters = array('foo' => array('bar', 'baz'));
         $sql = "SELECT :foo";
         $parsedQuery = $this->parseSingleQuery($sql, $parameters);
-        $expectedSql = "SELECT :foo, :foo_0";
-        $expectedParameters = array('foo' => 'bar', 'foo_0' => 'baz');
-        $this->assertEquals($expectedSql, $parsedQuery->getString());
-        $this->assertEquals($expectedParameters, $parsedQuery->getParameters());
+        $expectedStatement = "SELECT :foo, :foo_0";
+        $expectedValues = array('foo' => 'bar', 'foo_0' => 'baz');
+        $this->assertEquals($expectedStatement, $parsedQuery->getStatement());
+        $this->assertEquals($expectedValues, $parsedQuery->getValues());
 
         $parameters = array(array('bar', 'baz'));
         $sql = "SELECT ?";
         $parsedQuery = $this->parseSingleQuery($sql, $parameters);
-        $expectedSql = "SELECT :__numbered, :__numbered_0";
-        $expectedParameters = array('__numbered' => 'bar', '__numbered_0' => 'baz');
-        $this->assertEquals($expectedSql, $parsedQuery->getString());
-        $this->assertEquals($expectedParameters, $parsedQuery->getParameters());
+        $expectedStatement = "SELECT :__numbered, :__numbered_0";
+        $expectedValues = array('__numbered' => 'bar', '__numbered_0' => 'baz');
+        $this->assertEquals($expectedStatement, $parsedQuery->getStatement());
+        $this->assertEquals($expectedValues, $parsedQuery->getValues());
     }
 
     public function testSingleLineComment()
@@ -74,21 +74,21 @@ class PgsqlParserTest extends \PHPUnit_Framework_TestCase
         $parameters = array('foo' => array('bar', 'baz'));
         $sql = "-- :foo";
         $parsedQuery = $this->parseSingleQuery($sql, $parameters);
-        $this->assertEquals($sql, $parsedQuery->getString());
+        $this->assertEquals($sql, $parsedQuery->getStatement());
 
         $sql = "SELECT 1 -- :foo = 1";
         $parsedQuery = $this->parseSingleQuery($sql, $parameters);
-        $this->assertEquals($sql, $parsedQuery->getString());
+        $this->assertEquals($sql, $parsedQuery->getStatement());
 
         $sql = "SELECT 1
 -- :foo";
         $parsedQuery = $this->parseSingleQuery($sql, $parameters);
-        $this->assertEquals($sql, $parsedQuery->getString());
+        $this->assertEquals($sql, $parsedQuery->getStatement());
 
         $sql = "SELECT 1 - :foo";
         $parsedQuery = $this->parseSingleQuery($sql, $parameters);
-        $expectedSql = "SELECT 1 - :foo, :foo_0";
-        $this->assertEquals($expectedSql, $parsedQuery->getString());
+        $expectedStatement = "SELECT 1 - :foo, :foo_0";
+        $this->assertEquals($expectedStatement, $parsedQuery->getStatement());
     }
 
     public function testMultiLineComment()
@@ -100,7 +100,7 @@ class PgsqlParserTest extends \PHPUnit_Framework_TestCase
 */
 1";
         $parsedQuery = $this->parseSingleQuery($sql, $parameters);
-        $this->assertEquals($sql, $parsedQuery->getString());
+        $this->assertEquals($sql, $parsedQuery->getStatement());
 
         $sql = "SELECT
 /* comment in
@@ -108,12 +108,12 @@ class PgsqlParserTest extends \PHPUnit_Framework_TestCase
 */ :foo */
 1";
         $parsedQuery = $this->parseSingleQuery($sql, $parameters);
-        $this->assertEquals($sql, $parsedQuery->getString());
+        $this->assertEquals($sql, $parsedQuery->getStatement());
 
         $sql = "SELECT 1 / :foo";
         $parsedQuery = $this->parseSingleQuery($sql, $parameters);
-        $expectedSql = "SELECT 1 / :foo, :foo_0";
-        $this->assertEquals($expectedSql, $parsedQuery->getString());
+        $expectedStatement = "SELECT 1 / :foo, :foo_0";
+        $this->assertEquals($expectedStatement, $parsedQuery->getStatement());
     }
 
     public function testDoubleQuotedIdentifier()
@@ -123,13 +123,13 @@ class PgsqlParserTest extends \PHPUnit_Framework_TestCase
 SELECT ":foo"
 SQL;
         $parsedQuery = $this->parseSingleQuery($sql, $parameters);
-        $this->assertEquals($sql, $parsedQuery->getString());
+        $this->assertEquals($sql, $parsedQuery->getStatement());
 
         $sql = <<<SQL
 SELECT "to use double quotes, just double them "" :foo "
 SQL;
         $parsedQuery = $this->parseSingleQuery($sql, $parameters);
-        $this->assertEquals($sql, $parsedQuery->getString());
+        $this->assertEquals($sql, $parsedQuery->getStatement());
 
         $parameters = array('a000' => array('foo', 'bar'));
         $sql = <<<SQL
@@ -137,7 +137,7 @@ SELECT U&"\a000"
 FROM (SELECT 1 AS U&":a000" UEScAPE ':') AS temp
 SQL;
         $parsedQuery = $this->parseSingleQuery($sql, $parameters);
-        $this->assertEquals($sql, $parsedQuery->getString());
+        $this->assertEquals($sql, $parsedQuery->getStatement());
     }
 
     public function testStringConstants()
@@ -147,7 +147,7 @@ SQL;
 SELECT ':foo'
 SQL;
         $parsedQuery = $this->parseSingleQuery($sql, $parameters);
-        $this->assertEquals($sql, $parsedQuery->getString());
+        $this->assertEquals($sql, $parsedQuery->getStatement());
 
         $sql = <<<SQL
 SELECT 'multi line string'
@@ -155,13 +155,13 @@ SELECT 'multi line string'
 'bar'
 SQL;
         $parsedQuery = $this->parseSingleQuery($sql, $parameters);
-        $this->assertEquals($sql, $parsedQuery->getString());
+        $this->assertEquals($sql, $parsedQuery->getStatement());
 
         $sql = <<<SQL
 SELECT 'single quote''s :foo'
 SQL;
         $parsedQuery = $this->parseSingleQuery($sql, $parameters);
-        $this->assertEquals($sql, $parsedQuery->getString());
+        $this->assertEquals($sql, $parsedQuery->getStatement());
     }
 
     public function testCStyleStringConstants()
@@ -171,14 +171,14 @@ SQL;
 SELECT E'C-style escaping \' :foo \''
 SQL;
         $parsedQuery = $this->parseSingleQuery($sql, $parameters);
-        $this->assertEquals($sql, $parsedQuery->getString());
+        $this->assertEquals($sql, $parsedQuery->getStatement());
 
         $sql = <<<SQL
 SELECT E'Multiline'
 'C-style escaping \' :foo \''
 SQL;
         $parsedQuery = $this->parseSingleQuery($sql, $parameters);
-        $this->assertEquals($sql, $parsedQuery->getString());
+        $this->assertEquals($sql, $parsedQuery->getStatement());
     }
 
     public function testUnicodeStringConstants()
@@ -189,7 +189,7 @@ SELECT u&':a000'
 '\'':b0a0' UeSCaPE ':'
 SQL;
         $parsedQuery = $this->parseSingleQuery($sql, $parameters);
-        $this->assertEquals($sql, $parsedQuery->getString());
+        $this->assertEquals($sql, $parsedQuery->getStatement());
     }
 
     public function testDollarQuotedStrings()
@@ -197,15 +197,15 @@ SQL;
         $parameters = array('foo' => array('bar', 'baz'));
         $sql = 'SELECT $$:foo$$';
         $parsedQuery = $this->parseSingleQuery($sql, $parameters);
-        $this->assertEquals($sql, $parsedQuery->getString());
+        $this->assertEquals($sql, $parsedQuery->getStatement());
 
         $sql = 'SELECT $tag$ :foo $tag$';
         $parsedQuery = $this->parseSingleQuery($sql, $parameters);
-        $this->assertEquals($sql, $parsedQuery->getString());
+        $this->assertEquals($sql, $parsedQuery->getStatement());
 
         $sql = 'SELECT $outer$ nested strings $inner$:foo$inner$ $outer$';
         $parsedQuery = $this->parseSingleQuery($sql, $parameters);
-        $this->assertEquals($sql, $parsedQuery->getString());
+        $this->assertEquals($sql, $parsedQuery->getStatement());
     }
 
     public function testTypeCasting()
@@ -215,7 +215,7 @@ SQL;
 SELECT 'hello'::TEXT
 SQL;
         $parsedQuery = $this->parseSingleQuery($sql, $parameters);
-        $this->assertEquals($sql, $parsedQuery->getString());
+        $this->assertEquals($sql, $parsedQuery->getStatement());
     }
 
     public function testArrayAccessor()
@@ -228,7 +228,7 @@ SELECT CAST('{"foo", "bar", "baz", "qux"}' AS TEXT[]) AS test
 ) AS t
 SQL;
         $parsedQuery = $this->parseSingleQuery($sql, $parameters);
-        $this->assertEquals($sql, $parsedQuery->getString());
+        $this->assertEquals($sql, $parsedQuery->getStatement());
     }
 
     public function testMultiQueries()
@@ -267,12 +267,12 @@ SELECT :foo
 SQL;
         $queries = $this->parseMultipleQueries($sql, $parameters);
         $this->assertTrue(count($queries) == 2);
-        $expectedSql = "SELECT :foo, :foo_0";
-        $expectedParameters = array('foo' => 'bar', 'foo_0' => 'baz');
-        $this->assertEquals($expectedSql, $queries[0]->getString());
-        $this->assertEquals($expectedSql, $queries[1]->getString());
-        $this->assertEquals($expectedParameters, $queries[0]->getParameters());
-        $this->assertEquals($expectedParameters, $queries[1]->getParameters());
+        $expectedStatement = "SELECT :foo, :foo_0";
+        $expectedValues = array('foo' => 'bar', 'foo_0' => 'baz');
+        $this->assertEquals($expectedStatement, $queries[0]->getStatement());
+        $this->assertEquals($expectedStatement, $queries[1]->getStatement());
+        $this->assertEquals($expectedValues, $queries[0]->getValues());
+        $this->assertEquals($expectedValues, $queries[1]->getValues());
 
         $parameters = array('foo' => array('bar', 'baz'), 'bar' => array('foo', 'qux'));
         $sql = <<<SQL
@@ -281,14 +281,14 @@ SELECT :foo
 SQL;
         $queries = $this->parseMultipleQueries($sql, $parameters);
         $this->assertTrue(count($queries) == 2);
-        $expectedSql = "SELECT :bar, :bar_0";
-        $expectedParameters = array('bar' => 'foo', 'bar_0' => 'qux');
-        $this->assertEquals($expectedSql, $queries[0]->getString());
-        $this->assertEquals($expectedParameters, $queries[0]->getParameters());
-        $expectedSql = "SELECT :foo, :foo_0";
-        $expectedParameters = array('foo' => 'bar', 'foo_0' => 'baz');
-        $this->assertEquals($expectedSql, $queries[1]->getString());
-        $this->assertEquals($expectedParameters, $queries[1]->getParameters());
+        $expectedStatement = "SELECT :bar, :bar_0";
+        $expectedValues = array('bar' => 'foo', 'bar_0' => 'qux');
+        $this->assertEquals($expectedStatement, $queries[0]->getStatement());
+        $this->assertEquals($expectedValues, $queries[0]->getValues());
+        $expectedStatement = "SELECT :foo, :foo_0";
+        $expectedValues = array('foo' => 'bar', 'foo_0' => 'baz');
+        $this->assertEquals($expectedStatement, $queries[1]->getStatement());
+        $this->assertEquals($expectedValues, $queries[1]->getValues());
     }
 
     public function testInvalidPlaceholderName()
@@ -298,6 +298,6 @@ SQL;
 SELECT 'hello':]
 SQL;
         $parsedQuery = $this->parseSingleQuery($sql, $parameters);
-        $this->assertEquals($sql, $parsedQuery->getString());
+        $this->assertEquals($sql, $parsedQuery->getStatement());
     }
 }

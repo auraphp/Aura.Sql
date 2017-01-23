@@ -59,7 +59,7 @@ abstract class AbstractParser implements ParserInterface
         $charset = 'UTF-8';
 
         /** @var State $state */
-        $state = new State($query->getString(), $query->getParameters(), $charset);
+        $state = new State($query->getStatement(), $query->getValues(), $charset);
 
         $last_check_index = -1;
 

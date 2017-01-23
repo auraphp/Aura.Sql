@@ -10,7 +10,7 @@ namespace Aura\Sql\Parser;
 
 /**
  *
- * A rebuilt query string, with the parameters to bind to it.
+ * A rebuilt query statement, with the values to bind to it.
  *
  * @package aura/sql
  *
@@ -18,41 +18,41 @@ namespace Aura\Sql\Parser;
 class Query
 {
     /**
-     * @var string A query string
+     * @var string A query statement
      */
-    private $string = '';
+    private $statement = '';
 
     /**
-     * @var array Parameters associated with a query
+     * @var array values associated with a query
      */
-    private $parameters = array();
+    private $values = array();
 
     /**
      * Query constructor.
-     * @param string $string
-     * @param array $parameters
+     * @param string $statement
+     * @param array $values
      */
-    public function __construct($string, $parameters = array())
+    public function __construct($statement, $values = array())
     {
-        $this->string = $string;
-        $this->parameters = $parameters;
+        $this->statement = $statement;
+        $this->values = $values;
     }
 
     /**
-     * Returns a Query SQL string
-     * @return string
+     * Returns a Query SQL statement
+     * @return statement
      */
-    public function getString()
+    public function getStatement()
     {
-        return $this->string;
+        return $this->statement;
     }
 
     /**
-     * Returns a Query parameters
+     * Returns a Query values
      * @return array
      */
-    public function getParameters()
+    public function getValues()
     {
-        return $this->parameters;
+        return $this->values;
     }
 }
