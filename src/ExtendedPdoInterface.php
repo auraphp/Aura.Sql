@@ -8,6 +8,8 @@
  */
 namespace Aura\Sql;
 
+use Aura\Sql\Parser\ParserInterface;
+
 /**
  *
  * An interface to the Aura.Sql extended PDO object.
@@ -212,12 +214,30 @@ interface ExtendedPdoInterface extends PdoInterface
 
     /**
      *
+     * Returns the Parser instance.
+     *
+     * @return ParserInterface
+     *
+     */
+    public function getParser();
+
+    /**
+     *
      * Returns the Profiler instance.
      *
      * @return ProfilerInterface
      *
      */
     public function getProfiler();
+
+    /**
+     *
+     * Sets the Parser instance.
+     *
+     * @param ParserInterface $parser The Parser instance.
+     *
+     */
+    public function setParser(ParserInterface $parser);
 
     /**
      *

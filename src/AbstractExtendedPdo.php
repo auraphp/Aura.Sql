@@ -53,24 +53,6 @@ abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
 
     /**
      *
-     * Returns a new Parser instance.
-     *
-     * @param string $driver Return a parser for this driver.
-     *
-     * @return ParserInterface
-     *
-     */
-    protected function newParser($driver)
-    {
-        $class = 'Aura\Sql\Parser\\' . ucfirst($driver) . 'Parser';
-        if (! class_exists($class)) {
-            $class = 'Aura\Sql\Parser\SqliteParser';
-        }
-        return new $class();
-    }
-
-    /**
-     *
      * Begins a transaction and turns off autocommit mode.
      *
      * @return bool True on success, false on failure.
@@ -401,6 +383,11 @@ abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
         return $sth->fetchColumn(0);
     }
 
+    public function getParser()
+    {
+        return $this->parser;
+    }
+
     public function getProfiler()
     {
         return $this->profiler;
@@ -593,11 +580,6 @@ abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
         return implode(', ', $value);
     }
 
-    public function setProfiler(ProfilerInterface $profiler)
-    {
-        $this->profiler = $profiler;
-    }
-
     /**
      *
      * Rolls back the current transaction, and restores autocommit mode.
@@ -614,6 +596,23 @@ abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
         $result = $this->pdo->rollBack();
         $this->profiler->finish();
         return $result;
+    }
+
+    /**
+     *
+     * Registers a query parser
+     *
+     * @param ParserInterface $parser
+     *
+     */
+    public function setParser(ParserInterface $parser)
+    {
+        $this->parser = $parser;
+    }
+
+    public function setProfiler(ProfilerInterface $profiler)
+    {
+        $this->profiler = $profiler;
     }
 
     /**
@@ -777,13 +776,19 @@ abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
 
     /**
      *
-     * Registers a query parser
+     * Returns a new Parser instance.
      *
-     * @param ParserInterface $parser
+     * @param string $driver Return a parser for this driver.
+     *
+     * @return ParserInterface
      *
      */
-    public function setParser(ParserInterface $parser)
+    protected function newParser($driver)
     {
-        $this->parser = $parser;
+        $class = 'Aura\Sql\Parser\\' . ucfirst($driver) . 'Parser';
+        if (! class_exists($class)) {
+            $class = 'Aura\Sql\Parser\SqliteParser';
+        }
+        return new $class();
     }
 }

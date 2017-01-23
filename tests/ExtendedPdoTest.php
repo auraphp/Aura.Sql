@@ -658,4 +658,10 @@ class ExtendedPdoTest extends \PHPUnit_Framework_TestCase
         $this->assertContains('[2]=>string(4) "****"', $data);
         $this->assertContains('[3]=>array(1) {[3]=>int(2)}[4]=>array(0) {}', $data);
     }
+
+    public function testDefaultParserIsSqlite()
+    {
+        $pdo = new ExtendedPdo('foobar', 'username', 'password');
+        $this->assertInstanceOf('Aura\Sql\Parser\SqliteParser', $pdo->getParser());
+    }
 }
