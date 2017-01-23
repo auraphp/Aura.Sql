@@ -69,8 +69,11 @@ class State
      */
     protected $new_statement_character_found = false;
 
+    /**
+     * @var array A list of valid placeholder characters.
+     */
     protected $valid_placeholder_characters = [];
-    
+
     /**
      *
      * Constructor
@@ -350,7 +353,7 @@ class State
             }
             $identifier .= $character;
             $length++;
-            
+
         }
         return $identifier;
     }
