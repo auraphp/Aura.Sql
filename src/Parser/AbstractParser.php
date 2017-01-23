@@ -138,7 +138,7 @@ abstract class AbstractParser implements ParserInterface
      */
     private function isStatementEmpty($statement)
     {
-        return mb_ereg_match('^\\s*$', $statement);
+        return trim($statement) === '';
     }
 
     /**
@@ -244,8 +244,15 @@ abstract class AbstractParser implements ParserInterface
      */
     protected function handleSemiColon(State $state)
     {
-        $uselessCharacters = $state->capture(';\\s*');
-        $state->passString($uselessCharacters);
+        while (! $state->done())
+        {
+            $character = $state->getCurrentCharacter();
+            if (! in_array($character, array(';', "\r", "\n", "\t", " "), true))
+            {
+                break;
+            }
+            $state->passString($character);
+        }
         $state->setNewStatementCharacterFound(true);
     }
 
