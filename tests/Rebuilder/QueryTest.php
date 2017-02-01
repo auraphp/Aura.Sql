@@ -1,5 +1,5 @@
 <?php
-namespace Aura\Sql\Parser;
+namespace Aura\Sql\Rebuilder;
 
 class QueryTest extends \PHPUnit_Framework_TestCase
 {

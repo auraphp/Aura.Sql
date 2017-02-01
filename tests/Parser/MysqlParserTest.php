@@ -1,6 +1,8 @@
 <?php
 namespace Aura\Sql\Parser;
 
+use Aura\Sql\Rebuilder\Query;
+
 class MysqlParserTest extends \PHPUnit_Framework_TestCase
 {
     /**

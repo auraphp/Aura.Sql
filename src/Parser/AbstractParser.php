@@ -9,6 +9,7 @@
 namespace Aura\Sql\Parser;
 
 use Aura\Sql\Exception;
+use Aura\Sql\Rebuilder\Query;
 
 /**
  *

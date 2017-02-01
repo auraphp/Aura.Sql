@@ -15,8 +15,6 @@ namespace Aura\Sql\Rebuilder;
 interface RebuilderInterface
 {
     /**
-     * Rebuilds a query and its parameters to adapt it to PDO's limitations,
-     * and returns a list of queries.
      * @param \Aura\Sql\Rebuilder\Query $query
      * @return \Aura\Sql\Rebuilder\Query the rebuilt query
      */

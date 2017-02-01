@@ -256,18 +256,18 @@ class ExtendedPdoTest extends \PHPUnit_Framework_TestCase
 
     public function testFetchObject()
     {
-        $stm = "SELECT id, name FROM pdotest WHERE id = :id";
-        $actual = $this->pdo->fetchObject($stm, array('id' => 1));
+        $stm = "SELECT id, name FROM pdotest WHERE id = ?";
+        $actual = $this->pdo->fetchObject($stm, array(1));
         $this->assertSame('1', $actual->id);
         $this->assertSame('Anna', $actual->name);
     }
 
     public function testFetchObject_withCtorArgs()
     {
-        $stm = "SELECT id, name FROM pdotest WHERE id = :id";
+        $stm = "SELECT id, name FROM pdotest WHERE id = ?";
         $actual = $this->pdo->fetchObject(
             $stm,
-            array('id' => 1),
+            array(1),
             'Aura\Sql\FakeObject',
             array('bar')
         );
@@ -504,6 +504,31 @@ class ExtendedPdoTest extends \PHPUnit_Framework_TestCase
         );
         $res = $this->pdo->fetchAll($stm, $val);
         $this->assertSame(10, count($res));
+    }
+
+    public function testNumberedPlaceholderArray()
+    {
+        $stm = 'SELECT * FROM pdotest WHERE id IN (?)';
+        $val = array(
+            1 => array('1', '2', '3'),
+        );
+        $res = $this->pdo->fetchAll($stm, $val);
+        $this->assertSame(3, count($res));
+    }
+
+    public function testNumberedPlaceholderMissing()
+    {
+        $this->setExpectedException('Aura\Sql\Exception\\MissingParameter');
+        $stm = "SELECT id, name FROM pdotest WHERE id = ? OR id = ?";
+        $this->pdo->fetchOne($stm, array(1));
+    }
+
+    public function testZeroIndexedPlaceholders()
+    {
+        $stm = 'SELECT * FROM pdotest WHERE id IN (?, ?, ?)';
+        $val = array(1, 2, 3);
+        $res = $this->pdo->fetchAll($stm, $val);
+        $this->assertSame(3, count($res));
     }
 
     public function testPdoDependency()

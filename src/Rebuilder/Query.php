@@ -14,7 +14,7 @@ class Query
     /**
      * @var string An sql query statement string
      */
-    private $sql = '';
+    private $statement = '';
 
     /**
      * @var array values associated with a query
@@ -28,21 +28,21 @@ class Query
      */
     public function __construct($sql, $values = [])
     {
-        $this->sql    = $sql;
-        $this->values = $values;
+        $this->statement = $sql;
+        $this->values    = $values;
     }
 
     /**
-     * Returns a the updated SQL statement
+     * Returns the SQL statement
      * @return string
      */
-    public function getSql()
+    public function getStatement()
     {
-        return $this->sql;
+        return $this->statement;
     }
 
     /**
-     * Returns the query parameter values
+     * Returns the sql query parameter values
      * @return array
      */
     public function getValues()

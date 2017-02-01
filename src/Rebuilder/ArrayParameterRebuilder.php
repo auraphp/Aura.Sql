@@ -6,14 +6,12 @@
 namespace Aura\Sql\Rebuilder;
 
 /**
- * Do several rebuild steps on the query
+ * Replace array values
  * @package aura/sql
  */
 class ArrayParameterRebuilder implements RebuilderInterface
 {
     /**
-     * Rebuilds a query and its parameters to adapt it to PDO's limitations,
-     * and returns a list of queries.
      * @param \Aura\Sql\Rebuilder\Query $query
      * @return \Aura\Sql\Rebuilder\Query the rebuilt query
      */
@@ -45,7 +43,7 @@ class ArrayParameterRebuilder implements RebuilderInterface
             $new_names[]           = ':' . $new_name;
         }
         unset($all_values[$name]);
-        $sql = str_replace('(:' . $name . ')', '(' . join(',', $new_names) . ')', $query->getSql());
+        $sql = str_replace('(:' . $name . ')', '(' . join(',', $new_names) . ')', $query->getStatement());
         return new Query($sql, $all_values);
     }
 }
