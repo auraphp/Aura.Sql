@@ -10,6 +10,9 @@ namespace Aura\Sql;
 
 use Aura\Sql\Exception;
 use Aura\Sql\Parser\ParserInterface;
+use Aura\Sql\Rebuilder\ArrayParameterRebuilder;
+use Aura\Sql\Rebuilder\Query;
+use Aura\Sql\Rebuilder\RebuilderInterface;
 use PDO;
 use PDOStatement;
 use Psr\Log\NullLogger;
@@ -50,6 +53,12 @@ abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
      *
      */
     protected $parser;
+
+    /**
+     * Rebuilds queries for easier parameter binding
+     * @var RebuilderInterface
+     */
+    protected $rebuilder;
 
     /**
      *
@@ -525,11 +534,10 @@ abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
         $this->connect();
 
         // rebuild the statement and values
-        $queries = $this->parser->rebuild($statement, $values);
-        $query = $queries[0];
+        $query = $this->getRebuilder()->rebuild(new Query($statement, $values));
 
         // prepare the statement
-        $sth = $this->pdo->prepare($query->getStatement());
+        $sth = $this->pdo->prepare($query->getSql());
 
         // for the placeholders we found, bind the corresponding data values
         foreach ($query->getValues() as $key => $val) {
@@ -634,6 +642,26 @@ abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
     public function setProfiler(ProfilerInterface $profiler)
     {
         $this->profiler = $profiler;
+    }
+
+    /**
+     * Sets the Rebuilder instance
+     * @param ProfilerInterface $profiler The Profiler instance.
+     */
+    public function setRebuilder(RebuilderInterface $rebuilder)
+    {
+        $this->rebuilder = $rebuilder;
+    }
+
+    /**
+     * @return RebuilderInterface
+     */
+    public function getRebuilder()
+    {
+        if (!isset($this->rebuilder)) {
+            $this->rebuilder = new ArrayParameterRebuilder();
+        }
+        return $this->rebuilder;
     }
 
     /**

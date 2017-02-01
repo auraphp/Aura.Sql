@@ -169,7 +169,7 @@ class ExtendedPdoTest extends \PHPUnit_Framework_TestCase
             'bar' => 'WRONG',
         ));
 
-        $expect = str_replace(':list', ":list, :list_0, :list_1, :list_2, :list_3", $stm);
+        $expect = str_replace(':list', ":list_0,:list_1,:list_2,:list_3,:list_4", $stm);
         $actual = $sth->queryString;
         $this->assertSame($expect, $actual);
     }
@@ -256,18 +256,18 @@ class ExtendedPdoTest extends \PHPUnit_Framework_TestCase
 
     public function testFetchObject()
     {
-        $stm = "SELECT id, name FROM pdotest WHERE id = ?";
-        $actual = $this->pdo->fetchObject($stm, array(1));
+        $stm = "SELECT id, name FROM pdotest WHERE id = :id";
+        $actual = $this->pdo->fetchObject($stm, array('id' => 1));
         $this->assertSame('1', $actual->id);
         $this->assertSame('Anna', $actual->name);
     }
 
     public function testFetchObject_withCtorArgs()
     {
-        $stm = "SELECT id, name FROM pdotest WHERE id = ?";
+        $stm = "SELECT id, name FROM pdotest WHERE id = :id";
         $actual = $this->pdo->fetchObject(
             $stm,
-            array(1),
+            array('id' => 1),
             'Aura\Sql\FakeObject',
             array('bar')
         );
@@ -506,31 +506,6 @@ class ExtendedPdoTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(10, count($res));
     }
 
-    public function testNumberedPlaceholderArray()
-    {
-        $stm = 'SELECT * FROM pdotest WHERE id IN (?)';
-        $val = array(
-            1 => array('1', '2', '3'),
-        );
-        $res = $this->pdo->fetchAll($stm, $val);
-        $this->assertSame(3, count($res));
-    }
-
-    public function testNumberedPlaceholderMissing()
-    {
-        $this->setExpectedException('Aura\Sql\Exception\\MissingParameter');
-        $stm = "SELECT id, name FROM pdotest WHERE id = ? OR id = ?";
-        $this->pdo->fetchOne($stm, array(1));
-    }
-
-    public function testZeroIndexedPlaceholders()
-    {
-        $stm = 'SELECT * FROM pdotest WHERE id IN (?, ?, ?)';
-        $val = array(1, 2, 3);
-        $res = $this->pdo->fetchAll($stm, $val);
-        $this->assertSame(3, count($res));
-    }
-
     public function testPdoDependency()
     {
         // pass in ExtendedPdo to see if it can replace PDO
@@ -597,7 +572,7 @@ class ExtendedPdoTest extends \PHPUnit_Framework_TestCase
 
         $this->pdo->query("SELECT 1 FROM pdotest");
         $this->pdo->exec("SELECT 2 FROM pdotest");
-        $this->pdo->fetchAll("SELECT 3 FROM pdotest", array('zim' => 'gir'));
+        $this->pdo->fetchAll("SELECT 3 FROM pdotest where id = :zim", array('zim' => 'gir'));
 
         $this->assertEquals(3, count($logger->getLog()));
 
@@ -614,7 +589,7 @@ class ExtendedPdoTest extends \PHPUnit_Framework_TestCase
             ),
             2 => array(
                 'function' => 'perform',
-                'statement' => 'SELECT 3 FROM pdotest',
+                'statement' => 'SELECT 3 FROM pdotest where id = :zim',
                 'values' => print_r(
                     array(
                         'zim' => 'gir',
