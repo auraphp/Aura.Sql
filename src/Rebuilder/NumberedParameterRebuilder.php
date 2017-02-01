@@ -28,7 +28,7 @@ class NumberedParameterRebuilder implements RebuilderInterface
      * @param \Aura\Sql\Rebuilder\Query $query
      * @return \Aura\Sql\Rebuilder\Query the rebuilt query
      */
-    public function rebuild(Query $query) : Query
+    public function rebuild(Query $query)
     {
         if (strpos($query->getStatement(), '?') === false) {
             // there are no numbered parameters, so we don't need to parse the SQL for them

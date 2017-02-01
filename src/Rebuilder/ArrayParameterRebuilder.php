@@ -15,7 +15,7 @@ class ArrayParameterRebuilder implements RebuilderInterface
      * @param \Aura\Sql\Rebuilder\Query $query
      * @return \Aura\Sql\Rebuilder\Query the rebuilt query
      */
-    public function rebuild(Query $query) : Query
+    public function rebuild(Query $query)
     {
         $result = clone($query);
         foreach ($query->getValues() as $name => $value) {
@@ -32,7 +32,7 @@ class ArrayParameterRebuilder implements RebuilderInterface
      * @param array                     $values
      * @return \Aura\Sql\Rebuilder\Query
      */
-    private function replaceArrayWithValues(Query $query, string $name, array $values) : Query
+    private function replaceArrayWithValues(Query $query, string $name, array $values)
     {
         $count      = 0;
         $new_names  = [];

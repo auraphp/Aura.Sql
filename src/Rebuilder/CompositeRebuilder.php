@@ -28,7 +28,7 @@ class CompositeRebuilder implements RebuilderInterface
      * @param \Aura\Sql\Rebuilder\Query $query
      * @return \Aura\Sql\Rebuilder\Query the rebuilt query
      */
-    public function rebuild(Query $query) : Query
+    public function rebuild(Query $query)
     {
         foreach ($this->rebuilder as $rebuilder) {
             $query = $rebuilder->rebuild($query);
