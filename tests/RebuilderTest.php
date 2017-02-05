@@ -13,7 +13,7 @@ class RebuilderTest extends \PHPUnit_Framework_TestCase
             WHERE created_at >= ':createdDate 00:00:00'::TIMESTAMP
             AND Foo::bar = 'something:else'
         ";
-        list ($actual, $values) = $rebuilder($expect, []);
+        list ($actual, $values) = $rebuilder($expect, array());
         $this->assertSame($expect, $actual);
     }
 }
