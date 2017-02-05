@@ -28,7 +28,7 @@ class ArrayParameterRebuilder implements RebuilderInterface
 
     /**
      * @param \Aura\Sql\Rebuilder\Query $query
-     * @param string                    $name
+     * @param \string                   $name
      * @param array                     $values
      * @return \Aura\Sql\Rebuilder\Query
      */

@@ -12,7 +12,7 @@ namespace Aura\Sql\Rebuilder;
 class Query
 {
     /**
-     * @var string An sql query statement string
+     * @var \string An sql query statement string
      */
     private $statement = '';
 
@@ -23,8 +23,8 @@ class Query
 
     /**
      * Query constructor.
-     * @param string $sql
-     * @param array  $values
+     * @param \string $sql
+     * @param array   $values
      */
     public function __construct($sql, $values = [])
     {
@@ -34,7 +34,7 @@ class Query
 
     /**
      * Returns the SQL statement
-     * @return string
+     * @return \string
      */
     public function getStatement()
     {
