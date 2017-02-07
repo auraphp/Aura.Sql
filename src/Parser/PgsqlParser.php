@@ -17,140 +17,16 @@ namespace Aura\Sql\Parser;
  */
 class PgsqlParser extends AbstractParser
 {
-    /**
-     *
-     * Map of characters to handler methods.
-     *
-     * @var array
-     *
-     */
-    protected $handlers = [
-        '-' => 'handleSingleLineComment',
-        '/' => 'handleMultiLineComment',
-        '"' => 'handleQuotedString',
-        "'" => 'handleQuotedString',
-        'E' => 'handlePossibleCStyleString',
-        'e' => 'handlePossibleCStyleString',
-        ':' => 'handleColon',
-        '?' => 'handleNumberedParameter',
-        ';' => 'handleSemiColon',
-        '$' => 'handleDollar',
-        '[' => 'handleArray',
+    protected $split = [
+        // single-quoted string
+        "'(?:[^'\\\\]|\\\\'?)*'",
+        // double-quoted string
+        '"(?:[^"\\\\]|\\\\"?)*"',
+        // double-dollar string (empty dollar-tag)
+        '\$\$(?:[^\$]?)*\$\$',
+        // dollar-tag string -- DOES NOT match tags properly
+        '\$[^\$]+\$.*\$[^\$]+\$',
     ];
 
-    /**
-     *
-     * If the character following a '/' one is a '*', advance the $current_index to the end of this multiple line comment
-     *
-     * @param State $state The parser state.
-     *
-     */
-    protected function handleMultiLineComment(State $state)
-    {
-        if ($state->nextCharactersAre('*')) {
-            // PG handled multiple levels of comments
-            $commentLevel = 1;
-            while ($commentLevel > 0 && ! $state->done()) {
-                $state->copyCurrentCharacter();
-                if ($state->nextCharactersAre('/*')) {
-                    $commentLevel ++;
-                } elseif ($state->nextCharactersAre('*/')) {
-                    $commentLevel --;
-                }
-            }
-            $state->copyUntilCharacter('*/');
-        } else {
-            $state->copyCurrentCharacter();
-        }
-    }
-
-    /**
-     *
-     * After a E or e character, a single quote string use the \ character as an escape character
-     *
-     * @param State $state The parser state.
-     *
-     */
-    protected function handlePossibleCStyleString(State $state)
-    {
-        $state->copyCurrentCharacter();
-        if (! $state->done() && ($currentCharacter = $state->getCurrentCharacter()) === "'") {
-            $escaped = false;
-            $inCString = true;
-            do {
-                $state->copyCurrentCharacter();
-                $currentCharacter = $state->getCurrentCharacter();
-                if ($currentCharacter === '\\') {
-                    $escaped = ! $escaped;
-                } elseif ($currentCharacter === "'" && ! $escaped) {
-                    if ($state->nextCharactersAre("'")) {
-                        $escaped = true;
-                    } else {
-                        $inCString = false;
-                    }
-                }
-                if (! $inCString) {
-                    // Checking if we have blank characters until next quote. In which case it is the same string
-                    $offset = 1;
-                    $blanks = true;
-                    while (! $state->done()) {
-                        $characterAtOffset = $state->getCharacterFromCurrent($offset);
-                        if ($characterAtOffset === "'") {
-                            break;
-                        }
-                        if (! in_array($characterAtOffset, array(" ", "\n", "\r", "\t"), true)) {
-                            $blanks = false;
-                            break;
-                        }
-                        $offset ++;                            
-                    }
-                    if ($blanks) {
-                        $state->copyCurrentCharacter();
-                        $state->copyUntilCharacter("'");
-                        $inCString = true;
-                    }
-                }
-            } while (! $state->done() && $inCString);
-        }
-    }
-
-    /**
-     *
-     * $ charaters can be used to create strings
-     *
-     * @param State $state The parser state.
-     *
-     */
-    protected function handleDollar(State $state)
-    {
-        $identifier = '$';
-        $offset = 1;
-        while (! $state->done()) {
-            $character = $state->getCharacterFromCurrent($offset); 
-            $identifier .= $character;
-            if ($character === '$') {
-                break;
-            }
-            $offset ++;
-        }
-        
-        if ($identifier) {
-            // Copy until the end of the starting tag
-            $state->copyUntilCharacter($identifier);
-            // Copy everything between the start and end tag (included)
-            $state->copyUntilCharacter($identifier);
-        }
-    }
-
-    /**
-     *
-     * As the : character can appear in array accessors, we have to manage this state
-     *
-     * @param State $state The parser state.
-     *
-     */
-    protected function handleArray(State $state)
-    {
-        $state->copyUntilCharacter(']');
-    }
+    protected $skip = '/^(\'|\"|\$|\:[^a-zA-Z_])/um';
 }

@@ -8,285 +8,265 @@
  */
 namespace Aura\Sql\Parser;
 
-use Aura\Sql\Exception;
+use Aura\Sql\Exception\MissingParameter;
 
 /**
  *
  * Parsing/rebuilding functionality for all drivers.
+ *
+ * Note that this does not validate the syntax; it only replaces/rebuilds
+ * placeholders in the query.
  *
  * @package aura/sql
  *
  */
 abstract class AbstractParser implements ParserInterface
 {
-    /**
-     *
-     * The character set to use when parsing query statements.
-     *
-     * @var string
-     *
-     */
-    protected $charset = 'UTF-8';
+    protected $split = [
+        // single-quoted string
+        "'(?:[^'\\\\]|\\\\'?)*'",
+        // double-quoted string
+        '"(?:[^"\\\\]|\\\\"?)*"',
+    ];
+
+    protected $skip = '/^(\'|\"|\:[^a-zA-Z_])/um';
 
     /**
      *
-     * Map of characters to handler methods.
+     * The current numbered-placeholder in the original statement.
+     *
+     * @var int
+     *
+     */
+    protected $num = 0;
+
+    /**
+     *
+     * How many times has a named placeholder been used?
      *
      * @var array
      *
      */
-    protected $handlers = [];
+    protected $count = [
+        '__' => null,
+    ];
 
     /**
      *
-     * Character used to define numbered placeholders.
+     * The initial values to be bound.
      *
-     * @var string
+     * @var array
      *
      */
-    protected $numberedPlaceHolderCharacter = "?";
+    protected $values = array();
 
     /**
      *
-     * Constructor.
+     * Final placeholders and values to bind.
      *
-     * @param string $charset The character set to use when parsing query
-     * statements.
+     * @var array
      *
      */
-    public function __construct($charset = 'UTF-8')
-    {
-        $this->charset = $charset;
-    }
+    protected $final_values = array();
 
     /**
      *
-     * Given a query string and parameters, rebuilds it so that parameters all
-     * match up, and replaces array-based placeholders.
+     * Rebuilds a statement with placeholders and bound values.
      *
-     * @param string $statement The query statement string.
+     * @param string $statement The statement to rebuild.
      *
-     * @param array $values Bind these values into the query.
+     * @param array $values The values to bind and/or replace into a statement.
      *
-     * @return Query[]
+     * @return array An array where element 0 is the rebuilt statement and
+     * element 1 is the rebuilt array of values.
      *
      */
     public function rebuild($statement, array $values = [])
     {
-        $query = new Query($statement, $values);
-
-        $queries = [];
-
-        $state = new State(
-            $query->getStatement(),
-            $query->getValues(),
-            $this->charset
-        );
-
-        $last_check_index = -1;
-
-        while (! $state->done()) {
-            if ($state->getCurrentIndex() <= $last_check_index) {
-                throw new Exception\ParserLoop(
-                    'SQL rebuilder seems to be in an infinite loop.'
-                );
-            }
-            $last_check_index = $state->getCurrentIndex();
-
-            if (isset($this->handlers[$state->getCurrentCharacter()])) {
-                $handler = $this->handlers[$state->getCurrentCharacter()];
-                $this->$handler($state);
-                // if we encountered a statement separator,
-                // we have to prepare a new Query
-                if ($state->isNewStatementCharacterFound()) {
-                    $this->storeQuery($state, $queries);
-                    $state->resetFinalStatement();
-                }
-            } else {
-                $state->copyCurrentCharacter();
-            }
+        // match standard PDO execute() behavior of zero-indexed arrays
+        if (array_key_exists(0, $values)) {
+            array_unshift($values, null);
         }
-        $this->storeQuery($state, $queries);
-        return $queries;
+
+        $this->values = $values;
+        $statement = $this->rebuildStatement($statement);
+        return array($statement, $this->final_values);
     }
 
     /**
      *
-     * Add a Query using the current statement and values from a State.
-     *
-     * @param State $state The parser state.
-     *
-     * @param Query[] $queries reference to the array holding a list of queries.
-     *
-     */
-    private function storeQuery(State $state, &$queries)
-    {
-        $statement = $state->getFinalStatement();
-        if (! $this->isStatementEmpty($statement)) {
-            $queries[] = new Query($statement, $state->getValuesToBind());
-        }
-    }
-
-    /**
-     *
-     * Is an SQL statement is empty?
+     * Given a statement, rebuilds it with array values embedded.
      *
      * @param string $statement The SQL statement.
      *
-     * @return bool True if empty, false if not.
+     * @return string The rebuilt statement.
      *
      */
-    private function isStatementEmpty($statement)
+    protected function rebuildStatement($statement)
     {
-        return trim($statement) === '';
+        $parts = $this->getParts($statement);
+        return $this->rebuildParts($parts);
     }
 
     /**
      *
-     * After a single or double quote string, advance the $current_index to the
-     * end of the string
+     * Given an array of statement parts, rebuilds each part.
      *
-     * @param State $state The parser state.
+     * @param array $parts The statement parts.
+     *
+     * @return string The rebuilt statement.
      *
      */
-    protected function handleQuotedString(State $state)
+    protected function rebuildParts(array $parts)
     {
-        $quoteCharacter = $state->getCurrentCharacter();
-        $state->copyCurrentCharacter();
-        if (! $state->done()) {
-            $state->copyUntilCharacter($quoteCharacter);
+        $statement = '';
+        foreach ($parts as $part) {
+            $statement .= $this->rebuildPart($part);
         }
+        return $statement;
     }
 
     /**
      *
-     * Check if a ':' colon character is followed by what can be a named
-     * placeholder.
+     * Rebuilds a single statement part.
      *
-     * @param State $state The parser state.
+     * @param string $part The statement part.
+     *
+     * @return string The rebuilt statement.
      *
      */
-    protected function handleColon(State $state)
+    protected function rebuildPart($part)
     {
-        $colon_number = 0;
-        do {
-            $state->copyCurrentCharacter();
-            $colon_number++;
-        } while ($state->getCurrentCharacter() === ':');
-
-        if ($colon_number != 1) {
-            return;
+        if (preg_match($this->skip, $part)) {
+            return $part;
         }
 
-        $name = $state->getIdentifier();
-        if (! $name) {
-            return;
-        }
+        // split into subparts by ":name" and "?"
+        $subs = preg_split(
+            "/(?<!:)(:[a-zA-Z_][a-zA-Z0-9_]*)|(\?)/um",
+            $part,
+            -1,
+            PREG_SPLIT_DELIM_CAPTURE
+        );
 
-        $value = $state->getNamedParameterValue($name);
-        $placeholder_identifiers = '';
+        // check subparts to expand placeholders for bound arrays
+        return $this->prepareValuePlaceholders($subs);
+    }
 
-        if (! is_array($value)) {
-            $identifier = $state->storeValueToBind($name, $value);
-            $placeholder_identifiers .= $identifier;
-        } else {
-            foreach ($value as $sub) {
-                $identifier = $state->storeValueToBind($name, $sub);
-                if ($placeholder_identifiers) {
-                    $placeholder_identifiers .= ', :';
-                }
-                $placeholder_identifiers .= $identifier;
+    /**
+     *
+     * Prepares the sub-parts of a query with placeholders.
+     *
+     * @param array $subs The query subparts.
+     *
+     * @return array The prepared subparts.
+     *
+     */
+    protected function prepareValuePlaceholders(array $subs)
+    {
+        $str = '';
+        foreach ($subs as $i => $sub) {
+            $char = substr($sub, 0, 1);
+            if ($char == '?') {
+                $str .= $this->prepareNumberedPlaceholder($sub);
+            } elseif ($char == ':') {
+                $str .= $this->prepareNamedPlaceholder($sub);
+            } else {
+                $str .= $sub;
             }
         }
-        $state->passString($name);
-        $state->addStringToStatement($placeholder_identifiers);
+        return $str;
     }
 
     /**
      *
-     * Replace a numbered placeholder character by multiple ones if a numbered
-     * placeholder contains an array.
+     * Bind or quote a numbered placeholder in a query subpart.
      *
-     * As the '?' character can't be used with PG queries, replace it with a
-     * named placeholder.
+     * @param string $sub The query subpart.
      *
-     * @param State $state The parser state.
+     * @return string The prepared query subpart.
      *
+     * @throws MissingParameter
      */
-    protected function handleNumberedParameter(State $state)
+    protected function prepareNumberedPlaceholder($sub)
     {
-        $value = $state->getFirstUnusedNumberedValue();
-
-        $name = '__numbered';
-
-        if (! is_array($value)) {
-            $placeholder_identifiers = ':' . $state->storeValueToBind($name, $value);
-        } else {
-            $placeholder_identifiers = '';
-            foreach ($value as $sub) {
-                $identifier = ':' . $state->storeValueToBind($name, $sub);
-                if ($placeholder_identifiers) {
-                    $placeholder_identifiers .= ', ';
-                }
-                $placeholder_identifiers .= $identifier;
-            }
+        $this->num ++;
+        if (array_key_exists($this->num, $this->values) === false) {
+            throw new MissingParameter("Parameter {$this->num} is missing from the bound values");
         }
-        $state->passString($this->numberedPlaceHolderCharacter);
-        $state->addStringToStatement($placeholder_identifiers);
+
+        $expanded = [];
+        foreach ((array) $this->values[$this->num] as $value) {
+            $count = ++ $this->count['__'];
+            $name = "__{$count}";
+            $expanded[] = ":{$name}";
+            $this->final_values[$name] = $value;
+        }
+        return implode(', ', $expanded);
     }
 
     /**
      *
-     * Saves the fact a new statement is starting.
+     * Bind or quote a named placeholder in a query subpart.
      *
-     * @param State $state The parser state.
+     * @param string $sub The query subpart.
+     *
+     * @return string The prepared query subpart.
      *
      */
-    protected function handleSemiColon(State $state)
+    protected function prepareNamedPlaceholder($sub)
     {
-        while (! $state->done())
-        {
-            $character = $state->getCurrentCharacter();
-            if (! in_array($character, array(';', "\r", "\n", "\t", " "), true))
-            {
-                break;
-            }
-            $state->passString($character);
+        $orig = substr($sub, 1);
+        if (array_key_exists($orig, $this->values) === false) {
+            throw new MissingParameter("Parameter '{$orig}' is missing from the bound values");
         }
-        $state->setNewStatementCharacterFound(true);
+
+        $name = $this->getPlaceholderName($orig);
+
+        // is the corresponding data element an array?
+        $bind_array = is_array($this->values[$orig]);
+        if ($bind_array) {
+            // expand to multiple placeholders
+            return $this->expandNamedPlaceholder($name, $this->values[$orig]);
+        }
+
+        // not an array, retain the placeholder for later
+        $this->final_values[$name] = $this->values[$orig];
+        return ":$name";
     }
 
-    /**
-     *
-     * Returns a modified statement, values, and current index depending on what
-     * follow a '-' character.
-     *
-     * @param State $state The parser state.
-     *
-     */
-    protected function handleSingleLineComment(State $state)
+    protected function getPlaceholderName($orig)
     {
-        if ($state->nextCharactersAre('-')) {
-            $state->copyUntilCharacter("\n");
-        } else {
-            $state->copyCurrentCharacter();
+        if (! isset($this->count[$orig])) {
+            $this->count[$orig] = 0;
+            return $orig;
         }
+
+        $count = ++ $this->count[$orig];
+        return "{$orig}__{$count}";
     }
 
-    /**
-     *
-     * If the character following a '/' one is a '*', advance the
-     * $current_index to the end of this multiple line comment.
-     *
-     * @param State $state The parser state.
-     *
-     */
-    protected function handleMultiLineComment(State $state)
+    protected function expandNamedPlaceholder($prefix, $values)
     {
-        if ($state->nextCharactersAre('*')) {
-            $state->copyUntilCharacter('*/');
-        } else {
-            $state->copyCurrentCharacter();
+        $i = 0;
+        $expanded = [];
+        foreach ($values as $value) {
+            $name = "{$prefix}_{$i}";
+            $expanded[] = ":{$name}";
+            $this->final_values[$name] = $value;
+            $i ++;
         }
+        return implode(', ', $expanded);
+    }
+
+    protected function getParts($statement)
+    {
+        $split = implode('|', $this->split);
+        return preg_split(
+            "/($split)/um",
+            $statement,
+            -1,
+            PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY
+        );
     }
 }

@@ -26,11 +26,11 @@ class NullParser implements ParserInterface
      *
      * @param array $values Bind these values into the query.
      *
-     * @return Query[]
+     * @return array
      *
      */
     public function rebuild($statement, array $values = [])
     {
-        return [new Query($statement, $values)];
+        return [$statement, $values];
     }
 }

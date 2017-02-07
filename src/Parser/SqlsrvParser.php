@@ -14,36 +14,9 @@ namespace Aura\Sql\Parser;
  *
  * @package aura/sql
  *
+ * @todo add $split and $skip for single quote, double quote, and square brackets
+ *
  */
 class SqlsrvParser extends AbstractParser
 {
-    /**
-     *
-     * Map of characters to handler methods.
-     *
-     * @var array
-     *
-     */
-    protected $handlers = [
-        '-' => 'handleSingleLineComment',
-        '/' => 'handleMultiLineComment',
-        '"' => 'handleQuotedString',
-        "'" => 'handleQuotedString',
-        "[" => 'handleIdentifier',
-        ':' => 'handleColon',
-        '?' => 'handleNumberedParameter',
-        ';' => 'handleSemiColon',
-    ];
-
-    /**
-     *
-     * Handles `[table.col]` (etc.) identifiers.
-     *
-     * @param State $state The parser state.
-     *
-     */
-    protected function handleIdentifier(State $state)
-    {
-        $state->copyUntilCharacter(']');
-    }
 }
