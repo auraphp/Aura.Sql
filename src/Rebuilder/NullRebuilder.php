@@ -17,6 +17,7 @@ class NullRebuilder implements RebuilderInterface
      */
     public function rebuild(Query $query)
     {
-        return $query;
+        // all values are used by the query
+        return new Query($query->getStatement(), $query->getAllValues(), $query->getAllValues());
     }
 }

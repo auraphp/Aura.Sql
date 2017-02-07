@@ -34,7 +34,7 @@ class NumberedParameterRebuilder implements RebuilderInterface
             // there are no numbered parameters, so we don't need to parse the SQL for them
             return $query;
         }
-        $result = $this->parser->rebuild($query->getStatement(), $query->getValues());
-        return new Query($result[0]->getStatement(), $result[0]->getValues());
+        $result = $this->parser->rebuild($query->getStatement(), $query->getAllValues());
+        return new Query($result[0]->getStatement(), $query->getAllValues(), $result[0]->getUsedValues());
     }
 }

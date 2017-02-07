@@ -18,9 +18,11 @@ class ArrayParameterRebuilder implements RebuilderInterface
     public function rebuild(Query $query)
     {
         $result = clone($query);
-        foreach ($query->getValues() as $name => $value) {
+        foreach ($query->getAllValues() as $name => $value) {
             if (is_array($value)) {
                 $result = $this->replaceArrayWithValues($result, $name, $value);
+            } else {
+                $result->useValue($name);
             }
         }
         return $result;
@@ -34,16 +36,15 @@ class ArrayParameterRebuilder implements RebuilderInterface
      */
     private function replaceArrayWithValues(Query $query, $name, array $values)
     {
-        $count      = 0;
-        $new_names  = [];
-        $all_values = $query->getValues();
+        $count       = 0;
+        $new_names   = [];
+        $used_values = $query->getUsedValues();
         foreach ($values as $value) {
-            $new_name              = $name . '_' . ($count++);
-            $all_values[$new_name] = $value;
-            $new_names[]           = ':' . $new_name;
+            $new_name               = $name . '__' . (++$count);
+            $used_values[$new_name] = $value;
+            $new_names[]            = ':' . $new_name;
         }
-        unset($all_values[$name]);
         $sql = str_replace('(:' . $name . ')', '(' . join(',', $new_names) . ')', $query->getStatement());
-        return new Query($sql, $all_values);
+        return new Query($sql, $query->getAllValues(), $used_values);
     }
 }

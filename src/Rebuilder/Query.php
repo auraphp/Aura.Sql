@@ -17,19 +17,26 @@ class Query
     private $statement = '';
 
     /**
-     * @var array values associated with a query
+     * @var array values provided by user may include extra values eg a row from the database with some unneeded
      */
-    private $values = [];
+    private $all_values = [];
+
+    /**
+     * @var array values actually used by the query
+     */
+    private $used_values = [];
 
     /**
      * Query constructor.
      * @param \string $sql
-     * @param array   $values
+     * @param array   $all_values
+     * @param array   $used_values
      */
-    public function __construct($sql, $values = [])
+    public function __construct($sql, $all_values = [], $used_values = [])
     {
-        $this->statement = $sql;
-        $this->values    = $values;
+        $this->statement   = $sql;
+        $this->all_values  = $all_values;
+        $this->used_values = $used_values;
     }
 
     /**
@@ -45,8 +52,25 @@ class Query
      * Returns the sql query parameter values
      * @return array
      */
-    public function getValues()
+    public function getAllValues()
     {
-        return $this->values;
+        return $this->all_values;
+    }
+
+    /**
+     * Returns the sql query parameter values
+     * @return array
+     */
+    public function getUsedValues()
+    {
+        return $this->used_values;
+    }
+
+    /**
+     * @param string $name
+     */
+    public function useValue($name)
+    {
+        $this->used_values[$name] = $this->all_values[$name];
     }
 }

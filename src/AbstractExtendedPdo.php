@@ -542,7 +542,7 @@ abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
         $sth = $this->pdo->prepare($query->getStatement());
 
         // for the placeholders we found, bind the corresponding data values
-        foreach ($query->getValues() as $key => $val) {
+        foreach ($query->getUsedValues() as $key => $val) {
             $this->bindValue($sth, $key, $val);
         }
 

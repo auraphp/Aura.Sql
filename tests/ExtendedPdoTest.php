@@ -169,7 +169,7 @@ class ExtendedPdoTest extends \PHPUnit_Framework_TestCase
             'bar' => 'WRONG',
         ));
 
-        $expect = str_replace(':list', ":list_0,:list_1,:list_2,:list_3,:list_4", $stm);
+        $expect = str_replace(':list', ":list__1,:list__2,:list__3,:list__4,:list__5", $stm);
         $actual = $sth->queryString;
         $this->assertSame($expect, $actual);
     }

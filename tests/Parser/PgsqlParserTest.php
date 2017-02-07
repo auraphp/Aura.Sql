@@ -38,7 +38,7 @@ class PgsqlParserTest extends \PHPUnit_Framework_TestCase
         $expectedStatement = "SELECT :foo AS a, :foo_0 AS b";
         $expectedValues = array('foo' => 'bar', 'foo_0' => 'bar');
         $this->assertEquals($expectedStatement, $parsedQuery->getStatement());
-        $this->assertEquals($expectedValues, $parsedQuery->getValues());
+        $this->assertEquals($expectedValues, $parsedQuery->getAllValues());
     }
 
     public function testReplaceNumberedParameter()
@@ -49,7 +49,7 @@ class PgsqlParserTest extends \PHPUnit_Framework_TestCase
         $expectedStatement = "SELECT :__numbered AS a, :__numbered_0 AS b";
         $expectedValues = array('__numbered' => 'bar', '__numbered_0' => 'baz');
         $this->assertEquals($expectedStatement, $parsedQuery->getStatement());
-        $this->assertEquals($expectedValues, $parsedQuery->getValues());
+        $this->assertEquals($expectedValues, $parsedQuery->getAllValues());
     }
 
     public function testReplaceArrayAsParameter()
@@ -60,7 +60,7 @@ class PgsqlParserTest extends \PHPUnit_Framework_TestCase
         $expectedStatement = "SELECT :foo, :foo_0";
         $expectedValues = array('foo' => 'bar', 'foo_0' => 'baz');
         $this->assertEquals($expectedStatement, $parsedQuery->getStatement());
-        $this->assertEquals($expectedValues, $parsedQuery->getValues());
+        $this->assertEquals($expectedValues, $parsedQuery->getAllValues());
 
         $parameters = array(array('bar', 'baz'));
         $sql = "SELECT ?";
@@ -68,7 +68,7 @@ class PgsqlParserTest extends \PHPUnit_Framework_TestCase
         $expectedStatement = "SELECT :__numbered, :__numbered_0";
         $expectedValues = array('__numbered' => 'bar', '__numbered_0' => 'baz');
         $this->assertEquals($expectedStatement, $parsedQuery->getStatement());
-        $this->assertEquals($expectedValues, $parsedQuery->getValues());
+        $this->assertEquals($expectedValues, $parsedQuery->getAllValues());
     }
 
     public function testSingleLineComment()
@@ -281,8 +281,8 @@ SQL;
         $expectedValues = array('foo' => 'bar', 'foo_0' => 'baz');
         $this->assertEquals($expectedStatement, $queries[0]->getStatement());
         $this->assertEquals($expectedStatement, $queries[1]->getStatement());
-        $this->assertEquals($expectedValues, $queries[0]->getValues());
-        $this->assertEquals($expectedValues, $queries[1]->getValues());
+        $this->assertEquals($expectedValues, $queries[0]->getAllValues());
+        $this->assertEquals($expectedValues, $queries[1]->getAllValues());
 
         $parameters = array('foo' => array('bar', 'baz'), 'bar' => array('foo', 'qux'));
         $sql = <<<SQL
@@ -294,11 +294,11 @@ SQL;
         $expectedStatement = "SELECT :bar, :bar_0";
         $expectedValues = array('bar' => 'foo', 'bar_0' => 'qux');
         $this->assertEquals($expectedStatement, $queries[0]->getStatement());
-        $this->assertEquals($expectedValues, $queries[0]->getValues());
+        $this->assertEquals($expectedValues, $queries[0]->getAllValues());
         $expectedStatement = "SELECT :foo, :foo_0";
         $expectedValues = array('foo' => 'bar', 'foo_0' => 'baz');
         $this->assertEquals($expectedStatement, $queries[1]->getStatement());
-        $this->assertEquals($expectedValues, $queries[1]->getValues());
+        $this->assertEquals($expectedValues, $queries[1]->getAllValues());
     }
 
     public function testInvalidPlaceholderName()

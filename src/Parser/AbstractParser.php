@@ -80,7 +80,7 @@ abstract class AbstractParser implements ParserInterface
 
         $state = new State(
             $query->getStatement(),
-            $query->getValues(),
+            $query->getAllValues(),
             $this->charset
         );
 
