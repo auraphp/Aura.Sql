@@ -27,6 +27,7 @@
         "ext-mbstring": "*"
     },
     "require-dev": {
+        "pds/skeleton": "~1.0",
         "phpunit/phpunit": "^6.0"
     },
     "autoload": {
