@@ -1,7 +1,7 @@
 <?php
 namespace Aura\Sql;
 
-class ConnectionLocatorTest extends \PHPUnit_Framework_TestCase
+class ConnectionLocatorTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var ConnectionLocator
@@ -88,10 +88,12 @@ class ConnectionLocatorTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($expect, $actual);
     }
 
+    /**
+     * @expectedException Aura\Sql\Exception\ConnectionNotFound
+     */
     public function testGetReadMissing()
     {
         $locator = $this->newLocator($this->read, $this->write);
-        $this->setExpectedException('Aura\Sql\Exception\ConnectionNotFound');
         $locator->getRead('no-such-connection');
     }
 
@@ -128,10 +130,12 @@ class ConnectionLocatorTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($expect, $actual);
     }
 
+    /**
+     * @expectedException Aura\Sql\Exception\ConnectionNotFound
+     */
     public function testGetWriteMissing()
     {
         $locator = $this->newLocator($this->read, $this->write);
-        $this->setExpectedException('Aura\Sql\Exception\ConnectionNotFound');
         $locator->getWrite('no-such-connection');
     }
 }

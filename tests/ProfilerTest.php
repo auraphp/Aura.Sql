@@ -3,7 +3,7 @@ namespace Aura\Sql;
 
 use Psr\Log\LogLevel;
 
-class ProfilerTest extends \PHPUnit_Framework_TestCase
+class ProfilerTest extends \PHPUnit\Framework\TestCase
 {
     protected function setUp()
     {
