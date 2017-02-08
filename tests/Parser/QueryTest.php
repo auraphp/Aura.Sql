@@ -1,7 +1,7 @@
 <?php
 namespace Aura\Sql\Parser;
 
-class QueryTest extends \PHPUnit_Framework_TestCase
+class QueryTest extends \PHPUnit\Framework\TestCase
 {
     public function testConstructor()
     {
