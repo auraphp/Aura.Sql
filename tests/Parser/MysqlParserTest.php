@@ -1,7 +1,7 @@
 <?php
 namespace Aura\Sql\Parser;
 
-class MysqlParserTest extends \PHPUnit_Framework_TestCase
+class MysqlParserTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @param string $sql

@@ -1,7 +1,7 @@
 <?php
 namespace Aura\Sql\Parser;
 
-class PgsqlParserTest extends \PHPUnit_Framework_TestCase
+class PgsqlParserTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @param string $sql

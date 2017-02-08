@@ -1,7 +1,7 @@
 <?php
 namespace Aura\Sql\Parser;
 
-class NullParserTest extends \PHPUnit_Framework_TestCase
+class NullParserTest extends \PHPUnit\Framework\TestCase
 {
     public function test()
     {

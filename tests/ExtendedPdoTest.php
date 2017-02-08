@@ -4,7 +4,7 @@ namespace Aura\Sql;
 use PDO;
 use stdClass;
 
-class ExtendedPdoTest extends \PHPUnit_Framework_TestCase
+class ExtendedPdoTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ExtendedPdoInterface */
     protected $pdo;
@@ -516,9 +516,11 @@ class ExtendedPdoTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(3, count($res));
     }
 
+    /**
+     * @expectedException Aura\Sql\Exception\MissingParameter
+     */
     public function testNumberedPlaceholderMissing()
     {
-        $this->setExpectedException('Aura\Sql\Exception\\MissingParameter');
         $stm = "SELECT id, name FROM pdotest WHERE id = ? OR id = ?";
         $this->pdo->fetchOne($stm, array(1));
     }
@@ -546,6 +548,9 @@ class ExtendedPdoTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expect, $actual);
     }
 
+    /**
+     * @expectedException Aura\Sql\Exception\CannotBindValue
+     */
     public function testBindValues()
     {
         $stm = 'SELECT * FROM pdotest WHERE id = :id';
@@ -571,10 +576,6 @@ class ExtendedPdoTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('PDOStatement', $sth);
 
         // non-bindable
-        $this->setExpectedException(
-            'Aura\Sql\Exception\CannotBindValue',
-            "Cannot bind value of type 'object' to placeholder 'id'"
-        );
         $sth = $this->pdo->prepareWithValues($stm, array('id' => new stdClass));
     }
 
