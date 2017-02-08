@@ -8,6 +8,8 @@
  */
 namespace Aura\Sql\Parser;
 
+use Aura\Sql\Rebuilder\Query;
+
 /**
  *
  * A parser/rebuilder that does nothing at all; use this when your placeholders

@@ -1,5 +1,5 @@
 <?php
-namespace Aura\Sql\Parser;
+namespace Aura\Sql\Rebuilder;
 
 class QueryTest extends \PHPUnit_Framework_TestCase
 {
@@ -9,6 +9,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
         $parameters = array('bar' => 'baz');
         $query = new Query($sqlString, $parameters);
         $this->assertEquals($sqlString, $query->getStatement());
-        $this->assertEquals($parameters, $query->getValues());
+        $this->assertEquals($parameters, $query->getAllValues());
+        $this->assertEquals([], $query->getUsedValues());
     }
 }

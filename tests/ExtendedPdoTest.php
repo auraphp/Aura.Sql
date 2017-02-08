@@ -169,7 +169,7 @@ class ExtendedPdoTest extends \PHPUnit_Framework_TestCase
             'bar' => 'WRONG',
         ));
 
-        $expect = str_replace(':list', ":list, :list_0, :list_1, :list_2, :list_3", $stm);
+        $expect = str_replace(':list', ":list__1,:list__2,:list__3,:list__4,:list__5", $stm);
         $actual = $sth->queryString;
         $this->assertSame($expect, $actual);
     }
@@ -597,7 +597,7 @@ class ExtendedPdoTest extends \PHPUnit_Framework_TestCase
 
         $this->pdo->query("SELECT 1 FROM pdotest");
         $this->pdo->exec("SELECT 2 FROM pdotest");
-        $this->pdo->fetchAll("SELECT 3 FROM pdotest", array('zim' => 'gir'));
+        $this->pdo->fetchAll("SELECT 3 FROM pdotest where id = :zim", array('zim' => 'gir'));
 
         $this->assertEquals(3, count($logger->getLog()));
 
@@ -614,7 +614,7 @@ class ExtendedPdoTest extends \PHPUnit_Framework_TestCase
             ),
             2 => array(
                 'function' => 'perform',
-                'statement' => 'SELECT 3 FROM pdotest',
+                'statement' => 'SELECT 3 FROM pdotest where id = :zim',
                 'values' => print_r(
                     array(
                         'zim' => 'gir',

@@ -8,6 +8,8 @@
  */
 namespace Aura\Sql\Parser;
 
+use Aura\Sql\Rebuilder\Query;
+
 /**
  *
  * Interface for query parsing/rebuilding functionality.

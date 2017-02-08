@@ -1,6 +1,8 @@
 <?php
 namespace Aura\Sql\Parser;
 
+use Aura\Sql\Rebuilder\Query;
+
 class MysqlParserTest extends \PHPUnit_Framework_TestCase
 {
     /**
@@ -36,7 +38,7 @@ class MysqlParserTest extends \PHPUnit_Framework_TestCase
         $expectedStatement = "SELECT :foo AS a, :foo_0 AS b";
         $expectedValues = array('foo' => 'bar', 'foo_0' => 'bar');
         $this->assertEquals($expectedStatement, $parsedQuery->getStatement());
-        $this->assertEquals($expectedValues, $parsedQuery->getValues());
+        $this->assertEquals($expectedValues, $parsedQuery->getAllValues());
     }
 
     public function testReplaceNumberedParameter()
@@ -47,7 +49,7 @@ class MysqlParserTest extends \PHPUnit_Framework_TestCase
         $expectedStatement = "SELECT :__numbered AS a, :__numbered_0 AS b";
         $expectedValues = array('__numbered' => 'bar', '__numbered_0' => 'baz');
         $this->assertEquals($expectedStatement, $parsedQuery->getStatement());
-        $this->assertEquals($expectedValues, $parsedQuery->getValues());
+        $this->assertEquals($expectedValues, $parsedQuery->getAllValues());
     }
 
     public function testReplaceArrayAsParameter()
@@ -58,7 +60,7 @@ class MysqlParserTest extends \PHPUnit_Framework_TestCase
         $expectedStatement = "SELECT :foo, :foo_0";
         $expectedValues = array('foo' => 'bar', 'foo_0' => 'baz');
         $this->assertEquals($expectedStatement, $parsedQuery->getStatement());
-        $this->assertEquals($expectedValues, $parsedQuery->getValues());
+        $this->assertEquals($expectedValues, $parsedQuery->getAllValues());
 
         $parameters = array(array('bar', 'baz'));
         $sql = "SELECT ?";
@@ -66,7 +68,7 @@ class MysqlParserTest extends \PHPUnit_Framework_TestCase
         $expectedStatement = "SELECT :__numbered, :__numbered_0";
         $expectedValues = array('__numbered' => 'bar', '__numbered_0' => 'baz');
         $this->assertEquals($expectedStatement, $parsedQuery->getStatement());
-        $this->assertEquals($expectedValues, $parsedQuery->getValues());
+        $this->assertEquals($expectedValues, $parsedQuery->getAllValues());
     }
 
     public function testSingleLineComment()
@@ -91,7 +93,7 @@ class MysqlParserTest extends \PHPUnit_Framework_TestCase
         $expectedStatement = "SELECT 1 --:foo, :foo_0";
         $expectedValues = array('foo' => 'bar', 'foo_0' => 'baz');
         $this->assertEquals($expectedStatement, $parsedQuery->getStatement());
-        $this->assertEquals($expectedValues, $parsedQuery->getValues());
+        $this->assertEquals($expectedValues, $parsedQuery->getAllValues());
     }
 
     public function testMultiLineComment()
@@ -114,7 +116,7 @@ class MysqlParserTest extends \PHPUnit_Framework_TestCase
         $parsedQuery = $this->parseSingleQuery($sql, $parameters);
         $this->assertNotEquals($sql, $parsedQuery->getStatement());
         $expectedValues = array('foo' => 'bar', 'foo_0' => 'baz');
-        $this->assertEquals($expectedValues, $parsedQuery->getValues());
+        $this->assertEquals($expectedValues, $parsedQuery->getAllValues());
     }
 
     public function testDoubleQuotedIdentifier()
@@ -191,7 +193,7 @@ SQL;
         $expectedValues = array('foo' => 'bar', 'foo_0' => 'baz');
         $parsedQuery = $this->parseSingleQuery($sql, $parameters);
         $this->assertEquals($expectedStatement, $parsedQuery->getStatement());
-        $this->assertEquals($expectedValues, $parsedQuery->getValues());
+        $this->assertEquals($expectedValues, $parsedQuery->getAllValues());
 
         $sql = <<<SQL
 SELECT "Escaping \" :foo \"
@@ -246,8 +248,8 @@ SQL;
         $expectedValues = array('foo' => 'bar', 'foo_0' => 'baz');
         $this->assertEquals($expectedStatement, $queries[0]->getStatement());
         $this->assertEquals($expectedStatement, $queries[1]->getStatement());
-        $this->assertEquals($expectedValues, $queries[0]->getValues());
-        $this->assertEquals($expectedValues, $queries[1]->getValues());
+        $this->assertEquals($expectedValues, $queries[0]->getAllValues());
+        $this->assertEquals($expectedValues, $queries[1]->getAllValues());
 
         $parameters = array('foo' => array('bar', 'baz'), 'bar' => array('foo', 'qux'));
         $sql = <<<SQL
@@ -259,11 +261,11 @@ SQL;
         $expectedStatement = "SELECT :bar, :bar_0";
         $expectedValues = array('bar' => 'foo', 'bar_0' => 'qux');
         $this->assertEquals($expectedStatement, $queries[0]->getStatement());
-        $this->assertEquals($expectedValues, $queries[0]->getValues());
+        $this->assertEquals($expectedValues, $queries[0]->getAllValues());
         $expectedStatement = "SELECT :foo, :foo_0";
         $expectedValues = array('foo' => 'bar', 'foo_0' => 'baz');
         $this->assertEquals($expectedStatement, $queries[1]->getStatement());
-        $this->assertEquals($expectedValues, $queries[1]->getValues());
+        $this->assertEquals($expectedValues, $queries[1]->getAllValues());
     }
 
     public function testIssue107()
@@ -272,6 +274,6 @@ SQL;
         $parameters = ['value'=> 'string', 'id'=> 1, 'value2'=> 'string', 'value3'=>'string'];
         $parsedQuery = $this->parseSingleQuery($sql, $parameters);
         $this->assertEquals($parsedQuery->getStatement(), $sql);
-        $this->assertEquals($parsedQuery->getValues(), $parameters);
+        $this->assertEquals($parsedQuery->getAllValues(), $parameters);
     }
 }
