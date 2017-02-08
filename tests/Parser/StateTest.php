@@ -168,18 +168,18 @@ class StateTest extends \PHPUnit_Framework_TestCase
         $this->assertSame("foo", $state->getFirstUnusedNumberedValue());
         $this->assertSame("bar", $state->getFirstUnusedNumberedValue());
         $this->assertSame("baz", $state->getFirstUnusedNumberedValue());
-        $this->setExpectedException('Aura\\Sql\\Exception\\MissingParameter');
+        $this->expectException('Aura\\Sql\\Exception\\MissingParameter');
         $state->getFirstUnusedNumberedValue();
 
         $values = array("foo" => 1);
         $state = new State($stmt, $values);
-        $this->setExpectedException('Aura\\Sql\\Exception\\MissingParameter');
+        $this->expectException('Aura\\Sql\\Exception\\MissingParameter');
         $state->getFirstUnusedNumberedValue();
 
         $values = array("fizz" => 1, "buzz");
         $state = new State($stmt, $values);
         $this->assertSame("buzz", $state->getFirstUnusedNumberedValue());
-        $this->setExpectedException('Aura\\Sql\\Exception\\MissingParameter');
+        $this->expectException('Aura\\Sql\\Exception\\MissingParameter');
         $state->getFirstUnusedNumberedValue();
     }
 
