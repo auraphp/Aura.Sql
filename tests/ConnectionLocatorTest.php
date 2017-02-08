@@ -91,7 +91,7 @@ class ConnectionLocatorTest extends \PHPUnit_Framework_TestCase
     public function testGetReadMissing()
     {
         $locator = $this->newLocator($this->read, $this->write);
-        $this->setExpectedException('Aura\Sql\Exception\ConnectionNotFound');
+        $this->expectException('Aura\Sql\Exception\ConnectionNotFound');
         $locator->getRead('no-such-connection');
     }
 
@@ -131,7 +131,7 @@ class ConnectionLocatorTest extends \PHPUnit_Framework_TestCase
     public function testGetWriteMissing()
     {
         $locator = $this->newLocator($this->read, $this->write);
-        $this->setExpectedException('Aura\Sql\Exception\ConnectionNotFound');
+        $this->expectException('Aura\Sql\Exception\ConnectionNotFound');
         $locator->getWrite('no-such-connection');
     }
 }
