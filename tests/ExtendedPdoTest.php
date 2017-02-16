@@ -77,6 +77,31 @@ class ExtendedPdoTest extends \PHPUnit_Framework_TestCase
         $this->pdo->sqliteNoSuchMethod();
     }
 
+    public function testConnectionQueries()
+    {
+        // get default encoding
+        $defaultEncoding = (new ExtendedPdo('sqlite::memory:'))->fetchValue(
+            'PRAGMA encoding'
+        );
+
+        // determine a different encoding
+        $newEncoding = ($defaultEncoding == 'UTF-8')
+            ? 'UTF-16'
+            : 'UTF-8';
+
+        // connect with new encoding
+        $pdo = new ExtendedPdo(
+            'sqlite::memory:',
+            null,
+            null,
+            [],
+            ["PRAGMA encoding = '{$newEncoding}'"]
+        );
+
+        // make sure new encoding was honored
+        $actual = $pdo->fetchValue('PRAGMA encoding');
+    }
+
     public function testErrorCodeAndInfo()
     {
         $actual = $this->pdo->errorCode();
