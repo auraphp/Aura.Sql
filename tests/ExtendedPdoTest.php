@@ -538,6 +538,13 @@ class ExtendedPdoTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(10, count($res));
     }
 
+    public function testPlaceholderMissing()
+    {
+        $this->expectException('Aura\Sql\Exception\MissingParameter');
+        $stm = "SELECT id, name FROM pdotest WHERE id = :id";
+        $this->pdo->fetchOne($stm, array('foo' => 'bar'));
+    }
+
     public function testNumberedPlaceholderArray()
     {
         $stm = 'SELECT * FROM pdotest WHERE id IN (?)';
@@ -550,7 +557,7 @@ class ExtendedPdoTest extends \PHPUnit_Framework_TestCase
 
     public function testNumberedPlaceholderMissing()
     {
-        $this->expectException('Aura\Sql\Exception\\MissingParameter');
+        $this->expectException('Aura\Sql\Exception\MissingParameter');
         $stm = "SELECT id, name FROM pdotest WHERE id = ? OR id = ?";
         $this->pdo->fetchOne($stm, array(1));
     }
