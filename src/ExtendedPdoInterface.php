@@ -232,6 +232,15 @@ interface ExtendedPdoInterface extends PdoInterface
 
     /**
      *
+     * Is the PDO connection active?
+     *
+     * @return bool
+     *
+     */
+    public function isConnected();
+
+    /**
+     *
      * Sets the Parser instance.
      *
      * @param ParserInterface $parser The Parser instance.

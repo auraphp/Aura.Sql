@@ -28,13 +28,13 @@ class ExtendedPdoTest extends \PHPUnit_Framework_TestCase
             $this->markTestSkipped("Need 'pdo_sqlite' to test in memory.");
         }
 
-        $this->pdo = $this->newExtendedPdo();
+        $this->pdo = $this->newPdo();
 
         $this->createTable();
         $this->fillTable();
     }
 
-    protected function newExtendedPdo()
+    protected function newPdo()
     {
         return new ExtendedPdo('sqlite::memory:');
     }
@@ -670,5 +670,12 @@ class ExtendedPdoTest extends \PHPUnit_Framework_TestCase
     {
         $pdo = new ExtendedPdo('foobar', 'username', 'password');
         $this->assertInstanceOf('Aura\Sql\Parser\SqliteParser', $pdo->getParser());
+    }
+
+    public function testDisconnect()
+    {
+        $this->assertTrue($this->pdo->isConnected());
+        $this->pdo->disconnect();
+        $this->assertFalse($this->pdo->isConnected());
     }
 }

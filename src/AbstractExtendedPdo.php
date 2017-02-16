@@ -456,6 +456,18 @@ abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
 
     /**
      *
+     * Is the PDO connection active?
+     *
+     * @return bool
+     *
+     */
+    public function isConnected()
+    {
+        return (bool) $this->pdo;
+    }
+
+    /**
+     *
      * Returns the last inserted autoincrement sequence value.
      *
      * @param string $name The name of the sequence to check; typically needed
