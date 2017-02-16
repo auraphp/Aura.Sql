@@ -26,6 +26,7 @@ without compromising flexibility. For specifics, please examine the package
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/auraphp/Aura.Sql/badges/quality-score.png?b=3.x)](https://scrutinizer-ci.com/g/auraphp/Aura.Sql/)
 [![Code Coverage](https://scrutinizer-ci.com/g/auraphp/Aura.Sql/badges/coverage.png?b=3.x)](https://scrutinizer-ci.com/g/auraphp/Aura.Sql/)
 [![Build Status](https://travis-ci.org/auraphp/Aura.Sql.png?branch=3.x)](https://travis-ci.org/auraphp/Aura.Sql)
+[![PDS Skeleton](https://img.shields.io/badge/pds-skeleton-blue.svg?style=flat-square)](https://github.com/php-pds/skeleton)
 
 This project adheres to [Semantic Versioning](http://semver.org/).
 
