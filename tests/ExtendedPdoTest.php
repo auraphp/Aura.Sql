@@ -70,6 +70,13 @@ class ExtendedPdoTest extends \PHPUnit_Framework_TestCase
         $this->pdo->perform($stm, $data);
     }
 
+    public function testCall()
+    {
+        $this->pdo->sqliteCreateFunction('foo', function () {});
+        $this->setExpectedException('BadMethodCallException');
+        $this->pdo->sqliteNoSuchMethod();
+    }
+
     public function testErrorCodeAndInfo()
     {
         $actual = $this->pdo->errorCode();

@@ -10,6 +10,7 @@ namespace Aura\Sql;
 
 use Aura\Sql\Exception;
 use Aura\Sql\Parser\ParserInterface;
+use BadMethodCallException;
 use PDO;
 use PDOStatement;
 use Psr\Log\NullLogger;
@@ -50,6 +51,34 @@ abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
      *
      */
     protected $parser;
+
+    /**
+     *
+     * Proxies to PDO methods created for specific drivers; in particular,
+     * `sqlite` and `pgsql`.
+     *
+     * @param string $name The PDO method to call; e.g. `sqliteCreateFunction`
+     * or `pgsqlGetPid`.
+     *
+     * @param array $arguments Arguments to pass to the called method.
+     *
+     * @return mixed
+     *
+     * @throws BadMethodCallException when the method does not exist.
+     *
+     */
+    public function __call($name, array $arguments)
+    {
+        $this->connect();
+
+        if (! method_exists($this->pdo, $name)) {
+            $class = get_class($this);
+            $message = "Class '{$class}' does not have a method '{$name}'";
+            throw new BadMethodCallException($message);
+        }
+
+        return call_user_func_array([$this->pdo, $name], $arguments);
+    }
 
     /**
      *
