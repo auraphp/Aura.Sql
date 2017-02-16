@@ -6,9 +6,8 @@ class NullParserTest extends \PHPUnit_Framework_TestCase
     public function test()
     {
         $parser = new NullParser();
-        $parsedQueries = $parser->rebuild('foo');
-        $this->assertTrue(count($parsedQueries) == 1);
-        $this->assertSame('foo', $parsedQueries[0]->getStatement());
-        $this->assertSame([], $parsedQueries[0]->getValues());
+        list ($statement, $values) = $parser->rebuild('foo', ['bar' => 'baz']);
+        $this->assertSame('foo', $statement);
+        $this->assertSame(['bar' => 'baz'], $values);
     }
 }
