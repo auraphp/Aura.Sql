@@ -682,6 +682,30 @@ class ExtendedPdoTest extends \PHPUnit_Framework_TestCase
     public function testNoExportOfLoginCredentials()
     {
         $pdo = new ExtendedPdo('sqlite::memory:', 'username', 'password');
+        $data = $this->dump($pdo);
+
+        // DSN
+        $this->assertContains('[0]=>string(15) "sqlite::memory:"', $data);
+        // username
+        $this->assertContains('[1]=>string(4) "****"', $data);
+        // password
+        $this->assertContains('[2]=>string(4) "****"', $data);
+        // options
+        $this->assertContains('[3]=>array(1) {[3]=>int(2)}', $data);
+        // queries
+        $this->assertContains('[4]=>array(0) {}', $data);
+    }
+
+    public function testSqlsrvErrmodeWarning()
+    {
+        $pdo = new ExtendedPdo('sqlsrv:bogus');
+        $data = $this->dump($pdo);
+        // options
+        $this->assertContains('[3]=>array(1) {[3]=>int(1)}', $data);
+    }
+
+    protected function dump($pdo)
+    {
         ob_start();
         var_dump($pdo);
         $data = ob_get_clean();
@@ -692,10 +716,8 @@ class ExtendedPdoTest extends \PHPUnit_Framework_TestCase
         // support hhvm tests, it leaves a space out in the var_dump output compared to php
         $data = str_replace('] ', ']', $data);
 
-        $this->assertContains('[0]=>string(15) "sqlite::memory:"', $data);
-        $this->assertContains('[1]=>string(4) "****"', $data);
-        $this->assertContains('[2]=>string(4) "****"', $data);
-        $this->assertContains('[3]=>array(1) {[3]=>int(2)}[4]=>array(0) {}', $data);
+        // done
+        return $data;
     }
 
     public function testDefaultParserIsSqlite()

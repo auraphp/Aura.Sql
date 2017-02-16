@@ -68,7 +68,7 @@ class ExtendedPdo extends AbstractExtendedPdo
         $sqlsrvWarnEx = substr($dsn, 0, 7) == 'sqlsrv:'
             && $options[PDO::ATTR_ERRMODE] == PDO::ERRMODE_EXCEPTION;
         if ($sqlsrvWarnEx) {
-            $options[PDO::ATTR_ERRMODE] == PDO::ERRMODE_WARNING;
+            $options[PDO::ATTR_ERRMODE] = PDO::ERRMODE_WARNING;
         }
 
         // retain the arguments for later
