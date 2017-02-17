@@ -128,7 +128,7 @@ class ConnectionLocator implements ConnectionLocatorInterface
      * @return ExtendedPdoInterface
      *
      */
-    public function getRead($name = null)
+    public function getRead($name = '')
     {
         return $this->getConnection('read', $name);
     }
@@ -160,7 +160,7 @@ class ConnectionLocator implements ConnectionLocatorInterface
      * @return ExtendedPdoInterface
      *
      */
-    public function getWrite($name = null)
+    public function getWrite($name = '')
     {
         return $this->getConnection('write', $name);
     }
@@ -186,7 +186,7 @@ class ConnectionLocator implements ConnectionLocatorInterface
             return $this->getDefault();
         }
 
-        if (! $name) {
+        if ($name === '') {
             $name = array_rand($conn);
         }
 
