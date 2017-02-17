@@ -24,24 +24,25 @@ class ConnectionLocator implements ConnectionLocatorInterface
      * @var array
      *
      */
-    protected $registry = array(
-        'default' => null,
-        'read' => array(),
-        'write' => array(),
-    );
+    protected $default;
 
     /**
      *
-     * Whether or not registry entries have been converted to objects.
+     * A registry of PDO connection entries.
      *
      * @var array
      *
      */
-    protected $converted = array(
-        'default' => false,
-        'read' => array(),
-        'write' => array(),
-    );
+    protected $read = [];
+
+    /**
+     *
+     * A registry of PDO connection entries.
+     *
+     * @var array
+     *
+     */
+    protected $write = [];
 
     /**
      *
@@ -79,10 +80,9 @@ class ConnectionLocator implements ConnectionLocatorInterface
      * @return null
      *
      */
-    public function setDefault($callable)
+    public function setDefault(callable $callable)
     {
-        $this->registry['default'] = $callable;
-        $this->converted['default'] = false;
+        $this->default = $callable;
     }
 
     /**
@@ -94,13 +94,11 @@ class ConnectionLocator implements ConnectionLocatorInterface
      */
     public function getDefault()
     {
-        if (! $this->converted['default']) {
-            $callable = $this->registry['default'];
-            $this->registry['default'] = call_user_func($callable);
-            $this->converted['default'] = true;
+        if (! $this->default instanceof ExtendedPdo) {
+            $this->default = call_user_func($this->default);
         }
 
-        return $this->registry['default'];
+        return $this->default;
     }
 
     /**
@@ -114,10 +112,9 @@ class ConnectionLocator implements ConnectionLocatorInterface
      * @return null
      *
      */
-    public function setRead($name, $callable)
+    public function setRead($name, callable $callable)
     {
-        $this->registry['read'][$name] = $callable;
-        $this->converted['read'][$name] = false;
+        $this->read[$name] = $callable;
     }
 
     /**
@@ -147,10 +144,9 @@ class ConnectionLocator implements ConnectionLocatorInterface
      * @return null
      *
      */
-    public function setWrite($name, $callable)
+    public function setWrite($name, callable $callable)
     {
-        $this->registry['write'][$name] = $callable;
-        $this->converted['write'][$name] = false;
+        $this->write[$name] = $callable;
     }
 
     /**
@@ -184,24 +180,24 @@ class ConnectionLocator implements ConnectionLocatorInterface
      */
     protected function getConnection($type, $name)
     {
-        if (! $this->registry[$type]) {
+        $conn = &$this->{$type};
+
+        if (empty($conn)) {
             return $this->getDefault();
         }
 
         if (! $name) {
-            $name = array_rand($this->registry[$type]);
+            $name = array_rand($conn);
         }
 
-        if (! isset($this->registry[$type][$name])) {
+        if (! isset($conn[$name])) {
             throw new Exception\ConnectionNotFound("{$type}:{$name}");
         }
 
-        if (! $this->converted[$type][$name]) {
-            $callable = $this->registry[$type][$name];
-            $this->registry[$type][$name] = call_user_func($callable);
-            $this->converted[$type][$name] = true;
+        if (! $conn[$name] instanceof ExtendedPdo) {
+            $conn[$name] = call_user_func($conn[$name]);
         }
 
-        return $this->registry[$type][$name];
+        return $conn[$name];
     }
 }

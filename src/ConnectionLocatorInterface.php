@@ -26,7 +26,7 @@ interface ConnectionLocatorInterface
      * @return null
      *
      */
-    public function setDefault($callable);
+    public function setDefault(callable $callable);
 
     /**
      *
@@ -48,7 +48,7 @@ interface ConnectionLocatorInterface
      * @return null
      *
      */
-    public function setRead($name, $callable);
+    public function setRead($name, callable $callable);
 
     /**
      *
@@ -74,7 +74,7 @@ interface ConnectionLocatorInterface
      * @return null
      *
      */
-    public function setWrite($name, $callable);
+    public function setWrite($name, callable $callable);
 
     /**
      *
