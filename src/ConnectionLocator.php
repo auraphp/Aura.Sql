@@ -10,7 +10,7 @@ namespace Aura\Sql;
 
 /**
  *
- * Manages PDO connection objects for default, read, and write connections.
+ * Manages ExtendedPdo instances for default, read, and write connections.
  *
  * @package aura/sql
  *
@@ -19,16 +19,16 @@ class ConnectionLocator implements ConnectionLocatorInterface
 {
     /**
      *
-     * A registry of PDO connection entries.
+     * A default ExtendedPdo connection factory/instance.
      *
-     * @var array
+     * @var callable
      *
      */
     protected $default;
 
     /**
      *
-     * A registry of PDO connection entries.
+     * A registry of ExtendedPdo "read" factories/instances.
      *
      * @var array
      *
@@ -37,7 +37,7 @@ class ConnectionLocator implements ConnectionLocatorInterface
 
     /**
      *
-     * A registry of PDO connection entries.
+     * A registry of ExtendedPdo "write" factories/instances.
      *
      * @var array
      *
@@ -73,9 +73,9 @@ class ConnectionLocator implements ConnectionLocatorInterface
 
     /**
      *
-     * Sets the default connection registry entry.
+     * Sets the default connection factory.
      *
-     * @param callable $callable The registry entry.
+     * @param callable $callable The factory for the connection.
      *
      * @return null
      *
@@ -103,11 +103,11 @@ class ConnectionLocator implements ConnectionLocatorInterface
 
     /**
      *
-     * Sets a read connection registry entry by name.
+     * Sets a read connection factory by name.
      *
-     * @param string $name The name of the registry entry.
+     * @param string $name The name of the connection.
      *
-     * @param callable $callable The registry entry.
+     * @param callable $callable The factory for the connection.
      *
      * @return null
      *
@@ -135,11 +135,11 @@ class ConnectionLocator implements ConnectionLocatorInterface
 
     /**
      *
-     * Sets a write connection registry entry by name.
+     * Sets a write connection factory by name.
      *
-     * @param string $name The name of the registry entry.
+     * @param string $name The name of the connection.
      *
-     * @param callable $callable The registry entry.
+     * @param callable $callable The factory for the connection.
      *
      * @return null
      *
