@@ -241,6 +241,15 @@ interface ExtendedPdoInterface extends PdoInterface
 
     /**
      *
+     * Return the inner PDO (if any)
+     *
+     * @return \PDO
+     *
+     */
+    public function getPdo();
+
+    /**
+     *
      * Sets the Parser instance.
      *
      * @param ParserInterface $parser The Parser instance.
