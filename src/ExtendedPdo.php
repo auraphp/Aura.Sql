@@ -150,4 +150,17 @@ class ExtendedPdo extends AbstractExtendedPdo
             ]
         ];
     }
+
+    /**
+     *
+     * Return the inner PDO (if any)
+     *
+     * @return \PDO
+     *
+     */
+    public function getPdo()
+    {
+        $this->connect();
+        return $this->pdo;
+    }
 }

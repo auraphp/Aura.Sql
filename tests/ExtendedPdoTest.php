@@ -729,9 +729,16 @@ class ExtendedPdoTest extends \PHPUnit_Framework_TestCase
     public function testDisconnect()
     {
         $this->assertTrue($this->pdo->isConnected());
-        $this->assertNotEmpty($this->pdo->getPdo());
         $this->pdo->disconnect();
         $this->assertFalse($this->pdo->isConnected());
-        $this->assertEmpty($this->pdo->getPdo());
+    }
+
+    public function testGetPdo()
+    {
+        $this->assertTrue($this->pdo->isConnected());
+        $this->assertNotEmpty($this->pdo->getPdo());
+        $this->pdo->disconnect();
+        $this->assertNotEmpty($this->pdo->getPdo(), 'getPdo() will re-connect if disconnected');
+        $this->assertTrue($this->pdo->isConnected());
     }
 }

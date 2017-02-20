@@ -426,6 +426,18 @@ abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
 
     /**
      *
+     * Return the inner PDO (if any)
+     *
+     * @return \PDO
+     *
+     */
+    public function getPdo()
+    {
+        return $this->pdo;
+    }
+
+    /**
+     *
      * Returns the Profiler instance.
      *
      * @return ProfilerInterface
@@ -464,18 +476,6 @@ abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
     public function isConnected()
     {
         return (bool) $this->pdo;
-    }
-
-    /**
-     *
-     * Return the inner PDO (if any)
-     *
-     * @return \PDO
-     *
-     */
-    public function getPdo()
-    {
-        return $this->pdo;
     }
 
     /**
