@@ -240,6 +240,18 @@ abstract class AbstractExtendedPdoTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expect, $actual);
     }
 
+    public function testYieldAllWithCallback()
+    {
+        $callable = function ($row) {
+            return array(strtolower($row['name']));
+        };
+        $stm = "SELECT * FROM pdotest";
+        $expect = $this->pdo->fetchAll($stm, array(), $callable);
+        $actual = $this->iteratorIntoArray($this->pdo->yieldAll($stm, array(), $callable));
+
+        $this->assertEquals($expect, $actual);
+    }
+
     public function testFetchAssoc()
     {
         $stm = "SELECT * FROM pdotest ORDER BY id";
@@ -289,6 +301,18 @@ abstract class AbstractExtendedPdoTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expect, $actual);
     }
 
+    public function testYieldAssocWithCallback()
+    {
+        $callable = function ($row) {
+            return array(strtolower($row['name']));
+        };
+        $stm = "SELECT * FROM pdotest ORDER BY id";
+        $expect = $this->pdo->fetchAssoc($stm, array(), $callable);
+        $actual = $this->iteratorIntoArray($this->pdo->yieldAssoc($stm, array(), $callable));
+
+        $this->assertEquals($expect, $actual);
+    }
+
     public function testFetchCol()
     {
         $stm = "SELECT id FROM pdotest ORDER BY id";
@@ -323,6 +347,18 @@ abstract class AbstractExtendedPdoTest extends \PHPUnit_Framework_TestCase
 
         $expect = array(2, 4, 6, 8, 10);
         $this->assertEquals($expect, $result);
+    }
+
+    public function testYieldColWithCallback()
+    {
+        $callable = function ($val) {
+            return $val * 2;
+        };
+        $stm = "SELECT id FROM pdotest ORDER BY id LIMIT 5";
+        $expect = $this->pdo->fetchCol($stm, array(), $callable);
+        $actual = $this->iteratorIntoArray($this->pdo->yieldCol($stm, array(), $callable));
+
+        $this->assertEquals($expect, $actual);
     }
 
     public function testFetchObject()
@@ -506,6 +542,18 @@ abstract class AbstractExtendedPdoTest extends \PHPUnit_Framework_TestCase
           '10' => 'kara',
         );
         $this->assertSame($expect, $actual);
+    }
+
+    public function testYieldPairsWithCallback()
+    {
+        $callable = function ($row) {
+            return array((string) $row[0], strtolower($row[1]));
+        };
+        $stm = "SELECT id, name FROM pdotest ORDER BY id";
+        $expect = $this->pdo->fetchPairs($stm, array(), $callable);
+        $actual = $this->iteratorIntoArray($this->pdo->yieldPairs($stm, array(), $callable));
+
+        $this->assertEquals($expect, $actual);
     }
 
     public function testFetchValue()
