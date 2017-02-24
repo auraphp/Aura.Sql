@@ -72,6 +72,11 @@ class ExtendedPdoTest extends \PHPUnit_Framework_TestCase
 
     public function testCall()
     {
+        if (defined('HHVM_VERSION')) {
+            $this->markTestSkipped('HHVM blows up on this test.');
+            return;
+        }
+
         $this->pdo->sqliteCreateFunction('foo', function () {});
         $this->setExpectedException('BadMethodCallException');
         $this->pdo->sqliteNoSuchMethod();
