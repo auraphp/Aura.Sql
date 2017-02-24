@@ -758,6 +758,7 @@ class ExtendedPdoTest extends \PHPUnit_Framework_TestCase
 
         $pdo = new ExtendedPdo('sqlsrv:bogus');
         $this->assertSame('[fo][o]', $pdo->quoteName('fo]o'));
+        $this->assertSame('[fo[o]', $pdo->quoteName('fo[o'));
         $this->assertSame('[foo].[[bar][]', $pdo->quoteName('foo.[bar]'));
 
     }
