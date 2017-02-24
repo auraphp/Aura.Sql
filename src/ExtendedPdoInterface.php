@@ -223,6 +223,15 @@ interface ExtendedPdoInterface extends PdoInterface
 
     /**
      *
+     * Return the inner PDO (if any)
+     *
+     * @return \PDO
+     *
+     */
+    public function getPdo();
+
+    /**
+     *
      * Returns the Profiler instance.
      *
      * @return ProfilerInterface
