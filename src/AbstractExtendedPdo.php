@@ -657,33 +657,47 @@ abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
 
     /**
      *
-     * Quotes an identifier name.
+     * Quotes a multi-part (dotted) identifier name.
+     *
+     * @param string $name The multi-part identifier name.
+     *
+     * @return string The multi-part identifier name, quoted.
+     *
+     */
+    public function quoteName($name)
+    {
+        if (strpos($name, '.') === false) {
+            return $this->quoteSingleName($name);
+        }
+
+        return implode(
+            '.',
+            array_map(
+                [$this, 'quoteSingleName'],
+                explode('.', $name)
+            )
+        );
+    }
+
+    /**
+     *
+     * Quotes a single identifier name.
      *
      * @param string $name The identifier name.
      *
      * @return string The quoted identifier name.
      *
      */
-    public function quoteName($name)
+    public function quoteSingleName($name)
     {
-        if (strpos($name, '.') === false) {
-            $name = str_replace(
-                $this->quoteNameEscapeFind,
-                $this->quoteNameEscapeRepl,
-                $name
-            );
-            return $this->quoteNamePrefix
-                . $name
-                . $this->quoteNameSuffix;
-        }
-
-        return implode(
-            '.',
-            array_map(
-                [$this, 'quoteName'],
-                explode('.', $name)
-            )
+        $name = str_replace(
+            $this->quoteNameEscapeFind,
+            $this->quoteNameEscapeRepl,
+            $name
         );
+        return $this->quoteNamePrefix
+            . $name
+            . $this->quoteNameSuffix;
     }
 
     /**

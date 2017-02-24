@@ -241,14 +241,25 @@ interface ExtendedPdoInterface extends PdoInterface
 
     /**
      *
-     * Quotes an identifier name.
+     * Quotes a multi-part (dotted) identifier name.
+     *
+     * @param string $name The multi-part identifier name.
+     *
+     * @return string The multi-part identifier name, quoted.
+     *
+     */
+    public function quoteName($name);
+
+    /**
+     *
+     * Quotes a single identifier name.
      *
      * @param string $name The identifier name.
      *
      * @return string The quoted identifier name.
      *
      */
-    public function quoteName($name);
+    public function quoteSingleName($name);
 
     /**
      *
