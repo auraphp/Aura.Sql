@@ -745,16 +745,20 @@ class ExtendedPdoTest extends \PHPUnit_Framework_TestCase
     public function testQuoteName()
     {
         $pdo = new ExtendedPdo('mysql:bogus');
-        $this->assertSame('`foo`.``bar``', $pdo->quoteName('foo.`bar`'));
+        $this->assertSame('`fo``o`', $pdo->quoteName('fo`o'));
+        $this->assertSame('`foo`.```bar```', $pdo->quoteName('foo.`bar`'));
 
         $pdo = new ExtendedPdo('pgsql:bogus');
-        $this->assertSame('"foo".""bar""', $pdo->quoteName('foo."bar"'));
+        $this->assertSame('"fo""o"', $pdo->quoteName('fo"o'));
+        $this->assertSame('"foo"."""bar"""', $pdo->quoteName('foo."bar"'));
 
         $pdo = new ExtendedPdo('sqlite:bogus');
-        $this->assertSame('"foo".""bar""', $pdo->quoteName('foo."bar"'));
+        $this->assertSame('"fo""o"', $pdo->quoteName('fo"o'));
+        $this->assertSame('"foo"."""bar"""', $pdo->quoteName('foo."bar"'));
 
         $pdo = new ExtendedPdo('sqlsrv:bogus');
-        $this->assertSame('[foo].[[bar]]', $pdo->quoteName('foo.[bar]'));
+        $this->assertSame('[fo][o]', $pdo->quoteName('fo]o'));
+        $this->assertSame('[foo].[[bar][]', $pdo->quoteName('foo.[bar]'));
 
     }
 }

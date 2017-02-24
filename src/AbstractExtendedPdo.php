@@ -667,10 +667,10 @@ abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
     public function quoteName($name)
     {
         if (strpos($name, '.') === false) {
-            $name = strtr(
-                $name,
+            $name = str_replace(
                 $this->quoteNameEscapeFind,
-                $this->quoteNameEscapeRepl
+                $this->quoteNameEscapeRepl,
+                $name
             );
             return $this->quoteNamePrefix
                 . $name
