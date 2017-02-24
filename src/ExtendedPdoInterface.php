@@ -241,6 +241,17 @@ interface ExtendedPdoInterface extends PdoInterface
 
     /**
      *
+     * Quotes an identifier name.
+     *
+     * @param string $name The identifier name.
+     *
+     * @return string The quoted identifier name.
+     *
+     */
+    public function quoteName($name);
+
+    /**
+     *
      * Is the PDO connection active?
      *
      * @return bool
