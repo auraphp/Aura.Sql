@@ -746,4 +746,25 @@ class ExtendedPdoTest extends \PHPUnit_Framework_TestCase
         $this->assertNotEmpty($this->pdo->getPdo(), 'getPdo() will re-connect if disconnected');
         $this->assertTrue($this->pdo->isConnected());
     }
+
+    public function testQuoteName()
+    {
+        $pdo = new ExtendedPdo('mysql:bogus');
+        $this->assertSame('`fo``o`', $pdo->quoteName('fo`o'));
+        $this->assertSame('`foo`.```bar```', $pdo->quoteName('foo.`bar`'));
+
+        $pdo = new ExtendedPdo('pgsql:bogus');
+        $this->assertSame('"fo""o"', $pdo->quoteName('fo"o'));
+        $this->assertSame('"foo"."""bar"""', $pdo->quoteName('foo."bar"'));
+
+        $pdo = new ExtendedPdo('sqlite:bogus');
+        $this->assertSame('"fo""o"', $pdo->quoteName('fo"o'));
+        $this->assertSame('"foo"."""bar"""', $pdo->quoteName('foo."bar"'));
+
+        $pdo = new ExtendedPdo('sqlsrv:bogus');
+        $this->assertSame('[fo][o]', $pdo->quoteName('fo]o'));
+        $this->assertSame('[fo[o]', $pdo->quoteName('fo[o'));
+        $this->assertSame('[foo].[[bar][]', $pdo->quoteName('foo.[bar]'));
+
+    }
 }

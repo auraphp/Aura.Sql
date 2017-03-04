@@ -90,6 +90,9 @@ class ExtendedPdo extends AbstractExtendedPdo
         $parts = explode(':', $dsn);
         $parser = $this->newParser($parts[0]);
         $this->setParser($parser);
+
+        // set quotes for identifier names
+        $this->setQuoteName($parts[0]);
     }
 
     /**

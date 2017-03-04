@@ -52,6 +52,14 @@ abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
      */
     protected $parser;
 
+    protected $quoteNamePrefix = '"';
+
+    protected $quoteNameSuffix = '"';
+
+    protected $quoteNameEscapeFind = '"';
+
+    protected $quoteNameEscapeRepl = '""';
+
     /**
      *
      * Proxies to PDO methods created for specific drivers; in particular,
@@ -649,6 +657,51 @@ abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
 
     /**
      *
+     * Quotes a multi-part (dotted) identifier name.
+     *
+     * @param string $name The multi-part identifier name.
+     *
+     * @return string The multi-part identifier name, quoted.
+     *
+     */
+    public function quoteName($name)
+    {
+        if (strpos($name, '.') === false) {
+            return $this->quoteSingleName($name);
+        }
+
+        return implode(
+            '.',
+            array_map(
+                [$this, 'quoteSingleName'],
+                explode('.', $name)
+            )
+        );
+    }
+
+    /**
+     *
+     * Quotes a single identifier name.
+     *
+     * @param string $name The identifier name.
+     *
+     * @return string The quoted identifier name.
+     *
+     */
+    public function quoteSingleName($name)
+    {
+        $name = str_replace(
+            $this->quoteNameEscapeFind,
+            $this->quoteNameEscapeRepl,
+            $name
+        );
+        return $this->quoteNamePrefix
+            . $name
+            . $this->quoteNameSuffix;
+    }
+
+    /**
+     *
      * Rolls back the current transaction, and restores autocommit mode.
      *
      * @return bool True on success, false on failure.
@@ -864,5 +917,29 @@ abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
             $class = 'Aura\Sql\Parser\SqliteParser';
         }
         return new $class();
+    }
+
+    protected function setQuoteName($driver)
+    {
+        switch ($driver) {
+            case 'mysql':
+                $this->quoteNamePrefix = '`';
+                $this->quoteNameSuffix = '`';
+                $this->quoteNameEscapeFind = '`';
+                $this->quoteNameEscapeRepl = '``';
+                return;
+            case 'sqlsrv':
+                $this->quoteNamePrefix = '[';
+                $this->quoteNameSuffix = ']';
+                $this->quoteNameEscapeFind = ']';
+                $this->quoteNameEscapeRepl = '][';
+                return;
+            default:
+                $this->quoteNamePrefix = '"';
+                $this->quoteNameSuffix = '"';
+                $this->quoteNameEscapeFind = '"';
+                $this->quoteNameEscapeRepl = '""';
+                return;
+        }
     }
 }

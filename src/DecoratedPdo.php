@@ -41,8 +41,9 @@ class DecoratedPdo extends AbstractExtendedPdo
         }
         $this->setProfiler($profiler);
 
-        $parser = $this->newParser($pdo->getAttribute(PDO::ATTR_DRIVER_NAME));
-        $this->setParser($parser);
+        $driver = $pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
+        $this->setParser($this->newParser($driver));
+        $this->setQuoteName($driver);
     }
 
     /**
