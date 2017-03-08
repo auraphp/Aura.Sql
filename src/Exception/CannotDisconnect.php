@@ -15,7 +15,7 @@ use Aura\Sql\Exception;
  * ExtendedPdo could not disconnect; e.g., because its PDO connection was
  * created externally and then injected.
  *
- * @package aura/sql
+ * @package Aura.Sql
  *
  */
 class CannotDisconnect extends Exception

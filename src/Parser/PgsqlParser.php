@@ -12,7 +12,7 @@ namespace Aura\Sql\Parser;
  *
  * Parsing/rebuilding functionality for the pgsl driver.
  *
- * @package aura/sql
+ * @package Aura.Sql
  *
  */
 class PgsqlParser extends AbstractParser

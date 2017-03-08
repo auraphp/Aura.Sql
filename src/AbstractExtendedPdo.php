@@ -20,7 +20,7 @@ use Psr\Log\NullLogger;
  * Provides array quoting, profiling, a new `perform()` method, new `fetch*()`
  * methods, and new `yield*()` methods.
  *
- * @package aura/sql
+ * @package Aura.Sql
  *
  */
 abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface

@@ -12,7 +12,7 @@ namespace Aura\Sql\Parser;
  *
  * Parsing/rebuilding functionality for the sqlsrv driver.
  *
- * @package aura/sql
+ * @package Aura.Sql
  *
  * @todo add $split and $skip for single quote, double quote, and square brackets
  *

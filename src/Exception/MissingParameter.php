@@ -14,7 +14,7 @@ use Aura\Sql\Exception;
  *
  * Missing a parameter in the values bound to a statement
  *
- * @package aura/sql
+ * @package Aura.Sql
  *
  */
 class MissingParameter extends Exception

@@ -12,7 +12,7 @@ namespace Aura\Sql\Parser;
  *
  * Parsing/rebuilding functionality for the sqlite driver.
  *
- * @package aura/sql
+ * @package Aura.Sql
  *
  */
 class SqliteParser extends AbstractParser

@@ -17,7 +17,7 @@ use Aura\Sql\Exception\MissingParameter;
  * Note that this does not validate the syntax; it only replaces/rebuilds
  * placeholders in the query.
  *
- * @package aura/sql
+ * @package Aura.Sql
  *
  */
 abstract class AbstractParser implements ParserInterface

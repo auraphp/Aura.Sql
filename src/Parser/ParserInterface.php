@@ -12,7 +12,7 @@ namespace Aura\Sql\Parser;
  *
  * Interface for query parsing/rebuilding functionality.
  *
- * @package aura/sql
+ * @package Aura.Sql
  *
  */
 interface ParserInterface

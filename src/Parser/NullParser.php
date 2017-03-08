@@ -13,7 +13,7 @@ namespace Aura\Sql\Parser;
  * A parser/rebuilder that does nothing at all; use this when your placeholders
  * and bound-values are already perfectly matched.
  *
- * @package aura/sql
+ * @package Aura.Sql
  *
  */
 class NullParser implements ParserInterface

@@ -14,7 +14,7 @@ use Aura\Sql\Parser\ParserInterface;
  *
  * An interface to the Aura.Sql extended PDO object.
  *
- * @package aura/sql
+ * @package Aura.Sql
  *
  */
 interface ExtendedPdoInterface extends PdoInterface
