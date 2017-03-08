@@ -22,6 +22,13 @@ use Aura\Sql\Exception\MissingParameter;
  */
 abstract class AbstractParser implements ParserInterface
 {
+    /**
+     *
+     * Split the query string on these regexes.
+     *
+     * @var array
+     *
+     */
     protected $split = [
         // single-quoted string
         "'(?:[^'\\\\]|\\\\'?)*'",
@@ -29,6 +36,13 @@ abstract class AbstractParser implements ParserInterface
         '"(?:[^"\\\\]|\\\\"?)*"',
     ];
 
+    /**
+     *
+     * Skip query parts matching this regex.
+     *
+     * @var string
+     *
+     */
     protected $skip = '/^(\'|\"|\:[^a-zA-Z_])/um';
 
     /**
@@ -235,6 +249,15 @@ abstract class AbstractParser implements ParserInterface
         return ":$name";
     }
 
+    /**
+     *
+     * Given an original placeholder name, return a replacement name.
+     *
+     * @param string $orig The original placeholder name.
+     *
+     * @return string
+     *
+     */
     protected function getPlaceholderName($orig)
     {
         if (! isset($this->count[$orig])) {
@@ -246,7 +269,19 @@ abstract class AbstractParser implements ParserInterface
         return "{$orig}__{$count}";
     }
 
-    protected function expandNamedPlaceholder($prefix, $values)
+    /**
+     *
+     * Given a named placeholder for an array, expand it for the array values,
+     * and bind those values to the expanded names.
+     *
+     * @param string $prefix The named placeholder.
+     *
+     * @param array $values The array values to be bound.
+     *
+     * @return string
+     *
+     */
+    protected function expandNamedPlaceholder($prefix, array $values)
     {
         $i = 0;
         $expanded = [];
@@ -259,6 +294,15 @@ abstract class AbstractParser implements ParserInterface
         return implode(', ', $expanded);
     }
 
+    /**
+     *
+     * Given a query string, split it into parts.
+     *
+     * @param string $statement The query string.
+     *
+     * @return array
+     *
+     */
     protected function getParts($statement)
     {
         $split = implode('|', $this->split);

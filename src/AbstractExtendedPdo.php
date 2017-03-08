@@ -52,12 +52,40 @@ abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
      */
     protected $parser;
 
+    /**
+     *
+     * Prefix to use when quoting identifier names.
+     *
+     * @var string
+     *
+     */
     protected $quoteNamePrefix = '"';
 
+    /**
+     *
+     * Suffix to use when quoting identifier names.
+     *
+     * @var string
+     *
+     */
     protected $quoteNameSuffix = '"';
 
+    /**
+     *
+     * Find this string when escaping identifier names.
+     *
+     * @var string
+     *
+     */
     protected $quoteNameEscapeFind = '"';
 
+    /**
+     *
+     * Use this as the replacement when escaping identifier names.
+     *
+     * @var string
+     *
+     */
     protected $quoteNameEscapeRepl = '""';
 
     /**
