@@ -919,6 +919,15 @@ abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
         return new $class();
     }
 
+    /**
+     *
+     * Sets quoting properties based on the PDO driver.
+     *
+     * @param string $driver The PDO driver name.
+     *
+     * @return null
+     *
+     */
     protected function setQuoteName($driver)
     {
         switch ($driver) {
