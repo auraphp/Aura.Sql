@@ -17,6 +17,13 @@ namespace Aura\Sql\Parser;
  */
 class PgsqlParser extends AbstractParser
 {
+    /**
+     *
+     * Split the query string on these regexes.
+     *
+     * @var array
+     *
+     */
     protected $split = [
         // single-quoted string
         "'(?:[^'\\\\]|\\\\'?)*'",
@@ -28,5 +35,12 @@ class PgsqlParser extends AbstractParser
         '\$[^\$]+\$.*\$[^\$]+\$',
     ];
 
+    /**
+     *
+     * Skip query parts matching this regex.
+     *
+     * @var string
+     *
+     */
     protected $skip = '/^(\'|\"|\$|\:[^a-zA-Z_])/um';
 }

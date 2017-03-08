@@ -17,6 +17,13 @@ namespace Aura\Sql\Parser;
  */
 class MysqlParser extends AbstractParser
 {
+    /**
+     *
+     * Split the query string on these regexes.
+     *
+     * @var array
+     *
+     */
     protected $split = [
         // single-quoted string
         "'(?:[^'\\\\]|\\\\'?)*'",
@@ -26,5 +33,12 @@ class MysqlParser extends AbstractParser
         '`(?:[^`\\\\]|\\\\`?)*`',
     ];
 
+    /**
+     *
+     * Skip query parts matching this regex.
+     *
+     * @var string
+     *
+     */
     protected $skip = '/^(\'|\"|\`)/um';
 }
