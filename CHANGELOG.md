@@ -1,6 +1,6 @@
 # CHANGELOG
 
-# 3.0.0-alpha1
+## 3.0.0-alpha1
 
 First alpha release.
 
