@@ -1,9 +1,11 @@
 # Getting Started
 
+## Instantiation
+
 You can instantiate _ExtendedPdo_ so that it uses lazy connection, or you can
 use _DecoratedPdo_ to decorate an existing _PDO_ instance.
 
-## Lazy Connection Instance
+### Lazy Connection Instance
 
 Instantiation is the same as with the native _PDO_ class: pass a data source
 name, username, password, and driver options. There is one additional
@@ -55,7 +57,7 @@ However, calling an _ExtendedPdo_ method that implicitly establishes a
 connection, such as `query()` or one of the `fetch*()` methods, will
 automatically re-connect to the database.
 
-## Decorator Instance
+### Decorator Instance
 
 The _DecoratedPdo_ class can be used to decorate an existing PDO connection with
 the _ExtendedPdo_ methods. To do so, instantiate _DecoratedPdo_ by passing an
