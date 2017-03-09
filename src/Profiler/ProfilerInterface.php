@@ -6,7 +6,7 @@
  * @license https://opensource.org/licenses/MIT MIT
  *
  */
-namespace Aura\Sql;
+namespace Aura\Sql\Profiler;
 
 /**
  *
@@ -34,6 +34,15 @@ interface ProfilerInterface
      *
      */
     public function isActive();
+
+    /**
+     *
+     * Returns the underlying logger instance.
+     *
+     * @return Psr\Log\LoggerInterface
+     *
+     */
+    public function getLogger();
 
     /**
      *

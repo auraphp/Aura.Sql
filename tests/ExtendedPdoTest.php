@@ -624,64 +624,35 @@ class ExtendedPdoTest extends \PHPUnit_Framework_TestCase
 
     public function testWithProfileLogging()
     {
-        $logger = new FakeLogger();
-        $this->pdo->setProfiler(new Profiler($logger));
+        $logger = $this->pdo->getProfiler()->getLogger();
 
         // leave inactive
         $this->pdo->query("SELECT 1 FROM pdotest");
         $this->assertEquals(
             0,
-            count($logger->getLog()),
+            count($logger->getMessages()),
             'should log nothing: not enabled yet'
         );
 
         // activate
         $this->pdo->getProfiler()->setActive(true);
-        $this->pdo->getProfiler()->setLogFormat("{function}\n{statement}\n{values}\n\n");
+        $this->pdo->getProfiler()->setLogFormat("{function}: {statement} {values}");
 
         $this->pdo->query("SELECT 1 FROM pdotest");
         $this->pdo->exec("SELECT 2 FROM pdotest");
-        $this->pdo->fetchAll("SELECT 3 FROM pdotest", array('zim' => 'gir'));
-
-        $this->assertEquals(3, count($logger->getLog()));
-
+        $this->pdo->fetchAll("SELECT 3 FROM pdotest", ['zim' => 'gir']);
         $expect = array(
-            0 => array(
-                'function' => 'query',
-                'statement' => 'SELECT 1 FROM pdotest',
-                'values' => print_r(array(), true),
-            ),
-            1 => array(
-                'function' => 'exec',
-                'statement' => 'SELECT 2 FROM pdotest',
-                'values' => print_r(array(), true),
-            ),
-            2 => array(
-                'function' => 'perform',
-                'statement' => 'SELECT 3 FROM pdotest',
-                'values' => print_r(
-                    array(
-                        'zim' => 'gir',
-                    ),
-                    true
-                ),
-            ),
+            'query: SELECT 1 FROM pdotest ',
+            'exec: SELECT 2 FROM pdotest ',
+            "perform: SELECT 3 FROM pdotest Array\n(\n    [zim] => gir\n)\n",
         );
-
-        foreach ($logger->getLog() as $key => $log) {
-            $this->assertEquals($expect[$key]['function'], $log['context']['function'], $key);
-            $this->assertEquals($expect[$key]['statement'], $log['context']['statement'], $key);
-            $this->assertEquals($expect[$key]['values'], $log['context']['values'], $key);
-            $this->assertGreaterThan(0, $log['context']['duration'], $key);
-            $this->assertGreaterThan(0, $log['context']['start'], $key);
-            $this->assertGreaterThan($log['context']['start'], $log['context']['finish'], $key);
-        }
+        $this->assertSame($logger->getMessages(), $expect);
 
         // de-activate
         $this->pdo->getProfiler()->setActive(false);
-        $this->assertEquals(3, count($logger->getLog()));
+        $this->assertEquals(3, count($logger->getMessages()));
         $this->pdo->query("SELECT 5 FROM pdotest");
-        $this->assertEquals(3, count($logger->getLog()));
+        $this->assertEquals(3, count($logger->getMessages()));
     }
 
     public function testNoExportOfLoginCredentials()

@@ -8,8 +8,9 @@
  */
 namespace Aura\Sql;
 
+use Aura\Sql\Profiler\Profiler;
+use Aura\Sql\Profiler\ProfilerInterface;
 use PDO;
-use Psr\Log\NullLogger;
 
 /**
  *
@@ -37,7 +38,7 @@ class DecoratedPdo extends AbstractExtendedPdo
         $this->pdo = $pdo;
 
         if ($profiler === null) {
-            $profiler = new Profiler(new NullLogger());
+            $profiler = new Profiler();
         }
         $this->setProfiler($profiler);
 

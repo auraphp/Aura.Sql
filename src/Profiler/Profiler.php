@@ -6,8 +6,9 @@
  * @license https://opensource.org/licenses/MIT MIT
  *
  */
-namespace Aura\Sql;
+namespace Aura\Sql\Profiler;
 
+use Aura\Sql\Exception;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 
@@ -78,8 +79,11 @@ class Profiler implements ProfilerInterface
      * @param LoggerInterface $logger Record profiles through this interface.
      *
      */
-    public function __construct(LoggerInterface $logger)
+    public function __construct(LoggerInterface $logger = null)
     {
+        if ($logger === null) {
+            $logger = new MemoryLogger();
+        }
         $this->logger = $logger;
     }
 
@@ -105,6 +109,18 @@ class Profiler implements ProfilerInterface
     public function isActive()
     {
         return $this->active;
+    }
+
+    /**
+     *
+     * Returns the underlying logger instance.
+     *
+     * @return Psr\Log\LoggerInterface
+     *
+     */
+    public function getLogger()
+    {
+        return $this->logger;
     }
 
     /**
@@ -203,7 +219,7 @@ class Profiler implements ProfilerInterface
         $this->context['finish'] = $finish;
         $this->context['duration'] = $finish - $this->context['start'];
         $this->context['statement'] = $statement;
-        $this->context['values'] = print_r($values, true);
+        $this->context['values'] = empty($values) ? '' : print_r($values, true);
         $this->context['backtrace'] = $e->getTraceAsString();
 
         $this->logger->log($this->logLevel, $this->logFormat, $this->context);

@@ -9,6 +9,7 @@
 namespace Aura\Sql;
 
 use Aura\Sql\Exception;
+use Aura\Sql\Profiler\ProfilerInterface;
 use Aura\Sql\Parser\ParserInterface;
 use BadMethodCallException;
 use PDO;

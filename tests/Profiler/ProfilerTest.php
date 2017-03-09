@@ -1,5 +1,5 @@
 <?php
-namespace Aura\Sql;
+namespace Aura\Sql\Profiler;
 
 use Psr\Log\LogLevel;
 
@@ -7,7 +7,7 @@ class ProfilerTest extends \PHPUnit_Framework_TestCase
 {
     protected function setUp()
     {
-        $this->profiler = new Profiler(new FakeLogger());
+        $this->profiler = new Profiler();
     }
 
     public function testActive()

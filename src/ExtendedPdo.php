@@ -8,8 +8,9 @@
  */
 namespace Aura\Sql;
 
+use Aura\Sql\Profiler\Profiler;
+use Aura\Sql\Profiler\ProfilerInterface;
 use PDO;
-use Psr\Log\NullLogger;
 
 /**
  *
@@ -80,9 +81,9 @@ class ExtendedPdo extends AbstractExtendedPdo
             $queries
         ];
 
-        // retain a profiler, instantiating a null profiler if needed
+        // retain a profiler, instantiating a default one if needed
         if ($profiler === null) {
-            $profiler = new Profiler(new NullLogger());
+            $profiler = new Profiler();
         }
         $this->setProfiler($profiler);
 
