@@ -107,10 +107,8 @@ $cond = 'IN (' . $pdo->quote($array) . ')';
 
 The `ExtendedPdo::perform()` method will prepare a query with bound values in a
 single step.  Also, because the native _PDO_ does not deal with bound array
-values, `perform()` modifies the query string to replace array-bound
-placeholders with the quoted array.  Note that this is *not* the same thing as
-binding: the query string itself is modified before passing to the database for
-value binding.
+values, `perform()` modifies the query string to expand the array-bound
+placeholder into multiple placeholders.
 
 ```php
 // the array to be quoted
@@ -125,14 +123,14 @@ $sth = $pdo->prepare($stm);
 $sth->bindValue('foo', $array);
 
 // the ExtendedPdo way allows a single call to prepare and execute the query.
-// it quotes the array and replaces the array placeholder directly in the
-// query string
+// it quotes the array and expands the array placeholder directly in the
+// query string.
 $pdo = new ExtendedPdo(...);
 $bind_values = array('foo' => $array);
 $sth = $pdo->perform($stm, $bind_values);
 echo $sth->queryString;
 // the query string has been modified by ExtendedPdo to become
-// "SELECT * FROM test WHERE foo IN ('foo', 'bar', 'baz')"
+// "SELECT * FROM test WHERE foo IN (:foo_1, :foo_2, :foo_3)"
 ```
 
 Finally, note that array quoting works only via the `perform()` method,
