@@ -1,6 +1,50 @@
 # Aura.Sql
 
-A PDO extension that provides lazy connections, array quoting, query profiling, value binding, and convenience methods for common fetch styles. Because it extends PDO, existing code that uses PDO can use this without any changes to the existing code.
+Provides an extension to the native [PDO](http://php.net/PDO) along with a
+profiler and connection locator. Because _ExtendedPdo_ is an extension of the
+native _PDO_, code already using the native _PDO_ or typehinted to the native
+_PDO_ can use _ExtendedPdo_ without any changes.
+
+Added functionality in _Aura.Sql_ over the native _PDO_ includes:
+
+- **Lazy connection.** _ExtendedPdo_ connects to the database only on
+  method calls that require a connection. This means you can create an
+  instance and not incur the cost of a connection if you never make a query.
+
+- **Decoration.** _DecoratedPdo_ can be used to decorate an existing PDO
+  instance. This means that a PDO instance can be "extended" **at runtime** to
+  provide the _ExtendedPdo_ behaviors.
+
+- **Array quoting.** The `quote()` method will accept an array as input, and
+  return a string of comma-separated quoted values.
+
+- **New `perform()` method.** The `perform()` method acts just like `query()`,
+  but binds values to a prepared statement as part of the call.  In addition,
+  placeholders that represent array values will be replaced with comma-
+  separated quoted values. This means you can bind an  array of values to a
+  placeholder used with an `IN (...)`  condition when using `perform()`.
+
+- **New `fetch*()` methods.** The new `fetch*()` methods provide for
+  commonly-used fetch actions. For example, you can call `fetchAll()` directly
+  on the instance instead of having to prepare a statement, bind values,
+  execute, and then fetch from the prepared statement. All of the `fetch*()`
+  methods take an array of values to bind to to the query statement, and use
+  the new `perform()` method internally.
+
+- **New `yield*()` methods.** These are complements to the `fetch*()` methods
+  that `yield` results instead of `return`ing them.
+
+- **Exceptions by default.** _ExtendedPdo_ starts in the `ERRMODE_EXCEPTION`
+  mode for error reporting instead of the `ERRMODE_SILENT` mode. (Because the
+  `sqlsrv` driver fails to connect when using exceptions, it starts in
+  `ERRMODE_WARNING` instead.)
+
+- **Profiler.** An optional query profiler is provided, along with an
+  interface for other implementations, that logs to any PSR-3 interface.
+
+- **Connection locator.** A optional lazy-loading service locator is provided
+  for picking different database connections (default, read, and write).
+
 
 ## Installation and Autoloading
 
