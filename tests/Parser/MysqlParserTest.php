@@ -10,7 +10,7 @@ class MysqlParserTest extends AbstractParserTest
 
     public function testBacktickString()
     {
-        $parameters = array('foo' => array('bar', 'baz'));
+        $parameters = ['foo' => ['bar', 'baz']];
         $sql = <<<SQL
 SELECT `:foo`
 SQL;

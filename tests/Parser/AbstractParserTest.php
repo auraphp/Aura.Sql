@@ -13,48 +13,48 @@ abstract class AbstractParserTest extends \PHPUnit_Framework_TestCase
 
     public function testReplaceMultipleUsesOfNamedParameter()
     {
-        $parameters = array('foo' => 'bar');
+        $parameters = ['foo' => 'bar'];
         $sql = "SELECT :foo AS a, :foo AS b";
         list ($statement, $values) = $this->rebuild($sql, $parameters);
         $expectedStatement = "SELECT :foo AS a, :foo__1 AS b";
-        $expectedValues = array('foo' => 'bar', 'foo__1' => 'bar');
+        $expectedValues = ['foo' => 'bar', 'foo__1' => 'bar'];
         $this->assertEquals($expectedStatement, $statement);
         $this->assertEquals($expectedValues, $values);
     }
 
     public function testReplaceNumberedParameter()
     {
-        $parameters = array('bar', 'baz');
+        $parameters = ['bar', 'baz'];
         $sql = "SELECT ? AS a, ? AS b";
         list ($statement, $values) = $this->rebuild($sql, $parameters);
         $expectedStatement = "SELECT :__1 AS a, :__2 AS b";
-        $expectedValues = array('__1' => 'bar', '__2' => 'baz');
+        $expectedValues = ['__1' => 'bar', '__2' => 'baz'];
         $this->assertEquals($expectedStatement, $statement);
         $this->assertEquals($expectedValues, $values);
     }
 
     public function testReplaceArrayAsParameter()
     {
-        $parameters = array('foo' => array('bar', 'baz'));
+        $parameters = ['foo' => ['bar', 'baz']];
         $sql = "SELECT :foo";
         list ($statement, $values) = $this->rebuild($sql, $parameters);
         $expectedStatement = "SELECT :foo_0, :foo_1";
-        $expectedValues = array('foo_0' => 'bar', 'foo_1' => 'baz');
+        $expectedValues = ['foo_0' => 'bar', 'foo_1' => 'baz'];
         $this->assertEquals($expectedStatement, $statement);
         $this->assertEquals($expectedValues, $values);
 
-        $parameters = array(array('bar', 'baz'));
+        $parameters = [['bar', 'baz']];
         $sql = "SELECT ?";
         list ($statement, $values) = $this->rebuild($sql, $parameters);
         $expectedStatement = "SELECT :__1, :__2";
-        $expectedValues = array('__1' => 'bar', '__2' => 'baz');
+        $expectedValues = ['__1' => 'bar', '__2' => 'baz'];
         $this->assertEquals($expectedStatement, $statement);
         $this->assertEquals($expectedValues, $values);
     }
 
     public function testDoubleQuotedIdentifier()
     {
-        $parameters = array('foo' => array('bar', 'baz'));
+        $parameters = ['foo' => ['bar', 'baz']];
         $sql = <<<SQL
 SELECT ":foo"
 SQL;
@@ -70,7 +70,7 @@ SQL;
 
     public function testStringConstants()
     {
-        $parameters = array('foo' => array('bar', 'baz'));
+        $parameters = ['foo' => ['bar', 'baz']];
         $sql = <<<SQL
 SELECT ':foo'
 SQL;
@@ -95,7 +95,7 @@ SQL;
 
     public function testEscapedCharactersInStringConstants()
     {
-        $parameters = array('foo' => array('bar', 'baz'));
+        $parameters = ['foo' => ['bar', 'baz']];
         $sql = <<<SQL
 SELECT 'Escaping \' :foo \''
 SQL;
@@ -114,7 +114,7 @@ SQL;
 //         $expectedStatement = <<<SQL
 // SELECT "Escaping \\\\" :foo, :foo_0 ""
 // SQL;
-//         $expectedValues = array('foo' => 'bar', 'foo_0' => 'baz');
+//         $expectedValues = ['foo' => 'bar', 'foo_0' => 'baz'];
 //         list ($statement, $values) = $this->rebuild($sql, $parameters);
 //         $this->assertEquals($expectedStatement, $statement);
 //         $this->assertEquals($expectedValues, $values);

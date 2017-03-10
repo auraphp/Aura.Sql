@@ -10,7 +10,7 @@ class PgsqlParserTest extends AbstractParserTest
 
     public function testUnicodeDoubleQuotedIdentifier()
     {
-        $parameters = array('a000' => array('foo', 'bar'));
+        $parameters = ['a000' => ['foo', 'bar']];
         $sql = <<<SQL
 SELECT U&"\a000"
 FROM (SELECT 1 AS U&":a000" UEScAPE ':') AS temp
@@ -21,7 +21,7 @@ SQL;
 
     public function testCStyleStringConstants()
     {
-        $parameters = array('foo' => array('bar', 'baz'));
+        $parameters = ['foo' => ['bar', 'baz']];
         $sql = <<<SQL
 SELECT E'C-style escaping \' :foo \''
 SQL;
@@ -38,7 +38,7 @@ SQL;
 
     public function testDollarQuotedStrings()
     {
-        $parameters = array('foo' => array('bar', 'baz'));
+        $parameters = ['foo' => ['bar', 'baz']];
         $sql = 'SELECT $$:foo$$';
         list ($statement, $values) = $this->rebuild($sql, $parameters);
         $this->assertEquals($sql, $statement);
@@ -62,7 +62,7 @@ SQL;
 
     public function testTypeCasting()
     {
-        $parameters = array('TEXT' => array('bar', 'baz'));
+        $parameters = ['TEXT' => ['bar', 'baz']];
         $sql = <<<SQL
 SELECT 'hello'::TEXT
 SQL;
@@ -72,7 +72,7 @@ SQL;
 
     public function testArrayAccessor()
     {
-        $parameters = array('2' => array('bar', 'baz'));
+        $parameters = ['2' => ['bar', 'baz']];
         $sql = <<<SQL
 SELECT test[1:2]
 FROM (
@@ -85,7 +85,7 @@ SQL;
 
     public function testInvalidPlaceholderName()
     {
-        $parameters = array(']' => array('bar', 'baz'));
+        $parameters = [']' => ['bar', 'baz']];
         $sql = <<<SQL
 SELECT 'hello':]
 SQL;

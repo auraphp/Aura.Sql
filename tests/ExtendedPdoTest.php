@@ -9,7 +9,7 @@ class ExtendedPdoTest extends \PHPUnit_Framework_TestCase
     /** @var ExtendedPdoInterface */
     protected $pdo;
 
-    protected $data = array(
+    protected $data = [
         1 => 'Anna',
         2 => 'Betty',
         3 => 'Clara',
@@ -20,7 +20,7 @@ class ExtendedPdoTest extends \PHPUnit_Framework_TestCase
         8 => 'Ione',
         9 => 'Julia',
         10 => 'Kara',
-    );
+    ];
 
     public function setUp()
     {
@@ -53,14 +53,14 @@ class ExtendedPdoTest extends \PHPUnit_Framework_TestCase
     protected function fillTable()
     {
         foreach ($this->data as $id => $name) {
-            $this->insert(array('name' => $name));
+            $this->insert(['name' => $name]);
         }
     }
 
     protected function insert(array $data)
     {
         $cols = array_keys($data);
-        $vals = array();
+        $vals = [];
         foreach ($cols as $col) {
             $vals[] = ":$col";
         }
@@ -114,7 +114,7 @@ class ExtendedPdoTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($expect, $actual);
 
         $actual = $this->pdo->errorInfo();
-        $expect = array('00000', null, null);
+        $expect = ['00000', null, null];
         $this->assertSame($expect, $actual);
     }
 
@@ -132,7 +132,7 @@ class ExtendedPdoTest extends \PHPUnit_Framework_TestCase
     public function testPerform()
     {
         $stm = "SELECT * FROM pdotest WHERE id <= :val";
-        $sth = $this->pdo->perform($stm, array('val' => '5'));
+        $sth = $this->pdo->perform($stm, ['val' => '5']);
         $this->assertInstanceOf('PDOStatement', $sth);
         $result = $sth->fetchAll(PDO::FETCH_ASSOC);
         $expect = 5;
@@ -144,10 +144,10 @@ class ExtendedPdoTest extends \PHPUnit_Framework_TestCase
     {
         $stm = "SELECT * FROM pdotest WHERE id IN (:list) OR id = :id";
 
-        $sth = $this->pdo->perform($stm, array(
-            'list' => array(1, 2, 3, 4),
+        $sth = $this->pdo->perform($stm, [
+            'list' => [1, 2, 3, 4],
             'id' => 5
-        ));
+        ]);
 
         $this->assertInstanceOf('PDOStatement', $sth);
 
@@ -164,12 +164,12 @@ class ExtendedPdoTest extends \PHPUnit_Framework_TestCase
         // mode and 2 args
         $sth = $this->pdo->query($stm, ExtendedPdo::FETCH_CLASS, 'stdClass', null);
         $actual = $sth->fetchAll();
-        $expect = array();
+        $expect = [];
         foreach ($this->data as $id => $name) {
-            $expect[] = (object) array(
+            $expect[] = (object) [
                 'id' => $id,
                 'name' => $name
-            );
+            ];
         }
         $this->assertEquals($expect, $actual);
 
@@ -182,12 +182,12 @@ class ExtendedPdoTest extends \PHPUnit_Framework_TestCase
         // mode only
         $sth = $this->pdo->query($stm, ExtendedPdo::FETCH_ASSOC);
         $actual = $sth->fetchAll();
-        $expect = array();
+        $expect = [];
         foreach ($this->data as $id => $name) {
-            $expect[] = array(
+            $expect[] = [
                 'id' => $id,
                 'name' => $name
-            );
+            ];
         }
         $this->assertEquals($expect, $actual);
 
@@ -200,11 +200,11 @@ class ExtendedPdoTest extends \PHPUnit_Framework_TestCase
                  AND id IN (:list)
                  AND \"leave '':bar' alone\"";
 
-        $sth = $this->pdo->prepareWithValues($stm, array(
-            'list' => array('1', '2', '3', '4', '5'),
+        $sth = $this->pdo->prepareWithValues($stm, [
+            'list' => ['1', '2', '3', '4', '5'],
             'foo' => 'WRONG',
             'bar' => 'WRONG',
-        ));
+        ]);
 
         $expect = str_replace(':list', ":list_0, :list_1, :list_2, :list_3, :list_4", $stm);
         $actual = $sth->queryString;
@@ -223,12 +223,12 @@ class ExtendedPdoTest extends \PHPUnit_Framework_TestCase
     {
         $stm = "SELECT * FROM pdotest";
         $actual = $this->pdo->fetchAll($stm);
-        $expect = array();
+        $expect = [];
         foreach ($this->data as $id => $name) {
-            $expect[] = array(
+            $expect[] = [
                 'id' => $id,
                 'name' => $name
-            );
+            ];
         }
         $this->assertEquals($expect, $actual);
     }
@@ -252,7 +252,7 @@ class ExtendedPdoTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expect, $actual);
 
         // 1-based IDs, not 0-based sequential values
-        $expect = array(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
+        $expect = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
         $actual = array_keys($result);
         $this->assertEquals($expect, $actual);
     }
@@ -277,7 +277,7 @@ class ExtendedPdoTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expect, $actual);
 
         // // 1-based IDs, not 0-based sequential values
-        $expect = array('1', '2', '3', '4', '5', '6', '7', '8', '9', '10');
+        $expect = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'];
         $this->assertEquals($expect, $result);
     }
 
@@ -294,7 +294,7 @@ class ExtendedPdoTest extends \PHPUnit_Framework_TestCase
     public function testFetchObject()
     {
         $stm = "SELECT id, name FROM pdotest WHERE id = ?";
-        $actual = $this->pdo->fetchObject($stm, array(1));
+        $actual = $this->pdo->fetchObject($stm, [1]);
         $this->assertSame('1', $actual->id);
         $this->assertSame('Anna', $actual->name);
     }
@@ -304,9 +304,9 @@ class ExtendedPdoTest extends \PHPUnit_Framework_TestCase
         $stm = "SELECT id, name FROM pdotest WHERE id = ?";
         $actual = $this->pdo->fetchObject(
             $stm,
-            array(1),
+            [1],
             'Aura\Sql\FakeObject',
-            array('bar')
+            ['bar']
         );
         $this->assertSame('1', $actual->id);
         $this->assertSame('Anna', $actual->name);
@@ -317,12 +317,12 @@ class ExtendedPdoTest extends \PHPUnit_Framework_TestCase
     {
         $stm = "SELECT * FROM pdotest";
         $actual = $this->pdo->fetchObjects($stm);
-        $expect = array();
+        $expect = [];
         foreach ($this->data as $id => $name) {
-            $expect[] = (object) array(
+            $expect[] = (object) [
                 'id' => $id,
                 'name' => $name
-            );
+            ];
         }
         $this->assertEquals($expect, $actual);
     }
@@ -334,12 +334,12 @@ class ExtendedPdoTest extends \PHPUnit_Framework_TestCase
         foreach ($this->pdo->yieldObjects($stm) as $object) {
             $actual[]= $object;
         }
-        $expect = array();
+        $expect = [];
         foreach ($this->data as $id => $name) {
-            $expect[] = (object) array(
+            $expect[] = (object) [
                 'id' => $id,
                 'name' => $name
-            );
+            ];
         }
         $this->assertEquals($expect, $actual);
     }
@@ -349,11 +349,11 @@ class ExtendedPdoTest extends \PHPUnit_Framework_TestCase
         $stm = "SELECT * FROM pdotest";
         $actual = $this->pdo->fetchObjects(
             $stm,
-            array(),
+            [],
             'Aura\Sql\FakeObject',
-            array('bar')
+            ['bar']
         );
-        $expect = array();
+        $expect = [];
         foreach ($this->data as $id => $name) {
             $object = new FakeObject('bar');
             $object->id = $id;
@@ -369,14 +369,14 @@ class ExtendedPdoTest extends \PHPUnit_Framework_TestCase
         $actual = [];
         foreach ($this->pdo->yieldObjects(
             $stm,
-            array(),
+            [],
             'Aura\Sql\FakeObject',
-            array('bar')
+            ['bar']
         ) as $object)
         {
             $actual[]= $object;
         }
-        $expect = array();
+        $expect = [];
         foreach ($this->data as $id => $name) {
             $object = new FakeObject('bar');
             $object->id = $id;
@@ -390,10 +390,10 @@ class ExtendedPdoTest extends \PHPUnit_Framework_TestCase
     {
         $stm = "SELECT id, name FROM pdotest WHERE id = 1";
         $actual = $this->pdo->fetchOne($stm);
-        $expect = array(
+        $expect = [
             'id'   => '1',
             'name' => 'Anna',
-        );
+        ];
         $this->assertEquals($expect, $actual);
     }
 
@@ -401,25 +401,25 @@ class ExtendedPdoTest extends \PHPUnit_Framework_TestCase
     {
         $stm = "SELECT id, name FROM pdotest WHERE id = 1";
         $actual = $this->pdo->fetchGroup($stm);
-        $expect = array(
-            '1' => array(
+        $expect = [
+            '1' => [
                 'Anna'
-            )
-        );
+            ]
+        ];
         $this->assertEquals($expect, $actual);
     }
 
-    public function testGroupArray()
+    public function testGroup()
     {
         $stm = "SELECT id, name FROM pdotest WHERE id = 1";
-        $actual = $this->pdo->fetchGroup($stm, array(), PDO::FETCH_NAMED);
-        $expect = array(
-            '1' => array(
-                array(
+        $actual = $this->pdo->fetchGroup($stm, [], PDO::FETCH_NAMED);
+        $expect = [
+            '1' => [
+                [
                     'name' => 'Anna'
-                )
-            )
-        );
+                ]
+            ]
+        ];
         $this->assertEquals($expect, $actual);
     }
 
@@ -463,7 +463,7 @@ class ExtendedPdoTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals("'123.456'", $actual);
 
         // quote an array
-        $actual = $this->pdo->quote(array('"foo"', 'bar', "'baz'"));
+        $actual = $this->pdo->quote(['"foo"', 'bar', "'baz'"]);
         $this->assertEquals( "'\"foo\"', 'bar', '''baz'''", $actual);
 
         // quote a null
@@ -473,7 +473,7 @@ class ExtendedPdoTest extends \PHPUnit_Framework_TestCase
 
     public function testLastInsertId()
     {
-        $cols = array('name' => 'Laura');
+        $cols = ['name' => 'Laura'];
         $this->insert($cols);
         $expect = 11;
         $actual = $this->pdo->lastInsertId();
@@ -483,7 +483,7 @@ class ExtendedPdoTest extends \PHPUnit_Framework_TestCase
     public function testTransactions()
     {
         // data
-        $cols = array('name' => 'Laura');
+        $cols = ['name' => 'Laura'];
 
         // begin and rollback
         $this->assertFalse($this->pdo->inTransaction());
@@ -535,10 +535,10 @@ class ExtendedPdoTest extends \PHPUnit_Framework_TestCase
     public function testPlaceholders()
     {
         $stm = 'SELECT * FROM pdotest WHERE id > ? AND id < :max';
-        $val = array(
+        $val = [
             1 => '-1',
             'max' => '99',
-        );
+        ];
         $res = $this->pdo->fetchAll($stm, $val);
         $this->assertSame(10, count($res));
     }
@@ -547,15 +547,15 @@ class ExtendedPdoTest extends \PHPUnit_Framework_TestCase
     {
         $this->expectException('Aura\Sql\Exception\MissingParameter');
         $stm = "SELECT id, name FROM pdotest WHERE id = :id";
-        $this->pdo->fetchOne($stm, array('foo' => 'bar'));
+        $this->pdo->fetchOne($stm, ['foo' => 'bar']);
     }
 
-    public function testNumberedPlaceholderArray()
+    public function testNumberedPlaceholder()
     {
         $stm = 'SELECT * FROM pdotest WHERE id IN (?)';
-        $val = array(
-            1 => array('1', '2', '3'),
-        );
+        $val = [
+            1 => ['1', '2', '3'],
+        ];
         $res = $this->pdo->fetchAll($stm, $val);
         $this->assertSame(3, count($res));
     }
@@ -564,13 +564,13 @@ class ExtendedPdoTest extends \PHPUnit_Framework_TestCase
     {
         $this->expectException('Aura\Sql\Exception\MissingParameter');
         $stm = "SELECT id, name FROM pdotest WHERE id = ? OR id = ?";
-        $this->pdo->fetchOne($stm, array(1));
+        $this->pdo->fetchOne($stm, [1]);
     }
 
     public function testZeroIndexedPlaceholders()
     {
         $stm = 'SELECT * FROM pdotest WHERE id IN (?, ?, ?)';
-        $val = array(1, 2, 3);
+        $val = [1, 2, 3];
         $res = $this->pdo->fetchAll($stm, $val);
         $this->assertSame(3, count($res));
     }
@@ -580,12 +580,12 @@ class ExtendedPdoTest extends \PHPUnit_Framework_TestCase
         // pass in ExtendedPdo to see if it can replace PDO
         $depend = new PdoDependent($this->pdo);
         $actual = $depend->fetchAll();
-        $expect = array();
+        $expect = [];
         foreach ($this->data as $id => $name) {
-            $expect[] = array(
+            $expect[] = [
                 'id' => $id,
                 'name' => $name
-            );
+            ];
         }
         $this->assertEquals($expect, $actual);
     }
@@ -595,23 +595,23 @@ class ExtendedPdoTest extends \PHPUnit_Framework_TestCase
         $stm = 'SELECT * FROM pdotest WHERE id = :id';
 
         // PDO::PARAM_INT
-        $sth = $this->pdo->prepareWithValues($stm, array('id' => 1));
+        $sth = $this->pdo->prepareWithValues($stm, ['id' => 1]);
         $this->assertInstanceOf('PDOStatement', $sth);
 
         // PDO::PARAM_BOOL
-        $sth = $this->pdo->prepareWithValues($stm, array('id' => true));
+        $sth = $this->pdo->prepareWithValues($stm, ['id' => true]);
         $this->assertInstanceOf('PDOStatement', $sth);
 
         // PDO::PARAM_NULL
-        $sth = $this->pdo->prepareWithValues($stm, array('id' => null));
+        $sth = $this->pdo->prepareWithValues($stm, ['id' => null]);
         $this->assertInstanceOf('PDOStatement', $sth);
 
         // string (not a special type)
-        $sth = $this->pdo->prepareWithValues($stm, array('id' => 'xyz'));
+        $sth = $this->pdo->prepareWithValues($stm, ['id' => 'xyz']);
         $this->assertInstanceOf('PDOStatement', $sth);
 
         // float (also not a special type)
-        $sth = $this->pdo->prepareWithValues($stm, array('id' => 1.23));
+        $sth = $this->pdo->prepareWithValues($stm, ['id' => 1.23]);
         $this->assertInstanceOf('PDOStatement', $sth);
 
         // non-bindable
@@ -619,7 +619,7 @@ class ExtendedPdoTest extends \PHPUnit_Framework_TestCase
             'Aura\Sql\Exception\CannotBindValue',
             "Cannot bind value of type 'object' to placeholder 'id'"
         );
-        $sth = $this->pdo->prepareWithValues($stm, array('id' => new stdClass));
+        $sth = $this->pdo->prepareWithValues($stm, ['id' => new stdClass]);
     }
 
     public function testWithProfileLogging()
@@ -641,11 +641,11 @@ class ExtendedPdoTest extends \PHPUnit_Framework_TestCase
         $this->pdo->query("SELECT 1 FROM pdotest");
         $this->pdo->exec("SELECT 2 FROM pdotest");
         $this->pdo->fetchAll("SELECT 3 FROM pdotest", ['zim' => 'gir']);
-        $expect = array(
+        $expect = [
             'query: SELECT 1 FROM pdotest ',
             'exec: SELECT 2 FROM pdotest ',
             "perform: SELECT 3 FROM pdotest Array\n(\n    [zim] => gir\n)\n",
-        );
+        ];
         $this->assertSame($logger->getMessages(), $expect);
 
         // de-activate

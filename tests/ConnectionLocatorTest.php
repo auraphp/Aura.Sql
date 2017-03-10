@@ -12,9 +12,9 @@ class ConnectionLocatorTest extends \PHPUnit_Framework_TestCase
 
     protected $default;
 
-    protected $read = array();
+    protected $read = [];
 
-    protected $write = array();
+    protected $write = [];
 
     protected function setUp()
     {
@@ -107,11 +107,11 @@ class ConnectionLocatorTest extends \PHPUnit_Framework_TestCase
     {
         $locator = $this->newLocator($this->read, $this->write);
 
-        $expect = array(
+        $expect = [
             $this->conns['write1'],
             $this->conns['write2'],
             $this->conns['write3'],
-        );
+        ];
 
         // try 10 times to make sure we get lots of random responses
         for ($i = 1; $i <= 10; $i++) {

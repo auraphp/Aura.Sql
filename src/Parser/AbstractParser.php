@@ -72,7 +72,7 @@ abstract class AbstractParser implements ParserInterface
      * @var array
      *
      */
-    protected $values = array();
+    protected $values = [];
 
     /**
      *
@@ -81,7 +81,7 @@ abstract class AbstractParser implements ParserInterface
      * @var array
      *
      */
-    protected $final_values = array();
+    protected $final_values = [];
 
     /**
      *
@@ -104,7 +104,7 @@ abstract class AbstractParser implements ParserInterface
 
         $this->values = $values;
         $statement = $this->rebuildStatement($statement);
-        return array($statement, $this->final_values);
+        return [$statement, $this->final_values];
     }
 
     /**

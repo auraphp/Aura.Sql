@@ -57,8 +57,8 @@ class ConnectionLocator implements ConnectionLocatorInterface
      */
     public function __construct(
         $default = null,
-        array $read = array(),
-        array $write = array()
+        array $read = [],
+        array $write = []
     ) {
         if ($default) {
             $this->setDefault($default);

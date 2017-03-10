@@ -19,8 +19,8 @@ $pdo = new ExtendedPdo(
     'mysql:host=localhost;dbname=test',
     'username',
     'password',
-    array(), // driver attributes/options as key-value pairs
-    array()  // queries to execute after connection
+    [], // driver attributes/options as key-value pairs
+    []  // queries to execute after connection
 );
 ```
 
