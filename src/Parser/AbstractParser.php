@@ -173,7 +173,7 @@ abstract class AbstractParser implements ParserInterface
      *
      * @param array $subs The query subparts.
      *
-     * @return array The prepared subparts.
+     * @return string The prepared subparts.
      *
      */
     protected function prepareValuePlaceholders(array $subs)

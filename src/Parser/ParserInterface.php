@@ -26,7 +26,8 @@ interface ParserInterface
      *
      * @param array $parameters Bind these values into the query.
      *
-     * @return Query[]
+     * @return array An array where element 0 is the rebuilt statement and
+     * element 1 is the rebuilt array of values.
      *
      */
     public function rebuild($string, array $parameters = []);

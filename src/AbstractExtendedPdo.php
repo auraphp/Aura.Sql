@@ -9,12 +9,11 @@
 namespace Aura\Sql;
 
 use Aura\Sql\Exception;
-use Aura\Sql\Profiler\ProfilerInterface;
 use Aura\Sql\Parser\ParserInterface;
+use Aura\Sql\Profiler\ProfilerInterface;
 use BadMethodCallException;
 use PDO;
 use PDOStatement;
-use Psr\Log\NullLogger;
 
 /**
  *
