@@ -39,7 +39,7 @@ interface ProfilerInterface
      *
      * Returns the underlying logger instance.
      *
-     * @return Psr\Log\LoggerInterface
+     * @return \Psr\Log\LoggerInterface
      *
      */
     public function getLogger();
