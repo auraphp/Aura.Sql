@@ -4,6 +4,8 @@
 
 First alpha release.
 
+[See migration guide for details upgrading from 2.x to 3.x](https://github.com/auraphp/Aura.Sql/blob/695b240f1bd64dd5ba457935d7c0337be1055be5/docs/upgrade.md)
+
 ## 2.5.1
 
 Hygiene release: update documentation and testing.
