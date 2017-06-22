@@ -65,13 +65,6 @@ class ExtendedPdo extends AbstractExtendedPdo
             $options[PDO::ATTR_ERRMODE] = PDO::ERRMODE_EXCEPTION;
         }
 
-        // sqlsrv fails to connect when the error mode uses exceptions
-        $sqlsrvWarnEx = substr($dsn, 0, 7) == 'sqlsrv:'
-            && $options[PDO::ATTR_ERRMODE] == PDO::ERRMODE_EXCEPTION;
-        if ($sqlsrvWarnEx) {
-            $options[PDO::ATTR_ERRMODE] = PDO::ERRMODE_WARNING;
-        }
-
         // retain the arguments for later
         $this->args = [
             $dsn,

@@ -672,14 +672,6 @@ class ExtendedPdoTest extends \PHPUnit_Framework_TestCase
         $this->assertContains('[4]=>array(0) {}', $data);
     }
 
-    public function testSqlsrvErrmodeWarning()
-    {
-        $pdo = new ExtendedPdo('sqlsrv:bogus');
-        $data = $this->dump($pdo);
-        // options
-        $this->assertContains('[3]=>array(1) {[3]=>int(1)}', $data);
-    }
-
     protected function dump($pdo)
     {
         ob_start();
