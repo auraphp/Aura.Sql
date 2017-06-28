@@ -35,9 +35,7 @@ Added functionality in _Aura.Sql_ over the native _PDO_ includes:
   that `yield` results instead of `return`ing them.
 
 - **Exceptions by default.** _ExtendedPdo_ starts in the `ERRMODE_EXCEPTION`
-  mode for error reporting instead of the `ERRMODE_SILENT` mode. (Because the
-  `sqlsrv` driver fails to connect when using exceptions, it starts in
-  `ERRMODE_WARNING` instead.)
+  mode for error reporting instead of the `ERRMODE_SILENT` mode.
 
 - **Profiler.** An optional query profiler is provided, along with an
   interface for other implementations, that logs to any PSR-3 interface.
