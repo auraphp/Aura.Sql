@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## 3.0.0-beta1
+
+First beta release.
+
+- Updated documentation, and added a Bookdown JSON file.
+
+- The sqlsrv driver now defaults to exceptions like all other drivers.
+
 ## 3.0.0-alpha1
 
 First alpha release.
