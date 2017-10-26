@@ -730,4 +730,16 @@ class ExtendedPdoTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('[foo].[[bar][]', $pdo->quoteName('foo.[bar]'));
 
     }
+
+    public function testGetAttribute()
+    {
+        $driver = $this->pdo->getAttribute(\PDO::ATTR_DRIVER_NAME);
+        $this->assertEquals('sqlite', $driver);
+    }
+
+    public function testSetAttribute()
+    {
+        $result = $this->pdo->setAttribute(\PDO::ATTR_CASE, \PDO::CASE_NATURAL);
+        $this->assertTrue($result);
+    }
 }
