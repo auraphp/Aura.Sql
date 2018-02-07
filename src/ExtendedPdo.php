@@ -198,7 +198,7 @@ class ExtendedPdo extends PDO implements ExtendedPdoInterface
      *
      * @return null
      *
-     * @throws PDOException if the connection fails.
+     * @throws \PDOException if the connection fails.
      *
      */
     public function connect()
