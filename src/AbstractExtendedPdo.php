@@ -979,4 +979,31 @@ abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
                 return;
         }
     }
+
+    /**
+     *
+     * Retrieve a database connection attribute
+     *
+     * @param int $attribute
+     * @return mixed
+     */
+    public function getAttribute($attribute)
+    {
+        $this->connect();
+        return $this->pdo->getAttribute($attribute);
+    }
+
+    /**
+     *
+     * Set a database connection attribute
+     *
+     * @param int $attribute
+     * @param mixed $value
+     * @return bool
+     */
+    public function setAttribute($attribute, $value)
+    {
+        $this->connect();
+        return $this->pdo->setAttribute($attribute, $value);
+    }
 }
