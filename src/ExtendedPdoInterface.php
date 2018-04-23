@@ -10,6 +10,7 @@ namespace Aura\Sql;
 
 use Aura\Sql\Parser\ParserInterface;
 use Aura\Sql\Profiler\ProfilerInterface;
+use PDO;
 
 /**
  *
