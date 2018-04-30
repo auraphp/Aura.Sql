@@ -29,7 +29,7 @@ foreach ($pdo->yieldCol($stm, $bind) as $val) {
 // class name and optional array of constructor arguments.
 $class = 'ClassName';
 $args = ['arg0', 'arg1', 'arg2'];
-foreach ($pdo->yieldCol($stm, $bind, $class, $args) as $object) {
+foreach ($pdo->yieldObjects($stm, $bind, $class, $args) as $object) {
     // ...
 }
 
