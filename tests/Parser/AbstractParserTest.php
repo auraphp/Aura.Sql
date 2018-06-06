@@ -24,11 +24,11 @@ abstract class AbstractParserTest extends \PHPUnit_Framework_TestCase
 
     public function testReplaceNumberedParameter()
     {
-        $parameters = ['bar', 'baz'];
-        $sql = "SELECT ? AS a, ? AS b";
+        $parameters = ['bar', 'baz', null];
+        $sql = "SELECT ? AS a, ? AS b FROM table WHERE id = ?";
         list ($statement, $values) = $this->rebuild($sql, $parameters);
-        $expectedStatement = "SELECT :__1 AS a, :__2 AS b";
-        $expectedValues = ['__1' => 'bar', '__2' => 'baz'];
+        $expectedStatement = "SELECT :__1 AS a, :__2 AS b FROM table WHERE id = :__3";
+        $expectedValues = ['__1' => 'bar', '__2' => 'baz', '__3' => null];
         $this->assertEquals($expectedStatement, $statement);
         $this->assertEquals($expectedValues, $values);
     }
