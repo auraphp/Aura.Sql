@@ -210,7 +210,11 @@ abstract class AbstractParser implements ParserInterface
         }
 
         $expanded = [];
-        foreach ((array) $this->values[$this->num] as $value) {
+        $values = (array) $this->values[$this->num];
+        if (is_null($this->values[$this->num])) {
+            $values[] = null;
+        }
+        foreach ($values as $value) {
             $count = ++ $this->count['__'];
             $name = "__{$count}";
             $expanded[] = ":{$name}";
