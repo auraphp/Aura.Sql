@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## 3.0.0
+
+- Fixed issue #163: Add getAttribute and setAttribute functions to make sure pdo is connected before calling the functions
+
+- Merged pull request #170: fixes error "Class 'Aura\Sql\PDO' not found"
+
+- Merged pull request #174: fixes bug with null value.
+
 ## 3.0.0-beta1
 
 First beta release.
