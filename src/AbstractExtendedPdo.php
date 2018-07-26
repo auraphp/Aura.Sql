@@ -912,6 +912,10 @@ abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
         }
 
         if (is_bool($val)) {
+            if ($this->parser instanceof Parser\MysqlParser) {
+                return $this->bindValue($sth, $key, $val ? 1 : 0);
+            }
+
             return $sth->bindValue($key, $val, self::PARAM_BOOL);
         }
 
