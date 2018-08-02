@@ -28,9 +28,6 @@ matrix:
           php: 7.2
         - os: linux
           dist: trusty
-          php: hhvm
-        - os: linux
-          dist: trusty
           php: nightly
 
 before_script:
