@@ -1,24 +1,18 @@
-# CHANGELOG 
+# CHANGELOG
+
+## 2.5.3
+
+- `ExtendedPdo::bindValue()` method now binds `PDO::PARAM_BOOL` values as string '0' and string '1'; this addresses a not-a-bug-but-still-surprising behavior in PDO; cf. <https://bugs.php.net/bug.php?id=49255>.
+
+- Other hygiene fixes to docs, docblocks, etc.
 
 ## 2.5.2
 
-* Fix #111 : Binding variables conflicts with some Postgres SQL queries
-* Added phpunit to composer.json
-* Fix #166 : PHPStorm exception handling check
+- Fix #111 : Binding variables conflicts with some Postgres SQL queries
 
-## 3.0.0-beta1
+- Added phpunit to composer.json
 
-First beta release.
-
-- Updated documentation, and added a Bookdown JSON file.
-
-- The sqlsrv driver now defaults to exceptions like all other drivers.
-
-## 3.0.0-alpha1
-
-First alpha release.
-
-[See migration guide for details upgrading from 2.x to 3.x](https://github.com/auraphp/Aura.Sql/blob/695b240f1bd64dd5ba457935d7c0337be1055be5/docs/upgrade.md)
+- Fix #166 : PHPStorm exception handling check
 
 ## 2.5.1
 
@@ -26,9 +20,7 @@ Hygiene release: update documentation and testing.
 
 ## 2.5.0
 
-This release adds new `yield*()` methods to _ExtendedPdo_; these return
-iterators to generate one result row at a time, which can reduce memory usage
-with very large result sets.
+This release adds new `yield*()` methods to _ExtendedPdo_; these return iterators to generate one result row at a time, which can reduce memory usage with very large result sets.
 
 ## 2.4.3
 
