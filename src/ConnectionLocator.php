@@ -240,7 +240,7 @@ class ConnectionLocator implements ConnectionLocatorInterface
             $connection->setProfiler($profiler);
         }
 
-        $profiler->setProfiling($this->profiling);
+        $profiler->setActive($this->profiling);
     }
 
     /**
