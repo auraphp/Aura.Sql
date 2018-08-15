@@ -98,7 +98,7 @@ class ProfilerTest extends AbstractExtendedPdoTest
         }
 
         $expect = array(
-            0 => array(
+            4 => array(
                 'function' => 'query',
                 'statement' => 'SELECT 1 FROM pdotest',
                 'bind_values' => array(),
