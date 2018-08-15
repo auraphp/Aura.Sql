@@ -1,5 +1,14 @@
 # CHANGELOG
 
+## 2.6.0
+
+This release adds two new off-interface methods to `ConnectionLocator`:
+
+- `setProfiling()` to activate profiling across all connections
+
+- `getProfiles()` to get the profiles from all connections
+
+
 ## 2.5.3
 
 - `ExtendedPdo::bindValue()` method now binds `PDO::PARAM_BOOL` values as string '0' and string '1'; this addresses a not-a-bug-but-still-surprising behavior in PDO; cf. <https://bugs.php.net/bug.php?id=49255>.
