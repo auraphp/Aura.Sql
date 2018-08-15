@@ -274,7 +274,7 @@ class ConnectionLocator implements ConnectionLocatorInterface
             $this->addProfiles('default', $connection, $profiles);
         }
 
-        foreach (['read', 'write'] as $type) {
+        foreach (array('read', 'write') as $type) {
             foreach ($this->registry[$type] as $name) {
                 if ($this->converted[$type][$name]) {
                     $connection = $this->registry[$type][$name];
