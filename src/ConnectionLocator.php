@@ -308,7 +308,7 @@ class ConnectionLocator implements ConnectionLocatorInterface
         }
 
         foreach ($profiler->getProfiles() as $key => $profile) {
-            $profile = ['connection' => $label] + $profile;
+            $profile = array('connection' => $label) + $profile;
             $profiles[$key] = $profile;
         }
     }
