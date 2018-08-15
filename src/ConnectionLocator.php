@@ -247,13 +247,13 @@ class ConnectionLocator implements ConnectionLocatorInterface
      *
      * Set profiling on all connections at retrieval time?
      *
-     * @param bool $flag True to enable, or false to disable, profiling on each
-     * connection as it is retrieved.
+     * @param bool $profiling True to enable, or false to disable, profiling on
+     * each connection as it is retrieved.
      *
      * @return null
      *
      */
-    public function setProfiling($flag = true)
+    public function setProfiling($profiling = true)
     {
         $this->profiling = (bool) $profiling;
     }
