@@ -267,7 +267,7 @@ class ConnectionLocator implements ConnectionLocatorInterface
      */
     public function getProfiles()
     {
-        $profiles = [];
+        $profiles = array();
 
         if ($this->converted['default']) {
             $connection = $this->registry['default'];
