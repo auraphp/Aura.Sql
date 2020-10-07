@@ -9,9 +9,16 @@ php:
   - 7.4
 before_script:
   - composer self-update
+install:
   - composer install
 script:
   - ./vendor/bin/phpunit --coverage-clover=coverage.clover
 after_script:
   - wget https://scrutinizer-ci.com/ocular.phar
   - php ocular.phar code-coverage:upload --format=php-clover coverage.clover
+jobs:
+  include:
+    - stage: Test
+      name: PHP 8
+      php: nightly
+      install: composer install --ignore-platform-reqs
