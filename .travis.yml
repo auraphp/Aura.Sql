@@ -5,15 +5,6 @@ matrix:
     include:
         - os: linux
           dist: precise
-          php: 5.3
-        - os: linux
-          dist: precise
-          php: 5.4
-        - os: linux
-          dist: precise
-          php: 5.5
-        - os: linux
-          dist: precise
           php: 5.6
           env:
             - TEST_COVERAGE=true
@@ -27,8 +18,11 @@ matrix:
           dist: trusty
           php: 7.2
         - os: linux
-          dist: trusty
-          php: nightly
+          dist: focal
+          php: 7.4
+        - os: linux
+          dist: focal
+          php: 8.0
 
 before_script:
   - composer self-update
