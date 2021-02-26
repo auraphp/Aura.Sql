@@ -144,7 +144,7 @@ interface PdoInterface
      * @see http://php.net/manual/en/pdo.query.php
      *
      */
-    public function query($statement);
+    public function query($statement, ...$args);
 
     /**
      *

@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 2.7.0
+
+This release adds PHP 8 support.
+
+Minimum required PHP version has been increased from 5.3 to 5.6.
+
 ## 2.6.0
 
 This release adds two new off-interface methods to `ConnectionLocator`:
