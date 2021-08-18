@@ -4,7 +4,7 @@ namespace Aura\Sql;
 use PDO;
 use stdClass;
 
-class ExtendedPdoTest extends \PHPUnit_Framework_TestCase
+class ExtendedPdoTest extends TestCase
 {
     /** @var ExtendedPdoInterface */
     protected $pdo;
