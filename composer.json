@@ -32,7 +32,7 @@
     },
     "require-dev": {
         "pds/skeleton": "~1.0",
-        "phpunit/phpunit": "~5.0"
+        "phpunit/phpunit": "~5.0|~9.5"
     },
     "autoload-dev": {
         "psr-4": {
