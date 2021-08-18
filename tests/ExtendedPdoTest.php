@@ -2,6 +2,7 @@
 namespace Aura\Sql;
 
 use PDO;
+use PHPUnit\Framework\TestCase;
 use stdClass;
 
 class ExtendedPdoTest extends TestCase
