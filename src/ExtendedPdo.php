@@ -10,7 +10,6 @@ namespace Aura\Sql;
 
 use Aura\Sql\Profiler\Profiler;
 use Aura\Sql\Profiler\ProfilerInterface;
-use JetBrains\PhpStorm\ArrayShape;
 use PDO;
 
 /**
@@ -131,7 +130,6 @@ class ExtendedPdo extends AbstractExtendedPdo
      * @return array
      *
      */
-    #[ArrayShape(['args' => "array"])]
     public function __debugInfo(): array
     {
         return [
