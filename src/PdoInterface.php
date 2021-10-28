@@ -28,7 +28,7 @@ interface PdoInterface
      * @see http://php.net/manual/en/pdo.begintransaction.php
      *
      */
-    public function beginTransaction();
+    public function beginTransaction(): bool;
 
     /**
      *
