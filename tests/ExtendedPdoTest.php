@@ -670,6 +670,7 @@ class ExtendedPdoTest extends TestCase
 
     protected function dump($pdo)
     {
+        ini_set('xdebug.cli_color', 0);
         ob_start();
         var_dump($pdo);
         $data = ob_get_clean();

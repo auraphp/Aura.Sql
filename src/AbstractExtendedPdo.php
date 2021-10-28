@@ -672,6 +672,8 @@ abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
     {
         $this->connect();
 
+        $value = $value ?? '';
+
         // non-array quoting
         if (! is_array($value)) {
             return $this->pdo->quote($value, $type);
