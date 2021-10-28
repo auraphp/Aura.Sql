@@ -23,7 +23,7 @@ class ExtendedPdoTest extends TestCase
         10 => 'Kara',
     ];
 
-    public function setUp()
+    public function setUp(): void
     {
         if (! extension_loaded('pdo_sqlite')) {
             $this->markTestSkipped("Need 'pdo_sqlite' to test in memory.");
@@ -79,7 +79,7 @@ class ExtendedPdoTest extends TestCase
         }
 
         $this->pdo->sqliteCreateFunction('foo', function () {});
-        $this->setExpectedException('BadMethodCallException');
+        $this->expectException('BadMethodCallException');
         $this->pdo->sqliteNoSuchMethod();
     }
 
@@ -106,6 +106,8 @@ class ExtendedPdoTest extends TestCase
 
         // make sure new encoding was honored
         $actual = $pdo->fetchValue('PRAGMA encoding');
+
+        $this->assertStringStartsWith('UTF-16', $actual);
     }
 
     public function testErrorCodeAndInfo()
@@ -296,7 +298,7 @@ class ExtendedPdoTest extends TestCase
     {
         $stm = "SELECT id, name FROM pdotest WHERE id = ?";
         $actual = $this->pdo->fetchObject($stm, [1]);
-        $this->assertSame('1', $actual->id);
+        $this->assertSame(1, $actual->id);
         $this->assertSame('Anna', $actual->name);
     }
 
@@ -309,7 +311,7 @@ class ExtendedPdoTest extends TestCase
             'Aura\Sql\FakeObject',
             ['bar']
         );
-        $this->assertSame('1', $actual->id);
+        $this->assertSame(1, $actual->id);
         $this->assertSame('Anna', $actual->name);
         $this->assertSame('bar', $actual->foo);
     }
@@ -653,15 +655,15 @@ class ExtendedPdoTest extends TestCase
         $data = $this->dump($pdo);
 
         // DSN
-        $this->assertContains('[0]=>string(15) "sqlite::memory:"', $data);
+        $this->assertStringContainsString('[0]=>string(15) "sqlite::memory:"', $data);
         // username
-        $this->assertContains('[1]=>string(4) "****"', $data);
+        $this->assertStringContainsString('[1]=>string(4) "****"', $data);
         // password
-        $this->assertContains('[2]=>string(4) "****"', $data);
+        $this->assertStringContainsString('[2]=>string(4) "****"', $data);
         // options
-        $this->assertContains('[3]=>array(1) {[3]=>int(2)}', $data);
+        $this->assertStringContainsString('[3]=>array(1) {[3]=>int(2)}', $data);
         // queries
-        $this->assertContains('[4]=>array(0) {}', $data);
+        $this->assertStringContainsString('[4]=>array(0) {}', $data);
     }
 
     protected function dump($pdo)

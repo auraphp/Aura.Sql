@@ -9,6 +9,7 @@
 namespace Aura\Sql;
 
 use PDO;
+use PDOStatement;
 
 /**
  *
@@ -39,16 +40,15 @@ interface PdoInterface
      * @see http://php.net/manual/en/pdo.commit.php
      *
      */
-    public function commit();
+    public function commit(): bool;
 
     /**
      *
      * Gets the most recent error code.
      *
-     * @return mixed
-     *
+     * @return string|null
      */
-    public function errorCode();
+    public function errorCode(): ?string;
 
     /**
      *
@@ -57,7 +57,7 @@ interface PdoInterface
      * @return array
      *
      */
-    public function errorInfo();
+    public function errorInfo(): array;
 
     /**
      *
@@ -70,18 +70,18 @@ interface PdoInterface
      * @see http://php.net/manual/en/pdo.exec.php
      *
      */
-    public function exec($statement);
+    public function exec(string $statement): int;
 
     /**
      *
      * Gets a PDO attribute value.
      *
-     * @param mixed $attribute The PDO::ATTR_* constant.
+     * @param int $attribute The PDO::ATTR_* constant.
      *
      * @return mixed The value for the attribute.
      *
      */
-    public function getAttribute($attribute);
+    public function getAttribute(int $attribute): mixed;
 
     /**
      *
@@ -92,21 +92,21 @@ interface PdoInterface
      * @see http://php.net/manual/en/pdo.intransaction.php
      *
      */
-    public function inTransaction();
+    public function inTransaction(): bool;
 
     /**
      *
      * Returns the last inserted autoincrement sequence value.
      *
-     * @param string $name The name of the sequence to check; typically needed
+     * @param string|null $name The name of the sequence to check; typically needed
      * only for PostgreSQL, where it takes the form of `<table>_<column>_seq`.
      *
-     * @return string
+     * @return string|false
      *
      * @see http://php.net/manual/en/pdo.lastinsertid.php
      *
      */
-    public function lastInsertId($name = null);
+    public function lastInsertId(?string $name = null): string|false;
 
     /**
      *
@@ -117,12 +117,11 @@ interface PdoInterface
      * @param array $options Set these attributes on the returned
      * PDOStatement.
      *
-     * @return \PDOStatement
+     * @return \PDOStatement|false
      *
      * @see http://php.net/manual/en/pdo.prepare.php
-     *
      */
-    public function prepare($statement, $options = null);
+    public function prepare(string $statement, array $options = []): PDOStatement|false;
 
     /**
      *
@@ -130,14 +129,16 @@ interface PdoInterface
      *
      * @param string $statement The SQL statement to prepare and execute.
      *
-     * @param mixed ...$fetch Optional fetch-related parameters.
+     * @param int|null $fetchMode
      *
-     * @return \PDOStatement
+     * @param mixed ...$fetch_mode_args Optional fetch-related parameters.
+     *
+     * @return \PDOStatement|false
      *
      * @see http://php.net/manual/en/pdo.query.php
      *
      */
-    public function query($statement, ...$fetch);
+    public function query($statement, $fetchMode = null, ...$fetch_mode_args): PDOStatement|false;
 
     /**
      *
@@ -147,12 +148,12 @@ interface PdoInterface
      *
      * @param int $parameter_type A data type hint for the database driver.
      *
-     * @return string The quoted value.
+     * @return string|false The quoted value.
      *
      * @see http://php.net/manual/en/pdo.quote.php
      *
      */
-    public function quote($value, $parameter_type = PDO::PARAM_STR);
+    public function quote(mixed $value, int $parameter_type = PDO::PARAM_STR): string|false;
 
     /**
      *
@@ -163,20 +164,20 @@ interface PdoInterface
      * @see http://php.net/manual/en/pdo.rollback.php
      *
      */
-    public function rollBack();
+    public function rollBack(): bool;
 
     /**
      *
      * Sets a PDO attribute value.
      *
-     * @param mixed $attribute The PDO::ATTR_* constant.
+     * @param int $attribute The PDO::ATTR_* constant.
      *
      * @param mixed $value The value for the attribute.
      *
      * @return bool
      *
      */
-    public function setAttribute($attribute, $value);
+    public function setAttribute(int $attribute, mixed $value): bool;
 
     /**
      *
@@ -185,5 +186,5 @@ interface PdoInterface
      * @return array
      *
      */
-    public static function getAvailableDrivers();
+    //public static function getAvailableDrivers(): array;
 }

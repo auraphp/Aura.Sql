@@ -30,17 +30,14 @@ class DecoratedPdo extends AbstractExtendedPdo
      *
      * @param PDO $pdo An existing PDO instance to decorate.
      *
-     * @param ProfilerInterface $profiler Tracks and logs query profiles.
+     * @param ProfilerInterface|null $profiler Tracks and logs query profiles.
      *
      */
-    public function __construct(PDO $pdo, ProfilerInterface $profiler = null)
+    public function __construct(PDO $pdo, ?ProfilerInterface $profiler = null)
     {
         $this->pdo = $pdo;
 
-        if ($profiler === null) {
-            $profiler = new Profiler();
-        }
-        $this->setProfiler($profiler);
+        $this->setProfiler($profiler ?? new Profiler());
 
         $driver = $pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
         $this->setParser($this->newParser($driver));
@@ -51,10 +48,10 @@ class DecoratedPdo extends AbstractExtendedPdo
      *
      * Connects to the database.
      *
-     * @return null
+     * @return void
      *
      */
-    public function connect()
+    public function connect(): void
     {
         // already connected
     }
@@ -63,10 +60,11 @@ class DecoratedPdo extends AbstractExtendedPdo
      *
      * Disconnects from the database; disallowed with decorated PDO connections.
      *
-     * @return null
+     * @return void
      *
+     * @throws Exception\CannotDisconnect
      */
-    public function disconnect()
+    public function disconnect(): void
     {
         $message = "Cannot disconnect a DecoratedPdo instance.";
         throw new Exception\CannotDisconnect($message);

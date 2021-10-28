@@ -10,6 +10,7 @@ namespace Aura\Sql;
 
 use Aura\Sql\Profiler\Profiler;
 use Aura\Sql\Profiler\ProfilerInterface;
+use JetBrains\PhpStorm\ArrayShape;
 use PDO;
 
 /**
@@ -28,7 +29,7 @@ class ExtendedPdo extends AbstractExtendedPdo
      * @var array
      *
      */
-    protected $args = [];
+    protected array $args = [];
 
     /**
      *
@@ -39,26 +40,25 @@ class ExtendedPdo extends AbstractExtendedPdo
      *
      * @param string $dsn The data source name for the connection.
      *
-     * @param string $username The username for the connection.
+     * @param string|null $username The username for the connection.
      *
-     * @param string $password The password for the connection.
+     * @param string|null $password The password for the connection.
      *
      * @param array $options Driver-specific options for the connection.
      *
      * @param array $queries Queries to execute after the connection.
      *
-     * @param ProfilerInterface $profiler Tracks and logs query profiles.
+     * @param \Aura\Sql\Profiler\ProfilerInterface|null $profiler Tracks and logs query profiles.
      *
      * @see http://php.net/manual/en/pdo.construct.php
-     *
      */
     public function __construct(
-        $dsn,
-        $username = null,
-        $password = null,
+        string $dsn,
+        ?string $username = null,
+        ?string $password = null,
         array $options = [],
         array $queries = [],
-        ProfilerInterface $profiler = null
+        ?ProfilerInterface $profiler = null
     ) {
         // if no error mode is specified, use exceptions
         if (! isset($options[PDO::ATTR_ERRMODE])) {
@@ -75,10 +75,7 @@ class ExtendedPdo extends AbstractExtendedPdo
         ];
 
         // retain a profiler, instantiating a default one if needed
-        if ($profiler === null) {
-            $profiler = new Profiler();
-        }
-        $this->setProfiler($profiler);
+        $this->setProfiler($profiler ?? new Profiler());
 
         // retain a query parser
         $parts = explode(':', $dsn);
@@ -93,10 +90,9 @@ class ExtendedPdo extends AbstractExtendedPdo
      *
      * Connects to the database.
      *
-     * @return null
-     *
+     * @return void
      */
-    public function connect()
+    public function connect(): void
     {
         if ($this->pdo) {
             return;
@@ -118,10 +114,10 @@ class ExtendedPdo extends AbstractExtendedPdo
      *
      * Disconnects from the database.
      *
-     * @return null
+     * @return void
      *
      */
-    public function disconnect()
+    public function disconnect(): void
     {
         $this->profiler->start(__FUNCTION__);
         $this->pdo = null;
@@ -135,7 +131,8 @@ class ExtendedPdo extends AbstractExtendedPdo
      * @return array
      *
      */
-    public function __debugInfo()
+    #[ArrayShape(['args' => "array"])]
+    public function __debugInfo(): array
     {
         return [
             'args' => [
@@ -155,7 +152,7 @@ class ExtendedPdo extends AbstractExtendedPdo
      * @return \PDO
      *
      */
-    public function getPdo()
+    public function getPdo(): PDO
     {
         $this->connect();
         return $this->pdo;
