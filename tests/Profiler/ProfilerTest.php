@@ -1,9 +1,10 @@
 <?php
 namespace Aura\Sql\Profiler;
 
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LogLevel;
 
-class ProfilerTest extends \PHPUnit_Framework_TestCase
+class ProfilerTest extends TestCase
 {
     protected function setUp()
     {

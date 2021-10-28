@@ -2,9 +2,10 @@
 namespace Aura\Sql;
 
 use PDO;
+use PHPUnit\Framework\TestCase;
 use stdClass;
 
-class ExtendedPdoTest extends \PHPUnit_Framework_TestCase
+class ExtendedPdoTest extends TestCase
 {
     /** @var ExtendedPdoInterface */
     protected $pdo;
@@ -508,15 +509,6 @@ class ExtendedPdoTest extends \PHPUnit_Framework_TestCase
 
         $actual = $this->pdo->fetchAll("SELECT * FROM pdotest");
         $this->assertSame(11, count($actual));
-
-        return $rollBackResult;
-    }
-
-    /**
-     * @depends testTransactions
-     */
-    public function testRollBack($rollBackResult)
-    {
         $this->assertTrue($rollBackResult);
     }
 
