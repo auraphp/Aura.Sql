@@ -193,7 +193,6 @@ class ExtendedPdoTest extends TestCase
             ];
         }
         $this->assertEquals($expect, $actual);
-
     }
 
     public function testPrepareWithValues()
@@ -298,7 +297,9 @@ class ExtendedPdoTest extends TestCase
     {
         $stm = "SELECT id, name FROM pdotest WHERE id = ?";
         $actual = $this->pdo->fetchObject($stm, [1]);
-        $this->assertSame(1, $actual->id);
+
+        // in php <= 8 id is a string, in php >= 8.1 it is a int
+        $this->assertSame('1', (string)$actual->id);
         $this->assertSame('Anna', $actual->name);
     }
 
@@ -311,7 +312,8 @@ class ExtendedPdoTest extends TestCase
             'Aura\Sql\FakeObject',
             ['bar']
         );
-        $this->assertSame(1, $actual->id);
+        // in php <= 8 id is a string, in php >= 8.1 it is a int
+        $this->assertSame('1', (string)$actual->id);
         $this->assertSame('Anna', $actual->name);
         $this->assertSame('bar', $actual->foo);
     }
