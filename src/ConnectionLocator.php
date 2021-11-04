@@ -90,9 +90,14 @@ class ConnectionLocator implements ConnectionLocatorInterface
      *
      * @return ExtendedPdoInterface
      *
+     * @throws Exception\ConnectionNotFound
      */
     public function getDefault(): ExtendedPdoInterface
     {
+        if (! $this->default) {
+            throw new Exception\ConnectionNotFound("default");
+        }
+
         if (! $this->default instanceof ExtendedPdo) {
             $this->default = call_user_func($this->default);
         }

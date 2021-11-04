@@ -49,6 +49,13 @@ class ConnectionLocatorTest extends TestCase
         return new ConnectionLocator($this->default, $read, $write);
     }
 
+    public function testNullDefault()
+    {
+        $locator = new ConnectionLocator(null, $this->read, $this->write);
+        $this->expectException('Aura\Sql\Exception\ConnectionNotFound');
+        $locator->getDefault();
+    }
+
     public function testGetDefault()
     {
         $locator = $this->newLocator();
