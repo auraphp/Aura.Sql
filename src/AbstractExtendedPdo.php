@@ -29,7 +29,7 @@ abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
      *
      * The internal PDO connection.
      *
-     * @var PDO
+     * @var PDO|null
      *
      */
     protected ?PDO $pdo = null;
