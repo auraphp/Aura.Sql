@@ -70,7 +70,7 @@ interface PdoInterface
      * @see http://php.net/manual/en/pdo.exec.php
      *
      */
-    public function exec(string $statement): int;
+    public function exec(string $statement): int|false;
 
     /**
      *
