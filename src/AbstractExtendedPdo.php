@@ -575,7 +575,7 @@ abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
     public function prepare(string $query, array $options = []): PDOStatement
     {
         $this->connect();
-        $sth = $this->pdo->prepare($statement, $options);
+        $sth = $this->pdo->prepare($query, $options);
         return $sth;
     }
 
@@ -643,11 +643,11 @@ abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
      * @see http://php.net/manual/en/pdo.query.php
      *
      */
-    public function query($statement, $fetchMode = null, mixed ...$fetch_mode_args): PDOStatement
+    public function query(string $query, ?int $fetchMode = null, mixed ...$fetch_mode_args): PDOStatement
     {
         $this->connect();
         $this->profiler->start(__FUNCTION__);
-        $sth = $this->pdo->query($statement, $fetchMode, ...$fetch_mode_args);
+        $sth = $this->pdo->query($query, $fetchMode, ...$fetch_mode_args);
         $this->profiler->finish($sth->queryString);
         return $sth;
     }
@@ -668,7 +668,7 @@ abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
      * @see http://php.net/manual/en/pdo.quote.php
      *
      */
-    public function quote(mixed $value, int $type = self::PARAM_STR): string
+    public function quote(string|int|array|float|null $value, int $type = self::PARAM_STR): string
     {
         $this->connect();
 
@@ -990,7 +990,7 @@ abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
      * @param int $attribute
      * @return mixed
      */
-    public function getAttribute(int $attribute): mixed
+    public function getAttribute(int $attribute): bool|int|string|array|null
     {
         $this->connect();
         return $this->pdo->getAttribute($attribute);
@@ -1004,7 +1004,7 @@ abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
      * @param mixed $value
      * @return bool
      */
-    public function setAttribute(int $attribute, mixed$value): bool
+    public function setAttribute(int $attribute, mixed $value): bool
     {
         $this->connect();
         return $this->pdo->setAttribute($attribute, $value);

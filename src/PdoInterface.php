@@ -146,7 +146,7 @@ interface PdoInterface
      *
      * @param mixed $value The value to quote.
      *
-     * @param int $parameter_type A data type hint for the database driver.
+     * @param int $type A data type hint for the database driver.
      *
      * @return string|false The quoted value.
      *
