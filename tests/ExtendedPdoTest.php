@@ -741,4 +741,10 @@ class ExtendedPdoTest extends TestCase
         $result = $this->pdo->setAttribute(\PDO::ATTR_CASE, \PDO::CASE_NATURAL);
         $this->assertTrue($result);
     }
+
+    public function testGetAvailableDrivers()
+    {
+        $drivers = $this->pdo::getAvailableDrivers();
+        $this->assertTrue((bool)count($drivers));
+    }
 }
