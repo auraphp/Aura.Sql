@@ -153,7 +153,7 @@ interface PdoInterface
      * @see http://php.net/manual/en/pdo.quote.php
      *
      */
-    public function quote(mixed $value, int $parameter_type = PDO::PARAM_STR): string|false;
+    public function quote(string|int|array|float|null $value, int $type = PDO::PARAM_STR): string|false;
 
     /**
      *
