@@ -572,7 +572,7 @@ abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
      * @see http://php.net/manual/en/pdo.prepare.php
      *
      */
-    public function prepare(string $statement, array $options = []): PDOStatement
+    public function prepare(string $query, array $options = []): PDOStatement
     {
         $this->connect();
         $sth = $this->pdo->prepare($statement, $options);
