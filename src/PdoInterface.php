@@ -127,7 +127,7 @@ interface PdoInterface
      *
      * Queries the database and returns a PDOStatement.
      *
-     * @param string $statement The SQL statement to prepare and execute.
+     * @param string $query The SQL statement to prepare and execute.
      *
      * @param int|null $fetchMode
      *
