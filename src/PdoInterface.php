@@ -81,7 +81,7 @@ interface PdoInterface
      * @return mixed The value for the attribute.
      *
      */
-    public function getAttribute(int $attribute): mixed;
+    public function getAttribute(int $attribute): bool|int|string|array|null;
 
     /**
      *
