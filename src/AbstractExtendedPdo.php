@@ -562,7 +562,7 @@ abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
      *
      * Prepares an SQL statement for execution.
      *
-     * @param string $statement The SQL statement to prepare for execution.
+     * @param string $query The SQL statement to prepare for execution.
      *
      * @param array $options Set these attributes on the returned
      * PDOStatement.
@@ -632,7 +632,7 @@ abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
      *
      * Queries the database and returns a PDOStatement.
      *
-     * @param string $statement The SQL statement to prepare and execute.
+     * @param string $query The SQL statement to prepare and execute.
      *
      * @param int|null $fetchMode
      *
@@ -659,7 +659,7 @@ abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
      * This differs from `PDO::quote()` in that it will convert an array into
      * a string of comma-separated quoted values.
      *
-     * @param mixed $value The value to quote.
+     * @param string|int|array|float|null $value The value to quote.
      *
      * @param int $type A data type hint for the database driver.
      *
@@ -988,7 +988,7 @@ abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
      * Retrieve a database connection attribute
      *
      * @param int $attribute
-     * @return mixed
+     * @return bool|int|string|array|null
      */
     public function getAttribute(int $attribute): bool|int|string|array|null
     {
