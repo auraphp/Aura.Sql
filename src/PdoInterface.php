@@ -65,7 +65,7 @@ interface PdoInterface
      *
      * @param string $statement The SQL statement to execute.
      *
-     * @return int The number of rows affected.
+     * @return int|false The number of rows affected.
      *
      * @see http://php.net/manual/en/pdo.exec.php
      *
@@ -78,7 +78,7 @@ interface PdoInterface
      *
      * @param int $attribute The PDO::ATTR_* constant.
      *
-     * @return mixed The value for the attribute.
+     * @return bool|int|string|array|null The value for the attribute.
      *
      */
     public function getAttribute(int $attribute): bool|int|string|array|null;
@@ -112,7 +112,7 @@ interface PdoInterface
      *
      * Prepares an SQL statement for execution.
      *
-     * @param string $statement The SQL statement to prepare for execution.
+     * @param string $query The SQL statement to prepare for execution.
      *
      * @param array $options Set these attributes on the returned
      * PDOStatement.
@@ -144,7 +144,7 @@ interface PdoInterface
      *
      * Quotes a value for use in an SQL statement.
      *
-     * @param mixed $value The value to quote.
+     * @param string|int|array|float|null $value The value to quote.
      *
      * @param int $type A data type hint for the database driver.
      *
