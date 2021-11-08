@@ -3,7 +3,7 @@ namespace Aura\Sql\Parser;
 
 class PgsqlParserTest extends AbstractParserTest
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->parser = new PgsqlParser();
     }

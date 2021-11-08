@@ -6,7 +6,7 @@ use Psr\Log\LogLevel;
 
 class ProfilerTest extends TestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->profiler = new Profiler();
     }

@@ -18,7 +18,7 @@ class ConnectionLocatorTest extends TestCase
 
     protected $write = [];
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->conns = [
             'default' => new ExtendedPdo('sqlite::memory:'),
@@ -47,6 +47,13 @@ class ConnectionLocatorTest extends TestCase
     protected function newLocator($read = [], $write = [])
     {
         return new ConnectionLocator($this->default, $read, $write);
+    }
+
+    public function testNullDefault()
+    {
+        $locator = new ConnectionLocator(null, $this->read, $this->write);
+        $this->expectException('Aura\Sql\Exception\ConnectionNotFound');
+        $locator->getDefault();
     }
 
     public function testGetDefault()
