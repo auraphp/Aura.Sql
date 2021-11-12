@@ -33,7 +33,7 @@ class ConnectionLocator implements ConnectionLocatorInterface
      * @var array
      *
      */
-    protected array $read = [];
+    protected $read = [];
 
     /**
      *
@@ -42,7 +42,7 @@ class ConnectionLocator implements ConnectionLocatorInterface
      * @var array
      *
      */
-    protected array $write = [];
+    protected $write = [];
 
     /**
      *

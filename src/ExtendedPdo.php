@@ -28,7 +28,7 @@ class ExtendedPdo extends AbstractExtendedPdo
      * @var array
      *
      */
-    protected array $args = [];
+    protected $args = [];
 
     /**
      *

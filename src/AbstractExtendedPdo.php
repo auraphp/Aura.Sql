@@ -32,7 +32,7 @@ abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
      * @var PDO|null
      *
      */
-    protected ?PDO $pdo = null;
+    protected $pdo = null;
 
     /**
      *
@@ -41,7 +41,7 @@ abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
      * @var ProfilerInterface
      *
      */
-    protected ProfilerInterface $profiler;
+    protected $profiler;
 
     /**
      *
@@ -50,7 +50,7 @@ abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
      * @var ParserInterface
      *
      */
-    protected ParserInterface $parser;
+    protected $parser;
 
     /**
      *
@@ -59,7 +59,7 @@ abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
      * @var string
      *
      */
-    protected string $quoteNamePrefix = '"';
+    protected $quoteNamePrefix = '"';
 
     /**
      *
@@ -68,7 +68,7 @@ abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
      * @var string
      *
      */
-    protected string $quoteNameSuffix = '"';
+    protected $quoteNameSuffix = '"';
 
     /**
      *
@@ -77,7 +77,7 @@ abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
      * @var string
      *
      */
-    protected string $quoteNameEscapeFind = '"';
+    protected $quoteNameEscapeFind = '"';
 
     /**
      *
@@ -86,7 +86,7 @@ abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
      * @var string
      *
      */
-    protected string $quoteNameEscapeRepl = '""';
+    protected $quoteNameEscapeRepl = '""';
 
     /**
      *

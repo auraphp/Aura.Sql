@@ -24,7 +24,7 @@ class MysqlParser extends AbstractParser
      * @var array
      *
      */
-    protected array $split = [
+    protected $split = [
         // single-quoted string
         "'(?:[^'\\\\]|\\\\'?)*'",
         // double-quoted string
@@ -40,5 +40,5 @@ class MysqlParser extends AbstractParser
      * @var string
      *
      */
-    protected string $skip = '/^(\'|\"|\`)/um';
+    protected $skip = '/^(\'|\"|\`)/um';
 }
