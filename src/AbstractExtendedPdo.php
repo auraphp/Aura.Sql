@@ -205,7 +205,8 @@ abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
      * @see http://php.net/manual/en/pdo.exec.php
      *
      */
-    public function exec(string $statement): int
+    #[\ReturnTypeWillChange]
+    public function exec($statement)
     {
         $this->connect();
         $this->profiler->start(__FUNCTION__);
@@ -405,7 +406,7 @@ abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
      * @return array|false
      *
      */
-    public function fetchOne(string $statement, array $values = []): array|false
+    public function fetchOne(string $statement, array $values = [])
     {
         $sth = $this->perform($statement, $values);
         return $sth->fetch(self::FETCH_ASSOC);
@@ -440,7 +441,7 @@ abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
      * @return mixed
      *
      */
-    public function fetchValue(string $statement, array $values = []): mixed
+    public function fetchValue(string $statement, array $values = [])
     {
         $sth = $this->perform($statement, $values);
         return $sth->fetchColumn(0);
@@ -523,7 +524,8 @@ abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
      *
      * @see http://php.net/manual/en/pdo.lastinsertid.php
      */
-    public function lastInsertId(?string $name = null): string|false
+    #[\ReturnTypeWillChange]
+    public function lastInsertId($name = null)
     {
         $this->connect();
         $this->profiler->start(__FUNCTION__);
@@ -564,7 +566,7 @@ abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
      *
      * @param string $query The SQL statement to prepare for execution.
      *
-     * @param array $options Set these attributes on the returned
+     * @param array|null $options Set these attributes on the returned
      * PDOStatement.
      *
      * @return PDOStatement
@@ -572,10 +574,10 @@ abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
      * @see http://php.net/manual/en/pdo.prepare.php
      *
      */
-    public function prepare(string $query, array $options = []): PDOStatement
+    public function prepare($query, $options = null): PDOStatement
     {
         $this->connect();
-        $sth = $this->pdo->prepare($query, $options);
+        $sth = $this->pdo->prepare($query, $options ?? []);
         return $sth;
     }
 
@@ -634,20 +636,18 @@ abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
      *
      * @param string $query The SQL statement to prepare and execute.
      *
-     * @param int|null $fetchMode
-     *
-     * @param mixed ...$fetch_mode_args Optional fetch-related parameters.
+     * @param mixed ...$fetch Optional fetch-related parameters.
      *
      * @return PDOStatement
      *
      * @see http://php.net/manual/en/pdo.query.php
      *
      */
-    public function query(string $query, ?int $fetchMode = null, mixed ...$fetch_mode_args): PDOStatement
+    public function query(string $query, ...$fetch): PDOStatement
     {
         $this->connect();
         $this->profiler->start(__FUNCTION__);
-        $sth = $this->pdo->query($query, $fetchMode, ...$fetch_mode_args);
+        $sth = $this->pdo->query($query, ...$fetch);
         $this->profiler->finish($sth->queryString);
         return $sth;
     }
@@ -668,7 +668,7 @@ abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
      * @see http://php.net/manual/en/pdo.quote.php
      *
      */
-    public function quote(string|int|array|float|null $value, int $type = self::PARAM_STR): string
+    public function quote($value, $type = self::PARAM_STR): string
     {
         $this->connect();
 
@@ -908,7 +908,7 @@ abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
      * bindable (e.g., array, object, or resource).
      *
      */
-    protected function bindValue(PDOStatement $sth, mixed $key, mixed $val): bool
+    protected function bindValue(PDOStatement $sth, $key, $val): bool
     {
         if (is_int($val)) {
             return $sth->bindValue($key, $val, self::PARAM_INT);
@@ -990,7 +990,8 @@ abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
      * @param int $attribute
      * @return bool|int|string|array|null
      */
-    public function getAttribute(int $attribute): bool|int|string|array|null
+    #[\ReturnTypeWillChange]
+    public function getAttribute($attribute)
     {
         $this->connect();
         return $this->pdo->getAttribute($attribute);
@@ -1004,7 +1005,8 @@ abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
      * @param mixed $value
      * @return bool
      */
-    public function setAttribute(int $attribute, mixed $value): bool
+    #[\ReturnTypeWillChange]
+    public function setAttribute($attribute, $value)
     {
         $this->connect();
         return $this->pdo->setAttribute($attribute, $value);

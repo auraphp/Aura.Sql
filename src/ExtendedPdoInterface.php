@@ -187,7 +187,7 @@ interface ExtendedPdoInterface extends PdoInterface
      * @return array|false
      *
      */
-    public function fetchOne(string $statement, array $values = []): array|false;
+    public function fetchOne(string $statement, array $values = []);
 
     /**
      *
@@ -214,7 +214,7 @@ interface ExtendedPdoInterface extends PdoInterface
      * @return mixed
      *
      */
-    public function fetchValue(string $statement, array $values = []): mixed;
+    public function fetchValue(string $statement, array $values = []);
 
     /**
      *
