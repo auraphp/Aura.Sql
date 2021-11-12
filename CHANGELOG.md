@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 4.0.0
+
+- Backports 5.x branch (which includes 8.1 compatibility) to PHP 7.2-8.0 compat, including annotations as needed.
+
 ## 3.0.0
 
 - Fixed issue #163: Add getAttribute and setAttribute functions to make sure pdo is connected before calling the functions
