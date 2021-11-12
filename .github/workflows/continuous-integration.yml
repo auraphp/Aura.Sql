@@ -15,6 +15,10 @@ jobs:
         operating-system:
           - ubuntu-latest
         php-version:
+          - '7.2'
+          - '7.3'
+          - '7.4'
+          - '8.0'
           - '8.1'
     steps:
       - name: Checkout
@@ -40,7 +44,7 @@ jobs:
           restore-keys: ${{ runner.os }}-composer-
 
       - name: Install dependencies
-        run: composer install --no-interaction --prefer-dist --ignore-platform-req=php
+        run: composer install --no-interaction --prefer-dist
 
       - name: Run test suite
         run: ./vendor/bin/phpunit
