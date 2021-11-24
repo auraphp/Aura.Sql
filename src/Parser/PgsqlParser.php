@@ -24,7 +24,7 @@ class PgsqlParser extends AbstractParser
      * @var array
      *
      */
-    protected array $split = [
+    protected $split = [
         // single-quoted string
         "'(?:[^'\\\\]|\\\\'?)*'",
         // double-quoted string
@@ -42,5 +42,5 @@ class PgsqlParser extends AbstractParser
      * @var string
      *
      */
-    protected string $skip = '/^(\'|\"|\$|\:[^a-zA-Z_])/um';
+    protected $skip = '/^(\'|\"|\$|\:[^a-zA-Z_])/um';
 }

@@ -300,7 +300,7 @@ class ExtendedPdoTest extends TestCase
 
         // in php <= 8 id is a string, in php >= 8.1 it is a int
         // https://github.com/php/php-src/blob/PHP-8.1/UPGRADING#L131
-        $this->assertSame(1, $actual->id);
+        $this->assertSame(1, (int) $actual->id);
         $this->assertSame('Anna', $actual->name);
     }
 
@@ -315,7 +315,7 @@ class ExtendedPdoTest extends TestCase
         );
         // in php <= 8 id is a string, in php >= 8.1 it is a int
         // https://github.com/php/php-src/blob/PHP-8.1/UPGRADING#L131
-        $this->assertSame(1, $actual->id);
+        $this->assertSame(1, (int) $actual->id);
         $this->assertSame('Anna', $actual->name);
         $this->assertSame('bar', $actual->foo);
     }

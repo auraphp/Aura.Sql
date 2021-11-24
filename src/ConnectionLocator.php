@@ -33,7 +33,7 @@ class ConnectionLocator implements ConnectionLocatorInterface
      * @var array
      *
      */
-    protected array $read = [];
+    protected $read = [];
 
     /**
      *
@@ -42,7 +42,7 @@ class ConnectionLocator implements ConnectionLocatorInterface
      * @var array
      *
      */
-    protected array $write = [];
+    protected $write = [];
 
     /**
      *
@@ -92,7 +92,7 @@ class ConnectionLocator implements ConnectionLocatorInterface
      *
      * @throws Exception\ConnectionNotFound
      */
-    public function getDefault(): ExtendedPdoInterface
+    public function getDefault()
     {
         if (! $this->default) {
             throw new Exception\ConnectionNotFound("default");
@@ -132,7 +132,7 @@ class ConnectionLocator implements ConnectionLocatorInterface
      *
      * @throws \Aura\Sql\Exception\ConnectionNotFound
      */
-    public function getRead(string $name = ''): ExtendedPdoInterface
+    public function getRead(string $name = '')
     {
         return $this->getConnection('read', $name);
     }
@@ -164,7 +164,7 @@ class ConnectionLocator implements ConnectionLocatorInterface
      *
      * @throws \Aura\Sql\Exception\ConnectionNotFound
      */
-    public function getWrite(string $name = ''): ExtendedPdoInterface
+    public function getWrite(string $name = '')
     {
         return $this->getConnection('write', $name);
     }
@@ -182,7 +182,7 @@ class ConnectionLocator implements ConnectionLocatorInterface
      * @throws Exception\ConnectionNotFound
      *
      */
-    protected function getConnection(string $type, string $name): ExtendedPdoInterface
+    protected function getConnection(string $type, string $name)
     {
         $conn = &$this->{$type};
 
