@@ -200,12 +200,12 @@ abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
      *
      * @param string $statement The SQL statement to prepare and execute.
      *
-     * @return int The number of affected rows.
+     * @return int|false The number of affected rows.
      *
      * @see http://php.net/manual/en/pdo.exec.php
      *
      */
-    public function exec(string $statement): int
+    public function exec(string $statement): int|false
     {
         $this->connect();
         $this->profiler->start(__FUNCTION__);
@@ -567,12 +567,12 @@ abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
      * @param array $options Set these attributes on the returned
      * PDOStatement.
      *
-     * @return PDOStatement
+     * @return PDOStatement|false
      *
      * @see http://php.net/manual/en/pdo.prepare.php
      *
      */
-    public function prepare(string $query, array $options = []): PDOStatement
+    public function prepare(string $query, array $options = []): PDOStatement|false
     {
         $this->connect();
         $sth = $this->pdo->prepare($query, $options);
@@ -638,12 +638,12 @@ abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
      *
      * @param mixed ...$fetch_mode_args Optional fetch-related parameters.
      *
-     * @return PDOStatement
+     * @return PDOStatement|false
      *
      * @see http://php.net/manual/en/pdo.query.php
      *
      */
-    public function query(string $query, ?int $fetchMode = null, mixed ...$fetch_mode_args): PDOStatement
+    public function query(string $query, ?int $fetchMode = null, mixed ...$fetch_mode_args): PDOStatement|false
     {
         $this->connect();
         $this->profiler->start(__FUNCTION__);
