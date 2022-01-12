@@ -663,12 +663,12 @@ abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
      *
      * @param int $type A data type hint for the database driver.
      *
-     * @return string The quoted value.
+     * @return string|false The quoted value or false if the driver does not support quoting in this way.
      *
      * @see http://php.net/manual/en/pdo.quote.php
      *
      */
-    public function quote(string|int|array|float|null $value, int $type = self::PARAM_STR): string
+    public function quote(string|int|array|float|null $value, int $type = self::PARAM_STR): string|false
     {
         $this->connect();
 
@@ -697,7 +697,7 @@ abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
      */
     public function quoteName(string $name): string
     {
-        if (strpos($name, '.') === false) {
+        if (!str_contains($name, '.')) {
             return $this->quoteSingleName($name);
         }
 
