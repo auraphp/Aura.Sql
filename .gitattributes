@@ -10,6 +10,7 @@
 # testing and other
 tests/              export-ignore
 phpunit.xml.dist    export-ignore
+phpunit.php         export-ignore
 composer.lock       export-ignore
 .scrutinizer.yml    export-ignore
 
@@ -17,5 +18,5 @@ composer.lock       export-ignore
 .editorconfig       export-ignore
 
 # license
-LICENSE
-CONTRIBUTING.md
+LICENSE             export-ignore
+CONTRIBUTING.md     export-ignore

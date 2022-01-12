@@ -419,12 +419,6 @@ class ExtendedPdoTest extends TestCase
         $this->assertEquals($expect, $actual);
     }
 
-    public function testFetchOneWithNoResult()
-    {
-        $stm = "SELECT id, name FROM pdotest WHERE 1=2";
-        $this->assertFalse($this->pdo->fetchOne($stm));
-    }
-
     public function testGroupSingleColumn()
     {
         $stm = "SELECT id, name FROM pdotest WHERE id = 1";
