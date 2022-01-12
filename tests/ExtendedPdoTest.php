@@ -300,7 +300,12 @@ class ExtendedPdoTest extends TestCase
 
         // in php <= 8 id is a string, in php >= 8.1 it is a int
         // https://github.com/php/php-src/blob/PHP-8.1/UPGRADING#L131
-        $this->assertSame(1, $actual->id);
+        if (PHP_MINOR_VERSION > 0) {
+            $this->assertSame(1, $actual->id);
+        } else {
+            $this->assertSame('1', $actual->id);
+        }
+
         $this->assertSame('Anna', $actual->name);
     }
 
@@ -315,7 +320,11 @@ class ExtendedPdoTest extends TestCase
         );
         // in php <= 8 id is a string, in php >= 8.1 it is a int
         // https://github.com/php/php-src/blob/PHP-8.1/UPGRADING#L131
-        $this->assertSame(1, $actual->id);
+        if (PHP_MINOR_VERSION > 0) {
+            $this->assertSame(1, $actual->id);
+        } else {
+            $this->assertSame('1', $actual->id);
+        }
         $this->assertSame('Anna', $actual->name);
         $this->assertSame('bar', $actual->foo);
     }
@@ -332,6 +341,12 @@ class ExtendedPdoTest extends TestCase
             ];
         }
         $this->assertEquals($expect, $actual);
+    }
+
+    public function testFetchObjectWithNoResult()
+    {
+        $stm = "SELECT * FROM pdotest where 0";
+        $this->assertFalse($this->pdo->fetchObject($stm));
     }
 
     public function testYieldObjects()
@@ -402,6 +417,12 @@ class ExtendedPdoTest extends TestCase
             'name' => 'Anna',
         ];
         $this->assertEquals($expect, $actual);
+    }
+
+    public function testFetchOneWithNoResult()
+    {
+        $stm = "SELECT id, name FROM pdotest WHERE 1=2";
+        $this->assertFalse($this->pdo->fetchOne($stm));
     }
 
     public function testGroupSingleColumn()

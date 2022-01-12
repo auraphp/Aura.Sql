@@ -1,5 +1,5 @@
 {
-    "name": "aura/sql",
+    "name": "productsupcom/sql",
     "type": "library",
     "description": "A PDO extension that provides lazy connections, array quoting, query profiling, value binding, and convenience methods for common fetch styles. Because it extends PDO, existing code that uses PDO can use this without any changes to the existing code.",
     "keywords": [
@@ -22,7 +22,7 @@
         }
     ],
     "require": {
-        "php": ">=8.1",
+        "php": ">=8.0",
         "psr/log": "^1.0 || ^2.0",
         "ext-pdo": "*"
     },
@@ -33,7 +33,7 @@
     },
     "require-dev": {
         "pds/skeleton": "~1.0",
-        "phpunit/phpunit": "~5.7|~9.5"
+        "phpunit/phpunit": "^9.5"
     },
     "autoload-dev": {
         "psr-4": {
