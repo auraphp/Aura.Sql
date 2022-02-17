@@ -298,8 +298,6 @@ class ExtendedPdoTest extends TestCase
         $stm = "SELECT id, name FROM pdotest WHERE id = ?";
         $actual = $this->pdo->fetchObject($stm, [1]);
 
-        // in php <= 8 id is a string, in php >= 8.1 it is a int
-        // https://github.com/php/php-src/blob/PHP-8.1/UPGRADING#L131
         $this->assertSame(1, $actual->id);
         $this->assertSame('Anna', $actual->name);
     }
@@ -313,8 +311,7 @@ class ExtendedPdoTest extends TestCase
             'Aura\Sql\FakeObject',
             ['bar']
         );
-        // in php <= 8 id is a string, in php >= 8.1 it is a int
-        // https://github.com/php/php-src/blob/PHP-8.1/UPGRADING#L131
+
         $this->assertSame(1, $actual->id);
         $this->assertSame('Anna', $actual->name);
         $this->assertSame('bar', $actual->foo);
@@ -332,6 +329,12 @@ class ExtendedPdoTest extends TestCase
             ];
         }
         $this->assertEquals($expect, $actual);
+    }
+
+    public function testFetchObjectWithNoResult()
+    {
+        $stm = "SELECT * FROM pdotest where 0";
+        $this->assertFalse($this->pdo->fetchObject($stm));
     }
 
     public function testYieldObjects()

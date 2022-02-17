@@ -1,0 +1,22 @@
+# @see https://git-scm.com/docs/gitattributes
+# when you composer-require this library with --prefer-dist the tests will not be part of the installed vendor code
+# making your final package smaller in size and therefore faster to build and deploy
+
+# git files
+.github/            export-ignore
+.gitattributes      export-ignore
+.gitignore          export-ignore
+
+# testing and other
+tests/              export-ignore
+phpunit.xml.dist    export-ignore
+phpunit.php         export-ignore
+composer.lock       export-ignore
+.scrutinizer.yml    export-ignore
+
+# code style
+.editorconfig       export-ignore
+
+# license
+LICENSE             export-ignore
+CONTRIBUTING.md     export-ignore
