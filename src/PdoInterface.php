@@ -186,5 +186,5 @@ interface PdoInterface
      * @return array
      *
      */
-    public static function getAvailableDrivers();
+    public static function getAvailableDrivers(): array;
 }
