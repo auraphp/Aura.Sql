@@ -1,4 +1,19 @@
 # CHANGELOG
+## 5.0.1
+
+- Fix broken return types #204 by @r4ndsen
+- Fix scrutinizer.yml #206 by @harikt
+
+## 5.0.0
+
+- Remove unused param in queryparser by @r4ndsen in https://github.com/auraphp/Aura.Sql/pull/180
+- PHP 8 Support by @koriym in https://github.com/auraphp/Aura.Sql/pull/185
+- Allow psr/log v2 by @r4ndsen in https://github.com/auraphp/Aura.Sql/pull/191
+- Compatibility with PHP 8.1 by @srjlewis in https://github.com/auraphp/Aura.Sql/pull/193
+- Update PHPDoc by @kenjis in https://github.com/auraphp/Aura.Sql/pull/196
+- Migrate Travis to GitHub Actions by @koriym in https://github.com/auraphp/Aura.Sql/pull/197
+- Update GitHub Actions for 5.x by @kenjis in https://github.com/auraphp/Aura.Sql/pull/198
+- docs: update README for 5.x by @kenjis in https://github.com/auraphp/Aura.Sql/pull/200
 
 ## 3.0.0
 
