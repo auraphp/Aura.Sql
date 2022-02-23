@@ -241,10 +241,10 @@ abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
      *
      * @param array $values Values to bind to the query.
      *
-     * @return array
+     * @return array|false
      *
      */
-    public function fetchAll(string $statement, array $values = []): array
+    public function fetchAll(string $statement, array $values = [])
     {
         $sth = $this->perform($statement, $values);
         return $sth->fetchAll(self::FETCH_ASSOC);
@@ -284,10 +284,10 @@ abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
      *
      * @param array $values Values to bind to the query.
      *
-     * @return array
+     * @return array|false
      *
      */
-    public function fetchCol(string $statement, array $values = []): array
+    public function fetchCol(string $statement, array $values = [])
     {
         $sth = $this->perform($statement, $values);
         return $sth->fetchAll(self::FETCH_COLUMN, 0);
@@ -305,14 +305,14 @@ abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
      * @param int $style a fetch style defaults to PDO::FETCH_COLUMN for single
      * values, use PDO::FETCH_NAMED when fetching a multiple columns
      *
-     * @return array
+     * @return array|false
      *
      */
     public function fetchGroup(
         string $statement,
         array $values = [],
         int $style = PDO::FETCH_COLUMN
-    ): array {
+    ) {
         $sth = $this->perform($statement, $values);
         return $sth->fetchAll(self::FETCH_GROUP | $style);
     }
@@ -337,7 +337,7 @@ abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
      *
      * @param array $args Arguments to pass to the object constructor.
      *
-     * @return object
+     * @return object|false
      *
      */
     public function fetchObject(
@@ -345,7 +345,7 @@ abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
         array $values = [],
         string $class = 'stdClass',
         array $args = []
-    ): object {
+    ) {
         $sth = $this->perform($statement, $values);
 
         if (! empty($args)) {
@@ -377,7 +377,7 @@ abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
      *
      * @param array $args Arguments to pass to each object constructor.
      *
-     * @return array
+     * @return array|false
      *
      */
     public function fetchObjects(
@@ -385,7 +385,7 @@ abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
         array $values = [],
         string $class = 'stdClass',
         array $args = []
-    ): array {
+    ) {
         $sth = $this->perform($statement, $values);
 
         if (! empty($args)) {
@@ -421,10 +421,10 @@ abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
      *
      * @param array $values Values to bind to the query.
      *
-     * @return array
+     * @return array|false
      *
      */
-    public function fetchPairs(string $statement, array $values = []): array
+    public function fetchPairs(string $statement, array $values = [])
     {
         $sth = $this->perform($statement, $values);
         return $sth->fetchAll(self::FETCH_KEY_PAIR);
@@ -438,7 +438,7 @@ abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
      *
      * @param array $values Values to bind to the query.
      *
-     * @return mixed
+     * @return mixed|false
      *
      */
     public function fetchValue(string $statement, array $values = [])
