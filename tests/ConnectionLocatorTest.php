@@ -1,7 +1,9 @@
 <?php
 namespace Aura\Sql;
 
-class ConnectionLocatorTest extends \PHPUnit_Framework_TestCase
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
+
+class ConnectionLocatorTest extends TestCase
 {
     /**
      * @var ConnectionLocator
@@ -16,7 +18,7 @@ class ConnectionLocatorTest extends \PHPUnit_Framework_TestCase
 
     protected $write = [];
 
-    protected function setUp()
+    protected function set_up()
     {
         $this->conns = [
             'default' => new ExtendedPdo('sqlite::memory:'),

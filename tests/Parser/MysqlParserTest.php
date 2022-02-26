@@ -3,7 +3,7 @@ namespace Aura\Sql\Parser;
 
 class MysqlParserTest extends AbstractParserTest
 {
-    protected function setUp()
+    protected function set_up()
     {
         $this->parser = new MysqlParser();
     }
