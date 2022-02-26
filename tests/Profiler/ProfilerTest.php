@@ -2,10 +2,11 @@
 namespace Aura\Sql\Profiler;
 
 use Psr\Log\LogLevel;
+use Yoast\PHPUnitPolyfills\TestCases\TestCase;
 
-class ProfilerTest extends \PHPUnit_Framework_TestCase
+class ProfilerTest extends TestCase
 {
-    protected function setUp()
+    protected function set_up()
     {
         $this->profiler = new Profiler();
     }
