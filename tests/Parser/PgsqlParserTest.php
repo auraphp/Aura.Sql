@@ -96,7 +96,6 @@ SQL;
     public function testIssue177()
     {
         $parameters = ['types' => [1, 2]];
-        //  AND
         $sql = <<<SQL
 SELECT * FROM table WHERE type in (:types) AND removed = false AND data @> '{\"is_hidden\":false}'::jsonb
 SQL;
