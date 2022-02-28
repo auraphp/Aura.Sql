@@ -176,7 +176,7 @@ abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
      *
      * Gets the most recent error code.
      *
-     * @return mixed
+     * @return string
      *
      */
     #[\ReturnTypeWillChange]
@@ -206,7 +206,7 @@ abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
      *
      * @param string $statement The SQL statement to prepare and execute.
      *
-     * @return int The number of affected rows.
+     * @return int|false The number of affected rows.
      *
      * @see http://php.net/manual/en/pdo.exec.php
      *
@@ -343,7 +343,7 @@ abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
      *
      * @param array $args Arguments to pass to the object constructor.
      *
-     * @return object
+     * @return object|false
      *
      */
     public function fetchObject(
@@ -527,7 +527,7 @@ abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
      * @param string $name The name of the sequence to check; typically needed
      * only for PostgreSQL, where it takes the form of `<table>_<column>_seq`.
      *
-     * @return string
+     * @return string|false
      *
      * @see http://php.net/manual/en/pdo.lastinsertid.php
      *
@@ -576,7 +576,7 @@ abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
      * @param array $options Set these attributes on the returned
      * PDOStatement.
      *
-     * @return PDOStatement
+     * @return PDOStatement|false
      *
      * @see http://php.net/manual/en/pdo.prepare.php
      *
@@ -606,7 +606,7 @@ abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
      *
      * @param array $values The values to bind to the statement, if any.
      *
-     * @return PDOStatement
+     * @return PDOStatement|false
      *
      * @see http://php.net/manual/en/pdo.prepare.php
      *
@@ -645,7 +645,7 @@ abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
      *
      * @param mixed ...$fetch Optional fetch-related parameters.
      *
-     * @return PDOStatement
+     * @return PDOStatement|false
      *
      * @see http://php.net/manual/en/pdo.query.php
      *
@@ -671,7 +671,7 @@ abstract class AbstractExtendedPdo extends PDO implements ExtendedPdoInterface
      *
      * @param int $type A data type hint for the database driver.
      *
-     * @return string The quoted value.
+     * @return string|false The quoted value.
      *
      * @see http://php.net/manual/en/pdo.quote.php
      *
