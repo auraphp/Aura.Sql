@@ -17,4 +17,20 @@ namespace Aura\Sql\Parser;
  */
 class SqliteParser extends AbstractParser
 {
+    /**
+     * {@inheritDoc}
+     */
+    protected array $split = [
+        // single-quoted string
+        "'(?:[^'\\\\]|\\\\'?)*'",
+        // double-quoted string
+        '"(?:[^"\\\\]|\\\\"?)*"',
+        // backticked column names
+        '`(?:[^`\\\\]|\\\\`?)*`',
+    ];
+
+    /**
+     * {@inheritDoc}
+     */
+    protected string $skip = '/^(\'|"|`|\:[^a-zA-Z_])/um';
 }
