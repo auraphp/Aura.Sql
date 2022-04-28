@@ -1,5 +1,7 @@
 # Aura.Sql
 
+> 4.x is abandoned due to some of the problems mentioned in [#213](https://github.com/auraphp/Aura.Sql/issues/213). We will continue to support 3.x and 5.x. So you can use one of them.
+
 Provides an extension to the native [PDO](http://php.net/PDO) along with a
 profiler and connection locator. Because _ExtendedPdo_ is an extension of the
 native _PDO_, code already using the native _PDO_ or typehinted to the native
