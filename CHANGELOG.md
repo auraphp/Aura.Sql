@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## 3.1.0
+
+- Continous Integration Improvements via #184, #197 by @koriym
+- PHP 8.x support via #185, #209, #214 by @koriym, @harikt
+- Support psr/log v1 and v2 via #191 by @r4ndsen
+- Fixed #183 (Bug in sqlite query parser to support `:` in column name) via #203, #211 by @r4ndsen, @harikt
+
 ## 3.0.0
 
 - Fixed issue #163: Add getAttribute and setAttribute functions to make sure pdo is connected before calling the functions
