@@ -1,7 +1,9 @@
 <?php
 namespace Aura\Sql;
 
-class FakeObject
+use stdClass;
+
+class FakeObject extends stdClass
 {
     public $foo;
 
