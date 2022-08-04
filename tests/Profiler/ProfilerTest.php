@@ -6,6 +6,9 @@ use Yoast\PHPUnitPolyfills\TestCases\TestCase;
 
 class ProfilerTest extends TestCase
 {
+    /** @var Profiler */
+    private $profiler;
+
     protected function set_up()
     {
         $this->profiler = new Profiler();

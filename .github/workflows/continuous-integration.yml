@@ -23,6 +23,7 @@ jobs:
           - '7.4'
           - '8.0'
           - '8.1'
+          - '8.2'
     steps:
       - name: Checkout
         uses: actions/checkout@v1
@@ -32,8 +33,9 @@ jobs:
         with:
           php-version: ${{ matrix.php-version }}
           coverage: xdebug
-          tools: none
+          tools: composer:2.2
           ini-values: assert.exception=1, zend.assertions=1
+
 
       - name: Get composer cache directory
         id: composer-cache
@@ -46,8 +48,17 @@ jobs:
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
           restore-keys: ${{ runner.os }}-composer-
 
-      - name: Install dependencies
+      - name: Composer self-update
+        if: ${{ !contains(fromJSON('["5.6", "7.0", "7.1"]'), matrix.php-version) }}
+        run: composer self-update
+
+      - name: Install dependencies (PHP 5.6-8.1)
+        if: ${{ matrix.php-version != '8.2' }}
         run: composer install --no-interaction --prefer-dist
+
+      - name: Install dependencies (PHP 8.2)
+        if: ${{ matrix.php-version == '8.2' }}
+        run: composer install --no-interaction --prefer-dist --ignore-platform-req=php
 
       - name: Run test suite
         run: php -d xdebug.mode=coverage ./vendor/bin/phpunit --coverage-clover=coverage.xml
