@@ -1,10 +1,10 @@
 <?php
 namespace Aura\Sql;
 
-use stdClass;
-
-class FakeObject extends stdClass
+class FakeObject
 {
+    public $id;
+    public $name;
     public $foo;
 
     public function __construct($foo)
