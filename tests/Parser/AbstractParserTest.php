@@ -148,4 +148,24 @@ SQL;
         $this->assertEquals($statement, $sql);
         $this->assertEquals($values, $parameters);
     }
+
+    public function testIn()
+    {
+        $parameters = ['types' => [1, 2]];
+        $sql = <<<SQL
+SELECT * FROM table WHERE id IN (:types)
+SQL;
+        list ($statement, $values) = $this->rebuild($sql, $parameters);
+
+        $expectedSql = <<<SQL
+SELECT * FROM table WHERE id IN (:types_0, :types_1)
+SQL;
+        $expectedParameters = [
+            'types_0' => 1,
+            'types_1' => 2
+        ];
+
+        $this->assertEquals($expectedSql, $statement);
+        $this->assertEquals($expectedParameters, $values);
+    }
 }

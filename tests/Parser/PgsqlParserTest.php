@@ -92,4 +92,38 @@ SQL;
         list ($statement, $values) = $this->rebuild($sql, $parameters);
         $this->assertEquals($sql, $statement);
     }
+
+    public function testIssue177()
+    {
+        $parameters = ['types' => [1, 2]];
+        $sql = <<<SQL
+SELECT * FROM table WHERE type in (:types) AND removed = false AND data @> '{\"is_hidden\":false}'::jsonb
+SQL;
+        list ($statement, $values) = $this->rebuild($sql, $parameters);
+
+        $expectedSql = <<<SQL
+SELECT * FROM table WHERE type in (:types_0, :types_1) AND removed = false AND data @> '{\"is_hidden\":false}'::jsonb
+SQL;
+
+        $expectedParameters = [
+            'types_0' => 1,
+            'types_1' => 2
+        ];
+
+        $this->assertEquals($expectedSql, $statement);
+        $this->assertEquals($expectedParameters, $values);
+
+        // change order
+        $sql = <<<SQL
+SELECT * FROM table WHERE removed = false AND data @> '{\"is_hidden\":false}'::jsonb  AND type in (:types)
+SQL;
+        list ($statement, $values) = $this->rebuild($sql, $parameters);
+
+        $expectedSql = <<<SQL
+SELECT * FROM table WHERE removed = false AND data @> '{\"is_hidden\":false}'::jsonb AND type in (:types_0, :types_1)
+SQL;
+
+        $this->assertEquals($expectedSql, $statement);
+        $this->assertEquals($expectedParameters, $values);
+    }
 }
