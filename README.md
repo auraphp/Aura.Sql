@@ -54,7 +54,7 @@ Alternatively, [download a release][], or clone this repository, then map the
 
 ## Dependencies
 
-This package requires PHP 8.1 or later; it has also been tested on PHP 8.1.
+This package requires PHP 8.1 or later; it has also been tested on PHP 8.1-8.2.
 We recommend using the latest available version of PHP as a matter of
 principle.
 
