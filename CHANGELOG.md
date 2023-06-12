@@ -1,4 +1,14 @@
 # CHANGELOG
+
+## 5.0.2
+
+- Add failing test for #183 by @harikt in https://github.com/auraphp/Aura.Sql/pull/211
+- sqlite parser update by @harikt in https://github.com/auraphp/Aura.Sql/pull/212
+- Enable PHP 8.2 compat by @koriym in https://github.com/auraphp/Aura.Sql/pull/218
+- Fix missing properties by @koriym in https://github.com/auraphp/Aura.Sql/pull/219
+- Allow using psr/log v3 by @Qrzysio in https://github.com/auraphp/Aura.Sql/pull/223
+- Fix illegal space (0xE38080) in composer.json by @koriym in https://github.com/auraphp/Aura.Sql/pull/224
+
 ## 5.0.1
 
 - Fix broken return types #204 by @r4ndsen
