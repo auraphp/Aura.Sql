@@ -111,6 +111,18 @@ class ExtendedPdo extends AbstractExtendedPdo
 
     /**
      *
+     * alias of connect() for interoperability with future versions Aura.Sql
+     *
+     * @return void
+     */
+    public function establishConnection(): void
+    {
+        $this->connect();
+    }
+    
+
+    /**
+     *
      * Disconnects from the database.
      *
      * @return void
