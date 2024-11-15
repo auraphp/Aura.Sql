@@ -119,7 +119,6 @@ class ExtendedPdo extends AbstractExtendedPdo
     {
         $this->connect();
     }
-    
 
     /**
      *
