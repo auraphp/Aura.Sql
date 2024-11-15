@@ -89,6 +89,8 @@ class ExtendedPdo extends AbstractExtendedPdo
      *
      * Connects to the database.
      *
+     * @deprecated use establishConnection() as future versions will be using establishConnection()
+     *
      * @return void
      */
     public function connect(): void
