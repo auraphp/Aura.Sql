@@ -93,9 +93,7 @@ class ExtendedPdo extends AbstractExtendedPdo
         array $queries = [],
         ?ProfilerInterface $profiler = null
     ): static {
-        $pdo = new static($dsn, $username, $password, $options ?? [], $queries, $profiler);
-        $pdo->establishConnection();
-        return $pdo;
+        return new static($dsn, $username, $password, $options ?? [], $queries, $profiler);
     }
 
     /**
@@ -113,11 +111,7 @@ class ExtendedPdo extends AbstractExtendedPdo
         // connect
         $this->profiler->start(__FUNCTION__);
         list($dsn, $username, $password, $options, $queries) = $this->args;
-        if(version_compare(phpversion(), '8.4.0', '<')) {
-            $this->pdo = new PDO($dsn, $username, $password, $options);
-        } else {
-            $this->pdo = PDO::connect($dsn, $username, $password, $options);
-        }
+        $this->pdo = PDO::connect($dsn, $username, $password, $options);
         $this->profiler->finish();
 
         // connection-time queries
