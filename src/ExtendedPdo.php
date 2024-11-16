@@ -85,13 +85,24 @@ class ExtendedPdo extends AbstractExtendedPdo
         $this->setQuoteName($parts[0]);
     }
 
+    public static function connect(
+        string $dsn,
+        ?string $username = null,
+        ?string $password = null,
+        ?array $options = [],
+        array $queries = [],
+        ?ProfilerInterface $profiler = null
+    ): static {
+        return new static($dsn, $username, $password, $options ?? [], $queries, $profiler);
+    }
+
     /**
      *
      * Connects to the database.
      *
      * @return void
      */
-    public function connect(): void
+    public function establishConnection(): void
     {
         if ($this->pdo) {
             return;
@@ -100,7 +111,7 @@ class ExtendedPdo extends AbstractExtendedPdo
         // connect
         $this->profiler->start(__FUNCTION__);
         list($dsn, $username, $password, $options, $queries) = $this->args;
-        $this->pdo = new PDO($dsn, $username, $password, $options);
+        $this->pdo = PDO::connect($dsn, $username, $password, $options);
         $this->profiler->finish();
 
         // connection-time queries
@@ -152,7 +163,7 @@ class ExtendedPdo extends AbstractExtendedPdo
      */
     public function getPdo(): PDO
     {
-        $this->connect();
+        $this->establishConnection();
         return $this->pdo;
     }
 }

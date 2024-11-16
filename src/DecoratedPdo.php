@@ -51,7 +51,7 @@ class DecoratedPdo extends AbstractExtendedPdo
      * @return void
      *
      */
-    public function connect(): void
+    public function establishConnection(): void
     {
         // already connected
     }
