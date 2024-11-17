@@ -1,3 +1,44 @@
+# 5.x Upgrade Notes
+
+Most changes are to provide better typing and compatability with PHP 8.1 and above.
+
+## Deprecations
+
+The main change is the deprecation of `ExtendedPdo::connect()` and will be changed in versions starting with 6.x
+
+Older Code would look like ...
+
+```php
+// does not connect to the database
+$pdo = new ExtendedPdo(
+    'mysql:host=localhost;dbname=test',
+    'username',
+    'password'
+);
+
+// automatically connects
+$pdo->exec('SELECT * FROM test');
+
+// explicitly forces a connection
+$pdo->connect();
+```
+... and now needs to be changed to `ExtendedPdo::establishConnection()`
+
+```php
+// does not connect to the database
+$pdo = new ExtendedPdo(
+    'mysql:host=localhost;dbname=test',
+    'username',
+    'password'
+);
+
+// automatically connects
+$pdo->exec('SELECT * FROM test');
+
+// explicitly forces a connection
+$pdo->establishConnection();
+```
+
 # 3.x Upgrade Notes
 
 The vast majority of changes and breaks from the 2.x version are "under the
