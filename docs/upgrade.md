@@ -4,7 +4,7 @@ Most changes are to provide better typing and compatability with PHP 8.1 and abo
 
 ## Deprecations
 
-The main change is the deprecation of `ExtendedPdo::connect()` and will be changed in versions starting with 6.x
+The main change is the deprecation of `ExtendedPdo::connect()` and will be changed in future versions starting with 6.x
 
 Older Code would look like ...
 
