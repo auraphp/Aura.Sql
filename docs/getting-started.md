@@ -32,7 +32,7 @@ If you want to force a connection, call the `establishConnection()` method.
 
 > Previous `connect()` method has been deprecated due to the introduction of 
 > ```PDO::connect()``` in [PHP 8.4](https://www.php.net/releases/8.4/en.php#pdo_driver_specific_subclasses), 
-> so we encourage users tp use `establishConnection()` instead.
+> so we encourage users t0 use `establishConnection()` instead.
 
 ```php
 // does not connect to the database
