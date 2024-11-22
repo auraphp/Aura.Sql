@@ -8,4 +8,9 @@ class ExtendedConnectPdoTest extends \Aura\Sql\ExtendedPdoTest
     {
         return ExtendedPdo::connect('sqlite::memory:');
     }
+
+    public function testPdoType()
+    {
+        $this->assertInstanceOf(Pdo\Sqlite::class, $this->pdo);
+    }
 }

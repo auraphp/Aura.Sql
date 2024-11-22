@@ -21,6 +21,9 @@ use PDO;
  */
 class ExtendedPdo extends AbstractExtendedPdo
 {
+    public const string CONNECT_IMMEDIATELY = 'immediate';
+    public const string DRIVER_SPECIFIC     = 'driverSpecific';
+
     /**
      *
      * Constructor arguments for instantiating the PDO connection.
@@ -30,6 +33,14 @@ class ExtendedPdo extends AbstractExtendedPdo
      */
     protected array $args = [];
 
+
+    /**
+     *
+     * Flag for how will construct the PDO object
+     *
+     * @var bool
+     */
+    protected bool $driverSpecific = false;
     /**
      *
      * Constructor.
@@ -64,6 +75,11 @@ class ExtendedPdo extends AbstractExtendedPdo
             $options[PDO::ATTR_ERRMODE] = PDO::ERRMODE_EXCEPTION;
         }
 
+        // check option for driver specific construct and set flay for lazy loading later
+        if (isset($options[static::DRIVER_SPECIFIC])) {
+            $this->driverSpecific = (bool) $options[static::DRIVER_SPECIFIC];
+        }
+
         // retain the arguments for later
         $this->args = [
             $dsn,
@@ -83,17 +99,24 @@ class ExtendedPdo extends AbstractExtendedPdo
 
         // set quotes for identifier names
         $this->setQuoteName($parts[0]);
+
+        // create a connection immediately
+        if (isset($options[static::CONNECT_IMMEDIATELY]) && $options[static::CONNECT_IMMEDIATELY]) {
+            $this->establishConnection();
+        }
     }
 
     public static function connect(
         string $dsn,
         ?string $username = null,
         ?string $password = null,
-        ?array $options = [],
+        ?array $options = null,
         array $queries = [],
         ?ProfilerInterface $profiler = null
     ): static {
-        return new static($dsn, $username, $password, $options ?? [], $queries, $profiler);
+        $options ??= [];
+        $options[static::DRIVER_SPECIFIC] = true;
+        return new static($dsn, $username, $password, $options, $queries, $profiler);
     }
 
     /**
@@ -111,7 +134,11 @@ class ExtendedPdo extends AbstractExtendedPdo
         // connect
         $this->profiler->start(__FUNCTION__);
         list($dsn, $username, $password, $options, $queries) = $this->args;
-        $this->pdo = PDO::connect($dsn, $username, $password, $options);
+        if ($this->driverSpecific) {
+            $this->pdo = PDO::connect($dsn, $username, $password, $options);
+        } else {
+            $this->pdo = new PDO($dsn, $username, $password, $options);
+        }
         $this->profiler->finish();
 
         // connection-time queries
