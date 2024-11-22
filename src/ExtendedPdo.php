@@ -36,7 +36,7 @@ class ExtendedPdo extends AbstractExtendedPdo
 
     /**
      *
-     * Flag for how will construct the PDO object
+     * Flag for how to construct the PDO object
      *
      * @var bool
      */
@@ -75,7 +75,7 @@ class ExtendedPdo extends AbstractExtendedPdo
             $options[PDO::ATTR_ERRMODE] = PDO::ERRMODE_EXCEPTION;
         }
 
-        // check option for driver specific construct and set flay for lazy loading later
+        // check option for driver specific construct and set flag for lazy loading later
         if (isset($options[static::DRIVER_SPECIFIC])) {
             $this->driverSpecific = (bool) $options[static::DRIVER_SPECIFIC];
         }
