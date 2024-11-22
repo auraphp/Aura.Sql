@@ -30,8 +30,9 @@ actually needs the connection to the database; e.g., on `query()`.
 
 If you want to force a connection, call the `establishConnection()` method.
 
-> Previous `connect()` method has been deprecated and we encourage users move 
-> to using `establishConnection()`
+> Previous `connect()` method has been deprecated due to the introduction of 
+> ```PDO::connect()``` in [PHP 8.4](https://www.php.net/releases/8.4/en.php#pdo_driver_specific_subclasses), 
+> so we encourage users tp use `establishConnection()` instead.
 
 ```php
 // does not connect to the database
