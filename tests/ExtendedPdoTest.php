@@ -73,7 +73,7 @@ class ExtendedPdoTest extends TestCase
 
     public function testPdoType()
     {
-        $this->assertNotInstanceOf(Pdo\Sqlite::class, $this->pdo);
+        $this->assertNotInstanceOf(Pdo\Sqlite::class, $this->pdo->getPdo());
     }
 
     public function testCall()

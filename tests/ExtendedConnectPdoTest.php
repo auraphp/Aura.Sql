@@ -11,6 +11,6 @@ class ExtendedConnectPdoTest extends \Aura\Sql\ExtendedPdoTest
 
     public function testPdoType()
     {
-        $this->assertInstanceOf(Pdo\Sqlite::class, $this->pdo);
+        $this->assertInstanceOf(Pdo\Sqlite::class, $this->pdo->getPdo());
     }
 }
