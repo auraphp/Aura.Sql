@@ -28,7 +28,11 @@ Whereas the native _PDO_ connects on instantiation, _ExtendedPdo_ does not
 connect immediately. Instead, it connects only when you call a method that
 actually needs the connection to the database; e.g., on `query()`.
 
-If you want to force a connection, call the `connect()` method.
+If you want to force a connection, call the `establishConnection()` method.
+
+> Previous `connect()` method has been deprecated due to the introduction of 
+> ```PDO::connect()``` in [PHP 8.4](https://www.php.net/releases/8.4/en.php#pdo_driver_specific_subclasses), 
+> so we encourage users to use `establishConnection()` instead.
 
 ```php
 // does not connect to the database
@@ -42,7 +46,7 @@ $pdo = new ExtendedPdo(
 $pdo->exec('SELECT * FROM test');
 
 // explicitly forces a connection
-$pdo->connect();
+$pdo->establishConnection();
 ```
 
 If you want to explicitly force a disconnect, call the `disconnect()` method.
