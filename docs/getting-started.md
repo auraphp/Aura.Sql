@@ -12,6 +12,7 @@ name, username, password, and driver options. There is one additional
 parameter that allows you to pass attributes to be set after the connection is
 made.
 
+#### Creation using constructor
 ```php
 use Aura\Sql\ExtendedPdo;
 
@@ -23,12 +24,25 @@ $pdo = new ExtendedPdo(
     []  // queries to execute after connection
 );
 ```
+#### Creation using static factory
+```php
+use Aura\Sql\ExtendedPdo;
+
+$pdo = ExtendedPdo::connect(
+    'mysql:host=localhost;dbname=test',
+    'username',
+    'password',
+    [], // driver attributes/options as key-value pairs
+    []  // queries to execute after connection
+);
+```
+
 
 Whereas the native _PDO_ connects on instantiation, _ExtendedPdo_ does not
 connect immediately. Instead, it connects only when you call a method that
 actually needs the connection to the database; e.g., on `query()`.
 
-If you want to force a connection, call the `connect()` method.
+If you want to force a connection, call the `establishConnection()` method.
 
 ```php
 // does not connect to the database
@@ -42,7 +56,7 @@ $pdo = new ExtendedPdo(
 $pdo->exec('SELECT * FROM test');
 
 // explicitly forces a connection
-$pdo->connect();
+$pdo->establishConnection();
 ```
 
 If you want to explicitly force a disconnect, call the `disconnect()` method.
