@@ -106,7 +106,7 @@ class ExtendedPdo extends AbstractExtendedPdo
             if($options[static::CONNECT_IMMEDIATELY]) {
                 unset($options[static::CONNECT_IMMEDIATELY]);
                 $this->establishConnection();
-            }else {
+            } else {
                 unset($options[static::CONNECT_IMMEDIATELY]);
             }
         }
