@@ -21,8 +21,8 @@ use PDO;
  */
 class ExtendedPdo extends AbstractExtendedPdo
 {
-    public const string CONNECT_IMMEDIATELY = 'immediate';
-    public const string DRIVER_SPECIFIC     = 'driverSpecific';
+    public const string CONNECT_IMMEDIATELY = 'auraSqlImmediate';
+    public const string DRIVER_SPECIFIC     = 'auraSqlDriverSpecific';
 
     /**
      *
@@ -78,6 +78,7 @@ class ExtendedPdo extends AbstractExtendedPdo
         // check option for driver specific construct and set flag for lazy loading later
         if (isset($options[static::DRIVER_SPECIFIC])) {
             $this->driverSpecific = (bool) $options[static::DRIVER_SPECIFIC];
+            unset($options[static::DRIVER_SPECIFIC]);
         }
 
         // retain the arguments for later
@@ -101,8 +102,11 @@ class ExtendedPdo extends AbstractExtendedPdo
         $this->setQuoteName($parts[0]);
 
         // create a connection immediately
-        if (isset($options[static::CONNECT_IMMEDIATELY]) && $options[static::CONNECT_IMMEDIATELY]) {
-            $this->establishConnection();
+        if (isset($options[static::CONNECT_IMMEDIATELY])) {
+            if($options[static::CONNECT_IMMEDIATELY]) {
+                $this->establishConnection();
+            }
+            unset($options[static::CONNECT_IMMEDIATELY]);
         }
     }
 
