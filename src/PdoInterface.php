@@ -154,7 +154,7 @@ interface PdoInterface
      * @see http://php.net/manual/en/pdo.prepare.php
      */
     public function prepare(string $query, array $options = []): PDOStatement|false;
-     
+
     /**
      *
      * Queries the database and returns a PDOStatement.
