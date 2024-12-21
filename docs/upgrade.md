@@ -2,10 +2,7 @@
 
 Most changes are to provide better compatability with PHP 8.4 and above.
 
-With PHP 8.4 introducing `Pdo::connect()` as a way of creating driver specific connections.
-
-`ExtendedPdo::connect()` will be still using only the PDO and not subclass feature.
-If you want to use the subclass feature use the `DecoratedPdo` passing the pdo instance directly.
+BC Break : With PHP 8.4 introducing `Pdo::connect()` as a way of creating driver specific connections.
 
 ```php
 // does not connect to the database
