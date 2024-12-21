@@ -60,24 +60,18 @@ class ExtendedPdo extends AbstractExtendedPdo
         ?ProfilerInterface $profiler = null
     ) {
         // if no error mode is specified, use exceptions
-        if (! isset($options[PDO::ATTR_ERRMODE])) {
+        if (!isset($options[PDO::ATTR_ERRMODE])) {
             $options[PDO::ATTR_ERRMODE] = PDO::ERRMODE_EXCEPTION;
         }
 
         // retain the arguments for later
-        $this->args = [
-            $dsn,
-            $username,
-            $password,
-            $options,
-            $queries
-        ];
+        $this->args = [$dsn, $username, $password, $options, $queries];
 
         // retain a profiler, instantiating a default one if needed
         $this->setProfiler($profiler ?? new Profiler());
 
         // retain a query parser
-        $parts = explode(':', $dsn);
+        $parts = explode(":", $dsn);
         $parser = $this->newParser($parts[0]);
         $this->setParser($parser);
 
@@ -89,11 +83,9 @@ class ExtendedPdo extends AbstractExtendedPdo
         string $dsn,
         ?string $username = null,
         ?string $password = null,
-        ?array $options = [],
-        array $queries = [],
-        ?ProfilerInterface $profiler = null
+        ?array $options = []
     ): static {
-        return new static($dsn, $username, $password, $options ?? [], $queries, $profiler);
+        return new static($dsn, $username, $password, $options);
     }
 
     /**
@@ -102,7 +94,7 @@ class ExtendedPdo extends AbstractExtendedPdo
      *
      * @return void
      */
-    public function establishConnection(): void
+    public function lazyConnect(): void
     {
         if ($this->pdo) {
             return;
@@ -111,7 +103,7 @@ class ExtendedPdo extends AbstractExtendedPdo
         // connect
         $this->profiler->start(__FUNCTION__);
         list($dsn, $username, $password, $options, $queries) = $this->args;
-        $this->pdo = PDO::connect($dsn, $username, $password, $options);
+        $this->pdo = new PDO($dsn, $username, $password, $options);
         $this->profiler->finish();
 
         // connection-time queries
@@ -144,13 +136,13 @@ class ExtendedPdo extends AbstractExtendedPdo
     public function __debugInfo(): array
     {
         return [
-            'args' => [
+            "args" => [
                 $this->args[0],
-                '****',
-                '****',
+                "****",
+                "****",
                 $this->args[3],
                 $this->args[4],
-            ]
+            ],
         ];
     }
 
@@ -163,7 +155,7 @@ class ExtendedPdo extends AbstractExtendedPdo
      */
     public function getPdo(): PDO
     {
-        $this->establishConnection();
+        $this->lazyConnect();
         return $this->pdo;
     }
 }

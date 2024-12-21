@@ -44,6 +44,15 @@ class DecoratedPdo extends AbstractExtendedPdo
         $this->setQuoteName($driver);
     }
 
+    public static function connect(
+        string $dsn,
+        ?string $username = null,
+        ?string $password = null,
+        ?array $options = []
+    ): static {
+        return new static(\PDO::connect($dsn, $username, $password, $options));
+    }
+
     /**
      *
      * Connects to the database.
@@ -51,7 +60,7 @@ class DecoratedPdo extends AbstractExtendedPdo
      * @return void
      *
      */
-    public function establishConnection(): void
+    public function lazyConnect(): void
     {
         // already connected
     }

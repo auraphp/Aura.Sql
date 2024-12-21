@@ -4,8 +4,8 @@ Most changes are to provide better compatability with PHP 8.4 and above.
 
 With PHP 8.4 introducing `Pdo::connect()` as a way of creating driver specific connections.
 
-We have introducing our `ExtendedPdo::connect()` which uses the underlining PDO features then with all our
-normal added features.
+`ExtendedPdo::connect()` will be still using only the PDO and not subclass feature.
+If you want to use the subclass feature use the `DecoratedPdo` passing the pdo instance directly.
 
 ```php
 // does not connect to the database
@@ -19,7 +19,7 @@ $pdo = ExtendedPdo::connect(
 $pdo->exec('SELECT * FROM test');
 
 // explicitly forces a connection
-$pdo->establishConnection();
+$pdo->lazyConnect();
 ```
 
 # 5.x Upgrade Notes
@@ -46,7 +46,7 @@ $pdo->exec('SELECT * FROM test');
 // explicitly forces a connection
 $pdo->connect();
 ```
-... and now needs to be changed to `ExtendedPdo::establishConnection()`
+... and now needs to be changed to `ExtendedPdo::lazyConnect()`
 
 ```php
 // does not connect to the database
@@ -60,7 +60,7 @@ $pdo = new ExtendedPdo(
 $pdo->exec('SELECT * FROM test');
 
 // explicitly forces a connection
-$pdo->establishConnection();
+$pdo->lazyConnect();
 ```
 
 # 3.x Upgrade Notes
@@ -298,4 +298,3 @@ underlying PDO instance to make those methods available, if they exist.
 
 - When dumping an ExtendedPdo object, the username and password are omitted. This
 should help keep unexpected output of stack traces from revealing credentials.
-

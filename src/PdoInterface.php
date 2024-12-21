@@ -44,6 +44,29 @@ interface PdoInterface
 
     /**
      *
+     * Introduced in 6.x due to PHP 8.4 change. This is a BC break for Aura.Sql.
+     *
+     * @param string $dsn The Data Source Name, or DSN, contains the information required to connect to the database.
+     *
+     * @param string | null $username  The user name for the DSN string. This parameter is optional for some PDO drivers.
+     *
+     * @param string | null $password The password for the DSN string. This parameter is optional for some PDO drivers.
+     *
+     * @param array | null $options  A key=>value array of driver-specific connection options.
+     *
+     * @return \PDO Returns an instance of a generic PDO instance.
+     *
+     * @see https://www.php.net/manual/en/pdo.connect.php
+     */
+    public static function connect(
+        string $dsn,
+        ?string $username = null,
+        #[\SensitiveParameter] ?string $password = null,
+        ?array $options = null
+    ): static;
+
+    /**
+     *
      * Gets the most recent error code.
      *
      * @return string|null
@@ -85,6 +108,15 @@ interface PdoInterface
 
     /**
      *
+     * Returns all currently available PDO drivers.
+     *
+     * @return array
+     *
+     */
+    public static function getAvailableDrivers(): array;
+
+    /**
+     *
      * Is a transaction currently active?
      *
      * @return bool
@@ -121,7 +153,10 @@ interface PdoInterface
      *
      * @see http://php.net/manual/en/pdo.prepare.php
      */
-    public function prepare(string $query, array $options = []): PDOStatement|false;
+    public function prepare(
+        string $query,
+        array $options = []
+    ): PDOStatement|false;
 
     /**
      *
@@ -138,7 +173,11 @@ interface PdoInterface
      * @see http://php.net/manual/en/pdo.query.php
      *
      */
-    public function query(string $query, ?int $fetchMode = null, ...$fetch_mode_args): PDOStatement|false;
+    public function query(
+        string $query,
+        ?int $fetchMode = null,
+        ...$fetch_mode_args
+    ): PDOStatement|false;
 
     /**
      *
@@ -153,7 +192,10 @@ interface PdoInterface
      * @see http://php.net/manual/en/pdo.quote.php
      *
      */
-    public function quote(string|int|array|float|null $value, int $type = PDO::PARAM_STR): string|false;
+    public function quote(
+        string|int|array|float|null $value,
+        int $type = PDO::PARAM_STR
+    ): string|false;
 
     /**
      *
@@ -178,13 +220,4 @@ interface PdoInterface
      *
      */
     public function setAttribute(int $attribute, mixed $value): bool;
-
-    /**
-     *
-     * Returns all currently available PDO drivers.
-     *
-     * @return array
-     *
-     */
-    public static function getAvailableDrivers(): array;
 }
