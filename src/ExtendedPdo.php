@@ -60,12 +60,18 @@ class ExtendedPdo extends AbstractExtendedPdo
         ?ProfilerInterface $profiler = null
     ) {
         // if no error mode is specified, use exceptions
-        if (!isset($options[PDO::ATTR_ERRMODE])) {
+        if (! isset($options[PDO::ATTR_ERRMODE])) {
             $options[PDO::ATTR_ERRMODE] = PDO::ERRMODE_EXCEPTION;
         }
 
         // retain the arguments for later
-        $this->args = [$dsn, $username, $password, $options, $queries];
+        $this->args = [
+            $dsn,
+            $username,
+            $password,
+            $options,
+            $queries
+        ];
 
         // retain a profiler, instantiating a default one if needed
         $this->setProfiler($profiler ?? new Profiler());
@@ -136,10 +142,10 @@ class ExtendedPdo extends AbstractExtendedPdo
     public function __debugInfo(): array
     {
         return [
-            "args" => [
+            'args' => [
                 $this->args[0],
-                "****",
-                "****",
+                '****',
+                '****',
                 $this->args[3],
                 $this->args[4],
             ],

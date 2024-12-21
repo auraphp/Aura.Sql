@@ -153,11 +153,8 @@ interface PdoInterface
      *
      * @see http://php.net/manual/en/pdo.prepare.php
      */
-    public function prepare(
-        string $query,
-        array $options = []
-    ): PDOStatement|false;
-
+    public function prepare(string $query, array $options = []): PDOStatement|false;
+     
     /**
      *
      * Queries the database and returns a PDOStatement.
@@ -173,11 +170,7 @@ interface PdoInterface
      * @see http://php.net/manual/en/pdo.query.php
      *
      */
-    public function query(
-        string $query,
-        ?int $fetchMode = null,
-        ...$fetch_mode_args
-    ): PDOStatement|false;
+    public function query(string $query, ?int $fetchMode = null, ...$fetch_mode_args): PDOStatement|false;
 
     /**
      *
@@ -192,10 +185,7 @@ interface PdoInterface
      * @see http://php.net/manual/en/pdo.quote.php
      *
      */
-    public function quote(
-        string|int|array|float|null $value,
-        int $type = PDO::PARAM_STR
-    ): string|false;
+    public function quote(string|int|array|float|null $value, int $type = PDO::PARAM_STR): string|false;
 
     /**
      *

@@ -141,7 +141,7 @@ interface ExtendedPdoInterface extends PdoInterface
     public function fetchObject(
         string $statement,
         array $values = [],
-        string $class = "stdClass",
+        string $class = 'stdClass',
         array $args = []
     ): object|false;
 
@@ -172,7 +172,7 @@ interface ExtendedPdoInterface extends PdoInterface
     public function fetchObjects(
         string $statement,
         array $values = [],
-        string $class = "stdClass",
+        string $class = 'stdClass',
         array $args = []
     ): array;
 
@@ -187,10 +187,7 @@ interface ExtendedPdoInterface extends PdoInterface
      * @return array|false
      *
      */
-    public function fetchOne(
-        string $statement,
-        array $values = []
-    ): array|false;
+    public function fetchOne(string $statement, array $values = []): array|false;
 
     /**
      *
@@ -319,10 +316,7 @@ interface ExtendedPdoInterface extends PdoInterface
      * @return \Generator
      *
      */
-    public function yieldAssoc(
-        string $statement,
-        array $values = []
-    ): Generator;
+    public function yieldAssoc(string $statement, array $values = []): Generator;
 
     /**
      *
@@ -362,7 +356,7 @@ interface ExtendedPdoInterface extends PdoInterface
     public function yieldObjects(
         string $statement,
         array $values = [],
-        string $class = "stdClass",
+        string $class = 'stdClass',
         array $args = []
     ): Generator;
 
@@ -378,10 +372,7 @@ interface ExtendedPdoInterface extends PdoInterface
      * @return \Generator
      *
      */
-    public function yieldPairs(
-        string $statement,
-        array $values = []
-    ): Generator;
+    public function yieldPairs(string $statement, array $values = []): Generator;
 
     /**
      *
@@ -395,10 +386,7 @@ interface ExtendedPdoInterface extends PdoInterface
      * @return \PDOStatement
      *
      */
-    public function perform(
-        string $statement,
-        array $values = []
-    ): PDOStatement;
+    public function perform(string $statement, array $values = []): PDOStatement;
 
     /**
      *
@@ -422,8 +410,5 @@ interface ExtendedPdoInterface extends PdoInterface
      * @see http://php.net/manual/en/pdo.prepare.php
      *
      */
-    public function prepareWithValues(
-        string $statement,
-        array $values = []
-    ): PDOStatement;
+    public function prepareWithValues(string $statement, array $values = []): PDOStatement;
 }
