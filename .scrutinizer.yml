@@ -1,9 +1,11 @@
 build:
     image: default-bionic
-    environment:
-        php: 8.4.0
     nodes:
         analysis:
+            environment:
+                php: 8.4.0
+            packages:
+                - openssl=1.1.*
             tests:
                 override:
                     - php-scrutinizer-run
