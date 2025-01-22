@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 6.0.0
+
+- Changes for PHP 8.4 by @srjlewis in https://github.com/auraphp/Aura.Sql/pull/229
+- Update 6.x docs to reflect latest changes by @srjlewis in https://github.com/auraphp/Aura.Sql/pull/232
+- PDO according to 8.4 changes and feedbacks from @pmjones by @harikt in https://github.com/auraphp/Aura.Sql/pull/233
+
 ## 5.0.2
 
 - Add failing test for #183 by @harikt in https://github.com/auraphp/Aura.Sql/pull/211
@@ -270,4 +276,3 @@ Other Changes
 - [NEW] Class AbstractMapper (mapper implementation)
 
 - [NEW] Class UnitOfWork (unit-of-work implemetation)
-
