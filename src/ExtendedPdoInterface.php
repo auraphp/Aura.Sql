@@ -28,7 +28,7 @@ interface ExtendedPdoInterface extends PdoInterface
      * Connects to the database.
      *
      */
-    public function establishConnection(): void;
+    public function lazyConnect(): void;
 
     /**
      *
