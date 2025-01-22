@@ -89,7 +89,7 @@ class ExtendedPdo extends AbstractExtendedPdo
      *
      * Connects to the database.
      *
-     * @deprecated use establishConnection() as future versions will be using establishConnection()
+     * @deprecated use lazyConnect() as future versions will be using lazyConnect()
      *
      * @return void
      */
@@ -117,7 +117,7 @@ class ExtendedPdo extends AbstractExtendedPdo
      *
      * @return void
      */
-    public function establishConnection(): void
+    public function lazyConnect(): void
     {
         $this->connect();
     }

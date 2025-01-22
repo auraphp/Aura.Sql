@@ -22,7 +22,7 @@ $pdo->exec('SELECT * FROM test');
 // explicitly forces a connection
 $pdo->connect();
 ```
-... and now needs to be changed to `ExtendedPdo::establishConnection()`
+... and now needs to be changed to `ExtendedPdo::lazyConnect()`
 
 ```php
 // does not connect to the database
@@ -36,7 +36,7 @@ $pdo = new ExtendedPdo(
 $pdo->exec('SELECT * FROM test');
 
 // explicitly forces a connection
-$pdo->establishConnection();
+$pdo->lazyConnect();
 ```
 
 # 3.x Upgrade Notes
