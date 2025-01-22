@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 5.0.3
+
+- Add PHP 8.3 to continuous integration workflow by @koriym in https://github.com/auraphp/Aura.Sql/pull/227
+- Add lazyConnect method for interoperability with future versions by @srjlewis in https://github.com/auraphp/Aura.Sql/pull/230
+> Note : establishConnection was renamed to lazyConnect
+
 ## 5.0.2
 
 - Add failing test for #183 by @harikt in https://github.com/auraphp/Aura.Sql/pull/211
@@ -270,4 +276,3 @@ Other Changes
 - [NEW] Class AbstractMapper (mapper implementation)
 
 - [NEW] Class UnitOfWork (unit-of-work implemetation)
-
