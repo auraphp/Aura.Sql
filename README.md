@@ -54,7 +54,7 @@ Alternatively, [download a release][], or clone this repository, then map the
 
 ## Dependencies
 
-6.x version of package requires PHP 8.4 or later. For PHP 8.1-8.3 you can use 5.x version.
+Version 6.x is compatible with PHP 8.4 and above. If you're running PHP 8.1-8.3, please use version 5.x.
 We recommend using the latest available version of PHP as a matter of
 principle.
 
