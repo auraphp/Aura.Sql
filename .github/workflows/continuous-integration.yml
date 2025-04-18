@@ -24,8 +24,8 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php-version }}
-          coverage: none
-          tools: none
+          coverage: xdebug
+          tools: composer:2.2
           ini-values: assert.exception=1, zend.assertions=1
 
       - name: Get composer cache directory
@@ -44,3 +44,8 @@ jobs:
 
       - name: Run test suite
         run: ./vendor/bin/phpunit
+
+      - name: Upload coverage report
+        uses: codecov/codecov-action@v2
+        with:
+          fail_ci_if_error: false
