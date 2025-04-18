@@ -43,9 +43,15 @@ jobs:
         run: composer install --no-interaction --prefer-dist --ignore-platform-req=php
 
       - name: Run test suite
-        run: ./vendor/bin/phpunit
+        run: ./vendor/bin/phpunit --log-junit junit.xml
 
       - name: Upload coverage report
         uses: codecov/codecov-action@v2
         with:
-          fail_ci_if_error: false
+          token: ${{ secrets.CODECOV_TOKEN }}
+
+      - name: Upload test results to Codecov
+        if: ${{ !cancelled() }}
+        uses: codecov/test-results-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
