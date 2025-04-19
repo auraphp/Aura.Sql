@@ -1,17 +1,15 @@
 build:
-    dependencies:
-        before_install:
-          - sudo apt-get update
-          - sudo apt-get install -y openssl libssl-dev
     image: default-bionic
     environment:
-        php: 
-            version: 8.4.0
+        php: 8.4.0
     nodes:
         analysis:
+            dependencies:
+                before:
+                    - sudo apt-get update
+                    - sudo apt-get install -y openssl libssl-dev
             tests:
                 override:
                     - php-scrutinizer-run
 filter:
-    paths: 
-        - "src/*"
+    paths: ["src/*"]
