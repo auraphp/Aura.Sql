@@ -12,15 +12,15 @@ class MysqlParserTest extends AbstractParserTest
     {
         $parameters = ['foo' => ['bar', 'baz']];
         $sql = <<<SQL
-SELECT `:foo`
-SQL;
+            SELECT `:foo`
+            SQL;
         list ($statement, $values) = $this->rebuild($sql, $parameters);
         $this->assertEquals($sql, $statement);
 
 
         $sql = <<<SQL
-SELECT `single quote``s :foo`
-SQL;
+            SELECT `single quote``s :foo`
+            SQL;
         list ($statement, $values) = $this->rebuild($sql, $parameters);
         $this->assertEquals($sql, $statement);
     }

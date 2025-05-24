@@ -15,7 +15,7 @@ class DecoratedPdoTest extends ExtendedPdoTest
     public function testDisconnect()
     {
         $this->assertTrue($this->pdo->isConnected());
-        $this->expectException(Exception\CannotDisconnect::CLASS);
+        $this->expectException(Exception\CannotDisconnect::class);
         $this->pdo->disconnect();
     }
 

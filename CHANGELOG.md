@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 6.1.0
+
+- Reintroduce PHP 8.1 - 8.3 support; ExtendedPdo::connect() is not supported in those versions, and requires PHP 8.4+, by @francislavoie in https://github.com/auraphp/Aura.Sql/pull/245
+
 ## 6.0.0
 
 - CHG: BC Break `ExtendedPdo::connect` renamed to `ExtendedPdo::lazyConnect`

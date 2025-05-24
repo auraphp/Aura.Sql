@@ -58,14 +58,14 @@ abstract class AbstractParserTest extends TestCase
     {
         $parameters = ['foo' => ['bar', 'baz']];
         $sql = <<<SQL
-SELECT ":foo"
-SQL;
+            SELECT ":foo"
+            SQL;
         list ($statement, $values) = $this->rebuild($sql, $parameters);
         $this->assertEquals($sql, $statement);
 
         $sql = <<<SQL
-SELECT "to use double quotes, just double them "" :foo "
-SQL;
+            SELECT "to use double quotes, just double them "" :foo "
+            SQL;
         list ($statement, $values) = $this->rebuild($sql, $parameters);
         $this->assertEquals($sql, $statement);
     }
@@ -74,23 +74,23 @@ SQL;
     {
         $parameters = ['foo' => ['bar', 'baz']];
         $sql = <<<SQL
-SELECT ':foo'
-SQL;
+            SELECT ':foo'
+            SQL;
         list ($statement, $values) = $this->rebuild($sql, $parameters);
         $this->assertEquals($sql, $statement);
 
 
         $sql = <<<SQL
-SELECT 'single quote''s :foo'
-SQL;
+            SELECT 'single quote''s :foo'
+            SQL;
         list ($statement, $values) = $this->rebuild($sql, $parameters);
         $this->assertEquals($sql, $statement);
 
         $sql = <<<SQL
-SELECT 'multi line string'
-':foo'
-'bar'
-SQL;
+            SELECT 'multi line string'
+            ':foo'
+            'bar'
+            SQL;
         list ($statement, $values) = $this->rebuild($sql, $parameters);
         $this->assertEquals($sql, $statement);
     }
@@ -99,43 +99,43 @@ SQL;
     {
         $parameters = ['foo' => ['bar', 'baz']];
         $sql = <<<SQL
-SELECT 'Escaping \' :foo \''
-SQL;
+            SELECT 'Escaping \' :foo \''
+            SQL;
         list ($statement, $values) = $this->rebuild($sql, $parameters);
         $this->assertEquals($sql, $statement);
 
         $sql = <<< 'SQL'
-SELECT "Escaping \" :foo \""
-SQL;
+            SELECT "Escaping \" :foo \""
+            SQL;
         list ($statement, $values) = $this->rebuild($sql, $parameters);
         $this->assertEquals($sql, $statement);
 
-//         $sql = <<<SQL
-// SELECT "Escaping \\\\" :foo ""
-// SQL;
-//         $expectedStatement = <<<SQL
-// SELECT "Escaping \\\\" :foo, :foo_0 ""
-// SQL;
-//         $expectedValues = ['foo' => 'bar', 'foo_0' => 'baz'];
-//         list ($statement, $values) = $this->rebuild($sql, $parameters);
-//         $this->assertEquals($expectedStatement, $statement);
-//         $this->assertEquals($expectedValues, $values);
+        // $sql = <<<SQL
+        //     SELECT "Escaping \\\\" :foo ""
+        //     SQL;
+        // $expectedStatement = <<<SQL
+        //     SELECT "Escaping \\\\" :foo, :foo_0 ""
+        //     SQL;
+        // $expectedValues = ['foo' => 'bar', 'foo_0' => 'baz'];
+        // list ($statement, $values) = $this->rebuild($sql, $parameters);
+        // $this->assertEquals($expectedStatement, $statement);
+        // $this->assertEquals($expectedValues, $values);
 
         $sql = <<<SQL
-SELECT "Escaping \" :foo \"
-SQL;
-        list ($statement, $values) = $this->rebuild($sql, $parameters);
-        $this->assertEquals($sql, $statement);
-
-        $sql = <<<SQL
-SELECT "Escaping "" :foo """
-SQL;
+            SELECT "Escaping \" :foo \"
+            SQL;
         list ($statement, $values) = $this->rebuild($sql, $parameters);
         $this->assertEquals($sql, $statement);
 
         $sql = <<<SQL
-SELECT 'Escaping '' :foo '''
-SQL;
+            SELECT "Escaping "" :foo """
+            SQL;
+        list ($statement, $values) = $this->rebuild($sql, $parameters);
+        $this->assertEquals($sql, $statement);
+
+        $sql = <<<SQL
+            SELECT 'Escaping '' :foo '''
+            SQL;
         list ($statement, $values) = $this->rebuild($sql, $parameters);
         $this->assertEquals($sql, $statement);
     }

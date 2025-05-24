@@ -12,9 +12,9 @@ class PgsqlParserTest extends AbstractParserTest
     {
         $parameters = ['a000' => ['foo', 'bar']];
         $sql = <<<SQL
-SELECT U&"\a000"
-FROM (SELECT 1 AS U&":a000" UEScAPE ':') AS temp
-SQL;
+            SELECT U&"\a000"
+            FROM (SELECT 1 AS U&":a000" UEScAPE ':') AS temp
+            SQL;
         list ($statement, $values) = $this->rebuild($sql, $parameters);
         $this->assertEquals($sql, $statement);
     }
@@ -23,15 +23,15 @@ SQL;
     {
         $parameters = ['foo' => ['bar', 'baz']];
         $sql = <<<SQL
-SELECT E'C-style escaping \' :foo \''
-SQL;
+            SELECT E'C-style escaping \' :foo \''
+            SQL;
         list ($statement, $values) = $this->rebuild($sql, $parameters);
         $this->assertEquals($sql, $statement);
 
         $sql = <<<SQL
-SELECT E'Multiline'
-       'C-style escaping \' :foo \' :foo'
-SQL;
+            SELECT E'Multiline'
+                   'C-style escaping \' :foo \' :foo'
+            SQL;
         list ($statement, $values) = $this->rebuild($sql, $parameters);
         $this->assertEquals($sql, $statement);
     }
@@ -64,8 +64,8 @@ SQL;
     {
         $parameters = ['TEXT' => ['bar', 'baz']];
         $sql = <<<SQL
-SELECT 'hello'::TEXT
-SQL;
+            SELECT 'hello'::TEXT
+            SQL;
         list ($statement, $values) = $this->rebuild($sql, $parameters);
         $this->assertEquals($sql, $statement);
     }
@@ -74,11 +74,11 @@ SQL;
     {
         $parameters = ['2' => ['bar', 'baz']];
         $sql = <<<SQL
-SELECT test[1:2]
-FROM (
-SELECT CAST('{"foo", "bar", "baz", "qux"}' AS TEXT[]) AS test
-) AS t
-SQL;
+            SELECT test[1:2]
+            FROM (
+            SELECT CAST('{"foo", "bar", "baz", "qux"}' AS TEXT[]) AS test
+            ) AS t
+            SQL;
         list ($statement, $values) = $this->rebuild($sql, $parameters);
         $this->assertEquals($sql, $statement);
     }
@@ -87,8 +87,8 @@ SQL;
     {
         $parameters = [']' => ['bar', 'baz']];
         $sql = <<<SQL
-SELECT 'hello':]
-SQL;
+            SELECT 'hello':]
+            SQL;
         list ($statement, $values) = $this->rebuild($sql, $parameters);
         $this->assertEquals($sql, $statement);
     }
