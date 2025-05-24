@@ -52,9 +52,9 @@ class ExtendedPdo extends AbstractExtendedPdo
      * @see http://php.net/manual/en/pdo.construct.php
      */
     public function __construct(
-        string $dsn,
+        #[\SensitiveParameter] string $dsn,
         ?string $username = null,
-        ?string $password = null,
+        #[\SensitiveParameter] ?string $password = null,
         array $options = [],
         array $queries = [],
         ?ProfilerInterface $profiler = null

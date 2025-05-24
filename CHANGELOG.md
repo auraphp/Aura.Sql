@@ -2,7 +2,8 @@
 
 ## 6.1.0
 
-- Reintroduce PHP 8.1 - 8.3 support; ExtendedPdo::connect() is not supported in those versions, and requires PHP 8.4+, by @francislavoie in https://github.com/auraphp/Aura.Sql/pull/245
+- Reintroduce PHP 8.1–8.3 support; `ExtendedPdo::connect()` is not supported in those versions, and requires PHP 8.4, by @francislavoie in https://github.com/auraphp/Aura.Sql/pull/245
+- Mark all `$dsn` and `$password` parameters as `#[\SensitiveParameter]` to prevent leaking sensitive information in error messages, by @francislavoie in https://github.com/auraphp/Aura.Sql/pull/245
 
 ## 6.0.0
 

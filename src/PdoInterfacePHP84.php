@@ -8,6 +8,7 @@
  */
 namespace Aura\Sql;
 
+use Aura\Sql\Profiler\ProfilerInterface;
 use PDO;
 use PDOStatement;
 
@@ -59,7 +60,7 @@ interface PdoInterface
      * @see https://www.php.net/manual/en/pdo.connect.php
      */
     public static function connect(
-        string $dsn,
+        #[\SensitiveParameter] string $dsn,
         ?string $username = null,
         #[\SensitiveParameter] ?string $password = null,
         ?array $options = null
