@@ -153,6 +153,8 @@ interface PdoInterface
      * @return \PDOStatement|false
      *
      * @see http://php.net/manual/en/pdo.prepare.php
+     *
+     * @psalm-taint-sink sql $query
      */
     public function prepare(string $query, array $options = []): PDOStatement|false;
 
@@ -186,6 +188,7 @@ interface PdoInterface
      *
      * @see http://php.net/manual/en/pdo.quote.php
      *
+     * @psalm-taint-escape sql
      */
     public function quote(string|int|array|float|null $value, int $type = PDO::PARAM_STR): string|false;
 
