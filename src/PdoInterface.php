@@ -92,6 +92,7 @@ interface PdoInterface
      *
      * @see http://php.net/manual/en/pdo.exec.php
      *
+     * @psalm-taint-sink sql $statement
      */
     public function exec(string $statement): int|false;
 
@@ -169,6 +170,7 @@ interface PdoInterface
      *
      * @see http://php.net/manual/en/pdo.query.php
      *
+     * @psalm-taint-sink sql $query
      */
     public function query(string $query, ?int $fetchMode = null, ...$fetch_mode_args): PDOStatement|false;
 
