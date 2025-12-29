@@ -251,6 +251,7 @@ interface ExtendedPdoInterface extends PdoInterface
      *
      * @return string The multi-part identifier name, quoted.
      *
+     * @psalm-taint-escape sql
      */
     public function quoteName(string $name): string;
 
@@ -262,6 +263,7 @@ interface ExtendedPdoInterface extends PdoInterface
      *
      * @return string The quoted identifier name.
      *
+     * @psalm-taint-escape sql
      */
     public function quoteSingleName(string $name): string;
 
