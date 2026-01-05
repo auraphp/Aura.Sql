@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## 6.0.1
+
+- Update README.md, continuous-integration.yml, scrutinizer.yml, code coverage by @harikt in https://github.com/auraphp/Aura.Sql/pull/237,  https://github.com/auraphp/Aura.Sql/pull/239 , https://github.com/auraphp/Aura.Sql/pull/240, https://github.com/auraphp/Aura.Sql/pull/241,
+https://github.com/auraphp/Aura.Sql/pull/244
+- Upload coverage report by @koriym in https://github.com/auraphp/Aura.Sql/pull/243
+- PHP 8.5 Support by @koriym in https://github.com/auraphp/Aura.Sql/pull/247
+- Add Psalm taint-sink annotations for SQL injection detection by @koriym in https://github.com/auraphp/Aura.Sql/pull/248,  https://github.com/auraphp/Aura.Sql/pull/249
+
 ## 6.0.0
 
 - CHG: BC Break `ExtendedPdo::connect` renamed to `ExtendedPdo::lazyConnect`
