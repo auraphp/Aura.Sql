@@ -43,7 +43,7 @@ abstract class AbstractParser implements ParserInterface
      * @var string
      *
      */
-    protected string $skip = '/^(\'|\"|\:[^a-zA-Z_])/um';
+    protected string $skip = '/^(\'|\")/um';
 
     /**
      *
@@ -180,10 +180,9 @@ abstract class AbstractParser implements ParserInterface
     {
         $str = '';
         foreach ($subs as $i => $sub) {
-            $char = substr($sub, 0, 1);
-            if ($char == '?') {
+            if ($sub === '?') {
                 $str .= $this->prepareNumberedPlaceholder();
-            } elseif ($char == ':') {
+            } elseif (preg_match('/^:[a-zA-Z_][a-zA-Z0-9_]*$/', $sub)) {
                 $str .= $this->prepareNamedPlaceholder($sub);
             } else {
                 $str .= $sub;
