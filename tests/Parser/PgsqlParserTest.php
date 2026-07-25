@@ -92,4 +92,62 @@ SQL;
         list ($statement, $values) = $this->rebuild($sql, $parameters);
         $this->assertEquals($sql, $statement);
     }
+
+    /**
+     * @see https://github.com/auraphp/Aura.Sql/issues/177
+     *
+     * A named array placeholder that appears after a type cast (`::`) which
+     * immediately follows a string literal must still be expanded. Previously
+     * the query part beginning with `::` was skipped entirely, so any
+     * placeholder later in that same part was left untouched.
+     */
+    public function testArrayPlaceholderAfterTypeCast()
+    {
+        $parameters = ['types' => [1, 2]];
+        $sql = "SELECT id FROM table WHERE removed = false"
+             . " AND data @> '{\"is_hidden\":false}'::jsonb"
+             . " AND type IN (:types)";
+        list ($statement, $values) = $this->rebuild($sql, $parameters);
+        $expectedStatement = "SELECT id FROM table WHERE removed = false"
+             . " AND data @> '{\"is_hidden\":false}'::jsonb"
+             . " AND type IN (:types_0, :types_1)";
+        $expectedValues = ['types_0' => 1, 'types_1' => 2];
+        $this->assertEquals($expectedStatement, $statement);
+        $this->assertEquals($expectedValues, $values);
+    }
+
+    /**
+     * @see https://github.com/auraphp/Aura.Sql/issues/177
+     *
+     * The reordered query from the issue discussion worked before the fix;
+     * make sure it keeps working afterwards.
+     */
+    public function testArrayPlaceholderBeforeTypeCast()
+    {
+        $parameters = ['types' => [1, 2]];
+        $sql = "SELECT id FROM table WHERE type IN (:types)"
+             . " AND removed = false"
+             . " AND data @> '{\"is_hidden\":false}'::jsonb";
+        list ($statement, $values) = $this->rebuild($sql, $parameters);
+        $expectedStatement = "SELECT id FROM table WHERE type IN (:types_0, :types_1)"
+             . " AND removed = false"
+             . " AND data @> '{\"is_hidden\":false}'::jsonb";
+        $expectedValues = ['types_0' => 1, 'types_1' => 2];
+        $this->assertEquals($expectedStatement, $statement);
+        $this->assertEquals($expectedValues, $values);
+    }
+
+    /**
+     * A scalar placeholder following a `::` cast must also survive.
+     */
+    public function testScalarPlaceholderAfterTypeCast()
+    {
+        $parameters = ['id' => 42];
+        $sql = "SELECT 'hello'::TEXT AS greeting WHERE id = :id";
+        list ($statement, $values) = $this->rebuild($sql, $parameters);
+        $expectedStatement = "SELECT 'hello'::TEXT AS greeting WHERE id = :id";
+        $expectedValues = ['id' => 42];
+        $this->assertEquals($expectedStatement, $statement);
+        $this->assertEquals($expectedValues, $values);
+    }
 }

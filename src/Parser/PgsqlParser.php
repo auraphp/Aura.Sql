@@ -42,5 +42,5 @@ class PgsqlParser extends AbstractParser
      * @var string
      *
      */
-    protected string $skip = '/^(\'|\"|\$|\:[^a-zA-Z_])/um';
+    protected string $skip = '/^(\'|\"|\$)/um';
 }

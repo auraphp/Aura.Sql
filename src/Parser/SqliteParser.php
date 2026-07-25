@@ -32,5 +32,5 @@ class SqliteParser extends AbstractParser
     /**
      * {@inheritDoc}
      */
-    protected string $skip = '/^(\'|"|`|\:[^a-zA-Z_])/um';
+    protected string $skip = '/^(\'|"|`)/um';
 }
