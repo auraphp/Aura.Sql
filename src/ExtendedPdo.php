@@ -54,7 +54,7 @@ class ExtendedPdo extends AbstractExtendedPdo
     public function __construct(
         string $dsn,
         ?string $username = null,
-        ?string $password = null,
+        #[\SensitiveParameter] ?string $password = null,
         array $options = [],
         array $queries = [],
         ?ProfilerInterface $profiler = null
@@ -88,7 +88,7 @@ class ExtendedPdo extends AbstractExtendedPdo
     public static function connect(
         string $dsn,
         ?string $username = null,
-        ?string $password = null,
+        #[\SensitiveParameter] ?string $password = null,
         ?array $options = []
     ): static {
         return new static($dsn, $username, $password, $options);

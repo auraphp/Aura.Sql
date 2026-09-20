@@ -47,7 +47,7 @@ class DecoratedPdo extends AbstractExtendedPdo
     public static function connect(
         string $dsn,
         ?string $username = null,
-        ?string $password = null,
+        #[\SensitiveParameter] ?string $password = null,
         ?array $options = []
     ): static {
         return new static(\PDO::connect($dsn, $username, $password, $options));
