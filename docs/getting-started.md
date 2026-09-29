@@ -71,6 +71,33 @@ However, calling an _ExtendedPdo_ method that implicitly establishes a
 connection, such as `query()` or one of the `fetch*()` methods, will
 automatically re-connect to the database.
 
+To drop the current connection and open a new one straight away, call the
+`reconnect()` method. The connection-time queries passed to the constructor
+are run again on the new connection.
+
+```php
+// disconnects, then connects again immediately
+$pdo->reconnect();
+```
+
+_ExtendedPdo_ never reconnects on its own. When a connection is lost (e.g.
+MySQL's "server has gone away"), any open transaction, temporary tables and
+session variables are lost with it, and silently re-running the failed query
+could apply a write twice. Catch the exception, decide whether the work is
+safe to retry, and then call `reconnect()`:
+
+```php
+try {
+    $rows = $pdo->fetchAll('SELECT * FROM test');
+} catch (PDOException $e) {
+    if (! isConnectionLost($e)) { // your own driver-specific check
+        throw $e;
+    }
+    $pdo->reconnect();
+    $rows = $pdo->fetchAll('SELECT * FROM test');
+}
+```
+
 ### Decorator Instance
 
 The _DecoratedPdo_ class can be used to decorate an existing PDO connection with
@@ -91,7 +118,8 @@ definition has already connected).
 Decoration of this kind can be useful when you have access to an existing _PDO_
 connection managed elsewhere in your application.
 
-> N.b.: The `disconnect()` method **will not work** on decorated _PDO_
+> N.b.: The `disconnect()` method **will not work** (and there is no
+> `reconnect()` method) on decorated _PDO_
 > connections, since _DecoratedPdo_ did not create the connection itself. You
 > will need to manage the decorated _PDO_ instance yourself in that case.
 
