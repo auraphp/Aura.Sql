@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 6.1.0
+
+- Add `ExtendedPdo::reconnect()` to drop the current connection and connect again, re-running the connection-time queries (fixes #179). Reconnection is never automatic; see the docs for the recommended catch-then-reconnect pattern. By @harikt in https://github.com/auraphp/Aura.Sql/pull/254
+
 ## 6.0.2
 
 - Fix array placeholder skipped after a `::` type cast following a string literal (fixes #177), and add a regression test confirming the parser never quotes expressions such as `@@session.time_zone` (#181) by @harikt in https://github.com/auraphp/Aura.Sql/pull/250
