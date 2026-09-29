@@ -65,9 +65,8 @@ without compromising flexibility. For specifics, please examine the package
 
 ## Quality
 
-[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/auraphp/Aura.Sql/badges/quality-score.png?b=5.x)](https://scrutinizer-ci.com/g/auraphp/Aura.Sql/)
-[![Code Coverage](https://scrutinizer-ci.com/g/auraphp/Aura.Sql/badges/coverage.png?b=5.x)](https://scrutinizer-ci.com/g/auraphp/Aura.Sql/)
-[![Build Status](https://github.com/auraphp/Aura.Sql/actions/workflows/continuous-integration.yml/badge.svg?branch=5.x)](https://github.com/auraphp/Aura.Sql/actions/workflows/continuous-integration.yml)
+[![Code Coverage](https://codecov.io/gh/auraphp/Aura.Sql/branch/6.x/graph/badge.svg)](https://codecov.io/gh/auraphp/Aura.Sql)
+[![Build Status](https://github.com/auraphp/Aura.Sql/actions/workflows/continuous-integration.yml/badge.svg?branch=6.x)](https://github.com/auraphp/Aura.Sql/actions/workflows/continuous-integration.yml)
 [![PDS Skeleton](https://img.shields.io/badge/pds-skeleton-blue.svg?style=flat-square)](https://github.com/php-pds/skeleton)
 
 This project adheres to [Semantic Versioning](http://semver.org/).
