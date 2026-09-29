@@ -134,6 +134,24 @@ class ExtendedPdo extends AbstractExtendedPdo
 
     /**
      *
+     * Disconnects from the database and connects again, re-running the
+     * connection-time queries.
+     *
+     * This is never done automatically; after a lost connection, the caller
+     * decides whether it is safe to retry, since any open transaction and
+     * session state are lost along with the old connection.
+     *
+     * @return void
+     *
+     */
+    public function reconnect(): void
+    {
+        $this->disconnect();
+        $this->lazyConnect();
+    }
+
+    /**
+     *
      * The purpose of this method is to hide sensitive data from stack traces.
      *
      * @return array

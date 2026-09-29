@@ -703,6 +703,48 @@ class ExtendedPdoTest extends TestCase
         $this->assertFalse($this->pdo->isConnected());
     }
 
+    public function testReconnect()
+    {
+        // uses its own ExtendedPdo, since DecoratedPdo cannot reconnect
+        $pdo = new ExtendedPdo('sqlite::memory:');
+        $pdo->exec('CREATE TABLE t (id INTEGER)');
+        $before = $pdo->getPdo();
+
+        $pdo->reconnect();
+
+        $this->assertTrue($pdo->isConnected());
+        $this->assertNotSame($before, $pdo->getPdo());
+        // a new in-memory database proves the old connection was dropped
+        $this->assertSame(
+            0,
+            (int) $pdo->fetchValue("SELECT COUNT(*) FROM sqlite_master WHERE name = 't'")
+        );
+    }
+
+    public function testReconnectWhenNotConnected()
+    {
+        $pdo = new ExtendedPdo('sqlite::memory:');
+        $this->assertFalse($pdo->isConnected());
+        $pdo->reconnect();
+        $this->assertTrue($pdo->isConnected());
+    }
+
+    public function testReconnectRerunsConnectionQueries()
+    {
+        $pdo = new ExtendedPdo(
+            'sqlite::memory:',
+            null,
+            null,
+            [],
+            ['PRAGMA user_version = 42']
+        );
+        $pdo->exec('PRAGMA user_version = 7');
+
+        $pdo->reconnect();
+
+        $this->assertSame(42, (int) $pdo->fetchValue('PRAGMA user_version'));
+    }
+
     public function testGetPdo()
     {
         $this->assertTrue($this->pdo->isConnected());
