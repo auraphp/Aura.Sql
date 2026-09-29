@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 6.0.2
+
+- Fix array placeholder skipped after a `::` type cast following a string literal (fixes #177), and add a regression test confirming the parser never quotes expressions such as `@@session.time_zone` (#181) by @harikt in https://github.com/auraphp/Aura.Sql/pull/250
+- Add the shared Release workflow by @harikt in https://github.com/auraphp/Aura.Sql/pull/251
+- Mark `$password` as `#[\SensitiveParameter]` in `DecoratedPdo::connect()`, `ExtendedPdo::__construct()` and `ExtendedPdo::connect()` so it is redacted from exception backtraces by @koriym in https://github.com/auraphp/Aura.Sql/pull/252
+
 ## 6.0.1
 
 - Update README.md, continuous-integration.yml, scrutinizer.yml, code coverage by @harikt in https://github.com/auraphp/Aura.Sql/pull/237,  https://github.com/auraphp/Aura.Sql/pull/239 , https://github.com/auraphp/Aura.Sql/pull/240, https://github.com/auraphp/Aura.Sql/pull/241,
